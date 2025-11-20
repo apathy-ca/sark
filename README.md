@@ -15,6 +15,13 @@ SARK provides enterprise-grade security and governance for Model Context Protoco
 
 ✅ **Cloud Ready** - Production-ready with Kubernetes support, health checks, metrics, and comprehensive monitoring.
 
+📋 **[Path to Production](docs/ROADMAP.md)** - Detailed roadmap with timelines, milestones, and resource requirements
+
+**Key Milestones:**
+- **Phase 2 (Weeks 1-6):** Security Hardening - Authentication, Authorization, SIEM Integration
+- **Phase 3 (Weeks 7-12):** Production Polish - Web UI, CLI, Documentation, Pilot Program
+- **Production Launch:** Q1 2026 (Estimated 2-3 months from MVP)
+
 ## Key Features
 
 - **Zero-Trust MCP Architecture** with multi-layer enforcement
@@ -277,10 +284,23 @@ helm install sark ./helm/sark \
 
 ### Documentation
 
+**Planning & Roadmap:**
+- **[Path to Production Roadmap](docs/ROADMAP.md)** - Detailed roadmap with phases, timelines, and milestones
+- **[Production Readiness Checklist](docs/PRODUCTION_READINESS.md)** - Comprehensive checklist for production deployment
+- **[Implementation Plan](docs/IMPLEMENTATION_PLAN.md)** - Granular task breakdown with dependencies and estimates
+
+**Deployment & Operations:**
 - **[Terraform Guide](terraform/README.md)** - Infrastructure as Code for AWS/GCP/Azure
 - **[Deployment Guide](docs/DEPLOYMENT.md)** - Complete Kubernetes deployment instructions
 - **[Monitoring Guide](docs/MONITORING.md)** - Observability, metrics, and logging setup
 - **[Helm Chart](helm/sark/README.md)** - Helm chart usage and configuration
+
+**Architecture & Development:**
+- **[Architecture Guide](docs/ARCHITECTURE.md)** - System architecture and design patterns
+- **[Development Guide](docs/DEVELOPMENT.md)** - Development setup and workflow
+- **[API Integration](docs/API_INTEGRATION.md)** - API integration guide
+- **[Security Guide](docs/SECURITY.md)** - Security requirements and best practices
+- **[OPA Policy Guide](docs/OPA_POLICY_GUIDE.md)** - Policy authoring and management
 
 ### Supported Cloud Platforms
 
