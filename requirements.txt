@@ -1,0 +1,2 @@
+# Core dependencies
+# Add production dependencies here as needed

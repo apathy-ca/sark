@@ -1,0 +1,63 @@
+version: '3.9'
+
+services:
+  # Main application service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: sark-app
+    volumes:
+      - .:/app
+      - pip-cache:/root/.cache/pip
+    environment:
+      - PYTHONPATH=/app/src
+      - ENVIRONMENT=development
+    stdin_open: true
+    tty: true
+    command: python -m pytest --cov
+    networks:
+      - sark-network
+
+  # Additional service example (uncomment and modify as needed)
+  # database:
+  #   image: postgres:15-alpine
+  #   container_name: sark-db
+  #   environment:
+  #     - POSTGRES_USER=sark
+  #     - POSTGRES_PASSWORD=sark
+  #     - POSTGRES_DB=sark
+  #   volumes:
+  #     - postgres-data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+  #   networks:
+  #     - sark-network
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U sark"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+  # Redis example (uncomment and modify as needed)
+  # cache:
+  #   image: redis:7-alpine
+  #   container_name: sark-cache
+  #   ports:
+  #     - "6379:6379"
+  #   networks:
+  #     - sark-network
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+networks:
+  sark-network:
+    driver: bridge
+
+volumes:
+  pip-cache:
+  # postgres-data:
