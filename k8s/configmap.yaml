@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sark-config
+  labels:
+    app: sark
+data:
+  app_version: "0.1.0"
+  environment: "production"
+  log_level: "INFO"
+  json_logs: "true"
+  enable_metrics: "true"
+  cors_origins: '["*"]'
+  api_prefix: "/api/v1"
+---
+# Example secrets manifest (DO NOT commit actual secrets to version control)
+# Store secrets using kubectl create secret or external secret management
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sark-secrets
+  labels:
+    app: sark
+type: Opaque
+# data:
+#   # Base64 encoded values
+#   database_url: <base64-encoded-database-url>
+#   api_key: <base64-encoded-api-key>
+#
+# To create from command line:
+# kubectl create secret generic sark-secrets \
+#   --from-literal=database_url='postgresql://user:pass@host:5432/db' \
+#   --from-literal=api_key='your-secret-api-key'
