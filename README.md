@@ -10,6 +10,8 @@ SARK provides enterprise-grade security and governance for Model Context Protoco
 
 🚀 **Phase 1 - MVP Development** - Building core control plane for 100 pilot servers
 
+✅ **Cloud Ready** - Production-ready with Kubernetes support, health checks, metrics, and comprehensive monitoring.
+
 ## Key Features
 
 - **Zero-Trust MCP Architecture** with multi-layer enforcement
@@ -63,6 +65,92 @@ docker compose run --rm app pytest
 # Access shell in container
 docker compose run --rm app bash
 ```
+
+## Cloud Deployment
+
+SARK is production-ready and cloud-native with comprehensive Kubernetes support.
+
+### Quick Start - Local Testing
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the application
+python -m sark.main
+
+# Access health endpoints
+curl http://localhost:8000/health
+curl http://localhost:8000/ready
+curl http://localhost:8000/metrics
+```
+
+### Infrastructure Provisioning with Terraform
+
+Provision production-ready Kubernetes clusters on major cloud providers:
+
+```bash
+# AWS EKS
+cd terraform/aws
+terraform init
+terraform apply
+
+# GCP GKE
+cd terraform/gcp
+terraform init
+terraform apply
+
+# Azure AKS
+cd terraform/azure
+terraform init
+terraform apply
+```
+
+See **[terraform/README.md](terraform/README.md)** for complete Terraform documentation.
+
+### Kubernetes Deployment
+
+#### Using kubectl
+
+```bash
+# Apply Kubernetes manifests
+kubectl apply -f k8s/configmap.yaml
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
+kubectl apply -f k8s/ingress.yaml
+```
+
+#### Using Helm
+
+```bash
+# Install with Helm
+helm install sark ./helm/sark \
+  --namespace production \
+  --create-namespace
+```
+
+### Cloud Features
+
+- **Health Checks**: `/health`, `/ready`, `/live`, `/startup` endpoints
+- **Metrics**: Prometheus-compatible metrics at `/metrics`
+- **Structured Logging**: JSON logs for cloud log aggregators
+- **Auto-scaling**: Horizontal Pod Autoscaler (HPA) configured
+- **High Availability**: 3 replicas with PodDisruptionBudget
+- **Security**: Non-root containers, security contexts, resource limits
+
+### Documentation
+
+- **[Terraform Guide](terraform/README.md)** - Infrastructure as Code for AWS/GCP/Azure
+- **[Deployment Guide](docs/DEPLOYMENT.md)** - Complete Kubernetes deployment instructions
+- **[Monitoring Guide](docs/MONITORING.md)** - Observability, metrics, and logging setup
+- **[Helm Chart](helm/sark/README.md)** - Helm chart usage and configuration
+
+### Supported Cloud Platforms
+
+- **AWS EKS** - Elastic Kubernetes Service
+- **GCP GKE** - Google Kubernetes Engine
+- **Azure AKS** - Azure Kubernetes Service
+- **Self-managed Kubernetes** - Any standard Kubernetes cluster
 
 ## Development Workflow
 

@@ -1,0 +1,36 @@
+# GCP Configuration
+project_id = "your-gcp-project-id"
+region     = "us-central1"
+
+# GKE Cluster Configuration
+cluster_name       = "sark-cluster"
+cluster_location   = "us-central1" # Use zone for zonal cluster, region for regional
+kubernetes_version = "1.28"
+environment        = "production"
+
+# Network Configuration
+network_name  = "sark-network"
+subnet_cidr   = "10.0.0.0/24"
+pods_cidr     = "10.1.0.0/16"
+services_cidr = "10.2.0.0/16"
+
+# Node Pool Configuration
+node_machine_type = "e2-medium"
+node_count        = 3
+node_min_count    = 1
+node_max_count    = 10
+disk_size_gb      = 50
+disk_type         = "pd-standard"
+
+# Features
+enable_monitoring = true
+enable_logging    = true
+enable_autopilot  = false # Set to true for GKE Autopilot
+
+# Labels
+labels = {
+  project     = "sark"
+  environment = "production"
+  managed-by  = "terraform"
+  owner       = "platform-team"
+}

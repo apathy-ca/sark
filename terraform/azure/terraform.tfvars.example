@@ -1,0 +1,36 @@
+# Azure Configuration
+resource_group_name = "sark-rg"
+location            = "East US"
+
+# AKS Cluster Configuration
+cluster_name       = "sark-cluster"
+kubernetes_version = "1.28"
+environment        = "production"
+
+# Network Configuration
+vnet_address_space      = ["10.0.0.0/16"]
+subnet_address_prefixes = ["10.0.1.0/24"]
+
+# Node Pool Configuration
+node_vm_size     = "Standard_D2s_v3"
+node_count       = 3
+node_min_count   = 1
+node_max_count   = 10
+os_disk_size_gb  = 50
+
+# Features
+enable_auto_scaling = true
+enable_monitoring   = true
+enable_azure_policy = true
+
+# Network
+network_plugin = "azure"   # azure or kubenet
+network_policy = "azure"   # azure or calico
+
+# Tags
+tags = {
+  Project     = "sark"
+  Environment = "production"
+  ManagedBy   = "terraform"
+  Owner       = "platform-team"
+}
