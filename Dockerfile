@@ -21,18 +21,15 @@ RUN apt-get update && apt-get install -y \
 # Development stage
 FROM base as development
 
-# Copy requirements first for better layer caching
-COPY requirements.txt requirements-dev.txt ./
-
-# Install Python dependencies
-RUN pip install --upgrade pip && \
-    pip install -r requirements-dev.txt
+# Copy pyproject.toml first for better layer caching
+COPY pyproject.toml ./
 
 # Copy application code
 COPY . .
 
-# Install application in editable mode
-RUN pip install -e .
+# Install application with dev dependencies in editable mode
+RUN pip install --upgrade pip && \
+    pip install -e .[dev]
 
 # Default command for development
 CMD ["python", "-m", "pytest"]
@@ -40,23 +37,19 @@ CMD ["python", "-m", "pytest"]
 # Production stage
 FROM base as production
 
-# Copy only production requirements
-COPY requirements.txt ./
-
-# Install production dependencies
-RUN pip install --upgrade pip && \
-    pip install -r requirements.txt
-
 # Create non-root user
 RUN useradd -m -u 1000 appuser && \
     chown -R appuser:appuser /app
 
-# Copy application code
-COPY --chown=appuser:appuser src ./src
+# Copy pyproject.toml first for better layer caching
 COPY --chown=appuser:appuser pyproject.toml ./
 
-# Install application
-RUN pip install .
+# Copy application code
+COPY --chown=appuser:appuser src ./src
+
+# Install production dependencies and application
+RUN pip install --upgrade pip && \
+    pip install .
 
 # Switch to non-root user
 USER appuser

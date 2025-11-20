@@ -1,12 +1,49 @@
-# Core dependencies
+# Core dependencies (auto-generated from pyproject.toml)
+# NOTE: This project uses pyproject.toml as the source of truth for dependencies
+# Install with: pip install -e . or pip install .
+
 # Web framework
-fastapi>=0.109.0
-uvicorn[standard]>=0.27.0
+fastapi>=0.100.0
+uvicorn[standard]>=0.23.0
 
-# Observability
-prometheus-client>=0.19.0
-python-json-logger>=2.0.7
+# Data validation and settings
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
 
-# Configuration
-pydantic>=2.5.0
-pydantic-settings>=2.1.0
+# Database
+sqlalchemy>=2.0.0
+alembic>=1.11.0
+asyncpg>=0.29.0
+psycopg2-binary>=2.9.9
+
+# Caching
+redis>=5.0.0
+
+# HTTP client
+httpx>=0.25.0
+
+# Service discovery
+python-consul>=1.1.0
+
+# File upload support
+python-multipart>=0.0.6
+
+# Authentication
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+
+# Logging and observability
+structlog>=23.1.0
+prometheus-client>=0.17.0
+opentelemetry-api>=1.20.0
+opentelemetry-sdk>=1.20.0
+opentelemetry-instrumentation-fastapi>=0.41b0
+
+# Secrets management
+hvac>=1.1.0
+
+# Kubernetes
+kubernetes>=27.0.0
+
+# Message queue
+aiokafka>=0.8.0
