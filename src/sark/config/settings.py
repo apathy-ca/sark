@@ -31,7 +31,10 @@ class Settings(BaseSettings):
     api_reload: bool = False
 
     # Security
-    secret_key: str = Field(..., min_length=32)
+    secret_key: str = Field(
+        default="dev-secret-key-change-in-production-min-32-chars",
+        min_length=32,
+    )
     access_token_expire_minutes: int = 15
     cors_origins: list[str] = ["http://localhost:3000"]
 
@@ -39,7 +42,7 @@ class Settings(BaseSettings):
     postgres_host: str = "localhost"
     postgres_port: int = 5432
     postgres_user: str = "sark"
-    postgres_password: str
+    postgres_password: str = "sark"
     postgres_db: str = "sark"
     postgres_pool_size: int = 20
     postgres_max_overflow: int = 10
@@ -48,7 +51,7 @@ class Settings(BaseSettings):
     timescale_host: str = "localhost"
     timescale_port: int = 5432
     timescale_user: str = "sark"
-    timescale_password: str
+    timescale_password: str = "sark"
     timescale_db: str = "sark_audit"
 
     # Redis
