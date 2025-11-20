@@ -1,205 +1,233 @@
+version: '3.9'
+
+# ============================================================================
+# SARK Docker Compose Configuration
+# ============================================================================
+# This file supports both:
+# - Managed services (deployed via Docker Compose)
+# - External services (existing enterprise deployments)
+#
+# Usage:
+# - Managed mode: docker-compose --profile managed up
+# - External mode: Use .env file to configure external service endpoints
+# - Mixed mode: Enable only specific managed services
+#
+# See docs/deployment/INTEGRATION.md for detailed instructions.
+# ============================================================================
+
 services:
-  # SARK API Server
-  api:
+  # ============================================================================
+  # Main Application Service
+  # ============================================================================
+  app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: sark-api
-    ports:
-      - "8000:8000"
-      - "9090:9090"  # Metrics
-    environment:
-      - ENVIRONMENT=development
-      - DEBUG=true
-      - LOG_LEVEL=INFO
-      - SECRET_KEY=dev-secret-key-change-in-production-min-32-chars
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_USER=sark
-      - POSTGRES_PASSWORD=sark_password
-      - POSTGRES_DB=sark
-      - TIMESCALE_HOST=timescaledb
-      - TIMESCALE_PORT=5432
-      - TIMESCALE_USER=sark
-      - TIMESCALE_PASSWORD=sark_password
-      - TIMESCALE_DB=sark_audit
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - CONSUL_HOST=consul
-      - CONSUL_PORT=8500
-      - OPA_URL=http://opa:8181
-      - VAULT_URL=http://vault:8200
-      - KAFKA_ENABLED=false
-      - METRICS_ENABLED=true
-    depends_on:
-      - postgres
-      - timescaledb
-      - redis
-      - consul
-      - opa
+      target: development
+    container_name: sark-app
     volumes:
-      - ./src:/app/src
-    command: uvicorn sark.api.main:app --host 0.0.0.0 --port 8000 --reload
+      - .:/app
+      - pip-cache:/root/.cache/pip
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/app/src
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      # Database configuration
+      - POSTGRES_ENABLED=${POSTGRES_ENABLED:-false}
+      - POSTGRES_MODE=${POSTGRES_MODE:-managed}
+      - POSTGRES_HOST=${POSTGRES_HOST:-database}
+      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+      - POSTGRES_DB=${POSTGRES_DB:-sark}
+      - POSTGRES_USER=${POSTGRES_USER:-sark}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-sark}
+      # Redis configuration
+      - REDIS_ENABLED=${REDIS_ENABLED:-false}
+      - REDIS_MODE=${REDIS_MODE:-managed}
+      - REDIS_HOST=${REDIS_HOST:-cache}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+      # Kong configuration
+      - KONG_ENABLED=${KONG_ENABLED:-false}
+      - KONG_MODE=${KONG_MODE:-managed}
+      - KONG_ADMIN_URL=${KONG_ADMIN_URL:-http://kong:8001}
+      - KONG_PROXY_URL=${KONG_PROXY_URL:-http://kong:8000}
+    stdin_open: true
+    tty: true
+    command: python -m pytest --cov
     networks:
       - sark-network
+    depends_on:
+      database:
+        condition: service_healthy
+        required: false
+      cache:
+        condition: service_healthy
+        required: false
+      kong:
+        condition: service_healthy
+        required: false
 
-  # PostgreSQL - Main Database
-  postgres:
+  # ============================================================================
+  # PostgreSQL Database (Managed Service)
+  # ============================================================================
+  # Use profile 'managed' to deploy this service locally
+  # For external PostgreSQL, configure via .env file
+  # ============================================================================
+  database:
     image: postgres:15-alpine
-    container_name: sark-postgres
+    container_name: sark-db
+    profiles:
+      - managed
+      - full
     environment:
-      - POSTGRES_USER=sark
-      - POSTGRES_PASSWORD=sark_password
-      - POSTGRES_DB=sark
-    ports:
-      - "5432:5432"
+      - POSTGRES_USER=${POSTGRES_USER:-sark}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-sark}
+      - POSTGRES_DB=${POSTGRES_DB:-sark}
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres-data:/var/lib/postgresql/data
+      - ./scripts/db/init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
     networks:
       - sark-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sark"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sark}"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
+    restart: unless-stopped
 
-  # TimescaleDB - Audit Database
-  timescaledb:
-    image: timescale/timescaledb:latest-pg15
-    container_name: sark-timescaledb
-    environment:
-      - POSTGRES_USER=sark
-      - POSTGRES_PASSWORD=sark_password
-      - POSTGRES_DB=sark_audit
-    ports:
-      - "5433:5432"
-    volumes:
-      - timescale_data:/var/lib/postgresql/data
-      - ./scripts/init-timescale.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - sark-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sark"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # Redis - Cache and Session Store
-  redis:
+  # ============================================================================
+  # Redis Cache (Managed Service)
+  # ============================================================================
+  # Use profile 'managed' to deploy this service locally
+  # For external Redis, configure via .env file
+  # ============================================================================
+  cache:
     image: redis:7-alpine
-    container_name: sark-redis
-    ports:
-      - "6379:6379"
+    container_name: sark-cache
+    profiles:
+      - managed
+      - full
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
     volumes:
-      - redis_data:/data
-    command: redis-server --appendonly yes
+      - redis-data:/data
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
     networks:
       - sark-network
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD:-}", "ping"]
       interval: 10s
-      timeout: 3s
+      timeout: 5s
       retries: 5
+      start_period: 5s
+    restart: unless-stopped
 
-  # Consul - Service Discovery
-  consul:
-    image: consul:1.16
-    container_name: sark-consul
-    ports:
-      - "8500:8500"
-      - "8600:8600/udp"
-    command: agent -server -ui -bootstrap-expect=1 -client=0.0.0.0
-    volumes:
-      - consul_data:/consul/data
-    networks:
-      - sark-network
-    healthcheck:
-      test: ["CMD", "consul", "members"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-
-  # Open Policy Agent
-  opa:
-    image: openpolicyagent/opa:latest
-    container_name: sark-opa
-    ports:
-      - "8181:8181"
-    command:
-      - "run"
-      - "--server"
-      - "--addr=0.0.0.0:8181"
-      - "--log-level=info"
-      - "/policies"
-    volumes:
-      - ./opa/policies:/policies
-    networks:
-      - sark-network
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8181/health"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-
-  # HashiCorp Vault (Development Mode)
-  vault:
-    image: vault:latest
-    container_name: sark-vault
-    ports:
-      - "8200:8200"
+  # ============================================================================
+  # Kong API Gateway (Managed Service)
+  # ============================================================================
+  # Kong requires a database (PostgreSQL) to store configuration
+  # Use profile 'managed' or 'kong' to deploy this service locally
+  # For external Kong, configure via .env file
+  # ============================================================================
+  kong-database:
+    image: postgres:15-alpine
+    container_name: sark-kong-db
+    profiles:
+      - managed
+      - kong
+      - full
     environment:
-      - VAULT_DEV_ROOT_TOKEN_ID=dev-root-token
-      - VAULT_DEV_LISTEN_ADDRESS=0.0.0.0:8200
-    cap_add:
-      - IPC_LOCK
+      - POSTGRES_USER=kong
+      - POSTGRES_PASSWORD=${KONG_DB_PASSWORD:-kong}
+      - POSTGRES_DB=kong
+    volumes:
+      - kong-data:/var/lib/postgresql/data
     networks:
       - sark-network
     healthcheck:
-      test: ["CMD", "vault", "status"]
+      test: ["CMD-SHELL", "pg_isready -U kong"]
       interval: 10s
-      timeout: 3s
+      timeout: 5s
       retries: 5
+      start_period: 10s
+    restart: unless-stopped
 
-  # Prometheus - Metrics
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: sark-prometheus
-    ports:
-      - "9091:9090"
-    volumes:
-      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus_data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-    networks:
-      - sark-network
-
-  # Grafana - Dashboards
-  grafana:
-    image: grafana/grafana:latest
-    container_name: sark-grafana
-    ports:
-      - "3000:3000"
+  kong-migrations:
+    image: kong:3.5-alpine
+    container_name: sark-kong-migrations
+    profiles:
+      - managed
+      - kong
+      - full
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-      - GF_USERS_ALLOW_SIGN_UP=false
-    volumes:
-      - grafana_data:/var/lib/grafana
+      - KONG_DATABASE=postgres
+      - KONG_PG_HOST=kong-database
+      - KONG_PG_PASSWORD=${KONG_DB_PASSWORD:-kong}
+      - KONG_PG_USER=kong
+      - KONG_PG_DATABASE=kong
+    command: kong migrations bootstrap
     networks:
       - sark-network
     depends_on:
-      - prometheus
+      kong-database:
+        condition: service_healthy
+    restart: on-failure
+
+  kong:
+    image: kong:3.5-alpine
+    container_name: sark-kong
+    profiles:
+      - managed
+      - kong
+      - full
+    environment:
+      - KONG_DATABASE=postgres
+      - KONG_PG_HOST=kong-database
+      - KONG_PG_USER=kong
+      - KONG_PG_PASSWORD=${KONG_DB_PASSWORD:-kong}
+      - KONG_PG_DATABASE=kong
+      - KONG_PROXY_ACCESS_LOG=/dev/stdout
+      - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+      - KONG_PROXY_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_LISTEN=0.0.0.0:8001
+      - KONG_ADMIN_GUI_URL=http://localhost:8002
+    ports:
+      - "8000:8000"  # Proxy
+      - "8001:8001"  # Admin API
+      - "8443:8443"  # Proxy SSL
+      - "8444:8444"  # Admin API SSL
+    networks:
+      - sark-network
+    depends_on:
+      kong-database:
+        condition: service_healthy
+      kong-migrations:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "kong", "health"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
 
 networks:
   sark-network:
     driver: bridge
+    name: sark-network
 
 volumes:
-  postgres_data:
-  timescale_data:
-  redis_data:
-  consul_data:
-  prometheus_data:
-  grafana_data:
+  pip-cache:
+    name: sark-pip-cache
+  postgres-data:
+    name: sark-postgres-data
+  redis-data:
+    name: sark-redis-data
+  kong-data:
+    name: sark-kong-data

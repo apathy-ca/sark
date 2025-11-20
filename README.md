@@ -22,6 +22,15 @@ SARK provides enterprise-grade security and governance for Model Context Protoco
 - **Kong API Gateway Integration** for edge security
 - **Comprehensive Threat Modeling** addressing MCP-specific attacks
 
+## Features
+
+- **🔌 Enterprise Integration**: Connect to existing Kong, PostgreSQL, and Redis deployments
+- **🐳 Flexible Deployment**: Support for both managed (Docker Compose) and external services
+- **⚙️ Configuration Management**: Environment-based configuration with validation
+- **🔒 Security**: Built-in SSL/TLS support, connection pooling, and secrets management
+- **📊 Health Checks**: Comprehensive service connectivity testing
+- **🏢 Enterprise-Ready**: Support for Kong Enterprise, Redis Sentinel, and PostgreSQL HA
+
 ## Requirements
 
 - Python 3.11+
@@ -32,6 +41,11 @@ SARK provides enterprise-grade security and governance for Model Context Protoco
 - Open Policy Agent 0.60+
 - Kong Gateway 3.8+ (for production)
 - Kubernetes 1.28+ (for production deployment)
+
+### Optional (for external services)
+- Access to existing Kong API Gateway
+- PostgreSQL database credentials
+- Redis cache credentials
 
 ## Development Setup
 
@@ -56,8 +70,14 @@ pre-commit install
 ### Docker Development
 
 ```bash
-# Build and start services
+# Build and start services (app only, using external services)
 docker compose up --build
+
+# Start with managed PostgreSQL and Redis
+docker compose --profile managed up --build
+
+# Start with all managed services (Kong included)
+docker compose --profile full up --build
 
 # Run tests in container
 docker compose run --rm app pytest
@@ -151,6 +171,47 @@ helm install sark ./helm/sark \
 - **GCP GKE** - Google Kubernetes Engine
 - **Azure AKS** - Azure Kubernetes Service
 - **Self-managed Kubernetes** - Any standard Kubernetes cluster
+
+### Enterprise Integration Setup
+
+SARK can integrate with existing Kong, PostgreSQL, and Redis deployments. See the [Quick Start Guide](docs/deployment/QUICKSTART.md) for detailed instructions.
+
+#### Quick Example: Connect to Existing Services
+
+1. Copy the environment template:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Edit `.env` to configure external services:
+   ```bash
+   # PostgreSQL
+   POSTGRES_ENABLED=true
+   POSTGRES_MODE=external
+   POSTGRES_HOST=postgres.example.com
+   POSTGRES_PASSWORD=your_password
+
+   # Redis
+   REDIS_ENABLED=true
+   REDIS_MODE=external
+   REDIS_HOST=redis.example.com
+   REDIS_PASSWORD=your_password
+
+   # Kong
+   KONG_ENABLED=true
+   KONG_MODE=external
+   KONG_ADMIN_URL=https://kong-admin.example.com
+   KONG_ADMIN_API_KEY=your_api_key
+   ```
+
+3. Start the application:
+   ```bash
+   docker compose up app
+   ```
+
+**📚 Documentation:**
+- [Quick Start Guide](docs/deployment/QUICKSTART.md) - Get started in 5 minutes
+- [Integration Guide](docs/deployment/INTEGRATION.md) - Complete reference for enterprise deployments
 
 ## Development Workflow
 
