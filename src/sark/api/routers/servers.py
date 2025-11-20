@@ -1,5 +1,6 @@
 """MCP Server registration and management endpoints."""
 
+from typing import Any
 from uuid import UUID
 
 import structlog
@@ -22,7 +23,7 @@ class ToolDefinition(BaseModel):
 
     name: str = Field(..., description="Tool name")
     description: str | None = Field(None, description="Tool description")
-    parameters: dict[str, any] = Field(default_factory=dict, description="Tool parameters schema")
+    parameters: dict[str, Any] = Field(default_factory=dict, description="Tool parameters schema")
     sensitivity_level: str = Field(default="medium", pattern="^(low|medium|high|critical)$")
     signature: str | None = Field(None, description="Cryptographic signature")
     requires_approval: bool = Field(default=False)
@@ -41,7 +42,7 @@ class ServerRegistrationRequest(BaseModel):
     description: str | None = Field(None, max_length=1000)
     sensitivity_level: str = Field(default="medium", pattern="^(low|medium|high|critical)$")
     signature: str | None = None
-    metadata: dict[str, any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class ServerResponse(BaseModel):
@@ -123,7 +124,7 @@ async def register_server(
 async def get_server(
     server_id: UUID,
     db: AsyncSession = Depends(get_db),
-) -> dict[str, any]:
+) -> dict[str, Any]:
     """Get server details by ID."""
     discovery_service = DiscoveryService(db)
     server = await discovery_service.get_server(server_id)
@@ -163,7 +164,7 @@ async def get_server(
 async def list_servers(
     status: str | None = None,
     db: AsyncSession = Depends(get_db),
-) -> list[dict[str, any]]:
+) -> list[dict[str, Any]]:
     """List all registered MCP servers."""
     discovery_service = DiscoveryService(db)
 

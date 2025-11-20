@@ -1,5 +1,6 @@
 """MCP Server discovery and registration service."""
 
+from typing import Any
 from uuid import UUID
 
 import consul
@@ -33,7 +34,7 @@ class DiscoveryService:
         transport: TransportType,
         mcp_version: str,
         capabilities: list[str],
-        tools: list[dict[str, any]],
+        tools: list[dict[str, Any]],
         owner_id: UUID | None = None,
         team_id: UUID | None = None,
         endpoint: str | None = None,
@@ -42,7 +43,7 @@ class DiscoveryService:
         sensitivity_level: str = "medium",
         signature: str | None = None,
         tags: list[str] | None = None,
-        metadata: dict[str, any] | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> MCPServer:
         """
         Register a new MCP server.

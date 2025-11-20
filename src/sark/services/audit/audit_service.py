@@ -1,6 +1,7 @@
 """Audit event capture and processing service."""
 
 from datetime import UTC, datetime
+from typing import Any
 from uuid import UUID
 
 import structlog
@@ -31,7 +32,7 @@ class AuditService:
         ip_address: str | None = None,
         user_agent: str | None = None,
         request_id: str | None = None,
-        details: dict[str, any] | None = None,
+        details: dict[str, Any] | None = None,
     ) -> AuditEvent:
         """
         Log an audit event to TimescaleDB.
@@ -97,7 +98,7 @@ class AuditService:
         server_id: UUID | None = None,
         ip_address: str | None = None,
         request_id: str | None = None,
-        details: dict[str, any] | None = None,
+        details: dict[str, Any] | None = None,
     ) -> AuditEvent:
         """
         Log an authorization decision (allow or deny).
@@ -144,7 +145,7 @@ class AuditService:
         user_email: str,
         server_id: UUID,
         tool_name: str,
-        parameters: dict[str, any] | None = None,
+        parameters: dict[str, Any] | None = None,
         ip_address: str | None = None,
         request_id: str | None = None,
     ) -> AuditEvent:
@@ -181,7 +182,7 @@ class AuditService:
         user_email: str,
         server_id: UUID,
         server_name: str,
-        details: dict[str, any] | None = None,
+        details: dict[str, Any] | None = None,
     ) -> AuditEvent:
         """
         Log MCP server registration.
@@ -211,7 +212,7 @@ class AuditService:
         user_email: str | None,
         violation_type: str,
         ip_address: str | None = None,
-        details: dict[str, any] | None = None,
+        details: dict[str, Any] | None = None,
     ) -> AuditEvent:
         """
         Log a security violation event.

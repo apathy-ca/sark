@@ -1,5 +1,6 @@
 """Policy evaluation endpoints."""
 
+from typing import Any
 from uuid import UUID
 
 import structlog
@@ -19,7 +20,7 @@ class PolicyEvaluationRequest(BaseModel):
     action: str = Field(..., description="Action to authorize (e.g., 'tool:invoke')")
     tool: str | None = Field(None, description="Tool name")
     server_id: UUID | None = Field(None, description="Server ID")
-    parameters: dict[str, any] = Field(default_factory=dict)
+    parameters: dict[str, Any] = Field(default_factory=dict)
 
 
 class PolicyEvaluationResponse(BaseModel):
@@ -27,7 +28,7 @@ class PolicyEvaluationResponse(BaseModel):
 
     decision: str = Field(..., description="'allow' or 'deny'")
     reason: str = Field(..., description="Reason for decision")
-    filtered_parameters: dict[str, any] | None = None
+    filtered_parameters: dict[str, Any] | None = None
     audit_id: str | None = None
 
 

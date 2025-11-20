@@ -1,5 +1,7 @@
 """Open Policy Agent client for authorization decisions."""
 
+from typing import Any
+
 import httpx
 import structlog
 from pydantic import BaseModel
@@ -13,11 +15,11 @@ settings = get_settings()
 class AuthorizationInput(BaseModel):
     """Authorization request input."""
 
-    user: dict[str, any]
+    user: dict[str, Any]
     action: str
-    tool: dict[str, any] | None = None
-    server: dict[str, any] | None = None
-    context: dict[str, any]
+    tool: dict[str, Any] | None = None
+    server: dict[str, Any] | None = None
+    context: dict[str, Any]
 
 
 class AuthorizationDecision(BaseModel):
@@ -25,7 +27,7 @@ class AuthorizationDecision(BaseModel):
 
     allow: bool
     reason: str
-    filtered_parameters: dict[str, any] | None = None
+    filtered_parameters: dict[str, Any] | None = None
     audit_id: str | None = None
 
 
