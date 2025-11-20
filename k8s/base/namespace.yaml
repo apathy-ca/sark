@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sark-system
+  labels:
+    name: sark-system
+    app.kubernetes.io/name: sark
+    app.kubernetes.io/part-of: sark

@@ -1,0 +1,149 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sark-api
+  namespace: sark-system
+  labels:
+    app: sark-api
+    component: control-plane
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: sark-api
+  template:
+    metadata:
+      labels:
+        app: sark-api
+        component: control-plane
+    spec:
+      serviceAccountName: sark-api
+      containers:
+      - name: api
+        image: sark/api:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8000
+          protocol: TCP
+        - name: metrics
+          containerPort: 9090
+          protocol: TCP
+        env:
+        - name: ENVIRONMENT
+          value: "production"
+        - name: DEBUG
+          value: "false"
+        - name: LOG_LEVEL
+          value: "INFO"
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: sark-secrets
+              key: secret-key
+        - name: POSTGRES_HOST
+          value: "postgres.sark-system.svc.cluster.local"
+        - name: POSTGRES_PORT
+          value: "5432"
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: username
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: password
+        - name: POSTGRES_DB
+          value: "sark"
+        - name: TIMESCALE_HOST
+          value: "timescaledb.sark-system.svc.cluster.local"
+        - name: TIMESCALE_PORT
+          value: "5432"
+        - name: TIMESCALE_USER
+          valueFrom:
+            secretKeyRef:
+              name: timescale-credentials
+              key: username
+        - name: TIMESCALE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: timescale-credentials
+              key: password
+        - name: TIMESCALE_DB
+          value: "sark_audit"
+        - name: REDIS_HOST
+          value: "redis.sark-system.svc.cluster.local"
+        - name: REDIS_PORT
+          value: "6379"
+        - name: CONSUL_HOST
+          value: "consul.sark-system.svc.cluster.local"
+        - name: CONSUL_PORT
+          value: "8500"
+        - name: OPA_URL
+          value: "http://opa.sark-system.svc.cluster.local:8181"
+        - name: VAULT_URL
+          value: "http://vault.sark-system.svc.cluster.local:8200"
+        - name: METRICS_ENABLED
+          value: "true"
+        resources:
+          requests:
+            cpu: 500m
+            memory: 512Mi
+          limits:
+            cpu: 2000m
+            memory: 2Gi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sark-api
+  namespace: sark-system
+  labels:
+    app: sark-api
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 8000
+    targetPort: http
+    protocol: TCP
+  - name: metrics
+    port: 9090
+    targetPort: metrics
+    protocol: TCP
+  selector:
+    app: sark-api
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sark-api
+  namespace: sark-system
+  labels:
+    app: sark-api

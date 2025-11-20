@@ -1,4 +1,4 @@
-.PHONY: help install install-dev test lint format type-check clean docker-build docker-up docker-down pre-commit
+.PHONY: help install install-dev test lint format type-check clean docker-build docker-up docker-down pre-commit run
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
@@ -60,6 +60,9 @@ clean: ## Clean up generated files
 	find . -type f -name '*.pyc' -delete
 	find . -type f -name '*.pyo' -delete
 
+run: ## Run SARK API server locally
+	uvicorn sark.api.main:app --reload --host 0.0.0.0 --port 8000
+
 docker-build: ## Build Docker images
 	docker compose build
 
@@ -74,6 +77,12 @@ docker-test: ## Run tests in Docker
 
 docker-shell: ## Open shell in Docker container
 	docker compose run --rm app bash
+
+docker-logs: ## View Docker logs
+	docker compose logs -f
+
+docker-ps: ## Show running containers
+	docker compose ps
 
 docker-clean: ## Clean Docker containers and volumes
 	docker compose down -v
@@ -91,6 +100,37 @@ docker-build-test: ## Test Docker builds (dev and prod)
 	@echo "Testing production Docker build..."
 	docker build --target production -t sark:prod-test .
 
+# Database commands
+db-shell: ## Connect to PostgreSQL database
+	docker compose exec postgres psql -U sark sark
+
+audit-db-shell: ## Connect to TimescaleDB audit database
+	docker compose exec timescaledb psql -U sark sark_audit
+
+# OPA commands
+opa-test: ## Test OPA policies
+	docker compose exec opa opa test /policies -v
+
+opa-check: ## Check OPA policy syntax
+	docker compose exec opa opa check /policies
+
+# Kubernetes commands
+k8s-deploy: ## Deploy to Kubernetes
+	kubectl apply -f k8s/base/namespace.yaml
+	kubectl apply -f k8s/base/opa-deployment.yaml
+	kubectl apply -f k8s/base/deployment.yaml
+
+k8s-status: ## Check Kubernetes deployment status
+	kubectl get all -n sark-system
+
+k8s-logs: ## View Kubernetes logs
+	kubectl logs -f deployment/sark-api -n sark-system
+
+k8s-delete: ## Delete Kubernetes resources
+	kubectl delete -f k8s/base/deployment.yaml
+	kubectl delete -f k8s/base/opa-deployment.yaml
+	kubectl delete -f k8s/base/namespace.yaml
+
 ci-local: quality test ## Run basic CI checks locally (quality + tests)
 
 ci-all: quality test security docker-build-test ## Run all CI checks locally (quality, tests, security, docker)
@@ -107,3 +147,5 @@ ci-all: quality test security docker-build-test ## Run all CI checks locally (qu
 setup-dev: install-dev ## Complete development setup
 	@echo "Development environment setup complete!"
 	@echo "Run 'make test' to verify everything works"
+
+dev: docker-up run ## Start dependencies and run API locally
