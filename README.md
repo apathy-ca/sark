@@ -1,10 +1,127 @@
 # Sark
 
+> *"He's not any kind of user, SARK, he's a program."*
+> —MCP, probably
+
 A large Python application built with Python 3.11.
 
 ## Project Status
 
 🚧 **In Development** - Project structure and CI/CD setup complete, awaiting design document.
+
+## Enterprise Integration
+
+SARK is designed to seamlessly integrate within enterprise environments, serving as a central orchestration and automation platform.
+
+### System Architecture Overview
+
+```mermaid
+graph TB
+    subgraph "Enterprise Systems"
+        IDP[Identity Provider<br/>LDAP/AD/SSO]
+        CICD[CI/CD Platform<br/>Jenkins/GitLab/GitHub]
+        MON[Monitoring<br/>Prometheus/Grafana]
+        LOG[Log Aggregation<br/>ELK/Splunk]
+    end
+
+    subgraph "SARK Core"
+        API[API Gateway]
+        AUTH[Authentication]
+        CORE[Core Engine]
+        QUEUE[Task Queue]
+        STORE[Data Store]
+    end
+
+    subgraph "External Integrations"
+        CLOUD[Cloud Providers<br/>AWS/GCP/Azure]
+        DB[Databases<br/>PostgreSQL/Redis]
+        MSG[Message Brokers<br/>RabbitMQ/Kafka]
+        THIRD[Third-Party APIs]
+    end
+
+    IDP -->|SAML/OIDC| AUTH
+    CICD -->|Webhooks| API
+    API --> CORE
+    AUTH --> CORE
+    CORE --> QUEUE
+    CORE --> STORE
+    CORE --> CLOUD
+    CORE --> DB
+    CORE --> MSG
+    CORE --> THIRD
+    CORE -->|Metrics| MON
+    CORE -->|Logs| LOG
+
+    style SARK Core fill:#4a90e2
+    style API fill:#50c878
+    style CORE fill:#50c878
+```
+
+### Data Flow Architecture
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Enterprise SSO
+    participant SARK API
+    participant SARK Core
+    participant External Systems
+    participant Monitoring
+
+    User->>SARK API: Request (with token)
+    SARK API->>Enterprise SSO: Validate token
+    Enterprise SSO-->>SARK API: Token valid
+    SARK API->>SARK Core: Process request
+    SARK Core->>External Systems: Execute operations
+    External Systems-->>SARK Core: Results
+    SARK Core->>Monitoring: Log metrics/events
+    SARK Core-->>SARK API: Response
+    SARK API-->>User: Return results
+```
+
+### Integration Points
+
+```mermaid
+graph LR
+    subgraph "Input Channels"
+        REST[REST API]
+        WH[Webhooks]
+        CLI[CLI Tools]
+        SDK[SDK/Libraries]
+    end
+
+    subgraph "SARK Platform"
+        CORE[Core Services]
+    end
+
+    subgraph "Output Integrations"
+        NOTIFY[Notifications<br/>Slack/Teams/Email]
+        REPORT[Reporting<br/>Dashboards/BI]
+        AUDIT[Audit Logs<br/>Compliance]
+        STORAGE[Object Storage<br/>S3/GCS/Azure Blob]
+    end
+
+    REST --> CORE
+    WH --> CORE
+    CLI --> CORE
+    SDK --> CORE
+
+    CORE --> NOTIFY
+    CORE --> REPORT
+    CORE --> AUDIT
+    CORE --> STORAGE
+
+    style CORE fill:#4a90e2
+```
+
+### Key Enterprise Features
+
+- **🔐 Enterprise Authentication**: Seamless integration with existing identity providers (LDAP, Active Directory, SAML, OIDC)
+- **📊 Observability**: Built-in metrics, logging, and tracing for enterprise monitoring platforms
+- **🔄 CI/CD Integration**: Native webhook support for automated workflows
+- **🛡️ Security & Compliance**: Audit logging, encryption at rest and in transit, role-based access control
+- **⚡ Scalability**: Containerized deployment with horizontal scaling capabilities
+- **🔌 Extensible**: Plugin architecture for custom integrations and workflows
 
 ## Requirements
 
