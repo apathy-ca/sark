@@ -35,6 +35,18 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 15
     cors_origins: list[str] = ["http://localhost:3000"]
 
+    # JWT Configuration
+    jwt_secret_key: str | None = None  # For HS256, defaults to secret_key if not set
+    jwt_public_key: str | None = None  # For RS256 (PEM format)
+    jwt_algorithm: str = Field(default="HS256", pattern="^(HS256|RS256)$")
+    jwt_expiration_minutes: int = 60
+    jwt_issuer: str | None = None
+    jwt_audience: str | None = None
+
+    # Refresh Token Configuration
+    refresh_token_expiration_days: int = 7
+    refresh_token_rotation_enabled: bool = True
+
     # PostgreSQL Database
     postgres_host: str = "localhost"
     postgres_port: int = 5432
