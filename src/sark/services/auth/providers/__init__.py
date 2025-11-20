@@ -5,5 +5,6 @@ identity systems including LDAP, SAML, and OIDC.
 """
 
 from sark.services.auth.providers.ldap import LDAPProvider
+from sark.services.auth.providers.oidc import OIDCProvider
 
-__all__ = ["LDAPProvider"]
+__all__ = ["LDAPProvider", "OIDCProvider"]

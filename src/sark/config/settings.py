@@ -60,6 +60,15 @@ class Settings(BaseSettings):
     ldap_use_ssl: bool = True  # Use LDAPS
     ldap_role_mapping: dict[str, str] = {}  # Map LDAP groups to SARK roles
 
+    # OIDC (OpenID Connect) Configuration
+    oidc_enabled: bool = False
+    oidc_discovery_url: str | None = None  # e.g., "https://idp.example.com/.well-known/openid-configuration"
+    oidc_client_id: str | None = None
+    oidc_client_secret: str | None = None
+    oidc_redirect_uri: str | None = None  # e.g., "https://sark.example.com/api/v1/auth/oidc/callback"
+    oidc_scopes: list[str] = ["openid", "profile", "email"]
+    oidc_use_pkce: bool = True  # Use PKCE for enhanced security
+
     # PostgreSQL Database
     postgres_host: str = "localhost"
     postgres_port: int = 5432

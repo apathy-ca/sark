@@ -15,10 +15,14 @@ import redis.asyncio as aioredis
 from sark.api.dependencies import CurrentUser, get_current_user
 from sark.config import get_settings
 from sark.services.auth import TokenService
-from sark.services.auth.providers import LDAPProvider
+from sark.services.auth.providers import LDAPProvider, OIDCProvider
 from sark.services.auth.providers.ldap import (
     LDAPAuthenticationError,
     LDAPConnectionError,
+)
+from sark.services.auth.providers.oidc import (
+    OIDCAuthenticationError,
+    OIDCConfigurationError,
 )
 
 logger = structlog.get_logger(__name__)
@@ -231,6 +235,214 @@ async def ldap_login(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Login failed due to internal error",
+        ) from e
+
+
+@router.get(
+    "/oidc/login",
+    status_code=status.HTTP_307_TEMPORARY_REDIRECT,
+    summary="Initiate OIDC login",
+    description="Redirect user to OIDC identity provider for authentication",
+    responses={
+        307: {"description": "Redirect to identity provider"},
+        503: {"description": "OIDC service unavailable"},
+    },
+)
+async def oidc_login(
+    redis_client: aioredis.Redis = Depends(get_redis_client),
+):
+    """Initiate OIDC authentication flow.
+
+    This endpoint generates an authorization URL and redirects the user
+    to the identity provider for authentication.
+
+    Args:
+        redis_client: Redis client for storing state and PKCE verifier
+
+    Returns:
+        Redirect response to IdP authorization endpoint
+
+    Raises:
+        HTTPException: If OIDC is not enabled or configuration fails
+    """
+    if not settings.oidc_enabled:
+        raise HTTPException(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+            detail="OIDC authentication is not enabled",
+        )
+
+    logger.info("oidc_login_initiated")
+
+    try:
+        from fastapi.responses import RedirectResponse
+
+        # Initialize OIDC provider
+        oidc_provider = OIDCProvider(settings=settings)
+
+        # Generate authorization URL with state and PKCE
+        authorization_url, state, code_verifier = await oidc_provider.get_authorization_url()
+
+        # Store state and code_verifier in Redis (5 minute TTL)
+        await redis_client.setex(f"oidc_state:{state}", 300, "1")
+        if code_verifier:
+            await redis_client.setex(f"oidc_verifier:{state}", 300, code_verifier)
+
+        logger.info("oidc_redirect_to_idp", state=state[:8] + "...")
+
+        return RedirectResponse(url=authorization_url, status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+
+    except OIDCConfigurationError as e:
+        logger.error("oidc_configuration_error", error=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="OIDC configuration error",
+        ) from e
+
+    except Exception as e:
+        logger.error(
+            "oidc_login_error",
+            error=str(e),
+            error_type=type(e).__name__,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to initiate OIDC login",
+        ) from e
+
+
+@router.get(
+    "/oidc/callback",
+    response_model=LoginResponse,
+    status_code=status.HTTP_200_OK,
+    summary="OIDC callback",
+    description="Handle callback from OIDC identity provider and complete authentication",
+    responses={
+        200: {"description": "Login successful"},
+        401: {"description": "Authentication failed"},
+        503: {"description": "OIDC service unavailable"},
+    },
+)
+async def oidc_callback(
+    code: str,
+    state: str,
+    redis_client: aioredis.Redis = Depends(get_redis_client),
+    token_service: TokenService = Depends(get_token_service),
+):
+    """Handle OIDC callback and complete authentication.
+
+    This endpoint receives the authorization code from the identity provider,
+    exchanges it for tokens, validates the ID token, and issues SARK tokens.
+
+    Args:
+        code: Authorization code from IdP
+        state: State parameter for CSRF protection
+        redis_client: Redis client for retrieving state and PKCE verifier
+        token_service: Token service for issuing tokens
+
+    Returns:
+        Access token, refresh token, and user information
+
+    Raises:
+        HTTPException: If authentication fails
+    """
+    if not settings.oidc_enabled:
+        raise HTTPException(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+            detail="OIDC authentication is not enabled",
+        )
+
+    logger.info("oidc_callback_received", state=state[:8] + "...")
+
+    try:
+        # Validate state (CSRF protection)
+        state_valid = await redis_client.get(f"oidc_state:{state}")
+        if not state_valid:
+            logger.warning("oidc_invalid_state", state=state[:8] + "...")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid or expired state parameter",
+            )
+
+        # Get code_verifier if PKCE was used
+        code_verifier = None
+        if settings.oidc_use_pkce:
+            code_verifier_bytes = await redis_client.get(f"oidc_verifier:{state}")
+            if code_verifier_bytes:
+                code_verifier = (
+                    code_verifier_bytes.decode("utf-8")
+                    if isinstance(code_verifier_bytes, bytes)
+                    else code_verifier_bytes
+                )
+
+        # Clean up state and verifier from Redis
+        await redis_client.delete(f"oidc_state:{state}", f"oidc_verifier:{state}")
+
+        # Initialize OIDC provider
+        oidc_provider = OIDCProvider(settings=settings)
+
+        # Complete authentication
+        user_info = await oidc_provider.authenticate(
+            code=code,
+            code_verifier=code_verifier,
+        )
+
+        # Create access token
+        access_token = await token_service.create_access_token(user_info)
+
+        # Create refresh token
+        refresh_token, _ = await token_service.create_refresh_token(user_info["user_id"])
+
+        # Calculate expiry in seconds
+        expires_in = settings.jwt_expiration_minutes * 60
+
+        # Prepare user info for response
+        user_response = {
+            "user_id": user_info["user_id"],
+            "username": user_info.get("username"),
+            "email": user_info.get("email"),
+            "name": user_info.get("name"),
+            "roles": user_info.get("roles", []),
+            "teams": user_info.get("teams", []),
+        }
+
+        logger.info(
+            "oidc_login_success",
+            user_id=user_info["user_id"],
+            email=user_info.get("email"),
+            roles=user_info.get("roles", []),
+        )
+
+        return LoginResponse(
+            access_token=access_token,
+            token_type="bearer",
+            expires_in=expires_in,
+            refresh_token=refresh_token,
+            user=user_response,
+        )
+
+    except OIDCAuthenticationError as e:
+        logger.warning("oidc_authentication_failed", error=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="OIDC authentication failed",
+        ) from e
+
+    except OIDCConfigurationError as e:
+        logger.error("oidc_configuration_error", error=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="OIDC configuration error",
+        ) from e
+
+    except Exception as e:
+        logger.error(
+            "oidc_callback_error",
+            error=str(e),
+            error_type=type(e).__name__,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="OIDC authentication failed",
         ) from e
 
 

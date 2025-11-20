@@ -48,6 +48,8 @@ class AuthMiddleware(BaseHTTPMiddleware):
         "/openapi.json",
         "/redoc",
         "/api/v1/auth/login/ldap",  # LDAP login is public
+        "/api/v1/auth/oidc/login",  # OIDC login initiation is public
+        "/api/v1/auth/oidc/callback",  # OIDC callback is public
         "/api/v1/auth/refresh",  # Token refresh doesn't require access token
     }
 
