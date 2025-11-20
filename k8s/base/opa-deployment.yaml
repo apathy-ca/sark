@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opa
+  namespace: sark-system
+  labels:
+    app: opa
+    component: policy-engine
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: opa
+  template:
+    metadata:
+      labels:
+        app: opa
+        component: policy-engine
+    spec:
+      containers:
+      - name: opa
+        image: openpolicyagent/opa:latest
+        args:
+        - "run"
+        - "--server"
+        - "--addr=0.0.0.0:8181"
+        - "--log-level=info"
+        - "/policies"
+        ports:
+        - name: http
+          containerPort: 8181
+          protocol: TCP
+        volumeMounts:
+        - name: policies
+          mountPath: /policies
+          readOnly: true
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health?bundle=true
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: policies
+        configMap:
+          name: opa-policies
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opa
+  namespace: sark-system
+  labels:
+    app: opa
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 8181
+    targetPort: http
+    protocol: TCP
+  selector:
+    app: opa
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opa-policies
+  namespace: sark-system
+data:
+  mcp_authorization.rego: |
+    # MCP Authorization Policy
+    package mcp
+
+    import future.keywords.if
+    import future.keywords.in
+
+    default allow := false
+
+    allow if {
+        input.action == "tool:invoke"
+        input.tool.owner == input.user.id
+    }
+
+    allow if {
+        input.action == "tool:invoke"
+        some team_id in input.user.teams
+        team_id in input.tool.managers
+    }
+
+    audit_reason := sprintf("Allowed: %s by user %s", [input.action, input.user.id]) if allow
+    audit_reason := sprintf("Denied: %s by user %s", [input.action, input.user.id]) if not allow

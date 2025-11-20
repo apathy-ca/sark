@@ -1,16 +1,35 @@
-# Sark
+# SARK (Security Audit and Resource Kontroler)
 
-A large Python application built with Python 3.11.
+**Enterprise-Grade MCP Governance System**
+
+SARK provides enterprise-grade security and governance for Model Context Protocol (MCP) deployments at massive scale. This system addresses discovery, authorization, audit, runtime enforcement, and API Gateway integration—enabling safe MCP adoption across large organizations.
+
+**Target Scale:** 50,000+ employees, 10,000+ MCP servers
 
 ## Project Status
 
-🚧 **In Development** - Project structure and CI/CD setup complete, awaiting design document.
+🚀 **Phase 1 - MVP Development** - Building core control plane for 100 pilot servers
+
+## Key Features
+
+- **Zero-Trust MCP Architecture** with multi-layer enforcement
+- **Automated Discovery** combining agentless scanning and lightweight monitoring
+- **Hybrid ReBAC+ABAC Authorization** via Open Policy Agent
+- **Immutable Audit Trails** with TimescaleDB
+- **Dynamic Secrets Management** via HashiCorp Vault
+- **Kong API Gateway Integration** for edge security
+- **Comprehensive Threat Modeling** addressing MCP-specific attacks
 
 ## Requirements
 
 - Python 3.11+
 - Docker with Docker Compose v2
 - Git
+- PostgreSQL 15+
+- Redis 7+
+- Open Policy Agent 0.60+
+- Kong Gateway 3.8+ (for production)
+- Kubernetes 1.28+ (for production deployment)
 
 ## Development Setup
 
@@ -108,15 +127,29 @@ mypy src
 ```
 sark/
 ├── src/
-│   └── sark/          # Main application code
-├── tests/             # Test files
-├── docker/            # Docker-related files
-├── .github/           # GitHub Actions workflows
-├── docs/              # Documentation
-├── scripts/           # Utility scripts
-├── pyproject.toml     # Project configuration
-├── docker-compose.yml # Docker Compose configuration
-└── README.md          # This file
+│   └── sark/
+│       ├── api/           # FastAPI REST API endpoints
+│       ├── models/        # Database models and schemas
+│       ├── services/      # Business logic services
+│       │   ├── discovery/ # MCP server discovery
+│       │   ├── policy/    # OPA policy integration
+│       │   ├── audit/     # Audit event processing
+│       │   └── vault/     # Secrets management
+│       ├── config/        # Configuration management
+│       └── db/            # Database connections and migrations
+├── kong/                  # Kong Gateway plugins
+│   └── plugins/
+│       └── mcp-security/  # MCP security plugin (Lua)
+├── opa/                   # Open Policy Agent policies
+│   └── policies/          # Rego policy files
+├── k8s/                   # Kubernetes manifests
+│   ├── base/             # Base configurations
+│   └── overlays/         # Environment-specific overlays
+├── terraform/            # Infrastructure as Code
+├── tests/                # Test files
+├── docs/                 # Documentation
+├── scripts/              # Utility scripts
+└── docker-compose.yml    # Development environment
 ```
 
 ## CI/CD
