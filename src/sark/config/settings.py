@@ -47,6 +47,19 @@ class Settings(BaseSettings):
     refresh_token_expiration_days: int = 7
     refresh_token_rotation_enabled: bool = True
 
+    # LDAP/Active Directory Configuration
+    ldap_enabled: bool = False
+    ldap_server: str | None = None  # e.g., "ldaps://ldap.example.com:636"
+    ldap_bind_dn: str | None = None  # e.g., "cn=sark,ou=service,dc=example,dc=com"
+    ldap_bind_password: str | None = None
+    ldap_user_base_dn: str | None = None  # e.g., "ou=users,dc=example,dc=com"
+    ldap_group_base_dn: str | None = None  # e.g., "ou=groups,dc=example,dc=com"
+    ldap_user_filter: str = "(uid={username})"  # Filter for user search
+    ldap_group_filter: str = "(member={user_dn})"  # Filter for group search
+    ldap_timeout: int = 5  # Connection timeout in seconds
+    ldap_use_ssl: bool = True  # Use LDAPS
+    ldap_role_mapping: dict[str, str] = {}  # Map LDAP groups to SARK roles
+
     # PostgreSQL Database
     postgres_host: str = "localhost"
     postgres_port: int = 5432

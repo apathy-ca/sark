@@ -1,6 +1,7 @@
 """Authentication API endpoints.
 
 Provides endpoints for authentication operations including:
+- LDAP/AD login
 - Token refresh
 - Token revocation
 - Authentication health checks
@@ -14,6 +15,11 @@ import redis.asyncio as aioredis
 from sark.api.dependencies import CurrentUser, get_current_user
 from sark.config import get_settings
 from sark.services.auth import TokenService
+from sark.services.auth.providers import LDAPProvider
+from sark.services.auth.providers.ldap import (
+    LDAPAuthenticationError,
+    LDAPConnectionError,
+)
 
 logger = structlog.get_logger(__name__)
 router = APIRouter()
@@ -21,6 +27,23 @@ settings = get_settings()
 
 
 # Pydantic models for request/response
+class LDAPLoginRequest(BaseModel):
+    """Request model for LDAP login."""
+
+    username: str = Field(..., description="LDAP username", min_length=1, max_length=255)
+    password: str = Field(..., description="User password", min_length=1)
+
+
+class LoginResponse(BaseModel):
+    """Response model for successful login."""
+
+    access_token: str = Field(..., description="JWT access token")
+    token_type: str = Field(default="bearer", description="Token type (always 'bearer')")
+    expires_in: int = Field(..., description="Token expiration time in seconds")
+    refresh_token: str = Field(..., description="Refresh token for obtaining new access tokens")
+    user: dict = Field(..., description="User information")
+
+
 class TokenRefreshRequest(BaseModel):
     """Request model for token refresh."""
 
@@ -93,6 +116,122 @@ async def get_token_service(
         Configured TokenService instance
     """
     return TokenService(settings=settings, redis_client=redis_client)
+
+
+@router.post(
+    "/login/ldap",
+    response_model=LoginResponse,
+    status_code=status.HTTP_200_OK,
+    summary="LDAP/AD login",
+    description="Authenticate user against LDAP/Active Directory and issue JWT tokens",
+    responses={
+        200: {"description": "Login successful"},
+        401: {"description": "Invalid credentials"},
+        503: {"description": "LDAP service unavailable"},
+    },
+)
+async def ldap_login(
+    request: LDAPLoginRequest,
+    token_service: TokenService = Depends(get_token_service),
+) -> LoginResponse:
+    """Authenticate user via LDAP/Active Directory.
+
+    This endpoint authenticates the user against an LDAP directory
+    (including Microsoft Active Directory) and returns JWT tokens
+    along with user information.
+
+    Args:
+        request: Login request containing username and password
+        token_service: Token service dependency
+
+    Returns:
+        Access token, refresh token, and user information
+
+    Raises:
+        HTTPException: If authentication fails or LDAP is unavailable
+    """
+    if not settings.ldap_enabled:
+        raise HTTPException(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+            detail="LDAP authentication is not enabled",
+        )
+
+    logger.info("ldap_login_attempt", username=request.username)
+
+    try:
+        # Initialize LDAP provider
+        ldap_provider = LDAPProvider(settings=settings)
+
+        # Authenticate user and get user info
+        user_info = ldap_provider.authenticate(request.username, request.password)
+
+        # Create access token
+        access_token = await token_service.create_access_token(user_info)
+
+        # Create refresh token
+        refresh_token, _ = await token_service.create_refresh_token(user_info["user_id"])
+
+        # Calculate expiry in seconds
+        expires_in = settings.jwt_expiration_minutes * 60
+
+        # Prepare user info for response (remove sensitive data)
+        user_response = {
+            "user_id": user_info["user_id"],
+            "username": user_info.get("username"),
+            "email": user_info.get("email"),
+            "name": user_info.get("name"),
+            "roles": user_info.get("roles", []),
+            "teams": user_info.get("teams", []),
+        }
+
+        logger.info(
+            "ldap_login_success",
+            username=request.username,
+            user_id=user_info["user_id"],
+            roles=user_info.get("roles", []),
+        )
+
+        return LoginResponse(
+            access_token=access_token,
+            token_type="bearer",
+            expires_in=expires_in,
+            refresh_token=refresh_token,
+            user=user_response,
+        )
+
+    except LDAPAuthenticationError as e:
+        logger.warning(
+            "ldap_login_failed",
+            username=request.username,
+            error=str(e),
+        )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid username or password",
+        ) from e
+
+    except LDAPConnectionError as e:
+        logger.error(
+            "ldap_connection_error",
+            username=request.username,
+            error=str(e),
+        )
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Authentication service temporarily unavailable",
+        ) from e
+
+    except Exception as e:
+        logger.error(
+            "ldap_login_error_unexpected",
+            username=request.username,
+            error=str(e),
+            error_type=type(e).__name__,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Login failed due to internal error",
+        ) from e
 
 
 @router.post(

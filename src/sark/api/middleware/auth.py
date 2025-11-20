@@ -47,6 +47,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
         "/docs",
         "/openapi.json",
         "/redoc",
+        "/api/v1/auth/login/ldap",  # LDAP login is public
         "/api/v1/auth/refresh",  # Token refresh doesn't require access token
     }
 
