@@ -1,9 +1,9 @@
 """SARK FastAPI application."""
 
-import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from prometheus_client import make_asgi_app
+import structlog
 
 from sark.api.routers import health, policy, servers
 from sark.config import get_settings

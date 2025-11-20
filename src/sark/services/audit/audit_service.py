@@ -4,8 +4,8 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
-import structlog
 from sqlalchemy.ext.asyncio import AsyncSession
+import structlog
 
 from sark.models.audit import AuditEvent, AuditEventType, SeverityLevel
 

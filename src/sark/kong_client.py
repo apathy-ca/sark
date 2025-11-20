@@ -6,11 +6,11 @@ supporting both managed (Docker Compose) and external enterprise deployments.
 """
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import httpx
 
-from sark.config import KongConfig, ServiceMode
+from sark.config import KongConfig
 
 logger = logging.getLogger(__name__)
 
@@ -117,7 +117,7 @@ class KongClient:
         self,
         service_name: str,
         paths: list[str],
-        methods: Optional[list[str]] = None,
+        methods: list[str] | None = None,
         strip_path: bool = True,
     ) -> dict[str, Any]:
         """
@@ -151,7 +151,10 @@ class KongClient:
         return response.json()
 
     def add_plugin(
-        self, plugin_name: str, config: Optional[dict[str, Any]] = None, service_name: Optional[str] = None
+        self,
+        plugin_name: str,
+        config: dict[str, Any] | None = None,
+        service_name: str | None = None,
     ) -> dict[str, Any]:
         """
         Add a plugin to Kong.
@@ -250,7 +253,7 @@ class KongClient:
         self.close()
 
 
-def create_kong_client(config: Optional[KongConfig] = None) -> Optional[KongClient]:
+def create_kong_client(config: KongConfig | None = None) -> KongClient | None:
     """
     Create a Kong client instance.
 
@@ -273,7 +276,7 @@ def create_kong_client(config: Optional[KongConfig] = None) -> Optional[KongClie
     return KongClient(config)
 
 
-def verify_kong_connectivity(config: Optional[KongConfig] = None) -> bool:
+def verify_kong_connectivity(config: KongConfig | None = None) -> bool:
     """
     Verify connectivity to Kong.
 

@@ -4,7 +4,8 @@ from datetime import UTC, datetime
 from enum import Enum
 from uuid import uuid4
 
-from sqlalchemy import JSON, Boolean, Column, DateTime, Enum as SQLEnum, ForeignKey, Integer, String
+from sqlalchemy import JSON, Boolean, Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -57,7 +58,9 @@ class MCPServer(Base):
     capabilities = Column(JSON, nullable=False, default=list)
 
     # Security and classification
-    sensitivity_level = Column(SQLEnum(SensitivityLevel), nullable=False, default=SensitivityLevel.MEDIUM)
+    sensitivity_level = Column(
+        SQLEnum(SensitivityLevel), nullable=False, default=SensitivityLevel.MEDIUM
+    )
     signature = Column(String(1000), nullable=True)  # Cryptographic signature
 
     # Status and health
@@ -66,7 +69,9 @@ class MCPServer(Base):
     last_health_check = Column(DateTime(timezone=True), nullable=True)
 
     # Ownership and access
-    owner_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    owner_id = Column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
     team_id = Column(UUID(as_uuid=True), ForeignKey("teams.id", ondelete="SET NULL"), nullable=True)
 
     # Service discovery
@@ -98,14 +103,18 @@ class MCPTool(Base):
     __tablename__ = "mcp_tools"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    server_id = Column(UUID(as_uuid=True), ForeignKey("mcp_servers.id", ondelete="CASCADE"), nullable=False)
+    server_id = Column(
+        UUID(as_uuid=True), ForeignKey("mcp_servers.id", ondelete="CASCADE"), nullable=False
+    )
 
     name = Column(String(255), nullable=False, index=True)
     description = Column(String(2000), nullable=True)
     parameters = Column(JSON, nullable=False, default=dict)
 
     # Security
-    sensitivity_level = Column(SQLEnum(SensitivityLevel), nullable=False, default=SensitivityLevel.MEDIUM)
+    sensitivity_level = Column(
+        SQLEnum(SensitivityLevel), nullable=False, default=SensitivityLevel.MEDIUM
+    )
     signature = Column(String(1000), nullable=True)
     requires_approval = Column(Boolean, default=False, nullable=False)
 

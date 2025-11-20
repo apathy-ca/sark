@@ -3,9 +3,9 @@
 from typing import Any
 from uuid import UUID
 
-import structlog
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter
 from pydantic import BaseModel, Field
+import structlog
 
 from sark.services.policy import OPAClient
 
@@ -55,12 +55,14 @@ async def evaluate_policy(
                 "teams": [],  # TODO: Get from user context
             },
             action=request.action,
-            tool={
-                "name": request.tool,
-                "sensitivity_level": "medium",  # TODO: Get from server/tool registry
-            }
-            if request.tool
-            else None,
+            tool=(
+                {
+                    "name": request.tool,
+                    "sensitivity_level": "medium",  # TODO: Get from server/tool registry
+                }
+                if request.tool
+                else None
+            ),
             context={"timestamp": 0},  # TODO: Add real timestamp
         )
 

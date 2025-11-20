@@ -1,7 +1,7 @@
 """Prometheus metrics collection for observability."""
 
+from collections.abc import Callable
 import time
-from typing import Callable
 
 from fastapi import Request, Response
 from prometheus_client import (
@@ -100,14 +100,10 @@ class PrometheusMiddleware(BaseHTTPMiddleware):
             status = response.status_code
 
             # Record metrics
-            http_requests_total.labels(
-                method=method, endpoint=path, status=status
-            ).inc()
+            http_requests_total.labels(method=method, endpoint=path, status=status).inc()
 
             duration = time.time() - start_time
-            http_request_duration_seconds.labels(method=method, endpoint=path).observe(
-                duration
-            )
+            http_request_duration_seconds.labels(method=method, endpoint=path).observe(duration)
 
             # Track errors (4xx and 5xx)
             if status >= 400:

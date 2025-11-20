@@ -2,9 +2,9 @@
 
 from uuid import UUID
 
-import structlog
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+import structlog
 
 from sark.models.policy import Policy, PolicyStatus, PolicyType, PolicyVersion
 

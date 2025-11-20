@@ -6,11 +6,11 @@ from sark.models.policy import Policy, PolicyVersion
 from sark.models.user import Team, User
 
 __all__ = [
-    "User",
-    "Team",
+    "AuditEvent",
     "MCPServer",
     "MCPTool",
     "Policy",
     "PolicyVersion",
-    "AuditEvent",
+    "Team",
+    "User",
 ]

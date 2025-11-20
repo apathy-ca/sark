@@ -3,8 +3,8 @@
 from typing import Any
 
 import httpx
-import structlog
 from pydantic import BaseModel
+import structlog
 
 from sark.config import get_settings
 
@@ -138,9 +138,11 @@ class OPAClient:
                 "managers": team_ids or [],
             },
             context={
-                "timestamp": httpx.get("https://worldtimeapi.org/api/ip").json()["unixtime"]
-                if settings.environment == "production"
-                else 0
+                "timestamp": (
+                    httpx.get("https://worldtimeapi.org/api/ip").json()["unixtime"]
+                    if settings.environment == "production"
+                    else 0
+                )
             },
         )
 

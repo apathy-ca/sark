@@ -4,9 +4,9 @@ from typing import Any
 from uuid import UUID
 
 import consul
-import structlog
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+import structlog
 
 from sark.config import get_settings
 from sark.models.mcp_server import MCPServer, MCPTool, ServerStatus, TransportType

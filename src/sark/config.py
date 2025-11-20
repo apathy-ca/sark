@@ -8,10 +8,9 @@ This module provides a flexible configuration system that supports both:
 Environment variables control which mode is used for each service.
 """
 
-import os
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
+import os
 
 
 class ServiceMode(str, Enum):
@@ -81,12 +80,12 @@ class RedisConfig:
     host: str
     port: int
     database: int
-    password: Optional[str]
+    password: str | None
     max_connections: int
     ssl: bool
     sentinel_enabled: bool
-    sentinel_service_name: Optional[str]
-    sentinel_hosts: Optional[str]
+    sentinel_service_name: str | None
+    sentinel_hosts: str | None
 
     @property
     def connection_url(self) -> str:
@@ -131,7 +130,7 @@ class KongConfig:
     mode: ServiceMode
     admin_url: str
     proxy_url: str
-    admin_api_key: Optional[str]
+    admin_api_key: str | None
     workspace: str
     verify_ssl: bool
     timeout: int
@@ -198,9 +197,7 @@ class AppConfig:
         # Validate PostgreSQL configuration
         if self.postgres.enabled and self.postgres.mode == ServiceMode.EXTERNAL:
             if not self.postgres.host or self.postgres.host == "database":
-                errors.append(
-                    "POSTGRES_HOST must be set when using external PostgreSQL deployment"
-                )
+                errors.append("POSTGRES_HOST must be set when using external PostgreSQL deployment")
             if self.postgres.password == "sark" and self.environment == "production":
                 errors.append("POSTGRES_PASSWORD must be changed in production")
 
@@ -209,9 +206,7 @@ class AppConfig:
             if not self.redis.host or self.redis.host == "cache":
                 errors.append("REDIS_HOST must be set when using external Redis deployment")
             if self.redis.sentinel_enabled and not self.redis.sentinel_hosts:
-                errors.append(
-                    "REDIS_SENTINEL_HOSTS must be set when Redis Sentinel is enabled"
-                )
+                errors.append("REDIS_SENTINEL_HOSTS must be set when Redis Sentinel is enabled")
 
         # Validate Kong configuration
         if self.kong.enabled and self.kong.mode == ServiceMode.EXTERNAL:
@@ -228,7 +223,7 @@ class AppConfig:
 
 
 # Global configuration instance (lazy-loaded)
-_config: Optional[AppConfig] = None
+_config: AppConfig | None = None
 
 
 def get_config() -> AppConfig:
@@ -246,7 +241,7 @@ def get_config() -> AppConfig:
         _config = AppConfig.from_env()
         errors = _config.validate()
         if errors:
-            raise ValueError(f"Configuration validation failed:\n" + "\n".join(errors))
+            raise ValueError("Configuration validation failed:\n" + "\n".join(errors))
     return _config
 
 

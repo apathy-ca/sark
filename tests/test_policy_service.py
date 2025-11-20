@@ -1,7 +1,8 @@
 """Tests for policy service."""
 
-import pytest
 from uuid import uuid4
+
+import pytest
 
 from sark.services.policy.opa_client import AuthorizationInput, OPAClient
 

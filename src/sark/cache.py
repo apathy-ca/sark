@@ -7,13 +7,13 @@ including Redis Sentinel for high availability.
 """
 
 import logging
-from typing import Any, Optional, Union
+from typing import Any
 
 import redis
 from redis import Redis
 from redis.sentinel import Sentinel
 
-from sark.config import RedisConfig, ServiceMode
+from sark.config import RedisConfig
 
 logger = logging.getLogger(__name__)
 
@@ -29,8 +29,8 @@ class CacheManager:
             config: Redis configuration
         """
         self.config = config
-        self._client: Optional[Redis] = None
-        self._sentinel: Optional[Sentinel] = None
+        self._client: Redis | None = None
+        self._sentinel: Sentinel | None = None
 
         logger.info(
             f"Initialized CacheManager in {config.mode} mode: "
@@ -125,7 +125,7 @@ class CacheManager:
             decode_responses=True,
         )
 
-    def get(self, key: str) -> Optional[str]:
+    def get(self, key: str) -> str | None:
         """
         Get value from cache.
 
@@ -141,9 +141,7 @@ class CacheManager:
             logger.error(f"Error getting key '{key}' from cache: {e}")
             return None
 
-    def set(
-        self, key: str, value: Union[str, bytes, int, float], expire: Optional[int] = None
-    ) -> bool:
+    def set(self, key: str, value: str | bytes | int | float, expire: int | None = None) -> bool:
         """
         Set value in cache.
 
@@ -210,7 +208,7 @@ class CacheManager:
             logger.error(f"Error setting expiration for key '{key}': {e}")
             return False
 
-    def increment(self, key: str, amount: int = 1) -> Optional[int]:
+    def increment(self, key: str, amount: int = 1) -> int | None:
         """
         Increment a counter.
 
@@ -321,7 +319,7 @@ class CacheManager:
         self.close()
 
 
-def create_cache_manager(config: Optional[RedisConfig] = None) -> Optional[CacheManager]:
+def create_cache_manager(config: RedisConfig | None = None) -> CacheManager | None:
     """
     Create a cache manager instance.
 
@@ -344,7 +342,7 @@ def create_cache_manager(config: Optional[RedisConfig] = None) -> Optional[Cache
     return CacheManager(config)
 
 
-def verify_cache_connectivity(config: Optional[RedisConfig] = None) -> bool:
+def verify_cache_connectivity(config: RedisConfig | None = None) -> bool:
     """
     Verify connectivity to Redis cache.
 

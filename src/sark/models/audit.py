@@ -4,7 +4,8 @@ from datetime import UTC, datetime
 from enum import Enum
 from uuid import uuid4
 
-from sqlalchemy import JSON, Column, DateTime, Enum as SQLEnum, String
+from sqlalchemy import JSON, Column, DateTime, String
+from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.dialects.postgresql import UUID
 
 from sark.db.base import Base
@@ -44,7 +45,9 @@ class AuditEvent(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
 
     # Temporal (TimescaleDB hypertable partitioned on this column)
-    timestamp = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC), index=True)
+    timestamp = Column(
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC), index=True
+    )
 
     # Event classification
     event_type = Column(SQLEnum(AuditEventType), nullable=False, index=True)

@@ -5,9 +5,10 @@ This module provides PostgreSQL database connection management,
 supporting both managed (Docker Compose) and external enterprise deployments.
 """
 
-import logging
+from collections.abc import AsyncGenerator, Generator
 from contextlib import asynccontextmanager, contextmanager
-from typing import Any, AsyncGenerator, Generator, Optional
+import logging
+from typing import Any
 
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
@@ -15,7 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engin
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import NullPool, QueuePool
 
-from sark.config import PostgreSQLConfig, ServiceMode
+from sark.config import PostgreSQLConfig
 
 logger = logging.getLogger(__name__)
 
@@ -31,10 +32,10 @@ class DatabaseManager:
             config: PostgreSQL configuration
         """
         self.config = config
-        self._engine: Optional[Engine] = None
-        self._async_engine: Optional[AsyncEngine] = None
-        self._session_factory: Optional[sessionmaker] = None
-        self._async_session_factory: Optional[sessionmaker] = None
+        self._engine: Engine | None = None
+        self._async_engine: AsyncEngine | None = None
+        self._session_factory: sessionmaker | None = None
+        self._async_session_factory: sessionmaker | None = None
 
         logger.info(
             f"Initialized DatabaseManager in {config.mode} mode: "
@@ -243,7 +244,7 @@ class DatabaseManager:
             self._engine = None
 
 
-def create_database_manager(config: Optional[PostgreSQLConfig] = None) -> Optional[DatabaseManager]:
+def create_database_manager(config: PostgreSQLConfig | None = None) -> DatabaseManager | None:
     """
     Create a database manager instance.
 
@@ -266,7 +267,7 @@ def create_database_manager(config: Optional[PostgreSQLConfig] = None) -> Option
     return DatabaseManager(config)
 
 
-def verify_database_connectivity(config: Optional[PostgreSQLConfig] = None) -> bool:
+def verify_database_connectivity(config: PostgreSQLConfig | None = None) -> bool:
     """
     Verify connectivity to PostgreSQL database.
 

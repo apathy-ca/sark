@@ -4,7 +4,8 @@ from datetime import UTC, datetime
 from enum import Enum
 from uuid import uuid4
 
-from sqlalchemy import Boolean, Column, DateTime, Enum as SQLEnum, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -75,7 +76,9 @@ class PolicyVersion(Base):
     __tablename__ = "policy_versions"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    policy_id = Column(UUID(as_uuid=True), ForeignKey("policies.id", ondelete="CASCADE"), nullable=False)
+    policy_id = Column(
+        UUID(as_uuid=True), ForeignKey("policies.id", ondelete="CASCADE"), nullable=False
+    )
 
     version = Column(Integer, nullable=False)
     content = Column(Text, nullable=False)  # Rego policy content
@@ -83,7 +86,9 @@ class PolicyVersion(Base):
     is_active = Column(Boolean, default=False, nullable=False)
     tested = Column(Boolean, default=False, nullable=False)
 
-    created_by = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    created_by = Column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
     created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC))
 
     notes = Column(Text, nullable=True)

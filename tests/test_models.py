@@ -1,11 +1,10 @@
 """Tests for database models."""
 
-import pytest
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 
-from sark.models.mcp_server import MCPServer, MCPTool, ServerStatus, TransportType, SensitivityLevel
-from sark.models.user import User, Team
 from sark.models.audit import AuditEvent, AuditEventType, SeverityLevel
+from sark.models.mcp_server import MCPServer, SensitivityLevel, ServerStatus, TransportType
+from sark.models.user import User
 
 
 class TestMCPServerModel:

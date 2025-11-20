@@ -3,14 +3,14 @@
 from typing import Any
 from uuid import UUID
 
-import structlog
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
+import structlog
 
 from sark.db import get_db, get_timescale_db
 from sark.models.audit import AuditEventType, SeverityLevel
-from sark.models.mcp_server import SensitivityLevel, TransportType
+from sark.models.mcp_server import TransportType
 from sark.services.audit import AuditService
 from sark.services.discovery import DiscoveryService
 
