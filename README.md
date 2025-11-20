@@ -121,15 +121,35 @@ sark/
 
 ## CI/CD
 
-This project uses GitHub Actions for continuous integration and deployment:
+### Local CI/CD Checks
+
+Run all CI checks locally before pushing:
+
+```bash
+# Run basic CI checks (quality + tests)
+make ci-local
+
+# Run ALL CI checks (quality, tests, security, docker)
+make ci-all
+
+# Run individual check suites
+make quality        # Linting, formatting, type-checking
+make test          # Tests with coverage
+make security      # Security scans (bandit, safety)
+make docker-build-test  # Docker build verification
+```
+
+### GitHub Actions (Optional)
+
+This project includes GitHub Actions workflows for automated CI/CD:
 
 - **CI Pipeline**: Runs on every push and PR
   - Code quality checks (ruff, black, mypy)
   - Tests with coverage
-  - Build verification
+  - Security scanning
   - Docker image builds
 
-- **Branch Protection**: Main branch requires:
+- **Branch Protection**: Can be configured to require:
   - All CI checks to pass
   - Code review approval
   - Up-to-date with base branch

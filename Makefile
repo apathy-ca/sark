@@ -79,7 +79,30 @@ docker-clean: ## Clean Docker containers and volumes
 	docker compose down -v
 	docker system prune -f
 
-ci-local: quality test ## Run CI checks locally
+security: ## Run security scans (bandit, safety)
+	@echo "Running security scans..."
+	bandit -r src -f json -o bandit-report.json || true
+	@echo "Bandit report saved to bandit-report.json"
+	safety check --json || true
+
+docker-build-test: ## Test Docker builds (dev and prod)
+	@echo "Testing development Docker build..."
+	docker compose build
+	@echo "Testing production Docker build..."
+	docker build --target production -t sark:prod-test .
+
+ci-local: quality test ## Run basic CI checks locally (quality + tests)
+
+ci-all: quality test security docker-build-test ## Run all CI checks locally (quality, tests, security, docker)
+	@echo ""
+	@echo "========================================="
+	@echo "All CI checks completed!"
+	@echo "========================================="
+	@echo "✓ Code quality (lint, format, type-check)"
+	@echo "✓ Tests with coverage"
+	@echo "✓ Security scans"
+	@echo "✓ Docker builds"
+	@echo ""
 
 setup-dev: install-dev ## Complete development setup
 	@echo "Development environment setup complete!"
