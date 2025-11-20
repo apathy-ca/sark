@@ -64,6 +64,29 @@ curl http://localhost:8000/ready
 curl http://localhost:8000/metrics
 ```
 
+### Infrastructure Provisioning with Terraform
+
+Provision production-ready Kubernetes clusters on major cloud providers:
+
+```bash
+# AWS EKS
+cd terraform/aws
+terraform init
+terraform apply
+
+# GCP GKE
+cd terraform/gcp
+terraform init
+terraform apply
+
+# Azure AKS
+cd terraform/azure
+terraform init
+terraform apply
+```
+
+See **[terraform/README.md](terraform/README.md)** for complete Terraform documentation.
+
 ### Kubernetes Deployment
 
 #### Using kubectl
@@ -96,6 +119,7 @@ helm install sark ./helm/sark \
 
 ### Documentation
 
+- **[Terraform Guide](terraform/README.md)** - Infrastructure as Code for AWS/GCP/Azure
 - **[Deployment Guide](docs/DEPLOYMENT.md)** - Complete Kubernetes deployment instructions
 - **[Monitoring Guide](docs/MONITORING.md)** - Observability, metrics, and logging setup
 - **[Helm Chart](helm/sark/README.md)** - Helm chart usage and configuration
