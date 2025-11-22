@@ -7,6 +7,7 @@ from pydantic import BaseModel
 import structlog
 
 from sark.config import get_settings
+from sark.db import get_http_client
 
 logger = structlog.get_logger()
 settings = get_settings()
@@ -32,14 +33,23 @@ class AuthorizationDecision(BaseModel):
 
 
 class OPAClient:
-    """Client for interacting with Open Policy Agent."""
+    """Client for interacting with Open Policy Agent.
+
+    Uses a shared HTTP client with connection pooling for improved performance.
+    """
 
     def __init__(self, opa_url: str | None = None, timeout: float | None = None) -> None:
-        """Initialize OPA client."""
+        """Initialize OPA client.
+
+        Args:
+            opa_url: OPA server URL (uses settings default if None)
+            timeout: Request timeout in seconds (uses settings default if None)
+        """
         self.opa_url = opa_url or settings.opa_url
         self.timeout = timeout or settings.opa_timeout_seconds
         self.policy_path = settings.opa_policy_path
-        self.client = httpx.AsyncClient(timeout=self.timeout)
+        # Use shared HTTP client with connection pooling instead of creating new client
+        self.client = get_http_client()
 
     async def evaluate_policy(self, auth_input: AuthorizationInput) -> AuthorizationDecision:
         """
@@ -58,6 +68,7 @@ class OPAClient:
             response = await self.client.post(
                 f"{self.opa_url}{self.policy_path}",
                 json={"input": auth_input.model_dump()},
+                timeout=self.timeout,
             )
             response.raise_for_status()
 
@@ -186,8 +197,12 @@ class OPAClient:
         return await self.evaluate_policy(auth_input)
 
     async def close(self) -> None:
-        """Close HTTP client."""
-        await self.client.aclose()
+        """Close HTTP client.
+
+        Note: Since we use a shared HTTP client, this no longer closes the client.
+        The shared client is managed by the application lifecycle.
+        """
+        pass  # Shared client is closed on application shutdown
 
     async def health_check(self) -> bool:
         """
