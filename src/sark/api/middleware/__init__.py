@@ -1,5 +1,5 @@
-"""API middleware."""
+"""SARK API middleware."""
 
-from sark.api.middleware.auth import AuthenticationMiddleware
+from sark.api.middleware.auth import AuthenticationMiddleware, AuthMiddleware
 
-__all__ = ["AuthenticationMiddleware"]
+__all__ = ["AuthenticationMiddleware", "AuthMiddleware"]

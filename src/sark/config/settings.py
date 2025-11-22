@@ -38,18 +38,45 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 15
     cors_origins: list[str] = ["http://localhost:3000"]
 
-    # Authentication Providers
-    # OIDC Configuration
+    # JWT Configuration
+    jwt_secret_key: str | None = None  # For HS256, defaults to secret_key if not set
+    jwt_public_key: str | None = None  # For RS256 (PEM format)
+    jwt_algorithm: str = Field(default="HS256", pattern="^(HS256|RS256)$")
+    jwt_expiration_minutes: int = 60
+    jwt_issuer: str | None = None
+    jwt_audience: str | None = None
+
+    # Refresh Token Configuration
+    refresh_token_expiration_days: int = 7
+    refresh_token_rotation_enabled: bool = True
+
+    # LDAP/Active Directory Configuration
+    ldap_enabled: bool = False
+    ldap_server: str | None = None  # e.g., "ldaps://ldap.example.com:636"
+    ldap_bind_dn: str | None = None  # e.g., "cn=sark,ou=service,dc=example,dc=com"
+    ldap_bind_password: str | None = None
+    ldap_user_base_dn: str | None = None  # e.g., "ou=users,dc=example,dc=com"
+    ldap_group_base_dn: str | None = None  # e.g., "ou=groups,dc=example,dc=com"
+    ldap_user_filter: str = "(uid={username})"  # Filter for user search
+    ldap_group_filter: str = "(member={user_dn})"  # Filter for group search
+    ldap_timeout: int = 5  # Connection timeout in seconds
+    ldap_use_ssl: bool = True  # Use LDAPS
+    ldap_role_mapping: dict[str, str] = {}  # Map LDAP groups to SARK roles
+
+    # OIDC (OpenID Connect) Configuration
     oidc_enabled: bool = False
     oidc_provider: str = "google"  # google, azure, okta, custom
-    oidc_client_id: str = ""
-    oidc_client_secret: str = ""
+    oidc_discovery_url: str | None = None  # e.g., "https://idp.example.com/.well-known/openid-configuration"
+    oidc_client_id: str | None = None
+    oidc_client_secret: str | None = None
+    oidc_redirect_uri: str | None = None  # e.g., "https://sark.example.com/api/v1/auth/oidc/callback"
     oidc_issuer: str | None = None  # Required for custom provider
     oidc_authorization_endpoint: str | None = None
     oidc_token_endpoint: str | None = None
     oidc_userinfo_endpoint: str | None = None
     oidc_jwks_uri: str | None = None
     oidc_scopes: list[str] = ["openid", "profile", "email"]
+    oidc_use_pkce: bool = True  # Use PKCE for enhanced security
     oidc_azure_tenant: str | None = None  # Required for Azure AD
     oidc_okta_domain: str | None = None  # Required for Okta
 

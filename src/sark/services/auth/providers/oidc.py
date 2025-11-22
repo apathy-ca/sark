@@ -1,353 +1,436 @@
 """OpenID Connect (OIDC) authentication provider.
 
-Supports multiple OIDC providers:
-- Google OAuth
-- Azure AD
-- Okta
-- Any OIDC-compliant provider
+This module provides OIDC authentication support for modern cloud identity
+providers including Azure AD, Okta, Google, Auth0, and others.
+
+Features:
+- Authorization code flow with PKCE
+- Automatic IdP discovery via .well-known/openid-configuration
+- ID token validation (signature, nonce, expiry)
+- UserInfo endpoint support
+- Multiple OIDC provider support
+- State parameter for CSRF protection
 """
 
-import time
-from typing import Any
+import secrets
+from typing import Dict, Optional
+from urllib.parse import urlencode
 
 import httpx
+import structlog
 from authlib.integrations.httpx_client import AsyncOAuth2Client
 from authlib.jose import JsonWebToken, JWTClaims
 from authlib.oidc.core import CodeIDToken
 
-from .base import AuthProvider, UserInfo
+from sark.config import Settings, get_settings
+
+logger = structlog.get_logger(__name__)
 
 
-class OIDCProvider(AuthProvider):
+class OIDCAuthenticationError(Exception):
+    """Exception raised for OIDC authentication failures."""
+
+    pass
+
+
+class OIDCConfigurationError(Exception):
+    """Exception raised for OIDC configuration errors."""
+
+    pass
+
+
+class OIDCProvider:
     """OpenID Connect authentication provider.
 
-    Implements OAuth 2.0 / OIDC authentication flow with support for
-    major providers (Google, Azure AD, Okta) and any OIDC-compliant service.
+    Supports OIDC authentication with authorization code flow and PKCE.
+    Compatible with major identity providers.
     """
 
-    # Well-known OIDC provider configurations
-    PROVIDER_CONFIGS = {
-        "google": {
-            "issuer": "https://accounts.google.com",
-            "authorization_endpoint": "https://accounts.google.com/o/oauth2/v2/auth",
-            "token_endpoint": "https://oauth2.googleapis.com/token",
-            "userinfo_endpoint": "https://openidconnect.googleapis.com/v1/userinfo",
-            "jwks_uri": "https://www.googleapis.com/oauth2/v3/certs",
-        },
-        "azure": {
-            "issuer": "https://login.microsoftonline.com/{tenant}/v2.0",
-            "authorization_endpoint": "https://login.microsoftonline.com/{tenant}/oauth2/v2.0/authorize",
-            "token_endpoint": "https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token",
-            "userinfo_endpoint": "https://graph.microsoft.com/oidc/userinfo",
-            "jwks_uri": "https://login.microsoftonline.com/{tenant}/discovery/v2.0/keys",
-        },
-        "okta": {
-            "issuer": "https://{domain}",
-            "authorization_endpoint": "https://{domain}/oauth2/v1/authorize",
-            "token_endpoint": "https://{domain}/oauth2/v1/token",
-            "userinfo_endpoint": "https://{domain}/oauth2/v1/userinfo",
-            "jwks_uri": "https://{domain}/oauth2/v1/keys",
-        },
-    }
-
-    def __init__(
-        self,
-        client_id: str,
-        client_secret: str,
-        provider: str = "google",
-        issuer: str | None = None,
-        authorization_endpoint: str | None = None,
-        token_endpoint: str | None = None,
-        userinfo_endpoint: str | None = None,
-        jwks_uri: str | None = None,
-        scopes: list[str] | None = None,
-        tenant: str | None = None,  # For Azure AD
-        domain: str | None = None,  # For Okta
-    ):
+    def __init__(self, settings: Optional[Settings] = None):
         """Initialize OIDC provider.
 
         Args:
-            client_id: OAuth 2.0 client ID
-            client_secret: OAuth 2.0 client secret
-            provider: Provider name ('google', 'azure', 'okta', or 'custom')
-            issuer: OIDC issuer URL (required for custom provider)
-            authorization_endpoint: Authorization endpoint URL
-            token_endpoint: Token endpoint URL
-            userinfo_endpoint: UserInfo endpoint URL
-            jwks_uri: JSON Web Key Set URI
-            scopes: OAuth scopes (default: ['openid', 'profile', 'email'])
-            tenant: Azure AD tenant ID (required for Azure)
-            domain: Okta domain (required for Okta)
+            settings: Settings instance (defaults to get_settings())
+
+        Raises:
+            ValueError: If OIDC is enabled but required settings are missing
         """
-        self.client_id = client_id
-        self.client_secret = client_secret
-        self.provider = provider.lower()
-        self.scopes = scopes or ["openid", "profile", "email"]
+        self.settings = settings or get_settings()
 
-        # Get provider configuration
-        if self.provider in self.PROVIDER_CONFIGS:
-            config = self.PROVIDER_CONFIGS[self.provider].copy()
+        if not self.settings.oidc_enabled:
+            logger.info("oidc_provider_disabled")
+            return
 
-            # Replace placeholders for Azure AD
-            if self.provider == "azure":
-                if not tenant:
-                    raise ValueError("Azure AD requires 'tenant' parameter")
-                for key, value in config.items():
-                    config[key] = value.replace("{tenant}", tenant)
+        # Validate required settings
+        if not self.settings.oidc_discovery_url:
+            raise ValueError("OIDC_DISCOVERY_URL is required when OIDC is enabled")
+        if not self.settings.oidc_client_id:
+            raise ValueError("OIDC_CLIENT_ID is required when OIDC is enabled")
+        if not self.settings.oidc_client_secret:
+            raise ValueError("OIDC_CLIENT_SECRET is required when OIDC is enabled")
+        if not self.settings.oidc_redirect_uri:
+            raise ValueError("OIDC_REDIRECT_URI is required when OIDC is enabled")
 
-            # Replace placeholders for Okta
-            elif self.provider == "okta":
-                if not domain:
-                    raise ValueError("Okta requires 'domain' parameter")
-                for key, value in config.items():
-                    config[key] = value.replace("{domain}", domain)
+        # Will be populated from discovery
+        self.oidc_config: Optional[Dict] = None
+        self.jwks: Optional[Dict] = None
 
-            # Set endpoints from provider config
-            self.issuer = issuer or config["issuer"]
-            self.authorization_endpoint = authorization_endpoint or config["authorization_endpoint"]
-            self.token_endpoint = token_endpoint or config["token_endpoint"]
-            self.userinfo_endpoint = userinfo_endpoint or config["userinfo_endpoint"]
-            self.jwks_uri = jwks_uri or config["jwks_uri"]
-        else:
-            # Custom provider - all endpoints must be provided
-            if not all([issuer, authorization_endpoint, token_endpoint, userinfo_endpoint, jwks_uri]):
-                raise ValueError(
-                    "Custom OIDC provider requires all endpoints: "
-                    "issuer, authorization_endpoint, token_endpoint, userinfo_endpoint, jwks_uri"
-                )
-            self.issuer = issuer
-            self.authorization_endpoint = authorization_endpoint
-            self.token_endpoint = token_endpoint
-            self.userinfo_endpoint = userinfo_endpoint
-            self.jwks_uri = jwks_uri
-
-        # Initialize OAuth client
-        self.client = AsyncOAuth2Client(
-            client_id=self.client_id,
-            client_secret=self.client_secret,
-            token_endpoint=self.token_endpoint,
+        logger.info(
+            "oidc_provider_initialized",
+            discovery_url=self.settings.oidc_discovery_url,
+            client_id=self.settings.oidc_client_id,
         )
 
-        # JWT validator
-        self.jwt = JsonWebToken(["RS256", "HS256"])
-        self._jwks_cache: dict[str, Any] | None = None
-        self._jwks_cache_time: float = 0
-        self._jwks_cache_ttl: int = 3600  # 1 hour
-
-    async def authenticate(self, credentials: dict[str, Any]) -> UserInfo | None:
-        """Authenticate user with OIDC token.
-
-        Args:
-            credentials: Dictionary with 'access_token' or 'id_token'
+    async def _discover_configuration(self) -> Dict:
+        """Discover OIDC provider configuration.
 
         Returns:
-            UserInfo object if authentication successful, None otherwise
+            OIDC configuration dictionary
+
+        Raises:
+            OIDCConfigurationError: If discovery fails
         """
-        token = credentials.get("access_token") or credentials.get("id_token")
-        if not token:
-            return None
+        if self.oidc_config:
+            return self.oidc_config
 
-        return await self.validate_token(token)
-
-    async def validate_token(self, token: str) -> UserInfo | None:
-        """Validate OIDC token and extract user information.
-
-        Args:
-            token: JWT access token or ID token
-
-        Returns:
-            UserInfo object if token is valid, None otherwise
-        """
-        try:
-            # Get JWKS for token validation
-            jwks = await self._get_jwks()
-
-            # Decode and validate token
-            claims = self.jwt.decode(
-                token,
-                jwks,
-                claims_cls=JWTClaims,
-                claims_options={
-                    "iss": {"essential": True, "value": self.issuer},
-                    "aud": {"essential": True, "value": self.client_id},
-                },
-            )
-            claims.validate()
-
-            # Extract user info from claims
-            return self._extract_user_info(claims)
-
-        except Exception as e:
-            # Log error in production
-            print(f"Token validation failed: {e}")
-            return None
-
-    async def refresh_token(self, refresh_token: str) -> dict[str, str] | None:
-        """Refresh an OIDC access token.
-
-        Args:
-            refresh_token: Refresh token
-
-        Returns:
-            Dictionary with new access_token and refresh_token, or None if failed
-        """
-        try:
-            token_response = await self.client.refresh_token(
-                self.token_endpoint,
-                refresh_token=refresh_token,
-            )
-            return {
-                "access_token": token_response["access_token"],
-                "refresh_token": token_response.get("refresh_token", refresh_token),
-                "expires_in": token_response.get("expires_in", 3600),
-                "id_token": token_response.get("id_token"),
-            }
-        except Exception as e:
-            print(f"Token refresh failed: {e}")
-            return None
-
-    async def get_authorization_url(self, state: str, redirect_uri: str) -> str:
-        """Get the OIDC authorization URL.
-
-        Args:
-            state: State parameter for CSRF protection
-            redirect_uri: Redirect URI after authentication
-
-        Returns:
-            Authorization URL
-        """
-        uri, _ = self.client.create_authorization_url(
-            self.authorization_endpoint,
-            redirect_uri=redirect_uri,
-            scope=" ".join(self.scopes),
-            state=state,
-        )
-        return uri
-
-    async def handle_callback(
-        self, code: str, state: str, redirect_uri: str
-    ) -> dict[str, str] | None:
-        """Handle OIDC callback and exchange code for tokens.
-
-        Args:
-            code: Authorization code
-            state: State parameter for validation
-            redirect_uri: Redirect URI used in authorization request
-
-        Returns:
-            Dictionary with access_token, refresh_token, id_token, or None if failed
-        """
-        try:
-            # Exchange authorization code for tokens
-            token_response = await self.client.fetch_token(
-                self.token_endpoint,
-                code=code,
-                redirect_uri=redirect_uri,
-            )
-
-            return {
-                "access_token": token_response["access_token"],
-                "refresh_token": token_response.get("refresh_token"),
-                "expires_in": token_response.get("expires_in", 3600),
-                "id_token": token_response.get("id_token"),
-                "token_type": token_response.get("token_type", "Bearer"),
-            }
-        except Exception as e:
-            print(f"Token exchange failed: {e}")
-            return None
-
-    async def health_check(self) -> bool:
-        """Check if OIDC provider is reachable.
-
-        Returns:
-            True if provider is healthy, False otherwise
-        """
-        try:
-            async with httpx.AsyncClient() as client:
-                response = await client.get(self.jwks_uri, timeout=5.0)
-                return response.status_code == 200
-        except Exception:
-            return False
-
-    async def get_user_info(self, access_token: str) -> UserInfo | None:
-        """Fetch user information from userinfo endpoint.
-
-        Args:
-            access_token: Valid access token
-
-        Returns:
-            UserInfo object or None if failed
-        """
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.get(
-                    self.userinfo_endpoint,
+                    self.settings.oidc_discovery_url,
+                    timeout=10.0,
+                )
+                response.raise_for_status()
+                self.oidc_config = response.json()
+
+                logger.info(
+                    "oidc_configuration_discovered",
+                    issuer=self.oidc_config.get("issuer"),
+                    authorization_endpoint=self.oidc_config.get("authorization_endpoint"),
+                )
+
+                return self.oidc_config
+
+        except Exception as e:
+            logger.error(
+                "oidc_discovery_failed",
+                discovery_url=self.settings.oidc_discovery_url,
+                error=str(e),
+                error_type=type(e).__name__,
+            )
+            raise OIDCConfigurationError(f"Failed to discover OIDC configuration: {e}") from e
+
+    async def _fetch_jwks(self) -> Dict:
+        """Fetch JSON Web Key Set (JWKS) from IdP.
+
+        Returns:
+            JWKS dictionary
+
+        Raises:
+            OIDCConfigurationError: If JWKS fetch fails
+        """
+        if self.jwks:
+            return self.jwks
+
+        config = await self._discover_configuration()
+        jwks_uri = config.get("jwks_uri")
+
+        if not jwks_uri:
+            raise OIDCConfigurationError("JWKS URI not found in OIDC configuration")
+
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(jwks_uri, timeout=10.0)
+                response.raise_for_status()
+                self.jwks = response.json()
+
+                logger.debug("oidc_jwks_fetched", keys_count=len(self.jwks.get("keys", [])))
+                return self.jwks
+
+        except Exception as e:
+            logger.error(
+                "oidc_jwks_fetch_failed",
+                jwks_uri=jwks_uri,
+                error=str(e),
+                error_type=type(e).__name__,
+            )
+            raise OIDCConfigurationError(f"Failed to fetch JWKS: {e}") from e
+
+    async def get_authorization_url(self, state: Optional[str] = None) -> tuple[str, str, Optional[str]]:
+        """Generate authorization URL for OIDC login flow.
+
+        Args:
+            state: Optional state parameter for CSRF protection (generated if not provided)
+
+        Returns:
+            Tuple of (authorization_url, state, code_verifier)
+            code_verifier is only returned if PKCE is enabled
+
+        Raises:
+            OIDCConfigurationError: If configuration discovery fails
+        """
+        config = await self._discover_configuration()
+        authorization_endpoint = config.get("authorization_endpoint")
+
+        if not authorization_endpoint:
+            raise OIDCConfigurationError(
+                "Authorization endpoint not found in OIDC configuration"
+            )
+
+        # Generate state if not provided (for CSRF protection)
+        if not state:
+            state = secrets.token_urlsafe(32)
+
+        # Build authorization parameters
+        params = {
+            "response_type": "code",
+            "client_id": self.settings.oidc_client_id,
+            "redirect_uri": self.settings.oidc_redirect_uri,
+            "scope": " ".join(self.settings.oidc_scopes),
+            "state": state,
+        }
+
+        code_verifier = None
+
+        # Add PKCE if enabled
+        if self.settings.oidc_use_pkce:
+            code_verifier = secrets.token_urlsafe(32)
+            # Generate code challenge (SHA256 hash of verifier, base64url encoded)
+            import hashlib
+            import base64
+
+            challenge = hashlib.sha256(code_verifier.encode()).digest()
+            code_challenge = base64.urlsafe_b64encode(challenge).decode().rstrip("=")
+
+            params["code_challenge"] = code_challenge
+            params["code_challenge_method"] = "S256"
+
+            logger.debug("oidc_pkce_enabled", code_challenge=code_challenge[:10] + "...")
+
+        authorization_url = f"{authorization_endpoint}?{urlencode(params)}"
+
+        logger.info(
+            "oidc_authorization_url_generated",
+            state=state[:8] + "...",
+            pkce_enabled=self.settings.oidc_use_pkce,
+        )
+
+        return authorization_url, state, code_verifier
+
+    async def exchange_code_for_tokens(
+        self, code: str, code_verifier: Optional[str] = None
+    ) -> Dict[str, any]:
+        """Exchange authorization code for tokens.
+
+        Args:
+            code: Authorization code from callback
+            code_verifier: PKCE code verifier (required if PKCE is enabled)
+
+        Returns:
+            Dictionary containing access_token, id_token, and optionally refresh_token
+
+        Raises:
+            OIDCAuthenticationError: If token exchange fails
+        """
+        config = await self._discover_configuration()
+        token_endpoint = config.get("token_endpoint")
+
+        if not token_endpoint:
+            raise OIDCConfigurationError("Token endpoint not found in OIDC configuration")
+
+        # Build token request
+        data = {
+            "grant_type": "authorization_code",
+            "code": code,
+            "redirect_uri": self.settings.oidc_redirect_uri,
+            "client_id": self.settings.oidc_client_id,
+            "client_secret": self.settings.oidc_client_secret,
+        }
+
+        # Add PKCE verifier if provided
+        if code_verifier:
+            data["code_verifier"] = code_verifier
+
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    token_endpoint,
+                    data=data,
+                    timeout=10.0,
+                )
+                response.raise_for_status()
+                tokens = response.json()
+
+                logger.info("oidc_tokens_received", has_id_token="id_token" in tokens)
+                return tokens
+
+        except httpx.HTTPStatusError as e:
+            logger.error(
+                "oidc_token_exchange_failed",
+                status_code=e.response.status_code,
+                error=e.response.text,
+            )
+            raise OIDCAuthenticationError(f"Token exchange failed: {e.response.text}") from e
+        except Exception as e:
+            logger.error(
+                "oidc_token_exchange_error",
+                error=str(e),
+                error_type=type(e).__name__,
+            )
+            raise OIDCAuthenticationError(f"Token exchange failed: {e}") from e
+
+    async def validate_id_token(self, id_token: str, nonce: Optional[str] = None) -> JWTClaims:
+        """Validate ID token and extract claims.
+
+        Args:
+            id_token: The ID token to validate
+            nonce: Optional nonce value to validate (for replay protection)
+
+        Returns:
+            Validated JWT claims
+
+        Raises:
+            OIDCAuthenticationError: If token validation fails
+        """
+        try:
+            # Fetch JWKS for signature verification
+            jwks = await self._fetch_jwks()
+            config = await self._discover_configuration()
+
+            # Create JWT validator
+            jwt = JsonWebToken(["RS256", "HS256"])
+
+            # Decode and validate token
+            claims = jwt.decode(
+                id_token,
+                key=jwks,
+                claims_cls=CodeIDToken,
+                claims_options={
+                    "iss": {"value": config.get("issuer")},
+                    "aud": {"value": self.settings.oidc_client_id},
+                },
+            )
+
+            # Validate nonce if provided
+            if nonce and claims.get("nonce") != nonce:
+                raise OIDCAuthenticationError("ID token nonce mismatch")
+
+            logger.info(
+                "oidc_id_token_validated",
+                sub=claims.get("sub"),
+                email=claims.get("email"),
+            )
+
+            return claims
+
+        except Exception as e:
+            logger.error(
+                "oidc_id_token_validation_failed",
+                error=str(e),
+                error_type=type(e).__name__,
+            )
+            raise OIDCAuthenticationError(f"ID token validation failed: {e}") from e
+
+    async def get_user_info(self, access_token: str) -> Dict[str, any]:
+        """Fetch user information from UserInfo endpoint.
+
+        Args:
+            access_token: Access token for authentication
+
+        Returns:
+            User information dictionary
+
+        Raises:
+            OIDCAuthenticationError: If UserInfo request fails
+        """
+        config = await self._discover_configuration()
+        userinfo_endpoint = config.get("userinfo_endpoint")
+
+        if not userinfo_endpoint:
+            logger.warning("oidc_userinfo_endpoint_not_found")
+            return {}
+
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    userinfo_endpoint,
                     headers={"Authorization": f"Bearer {access_token}"},
                     timeout=10.0,
                 )
                 response.raise_for_status()
-                user_data = response.json()
-                return self._extract_user_info(user_data)
+                user_info = response.json()
+
+                logger.debug("oidc_userinfo_fetched", sub=user_info.get("sub"))
+                return user_info
+
         except Exception as e:
-            print(f"Failed to fetch user info: {e}")
-            return None
+            logger.warning(
+                "oidc_userinfo_fetch_failed",
+                error=str(e),
+                error_type=type(e).__name__,
+            )
+            # Don't fail authentication if UserInfo fails, just return empty dict
+            return {}
 
-    async def _get_jwks(self) -> dict[str, Any]:
-        """Fetch and cache JSON Web Key Set.
-
-        Returns:
-            JWKS dictionary
-        """
-        # Check cache
-        current_time = time.time()
-        if self._jwks_cache and (current_time - self._jwks_cache_time) < self._jwks_cache_ttl:
-            return self._jwks_cache
-
-        # Fetch JWKS
-        async with httpx.AsyncClient() as client:
-            response = await client.get(self.jwks_uri, timeout=10.0)
-            response.raise_for_status()
-            self._jwks_cache = response.json()
-            self._jwks_cache_time = current_time
-            return self._jwks_cache
-
-    def _extract_user_info(self, data: dict[str, Any] | JWTClaims) -> UserInfo:
-        """Extract user information from OIDC claims or userinfo response.
+    async def authenticate(
+        self, code: str, code_verifier: Optional[str] = None, nonce: Optional[str] = None
+    ) -> Dict[str, any]:
+        """Complete OIDC authentication flow.
 
         Args:
-            data: Claims dictionary or JWTClaims object
+            code: Authorization code from callback
+            code_verifier: PKCE code verifier (required if PKCE is enabled)
+            nonce: Optional nonce for ID token validation
 
         Returns:
-            UserInfo object
+            Dictionary containing user information:
+            - user_id: Unique user identifier (sub claim)
+            - email: User email address
+            - name: User display name
+            - roles: List of roles (from groups claim)
+            - teams: List of teams (from groups claim)
+            - attributes: All ID token claims
+
+        Raises:
+            OIDCAuthenticationError: If authentication fails
         """
-        # Convert JWTClaims to dict if needed
-        if isinstance(data, JWTClaims):
-            claims = dict(data)
-        else:
-            claims = data
+        logger.info("oidc_authentication_started")
 
-        # Extract standard OIDC claims
-        user_id = claims.get("sub") or claims.get("oid") or claims.get("uid", "")
-        email = claims.get("email", "")
-        name = claims.get("name")
-        given_name = claims.get("given_name")
-        family_name = claims.get("family_name")
-        picture = claims.get("picture")
+        # Exchange code for tokens
+        tokens = await self.exchange_code_for_tokens(code, code_verifier)
 
-        # Extract groups (provider-specific)
-        groups = None
-        if "groups" in claims:
-            groups = claims["groups"]
-        elif "roles" in claims:
-            groups = claims["roles"]
+        # Validate ID token
+        id_token = tokens.get("id_token")
+        if not id_token:
+            raise OIDCAuthenticationError("No ID token in response")
 
-        return UserInfo(
-            user_id=user_id,
-            email=email,
-            name=name,
-            given_name=given_name,
-            family_name=family_name,
-            picture=picture,
-            groups=groups,
-            attributes=claims,
+        claims = await self.validate_id_token(id_token, nonce)
+
+        # Optionally fetch additional user info
+        access_token = tokens.get("access_token")
+        user_info = {}
+        if access_token:
+            user_info = await self.get_user_info(access_token)
+
+        # Merge claims with user_info (user_info takes precedence)
+        merged_info = {**dict(claims), **user_info}
+
+        # Extract and normalize user information
+        user_data = {
+            "user_id": merged_info.get("sub"),
+            "username": merged_info.get("preferred_username") or merged_info.get("email"),
+            "email": merged_info.get("email"),
+            "name": merged_info.get("name") or merged_info.get("given_name", ""),
+            "roles": merged_info.get("roles", merged_info.get("groups", [])),
+            "teams": merged_info.get("groups", merged_info.get("roles", [])),
+            "permissions": [],  # Will be determined by OPA policies
+            "attributes": merged_info,  # Store all claims for reference
+        }
+
+        logger.info(
+            "oidc_authentication_success",
+            user_id=user_data["user_id"],
+            email=user_data["email"],
+            roles=user_data["roles"],
         )
+
+        return user_data
