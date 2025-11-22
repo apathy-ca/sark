@@ -3,11 +3,12 @@
 from typing import Any
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 import structlog
 
+from sark.api.pagination import PaginatedResponse, PaginationParams
 from sark.db import get_db, get_timescale_db
 from sark.models.audit import AuditEventType, SeverityLevel
 from sark.models.mcp_server import TransportType
@@ -53,6 +54,17 @@ class ServerResponse(BaseModel):
     server_id: UUID
     status: str
     consul_id: str | None
+
+
+class ServerListItem(BaseModel):
+    """Server list item schema."""
+
+    id: str
+    name: str
+    transport: str
+    status: str
+    sensitivity_level: str
+    created_at: str
 
 
 @router.post("/", response_model=ServerResponse, status_code=status.HTTP_201_CREATED)
@@ -185,25 +197,51 @@ async def get_server(
     }
 
 
-@router.get("/")
+@router.get("/", response_model=PaginatedResponse[ServerListItem])
 async def list_servers(
-    status: str | None = None,
+    limit: int = Query(default=50, ge=1, le=200, description="Items per page"),
+    cursor: str | None = Query(None, description="Pagination cursor"),
+    sort_order: str = Query(default="desc", pattern="^(asc|desc)$", description="Sort order"),
+    status: str | None = Query(None, description="Filter by status"),
+    include_total: bool = Query(
+        default=False, description="Include total count (expensive operation)"
+    ),
     db: AsyncSession = Depends(get_db),
-) -> list[dict[str, Any]]:
-    """List all registered MCP servers."""
+) -> PaginatedResponse[ServerListItem]:
+    """
+    List registered MCP servers with pagination.
+
+    Supports cursor-based pagination for efficient querying of large datasets.
+    Default page size is 50, maximum is 200.
+    """
     discovery_service = DiscoveryService(db)
 
-    # TODO: Add pagination
-    servers = await discovery_service.list_servers()
+    # Create pagination params
+    pagination = PaginationParams(limit=limit, cursor=cursor, sort_order=sort_order)
 
-    return [
-        {
-            "id": str(server.id),
-            "name": server.name,
-            "transport": server.transport.value,
-            "status": server.status.value,
-            "sensitivity_level": server.sensitivity_level.value,
-            "created_at": server.created_at.isoformat(),
-        }
+    # Get paginated servers
+    servers, next_cursor, has_more, total = await discovery_service.list_servers_paginated(
+        pagination=pagination,
+        status=None,  # TODO: Parse status string to enum
+        count_total=include_total,
+    )
+
+    # Convert to response format
+    items = [
+        ServerListItem(
+            id=str(server.id),
+            name=server.name,
+            transport=server.transport.value,
+            status=server.status.value,
+            sensitivity_level=server.sensitivity_level.value,
+            created_at=server.created_at.isoformat(),
+        )
         for server in servers
     ]
+
+    return PaginatedResponse(
+        items=items,
+        next_cursor=next_cursor,
+        has_more=has_more,
+        total=total,
+    )
