@@ -9,6 +9,18 @@ from sark.services.audit.siem.circuit_breaker import (
     CircuitState,
 )
 from sark.services.audit.siem.datadog import DatadogConfig, DatadogSIEM
+from sark.services.audit.siem.error_handler import (
+    ErrorAlert,
+    ErrorCategory,
+    ErrorRecord,
+    ErrorSeverity,
+    FallbackLogger,
+    RecoveryStrategy,
+    SIEMErrorHandler,
+    auth_failure_condition,
+    critical_error_condition,
+    high_error_rate_condition,
+)
 from sark.services.audit.siem.optimizer import (
     CompressionConfig,
     HealthMonitorConfig,
@@ -33,12 +45,22 @@ __all__ = [
     "CompressionConfig",
     "DatadogConfig",
     "DatadogSIEM",
+    "ErrorAlert",
+    "ErrorCategory",
+    "ErrorRecord",
+    "ErrorSeverity",
+    "FallbackLogger",
     "HealthMonitorConfig",
+    "RecoveryStrategy",
     "RetryHandler",
     "RetryConfig",
+    "SIEMErrorHandler",
     "SIEMOptimizer",
     "SplunkConfig",
     "SplunkSIEM",
+    "auth_failure_condition",
+    "critical_error_condition",
     "estimate_event_size",
     "get_optimal_batch_size",
+    "high_error_rate_condition",
 ]
