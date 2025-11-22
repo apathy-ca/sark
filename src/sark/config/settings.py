@@ -80,6 +80,22 @@ class Settings(BaseSettings):
     oidc_azure_tenant: str | None = None  # Required for Azure AD
     oidc_okta_domain: str | None = None  # Required for Okta
 
+    # SAML Configuration
+    saml_enabled: bool = False
+    saml_sp_entity_id: str = "https://sark.example.com"
+    saml_sp_acs_url: str = "https://sark.example.com/api/auth/saml/acs"
+    saml_sp_sls_url: str = "https://sark.example.com/api/auth/saml/slo"
+    saml_idp_entity_id: str = ""
+    saml_idp_sso_url: str = ""
+    saml_idp_slo_url: str | None = None
+    saml_idp_x509_cert: str | None = None  # IdP certificate (PEM without headers)
+    saml_idp_metadata_url: str | None = None  # Alternative to manual config
+    saml_sp_x509_cert: str | None = None  # SP certificate for signing
+    saml_sp_private_key: str | None = None  # SP private key for signing
+    saml_name_id_format: str = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
+    saml_want_assertions_signed: bool = True
+    saml_want_messages_signed: bool = False
+
     # PostgreSQL Database
     postgres_host: str = "localhost"
     postgres_port: int = 5432
@@ -136,6 +152,19 @@ class Settings(BaseSettings):
     audit_batch_size: int = 100
     audit_flush_interval_seconds: int = 5
     audit_retention_days: int = 90
+
+    # Splunk SIEM Configuration
+    splunk_enabled: bool = False
+    splunk_hec_url: str = "https://localhost:8088/services/collector"
+    splunk_hec_token: str = ""
+    splunk_index: str = "sark_audit"
+    splunk_sourcetype: str = "sark:audit:event"
+    splunk_source: str = "sark"
+    splunk_host: str | None = None
+    splunk_verify_ssl: bool = True
+    splunk_batch_size: int = 100
+    splunk_batch_timeout_seconds: int = 5
+    splunk_retry_attempts: int = 3
 
     # Observability
     metrics_enabled: bool = True

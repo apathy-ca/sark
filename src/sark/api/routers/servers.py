@@ -202,27 +202,61 @@ async def list_servers(
     limit: int = Query(default=50, ge=1, le=200, description="Items per page"),
     cursor: str | None = Query(None, description="Pagination cursor"),
     sort_order: str = Query(default="desc", pattern="^(asc|desc)$", description="Sort order"),
-    status: str | None = Query(None, description="Filter by status"),
+    status: str | None = Query(None, description="Filter by status (comma-separated)"),
+    sensitivity: str | None = Query(
+        None, description="Filter by sensitivity level (comma-separated)"
+    ),
+    team_id: str | None = Query(None, description="Filter by team UUID"),
+    owner_id: str | None = Query(None, description="Filter by owner UUID"),
+    tags: str | None = Query(None, description="Filter by tags (comma-separated)"),
+    match_all_tags: bool = Query(default=False, description="Match all tags (AND) vs any tag (OR)"),
+    search: str | None = Query(None, description="Full-text search on name/description"),
     include_total: bool = Query(
         default=False, description="Include total count (expensive operation)"
     ),
     db: AsyncSession = Depends(get_db),
 ) -> PaginatedResponse[ServerListItem]:
     """
-    List registered MCP servers with pagination.
+    List registered MCP servers with pagination and filtering.
 
     Supports cursor-based pagination for efficient querying of large datasets.
     Default page size is 50, maximum is 200.
+
+    Filters can be combined - all filters use AND logic.
+    Multiple values in status/sensitivity/tags use OR logic by default.
+
+    Examples:
+    - /api/servers/?status=active&sensitivity=high
+    - /api/servers/?search=analytics&tags=production,critical
+    - /api/servers/?team_id=<uuid>&limit=100
     """
+    # Import search utilities
+    from sark.services.discovery.search import (
+        parse_sensitivity_list,
+        parse_status_list,
+        parse_tags_filter,
+    )
+
     discovery_service = DiscoveryService(db)
 
     # Create pagination params
     pagination = PaginationParams(limit=limit, cursor=cursor, sort_order=sort_order)
 
-    # Get paginated servers
+    # Parse filters
+    status_filter = parse_status_list(status)
+    sensitivity_filter = parse_sensitivity_list(sensitivity)
+    tags_filter = parse_tags_filter(tags)
+
+    # Get paginated servers with filters
     servers, next_cursor, has_more, total = await discovery_service.list_servers_paginated(
         pagination=pagination,
-        status=None,  # TODO: Parse status string to enum
+        status=status_filter,
+        sensitivity=sensitivity_filter,
+        team_id=team_id,
+        owner_id=owner_id,
+        tags=tags_filter,
+        match_all_tags=match_all_tags,
+        search=search,
         count_total=include_total,
     )
 
