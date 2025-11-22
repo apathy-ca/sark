@@ -260,6 +260,99 @@ Get current authenticated user information.
 
 ---
 
+## Session Management
+
+SARK uses a dual-token authentication system for secure session management:
+- **Access Tokens** (JWT): Short-lived (60 minutes), used for API requests
+- **Refresh Tokens**: Long-lived (7 days), stored in Redis, used to obtain new access tokens
+
+### Session Lifecycle
+
+```
+1. User authenticates (LDAP/OIDC/SAML)
+   ↓
+2. Receive access_token + refresh_token
+   ↓
+3. Use access_token for API requests
+   ↓
+4. When access_token expires, use refresh_token to get new access_token
+   ↓
+5. Repeat (refresh_token valid for 7 days)
+```
+
+### Session Security Features
+
+**Token Rotation:**
+When `REFRESH_TOKEN_ROTATION_ENABLED=true`, each token refresh invalidates the old refresh token and issues a new one, preventing token replay attacks.
+
+**Concurrent Session Limits:**
+- Default: 5 active sessions per user
+- Configurable via `MAX_SESSIONS_PER_USER`
+- Oldest sessions automatically revoked when limit exceeded
+
+**Session Tracking:**
+Each session stores:
+- IP address of last use
+- User agent
+- Creation timestamp
+- Last activity timestamp
+- Expiration time
+
+### Managing Sessions
+
+**View Current Session:**
+```bash
+GET /api/v1/auth/me
+```
+Returns current user info from access token.
+
+**Logout (Revoke Session):**
+```bash
+POST /api/v1/auth/revoke
+```
+Invalidates the refresh token, effectively logging out that session.
+
+**Session Timeout:**
+- **Access Token TTL**: 60 minutes (configurable via `JWT_EXPIRATION_MINUTES`)
+- **Refresh Token TTL**: 7 days (configurable via `REFRESH_TOKEN_EXPIRATION_DAYS`)
+- **Idle Timeout**: Not currently implemented (future enhancement)
+
+### Best Practices
+
+**For Web Applications:**
+1. Store access token in memory (not localStorage)
+2. Store refresh token in httpOnly cookie
+3. Refresh access token before expiration
+4. Handle 401 errors by refreshing token
+5. Logout: Revoke refresh token and clear client state
+
+**For Mobile/Desktop Apps:**
+1. Store both tokens in secure storage (Keychain/Keystore)
+2. Refresh token proactively before expiration
+3. Implement automatic logout after inactivity
+4. Clear tokens on explicit logout
+
+**For Service-to-Service:**
+1. Use API keys instead of JWT tokens
+2. Rotate API keys regularly (90-day expiration recommended)
+3. Use scoped API keys (minimum required permissions)
+
+### Troubleshooting
+
+**Problem: 401 Unauthorized after token refresh**
+- **Cause**: Refresh token expired or revoked
+- **Solution**: User must re-authenticate
+
+**Problem: 401 Unauthorized on API call**
+- **Cause**: Access token expired
+- **Solution**: Refresh access token using refresh token endpoint
+
+**Problem: Too many active sessions**
+- **Cause**: User has exceeded concurrent session limit
+- **Solution**: Older sessions are automatically revoked, or user can explicitly revoke sessions
+
+---
+
 ## API Key Management
 
 ### POST /api/auth/api-keys
@@ -826,6 +919,214 @@ Evaluate authorization policy for a request.
   "filtered_parameters": null,
   "audit_id": "audit_456def"
 }
+```
+
+### Advanced Policy Features
+
+SARK supports advanced authorization policies beyond basic RBAC:
+
+#### Time-Based Access Control
+
+Policies can restrict access based on time of day or day of week:
+
+**Request Example:**
+```json
+{
+  "user_id": "550e8400-e29b-41d4-a716-446655440000",
+  "action": "server:register",
+  "server_id": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+  "context": {
+    "timestamp": "2025-11-22T23:30:00Z",
+    "time_of_day": "23:30",
+    "day_of_week": "friday"
+  }
+}
+```
+
+**Response (Deny - Outside Business Hours):**
+```json
+{
+  "decision": "deny",
+  "reason": "Server registration only allowed during business hours (9 AM - 5 PM Monday-Friday)",
+  "filtered_parameters": null,
+  "audit_id": "audit_789ghi"
+}
+```
+
+#### IP-Based Access Control
+
+Restrict access based on source IP address or IP ranges:
+
+**Request Example:**
+```json
+{
+  "user_id": "550e8400-e29b-41d4-a716-446655440000",
+  "action": "tool:invoke",
+  "tool": "delete_production_database",
+  "context": {
+    "ip_address": "203.0.113.50",
+    "network": "external"
+  }
+}
+```
+
+**Response (Deny - IP Not Whitelisted):**
+```json
+{
+  "decision": "deny",
+  "reason": "Critical operations require access from corporate network (IP range: 10.0.0.0/8)",
+  "filtered_parameters": null,
+  "audit_id": "audit_012jkl"
+}
+```
+
+#### MFA Requirement
+
+Require multi-factor authentication for sensitive operations:
+
+**Request Example:**
+```json
+{
+  "user_id": "550e8400-e29b-41d4-a716-446655440000",
+  "action": "tool:invoke",
+  "tool": "delete_user_account",
+  "context": {
+    "mfa_verified": false,
+    "authentication_method": "password"
+  }
+}
+```
+
+**Response (Deny - MFA Required):**
+```json
+{
+  "decision": "deny",
+  "reason": "Multi-factor authentication required for critical operations",
+  "filtered_parameters": null,
+  "required_conditions": ["mfa_verified"],
+  "audit_id": "audit_345mno"
+}
+```
+
+**Request Example (with MFA):**
+```json
+{
+  "user_id": "550e8400-e29b-41d4-a716-446655440000",
+  "action": "tool:invoke",
+  "tool": "delete_user_account",
+  "context": {
+    "mfa_verified": true,
+    "mfa_method": "totp",
+    "mfa_timestamp": "2025-11-22T10:29:55Z"
+  }
+}
+```
+
+**Response (Allow - MFA Verified):**
+```json
+{
+  "decision": "allow",
+  "reason": "User authenticated with MFA and has required permissions",
+  "filtered_parameters": null,
+  "audit_id": "audit_678pqr"
+}
+```
+
+#### Parameter Filtering
+
+Policies can filter or redact sensitive parameters:
+
+**Request Example:**
+```json
+{
+  "user_id": "550e8400-e29b-41d4-a716-446655440000",
+  "action": "tool:invoke",
+  "tool": "query_user_data",
+  "parameters": {
+    "user_id": "target-user-123",
+    "fields": ["email", "phone", "ssn", "name"]
+  }
+}
+```
+
+**Response (Allow with Filtered Parameters):**
+```json
+{
+  "decision": "allow",
+  "reason": "User has read access, but sensitive fields filtered based on role",
+  "filtered_parameters": {
+    "user_id": "target-user-123",
+    "fields": ["email", "name"]
+  },
+  "removed_parameters": ["phone", "ssn"],
+  "audit_id": "audit_901stu"
+}
+```
+
+#### Batch Policy Evaluation
+
+For bulk operations, evaluate multiple policy decisions in a single request:
+
+**Request:**
+```json
+{
+  "batch": [
+    {
+      "user_id": "550e8400-e29b-41d4-a716-446655440000",
+      "action": "server:register",
+      "server_id": "server-1"
+    },
+    {
+      "user_id": "550e8400-e29b-41d4-a716-446655440000",
+      "action": "server:register",
+      "server_id": "server-2"
+    }
+  ]
+}
+```
+
+**Response:**
+```json
+{
+  "decisions": [
+    {
+      "decision": "allow",
+      "reason": "User has server:write permission",
+      "audit_id": "audit_123"
+    },
+    {
+      "decision": "deny",
+      "reason": "Sensitivity level exceeds user's maximum",
+      "audit_id": "audit_456"
+    }
+  ],
+  "summary": {
+    "total": 2,
+    "allowed": 1,
+    "denied": 1
+  }
+}
+```
+
+### Policy Caching
+
+Policy decisions are cached in Redis for performance:
+
+**Cache Behavior:**
+- **Cache TTL**: Varies by sensitivity level (30s to 10min)
+- **Cache Key**: `policy:decision:{user_id}:{action}:{resource}:{context_hash}`
+- **Cache Hit**: Returns decision in <5ms
+- **Cache Miss**: Evaluates via OPA in <50ms
+
+**Cache Headers:**
+```
+X-Cache-Status: HIT | MISS
+X-Cache-TTL: 300
+```
+
+To bypass cache for critical operations:
+```bash
+curl -H "X-Skip-Policy-Cache: true" https://sark.example.com/api/v1/policy/evaluate
 ```
 
 ---
