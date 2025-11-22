@@ -29,3 +29,7 @@ bandit>=1.7.5
 # Type stubs for mypy
 types-redis>=4.6.0
 types-passlib>=1.7.7
+
+# Performance testing
+locust>=2.15.0
+faker>=19.0.0  # Already in deps but needed for load testing data generation

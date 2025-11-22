@@ -132,8 +132,22 @@ class Settings(BaseSettings):
     postgres_user: str = "sark"
     postgres_password: str = "sark"
     postgres_db: str = "sark"
+
+    # Database Connection Pool Configuration
+    # pool_size: Number of connections to keep in the pool
     postgres_pool_size: int = 20
+    # max_overflow: Additional connections beyond pool_size under high load
     postgres_max_overflow: int = 10
+    # pool_timeout: Seconds to wait for connection from pool before error
+    postgres_pool_timeout: int = 30
+    # pool_recycle: Recycle connections after N seconds (-1 = disabled)
+    # Prevents "MySQL server has gone away" and similar timeout issues
+    postgres_pool_recycle: int = 3600
+    # pool_pre_ping: Test connections before using them from pool
+    # Ensures connection is alive before query execution
+    postgres_pool_pre_ping: bool = True
+    # echo_pool: Log connection pool checkouts/returns (debugging)
+    postgres_echo_pool: bool = False
 
     # TimescaleDB (Audit Database) - can be same as PostgreSQL or separate
     timescale_host: str = "localhost"
@@ -142,12 +156,25 @@ class Settings(BaseSettings):
     timescale_password: str = "sark"
     timescale_db: str = "sark_audit"
 
-    # Redis
+    # Redis Connection Pool Configuration
     redis_host: str = "localhost"
     redis_port: int = 6379
     redis_password: str | None = None
     redis_db: int = 0
+    # max_connections: Maximum connections in pool (for ConnectionPool)
     redis_pool_size: int = 50
+    # min_idle_connections: Minimum idle connections to keep
+    redis_min_idle: int = 10
+    # socket_timeout: Socket timeout in seconds
+    redis_socket_timeout: int = 5
+    # socket_connect_timeout: Connection timeout in seconds
+    redis_socket_connect_timeout: int = 5
+    # socket_keepalive: Enable TCP keepalive
+    redis_socket_keepalive: bool = True
+    # retry_on_timeout: Retry commands on timeout
+    redis_retry_on_timeout: bool = True
+    # health_check_interval: Seconds between connection health checks
+    redis_health_check_interval: int = 30
 
     # Consul
     consul_host: str = "localhost"
@@ -159,6 +186,24 @@ class Settings(BaseSettings):
     opa_url: str = "http://localhost:8181"
     opa_policy_path: str = "/v1/data/mcp/allow"
     opa_timeout_seconds: float = 1.0
+
+    # HTTP Client Connection Pool Configuration
+    # max_connections: Maximum connections in pool
+    http_pool_connections: int = 100
+    # max_keepalive_connections: Maximum connections to keep alive
+    http_pool_keepalive: int = 20
+    # keepalive_expiry: Seconds to keep idle connections alive
+    http_keepalive_expiry: float = 5.0
+
+    # Response Caching Configuration
+    # enable_response_cache: Enable caching for read-heavy endpoints
+    enable_response_cache: bool = True
+    # cache_ttl_seconds: Default TTL for cached responses
+    cache_ttl_seconds: int = 60
+    # cache_server_list_ttl: TTL for server list endpoint
+    cache_server_list_ttl: int = 30
+    # cache_server_detail_ttl: TTL for server detail endpoint
+    cache_server_detail_ttl: int = 300
 
     # HashiCorp Vault
     vault_url: str = "http://localhost:8200"
