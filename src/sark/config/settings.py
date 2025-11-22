@@ -96,6 +96,22 @@ class Settings(BaseSettings):
     saml_want_assertions_signed: bool = True
     saml_want_messages_signed: bool = False
 
+    # LDAP/Active Directory Configuration
+    ldap_enabled: bool = False
+    ldap_server: str = "ldap://localhost:389"
+    ldap_bind_dn: str = "cn=admin,dc=example,dc=com"
+    ldap_bind_password: str = ""
+    ldap_user_base_dn: str = "ou=users,dc=example,dc=com"
+    ldap_group_base_dn: str | None = "ou=groups,dc=example,dc=com"
+    ldap_user_search_filter: str = "(uid={username})"
+    ldap_group_search_filter: str = "(member={user_dn})"
+    ldap_email_attribute: str = "mail"
+    ldap_name_attribute: str = "cn"
+    ldap_given_name_attribute: str = "givenName"
+    ldap_family_name_attribute: str = "sn"
+    ldap_use_ssl: bool = False
+    ldap_pool_size: int = 10
+
     # PostgreSQL Database
     postgres_host: str = "localhost"
     postgres_port: int = 5432

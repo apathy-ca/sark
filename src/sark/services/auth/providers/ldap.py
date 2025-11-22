@@ -1,425 +1,378 @@
-"""LDAP/Active Directory authentication provider.
+"""LDAP/Active Directory authentication provider."""
 
-This module provides LDAP authentication and user attribute extraction
-for enterprise single sign-on (SSO) integration.
+import logging
+from typing import Any
 
-Features:
-- LDAP bind authentication
-- LDAPS (SSL/TLS) support
-- User attribute extraction (email, name, groups)
-- Group-to-role mapping
-- Connection pooling
-- Comprehensive error handling
-"""
+from ldap3 import Connection, Server, ALL, SIMPLE, SUBTREE
+from ldap3.core.exceptions import LDAPException, LDAPBindError
 
-from typing import Dict, List, Optional
+from .base import AuthProvider, UserInfo
 
-import ldap3
-from ldap3 import ALL, ALL_ATTRIBUTES, Connection, Server, Tls
-from ldap3.core.exceptions import LDAPException
-import structlog
-
-from sark.config import Settings, get_settings
-
-logger = structlog.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
-class LDAPAuthenticationError(Exception):
-    """Exception raised for LDAP authentication failures."""
-
-    pass
-
-
-class LDAPConnectionError(Exception):
-    """Exception raised for LDAP connection failures."""
-
-    pass
-
-
-class LDAPProvider:
+class LDAPProvider(AuthProvider):
     """LDAP/Active Directory authentication provider.
 
-    Provides authentication and user attribute extraction from LDAP
-    directories including Microsoft Active Directory.
+    Supports both simple bind authentication and user/group lookup.
+    Uses connection pooling for performance.
+
+    Example:
+        >>> provider = LDAPProvider(
+        ...     server_uri="ldap://ldap.example.com:389",
+        ...     bind_dn="cn=admin,dc=example,dc=com",
+        ...     bind_password="password",
+        ...     user_base_dn="ou=users,dc=example,dc=com",
+        ...     group_base_dn="ou=groups,dc=example,dc=com"
+        ... )
+        >>> user_info = await provider.authenticate({
+        ...     "username": "jdoe",
+        ...     "password": "secret"
+        ... })
     """
 
-    def __init__(self, settings: Optional[Settings] = None):
+    def __init__(
+        self,
+        server_uri: str,
+        bind_dn: str,
+        bind_password: str,
+        user_base_dn: str,
+        group_base_dn: str | None = None,
+        user_search_filter: str = "(uid={username})",
+        group_search_filter: str = "(member={user_dn})",
+        email_attribute: str = "mail",
+        name_attribute: str = "cn",
+        given_name_attribute: str = "givenName",
+        family_name_attribute: str = "sn",
+        use_ssl: bool = False,
+        pool_size: int = 10,
+    ):
         """Initialize LDAP provider.
 
         Args:
-            settings: Settings instance (defaults to get_settings())
-
-        Raises:
-            ValueError: If LDAP is enabled but required settings are missing
+            server_uri: LDAP server URI (e.g., ldap://localhost:389)
+            bind_dn: DN for binding to LDAP server
+            bind_password: Password for bind DN
+            user_base_dn: Base DN for user searches
+            group_base_dn: Base DN for group searches (optional)
+            user_search_filter: LDAP filter for user search (default: uid={username})
+            group_search_filter: LDAP filter for group search (default: member={user_dn})
+            email_attribute: LDAP attribute for email (default: mail)
+            name_attribute: LDAP attribute for full name (default: cn)
+            given_name_attribute: LDAP attribute for first name (default: givenName)
+            family_name_attribute: LDAP attribute for last name (default: sn)
+            use_ssl: Whether to use SSL/TLS (default: False)
+            pool_size: Connection pool size (default: 10)
         """
-        self.settings = settings or get_settings()
+        self.server_uri = server_uri
+        self.bind_dn = bind_dn
+        self.bind_password = bind_password
+        self.user_base_dn = user_base_dn
+        self.group_base_dn = group_base_dn
+        self.user_search_filter = user_search_filter
+        self.group_search_filter = group_search_filter
+        self.email_attribute = email_attribute
+        self.name_attribute = name_attribute
+        self.given_name_attribute = given_name_attribute
+        self.family_name_attribute = family_name_attribute
+        self.use_ssl = use_ssl
+        self.pool_size = pool_size
 
-        if not self.settings.ldap_enabled:
-            logger.info("ldap_provider_disabled")
-            return
+        # Create LDAP server object
+        self.server = Server(server_uri, get_info=ALL, use_ssl=use_ssl)
 
-        # Validate required settings
-        if not self.settings.ldap_server:
-            raise ValueError("LDAP_SERVER is required when LDAP is enabled")
-        if not self.settings.ldap_bind_dn:
-            raise ValueError("LDAP_BIND_DN is required when LDAP is enabled")
-        if not self.settings.ldap_bind_password:
-            raise ValueError("LDAP_BIND_PASSWORD is required when LDAP is enabled")
-        if not self.settings.ldap_user_base_dn:
-            raise ValueError("LDAP_USER_BASE_DN is required when LDAP is enabled")
-
-        # Configure LDAP server
-        self.server = self._create_server()
-        self.pool = None  # Connection pool will be initialized when needed
-
-        logger.info(
-            "ldap_provider_initialized",
-            server=self.settings.ldap_server,
-            use_ssl=self.settings.ldap_use_ssl,
-        )
-
-    def _create_server(self) -> Server:
-        """Create LDAP server object with TLS configuration.
-
-        Returns:
-            Configured LDAP Server object
-        """
-        # Configure TLS if using LDAPS
-        tls = None
-        if self.settings.ldap_use_ssl:
-            tls = Tls()
-
-        # Create server object
-        server = Server(
-            self.settings.ldap_server,
-            get_info=ALL,
-            tls=tls,
-            connect_timeout=self.settings.ldap_timeout,
-        )
-
-        return server
-
-    def _get_connection(
-        self, user_dn: Optional[str] = None, password: Optional[str] = None
-    ) -> Connection:
-        """Get LDAP connection.
+    def _get_connection(self, user_dn: str | None = None, password: str | None = None) -> Connection:
+        """Get LDAP connection (for user or service account).
 
         Args:
-            user_dn: User DN for binding (defaults to service account)
-            password: Password for binding (defaults to service account)
+            user_dn: User DN for binding (optional, uses service account if not provided)
+            password: Password for user binding
 
         Returns:
             LDAP Connection object
-
-        Raises:
-            LDAPConnectionError: If connection fails
         """
-        bind_dn = user_dn or self.settings.ldap_bind_dn
-        bind_password = password or self.settings.ldap_bind_password
-
-        try:
-            connection = Connection(
+        if user_dn and password:
+            # User authentication connection
+            return Connection(
                 self.server,
-                user=bind_dn,
-                password=bind_password,
+                user=user_dn,
+                password=password,
+                authentication=SIMPLE,
                 auto_bind=True,
-                raise_exceptions=True,
+                pool_size=self.pool_size,
+                pool_name=f"ldap_user_{user_dn}",
+            )
+        else:
+            # Service account connection
+            return Connection(
+                self.server,
+                user=self.bind_dn,
+                password=self.bind_password,
+                authentication=SIMPLE,
+                auto_bind=True,
+                pool_size=self.pool_size,
+                pool_name="ldap_service",
             )
 
-            logger.debug("ldap_connection_established", bind_dn=bind_dn)
-            return connection
-
-        except LDAPException as e:
-            logger.error(
-                "ldap_connection_failed",
-                bind_dn=bind_dn,
-                error=str(e),
-                error_type=type(e).__name__,
-            )
-            raise LDAPConnectionError(f"Failed to connect to LDAP server: {e}") from e
-
-    def authenticate(self, username: str, password: str) -> Dict[str, any]:
-        """Authenticate user against LDAP directory.
+    async def authenticate(self, credentials: dict[str, Any]) -> UserInfo | None:
+        """Authenticate user with LDAP username and password.
 
         Args:
-            username: Username to authenticate
-            password: User password
+            credentials: Dictionary with 'username' and 'password' keys
 
         Returns:
-            Dictionary containing user information:
-            - user_id: Unique user identifier (DN or uid)
-            - email: User email address
-            - name: User display name
-            - groups: List of LDAP groups
-            - roles: List of SARK roles (mapped from groups)
-            - attributes: Dictionary of all user LDAP attributes
-
-        Raises:
-            LDAPAuthenticationError: If authentication fails
-            LDAPConnectionError: If LDAP connection fails
+            UserInfo object if authentication successful, None otherwise
         """
-        if not self.settings.ldap_enabled:
-            raise LDAPAuthenticationError("LDAP authentication is not enabled")
+        username = credentials.get("username")
+        password = credentials.get("password")
 
-        logger.info("ldap_authentication_attempt", username=username)
-
-        # Step 1: Search for user DN using service account
-        user_dn = self._find_user_dn(username)
-        if not user_dn:
-            logger.warning("ldap_user_not_found", username=username)
-            raise LDAPAuthenticationError(f"User '{username}' not found in LDAP")
-
-        # Step 2: Attempt to bind as the user (authenticate)
-        try:
-            connection = self._get_connection(user_dn=user_dn, password=password)
-            connection.unbind()
-            logger.info("ldap_authentication_success", username=username, user_dn=user_dn)
-        except LDAPConnectionError as e:
-            logger.warning(
-                "ldap_authentication_failed",
-                username=username,
-                user_dn=user_dn,
-                error=str(e),
-            )
-            raise LDAPAuthenticationError("Invalid username or password") from e
-
-        # Step 3: Extract user attributes and groups
-        user_info = self._get_user_info(user_dn)
-
-        return user_info
-
-    def _find_user_dn(self, username: str) -> Optional[str]:
-        """Find user DN by username.
-
-        Args:
-            username: Username to search for
-
-        Returns:
-            User DN if found, None otherwise
-
-        Raises:
-            LDAPConnectionError: If LDAP connection fails
-        """
-        connection = self._get_connection()
-
-        try:
-            # Build search filter from template
-            search_filter = self.settings.ldap_user_filter.format(username=username)
-
-            # Search for user
-            connection.search(
-                search_base=self.settings.ldap_user_base_dn,
-                search_filter=search_filter,
-                search_scope=ldap3.SUBTREE,
-                attributes=["dn"],
-            )
-
-            if connection.entries:
-                user_dn = connection.entries[0].entry_dn
-                logger.debug("ldap_user_found", username=username, user_dn=user_dn)
-                return user_dn
-
+        if not username or not password:
+            logger.warning("LDAP authentication failed: missing username or password")
             return None
 
-        except LDAPException as e:
-            logger.error(
-                "ldap_user_search_failed",
-                username=username,
-                error=str(e),
-                error_type=type(e).__name__,
-            )
-            raise LDAPConnectionError(f"Failed to search for user: {e}") from e
-        finally:
-            connection.unbind()
+        try:
+            # First, search for user DN using service account
+            conn = self._get_connection()
+            search_filter = self.user_search_filter.format(username=username)
 
-    def _get_user_info(self, user_dn: str) -> Dict[str, any]:
-        """Get user information and groups from LDAP.
+            conn.search(
+                search_base=self.user_base_dn,
+                search_filter=search_filter,
+                search_scope=SUBTREE,
+                attributes=[
+                    self.email_attribute,
+                    self.name_attribute,
+                    self.given_name_attribute,
+                    self.family_name_attribute,
+                ],
+            )
+
+            if not conn.entries:
+                logger.warning(f"LDAP user not found: {username}")
+                conn.unbind()
+                return None
+
+            # Get user entry and DN
+            user_entry = conn.entries[0]
+            user_dn = user_entry.entry_dn
+            conn.unbind()
+
+            # Try to bind as the user to verify password
+            try:
+                user_conn = self._get_connection(user_dn, password)
+                user_conn.unbind()
+            except LDAPBindError:
+                logger.warning(f"LDAP authentication failed for user: {username}")
+                return None
+
+            # Extract user information
+            user_info = self._extract_user_info(user_entry, user_dn)
+
+            # Get user groups if group_base_dn is configured
+            if self.group_base_dn:
+                user_info.groups = await self._get_user_groups(user_dn)
+
+            logger.info(f"LDAP authentication successful for user: {username}")
+            return user_info
+
+        except LDAPException as e:
+            logger.error(f"LDAP authentication error: {e}")
+            return None
+        except Exception as e:
+            logger.error(f"Unexpected error during LDAP authentication: {e}")
+            return None
+
+    async def validate_token(self, token: str) -> UserInfo | None:
+        """LDAP does not use tokens for authentication.
 
         Args:
-            user_dn: User distinguished name
+            token: Not used for LDAP
 
         Returns:
-            Dictionary containing user information
-
-        Raises:
-            LDAPConnectionError: If LDAP connection fails
+            None (LDAP doesn't support token validation)
         """
-        connection = self._get_connection()
+        logger.warning("Token validation not supported for LDAP provider")
+        return None
 
+    async def refresh_token(self, refresh_token: str) -> dict[str, str] | None:
+        """LDAP does not support token refresh.
+
+        Args:
+            refresh_token: Not used for LDAP
+
+        Returns:
+            None (LDAP doesn't support token refresh)
+        """
+        logger.warning("Token refresh not supported for LDAP provider")
+        return None
+
+    async def get_authorization_url(self, state: str, redirect_uri: str) -> str:
+        """LDAP does not use OAuth flow.
+
+        Args:
+            state: Not used for LDAP
+            redirect_uri: Not used for LDAP
+
+        Returns:
+            Empty string (LDAP doesn't use authorization URLs)
+        """
+        logger.warning("Authorization URL not supported for LDAP provider")
+        return ""
+
+    async def handle_callback(
+        self, code: str, state: str, redirect_uri: str
+    ) -> dict[str, str] | None:
+        """LDAP does not use OAuth callback flow.
+
+        Args:
+            code: Not used for LDAP
+            state: Not used for LDAP
+            redirect_uri: Not used for LDAP
+
+        Returns:
+            None (LDAP doesn't use OAuth callbacks)
+        """
+        logger.warning("OAuth callback not supported for LDAP provider")
+        return None
+
+    async def health_check(self) -> bool:
+        """Check if LDAP server is reachable.
+
+        Returns:
+            True if LDAP server is accessible, False otherwise
+        """
         try:
-            # Get user attributes
-            connection.search(
-                search_base=user_dn,
+            conn = self._get_connection()
+            # Try a simple search to verify connectivity
+            conn.search(
+                search_base=self.user_base_dn,
                 search_filter="(objectClass=*)",
-                search_scope=ldap3.BASE,
-                attributes=ALL_ATTRIBUTES,
+                search_scope=SUBTREE,
+                attributes=["dn"],
+                size_limit=1,
+            )
+            conn.unbind()
+            return True
+        except LDAPException as e:
+            logger.error(f"LDAP health check failed: {e}")
+            return False
+        except Exception as e:
+            logger.error(f"Unexpected error during LDAP health check: {e}")
+            return False
+
+    async def lookup_user(self, username: str) -> UserInfo | None:
+        """Look up user information without authentication.
+
+        Args:
+            username: Username to look up
+
+        Returns:
+            UserInfo object if user found, None otherwise
+        """
+        try:
+            conn = self._get_connection()
+            search_filter = self.user_search_filter.format(username=username)
+
+            conn.search(
+                search_base=self.user_base_dn,
+                search_filter=search_filter,
+                search_scope=SUBTREE,
+                attributes=[
+                    self.email_attribute,
+                    self.name_attribute,
+                    self.given_name_attribute,
+                    self.family_name_attribute,
+                ],
             )
 
-            if not connection.entries:
-                logger.warning("ldap_user_info_not_found", user_dn=user_dn)
-                raise LDAPConnectionError(f"User DN not found: {user_dn}")
+            if not conn.entries:
+                logger.warning(f"LDAP user not found: {username}")
+                conn.unbind()
+                return None
 
-            entry = connection.entries[0]
+            user_entry = conn.entries[0]
+            user_dn = user_entry.entry_dn
+            conn.unbind()
 
-            # Extract common attributes (with defaults)
-            email = self._get_attribute(entry, ["mail", "userPrincipalName", "email"])
-            name = self._get_attribute(
-                entry,
-                ["displayName", "cn", "name"],
-            )
-            username = self._get_attribute(entry, ["uid", "sAMAccountName", "cn"])
+            # Extract user information
+            user_info = self._extract_user_info(user_entry, user_dn)
 
-            # Get user groups
-            groups = self._get_user_groups(user_dn)
-
-            # Map LDAP groups to SARK roles
-            roles = self._map_groups_to_roles(groups)
-
-            # Build user info dictionary
-            user_info = {
-                "user_id": user_dn,  # Use DN as unique identifier
-                "username": username,
-                "email": email,
-                "name": name,
-                "groups": groups,
-                "roles": roles,
-                "teams": groups,  # Use groups as teams
-                "permissions": [],  # Will be determined by OPA policies
-                "attributes": dict(entry.entry_attributes_as_dict),  # All LDAP attributes
-            }
-
-            logger.info(
-                "ldap_user_info_retrieved",
-                user_dn=user_dn,
-                email=email,
-                groups=groups,
-                roles=roles,
-            )
+            # Get user groups if group_base_dn is configured
+            if self.group_base_dn:
+                user_info.groups = await self._get_user_groups(user_dn)
 
             return user_info
 
         except LDAPException as e:
-            logger.error(
-                "ldap_user_info_retrieval_failed",
-                user_dn=user_dn,
-                error=str(e),
-                error_type=type(e).__name__,
-            )
-            raise LDAPConnectionError(f"Failed to retrieve user info: {e}") from e
-        finally:
-            connection.unbind()
+            logger.error(f"LDAP user lookup error: {e}")
+            return None
+        except Exception as e:
+            logger.error(f"Unexpected error during LDAP user lookup: {e}")
+            return None
 
-    def _get_attribute(self, entry: any, attribute_names: List[str]) -> Optional[str]:
-        """Get first available attribute value from entry.
+    async def _get_user_groups(self, user_dn: str) -> list[str]:
+        """Get groups for a user.
 
         Args:
-            entry: LDAP entry object
-            attribute_names: List of attribute names to try (in order)
-
-        Returns:
-            First non-None attribute value, or None if all are missing
-        """
-        for attr_name in attribute_names:
-            if hasattr(entry, attr_name):
-                value = getattr(entry, attr_name).value
-                if value:
-                    return value if isinstance(value, str) else value[0]
-        return None
-
-    def _get_user_groups(self, user_dn: str) -> List[str]:
-        """Get groups that user belongs to.
-
-        Args:
-            user_dn: User distinguished name
+            user_dn: User DN
 
         Returns:
             List of group names
-
-        Raises:
-            LDAPConnectionError: If LDAP connection fails
         """
-        if not self.settings.ldap_group_base_dn:
-            logger.debug("ldap_group_search_disabled", reason="no_group_base_dn")
+        if not self.group_base_dn:
             return []
 
-        connection = self._get_connection()
-
         try:
-            # Build group search filter
-            search_filter = self.settings.ldap_group_filter.format(user_dn=user_dn)
+            conn = self._get_connection()
+            search_filter = self.group_search_filter.format(user_dn=user_dn)
 
-            # Search for groups
-            connection.search(
-                search_base=self.settings.ldap_group_base_dn,
+            conn.search(
+                search_base=self.group_base_dn,
                 search_filter=search_filter,
-                search_scope=ldap3.SUBTREE,
-                attributes=["cn", "name"],
+                search_scope=SUBTREE,
+                attributes=["cn"],
             )
 
-            groups = []
-            for entry in connection.entries:
-                group_name = self._get_attribute(entry, ["cn", "name"])
-                if group_name:
-                    groups.append(group_name)
-
-            logger.debug("ldap_user_groups_retrieved", user_dn=user_dn, groups=groups)
+            groups = [entry.cn.value for entry in conn.entries if hasattr(entry, "cn")]
+            conn.unbind()
             return groups
 
         except LDAPException as e:
-            logger.warning(
-                "ldap_group_search_failed",
-                user_dn=user_dn,
-                error=str(e),
-                error_type=type(e).__name__,
-            )
-            # Don't fail authentication if group search fails
+            logger.error(f"LDAP group lookup error: {e}")
             return []
-        finally:
-            connection.unbind()
+        except Exception as e:
+            logger.error(f"Unexpected error during LDAP group lookup: {e}")
+            return []
 
-    def _map_groups_to_roles(self, groups: List[str]) -> List[str]:
-        """Map LDAP groups to SARK roles.
+    def _extract_user_info(self, user_entry: Any, user_dn: str) -> UserInfo:
+        """Extract user information from LDAP entry.
 
         Args:
-            groups: List of LDAP group names
+            user_entry: LDAP entry object
+            user_dn: User DN
 
         Returns:
-            List of SARK role names
+            UserInfo object
         """
-        if not self.settings.ldap_role_mapping:
-            # If no mapping configured, use groups as roles
-            return groups
+        # Extract attributes safely
+        email = getattr(user_entry, self.email_attribute, None)
+        email = email.value if email else ""
 
-        roles = set()
-        for group in groups:
-            # Check if there's a mapping for this group
-            mapped_role = self.settings.ldap_role_mapping.get(group)
-            if mapped_role:
-                roles.add(mapped_role)
-            else:
-                # No mapping, use group name as role
-                roles.add(group)
+        name = getattr(user_entry, self.name_attribute, None)
+        name = name.value if name else None
 
-        return list(roles)
+        given_name = getattr(user_entry, self.given_name_attribute, None)
+        given_name = given_name.value if given_name else None
 
-    def validate_connection(self) -> bool:
-        """Validate LDAP connection.
+        family_name = getattr(user_entry, self.family_name_attribute, None)
+        family_name = family_name.value if family_name else None
 
-        Returns:
-            True if connection is successful, False otherwise
-        """
-        if not self.settings.ldap_enabled:
-            return False
-
-        try:
-            connection = self._get_connection()
-            connection.unbind()
-            logger.info("ldap_connection_validation_success")
-            return True
-        except Exception as e:
-            logger.error(
-                "ldap_connection_validation_failed",
-                error=str(e),
-                error_type=type(e).__name__,
-            )
-            return False
+        return UserInfo(
+            user_id=user_dn,
+            email=email,
+            name=name,
+            given_name=given_name,
+            family_name=family_name,
+            groups=[],  # Will be populated by caller if needed
+            attributes={"dn": user_dn},
+        )
