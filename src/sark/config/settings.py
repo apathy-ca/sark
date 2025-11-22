@@ -38,6 +38,21 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 15
     cors_origins: list[str] = ["http://localhost:3000"]
 
+    # Authentication Providers
+    # OIDC Configuration
+    oidc_enabled: bool = False
+    oidc_provider: str = "google"  # google, azure, okta, custom
+    oidc_client_id: str = ""
+    oidc_client_secret: str = ""
+    oidc_issuer: str | None = None  # Required for custom provider
+    oidc_authorization_endpoint: str | None = None
+    oidc_token_endpoint: str | None = None
+    oidc_userinfo_endpoint: str | None = None
+    oidc_jwks_uri: str | None = None
+    oidc_scopes: list[str] = ["openid", "profile", "email"]
+    oidc_azure_tenant: str | None = None  # Required for Azure AD
+    oidc_okta_domain: str | None = None  # Required for Okta
+
     # PostgreSQL Database
     postgres_host: str = "localhost"
     postgres_port: int = 5432
@@ -106,6 +121,13 @@ class Settings(BaseSettings):
         """Parse CORS origins from comma-separated string or list."""
         if isinstance(v, str):
             return [origin.strip() for origin in v.split(",")]
+        return v
+
+    @validator("oidc_scopes", pre=True)
+    def parse_oidc_scopes(cls, v: Any) -> list[str]:
+        """Parse OIDC scopes from comma-separated string or list."""
+        if isinstance(v, str):
+            return [scope.strip() for scope in v.split(",")]
         return v
 
     @validator("kafka_bootstrap_servers", pre=True)
