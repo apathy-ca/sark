@@ -3,6 +3,11 @@
 from sark.api.middleware.auth import AuthenticationMiddleware, AuthMiddleware
 from sark.api.middleware.cache import ResponseCacheMiddleware, invalidate_cache, invalidate_server_cache
 from sark.api.middleware.rate_limit import RateLimitMiddleware
+from sark.api.middleware.security_headers import (
+    CSRFProtectionMiddleware,
+    SecurityHeadersMiddleware,
+    add_security_middleware,
+)
 
 __all__ = [
     "AuthenticationMiddleware",
@@ -11,4 +16,7 @@ __all__ = [
     "ResponseCacheMiddleware",
     "invalidate_cache",
     "invalidate_server_cache",
+    "CSRFProtectionMiddleware",
+    "SecurityHeadersMiddleware",
+    "add_security_middleware",
 ]

@@ -265,7 +265,12 @@ class SIEMErrorHandler:
             max_error_history: Maximum errors to keep in history
             enable_fallback: Whether to enable fallback logging
         """
-        self.fallback_log_dir = Path(fallback_log_dir) if fallback_log_dir else Path("/tmp/siem_fallback")
+        import tempfile
+        self.fallback_log_dir = (
+            Path(fallback_log_dir)
+            if fallback_log_dir
+            else Path(tempfile.gettempdir()) / "sark" / "siem_fallback"
+        )
         self.max_error_history = max_error_history
         self.enable_fallback = enable_fallback
 

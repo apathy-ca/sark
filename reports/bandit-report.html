@@ -1,0 +1,189 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+
+<title>
+    Bandit Report
+</title>
+
+<style>
+
+html * {
+    font-family: "Arial", sans-serif;
+}
+
+pre {
+    font-family: "Monaco", monospace;
+}
+
+.bordered-box {
+    border: 1px solid black;
+    padding-top:.5em;
+    padding-bottom:.5em;
+    padding-left:1em;
+}
+
+.metrics-box {
+    font-size: 1.1em;
+    line-height: 130%;
+}
+
+.metrics-title {
+    font-size: 1.5em;
+    font-weight: 500;
+    margin-bottom: .25em;
+}
+
+.issue-description {
+    font-size: 1.3em;
+    font-weight: 500;
+}
+
+.candidate-issues {
+    margin-left: 2em;
+    border-left: solid 1px; LightGray;
+    padding-left: 5%;
+    margin-top: .2em;
+    margin-bottom: .2em;
+}
+
+.issue-block {
+    border: 1px solid LightGray;
+    padding-left: .5em;
+    padding-top: .5em;
+    padding-bottom: .5em;
+    margin-bottom: .5em;
+}
+
+.issue-sev-high {
+    background-color: Pink;
+}
+
+.issue-sev-medium {
+    background-color: NavajoWhite;
+}
+
+.issue-sev-low {
+    background-color: LightCyan;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="metrics">
+    <div class="metrics-box bordered-box">
+        <div class="metrics-title">
+            Metrics:<br>
+        </div>
+        Total lines of code: <span id="loc">5745</span><br>
+        Total lines skipped (#nosec): <span id="nosec">0</span>
+    </div>
+</div>
+
+
+
+
+<br>
+<div id="results">
+    
+<div id="issue-0">
+<div class="issue-block issue-sev-medium">
+    <b>hardcoded_bind_all_interfaces: </b> Possible binding to all interfaces.<br>
+    <b>Test ID:</b> B104<br>
+    <b>Severity: </b>MEDIUM<br>
+    <b>Confidence: </b>MEDIUM<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/605.html" target="_blank">CWE-605</a><br>
+    <b>File: </b><a href="src/sark/__main__.py" target="_blank">src/sark/__main__.py</a><br>
+    <b>Line number: </b>12<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.1/plugins/b104_hardcoded_bind_all_interfaces.html" target="_blank">https://bandit.readthedocs.io/en/1.9.1/plugins/b104_hardcoded_bind_all_interfaces.html</a><br>
+
+<div class="code">
+<pre>
+11	        app,
+12	        host=&quot;0.0.0.0&quot;,
+13	        port=8000,
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-1">
+<div class="issue-block issue-sev-low">
+    <b>hardcoded_password_string: </b> Possible hardcoded password: 'sark'<br>
+    <b>Test ID:</b> B105<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>MEDIUM<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/259.html" target="_blank">CWE-259</a><br>
+    <b>File: </b><a href="src/sark/config.py" target="_blank">src/sark/config.py</a><br>
+    <b>Line number: </b>201<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.1/plugins/b105_hardcoded_password_string.html" target="_blank">https://bandit.readthedocs.io/en/1.9.1/plugins/b105_hardcoded_password_string.html</a><br>
+
+<div class="code">
+<pre>
+200	                errors.append(&quot;POSTGRES_HOST must be set when using external PostgreSQL deployment&quot;)
+201	            if self.postgres.password == &quot;sark&quot; and self.environment == &quot;production&quot;:
+202	                errors.append(&quot;POSTGRES_PASSWORD must be changed in production&quot;)
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-2">
+<div class="issue-block issue-sev-medium">
+    <b>hardcoded_bind_all_interfaces: </b> Possible binding to all interfaces.<br>
+    <b>Test ID:</b> B104<br>
+    <b>Severity: </b>MEDIUM<br>
+    <b>Confidence: </b>MEDIUM<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/605.html" target="_blank">CWE-605</a><br>
+    <b>File: </b><a href="src/sark/config/settings.py" target="_blank">src/sark/config/settings.py</a><br>
+    <b>Line number: </b>28<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.1/plugins/b104_hardcoded_bind_all_interfaces.html" target="_blank">https://bandit.readthedocs.io/en/1.9.1/plugins/b104_hardcoded_bind_all_interfaces.html</a><br>
+
+<div class="code">
+<pre>
+27	    # API Server
+28	    api_host: str = &quot;0.0.0.0&quot;
+29	    api_port: int = 8000
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-3">
+<div class="issue-block issue-sev-medium">
+    <b>hardcoded_tmp_directory: </b> Probable insecure usage of temp file/directory.<br>
+    <b>Test ID:</b> B108<br>
+    <b>Severity: </b>MEDIUM<br>
+    <b>Confidence: </b>MEDIUM<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/377.html" target="_blank">CWE-377</a><br>
+    <b>File: </b><a href="src/sark/services/audit/siem/error_handler.py" target="_blank">src/sark/services/audit/siem/error_handler.py</a><br>
+    <b>Line number: </b>268<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.1/plugins/b108_hardcoded_tmp_directory.html" target="_blank">https://bandit.readthedocs.io/en/1.9.1/plugins/b108_hardcoded_tmp_directory.html</a><br>
+
+<div class="code">
+<pre>
+267	        &quot;&quot;&quot;
+268	        self.fallback_log_dir = Path(fallback_log_dir) if fallback_log_dir else Path(&quot;/tmp/siem_fallback&quot;)
+269	        self.max_error_history = max_error_history
+</pre>
+</div>
+
+
+</div>
+</div>
+
+</div>
+
+</body>
+</html>
