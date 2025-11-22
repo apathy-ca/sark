@@ -118,6 +118,14 @@ class Settings(BaseSettings):
     session_extend_on_activity: bool = True  # Extend session on activity
     session_cleanup_interval_seconds: int = 3600  # Clean up expired sessions every hour
 
+    # Rate Limiting
+    rate_limit_enabled: bool = True
+    rate_limit_per_api_key: int = 1000  # Requests per hour for API keys
+    rate_limit_per_user: int = 5000  # Requests per hour for authenticated users (JWT)
+    rate_limit_per_ip: int = 100  # Requests per hour for unauthenticated IPs
+    rate_limit_admin_bypass: bool = True  # Allow admins to bypass rate limits
+    rate_limit_window_seconds: int = 3600  # Rate limit window (1 hour)
+
     # PostgreSQL Database
     postgres_host: str = "localhost"
     postgres_port: int = 5432
