@@ -153,6 +153,19 @@ class Settings(BaseSettings):
     audit_flush_interval_seconds: int = 5
     audit_retention_days: int = 90
 
+    # Splunk SIEM Configuration
+    splunk_enabled: bool = False
+    splunk_hec_url: str = "https://localhost:8088/services/collector"
+    splunk_hec_token: str = ""
+    splunk_index: str = "sark_audit"
+    splunk_sourcetype: str = "sark:audit:event"
+    splunk_source: str = "sark"
+    splunk_host: str | None = None
+    splunk_verify_ssl: bool = True
+    splunk_batch_size: int = 100
+    splunk_batch_timeout_seconds: int = 5
+    splunk_retry_attempts: int = 3
+
     # Observability
     metrics_enabled: bool = True
     metrics_port: int = 9090
