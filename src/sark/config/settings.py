@@ -108,6 +108,19 @@ class Settings(BaseSettings):
     splunk_batch_timeout_seconds: int = 5
     splunk_retry_attempts: int = 3
 
+    # Datadog SIEM Configuration
+    datadog_enabled: bool = False
+    datadog_api_key: str = ""
+    datadog_app_key: str = ""
+    datadog_site: str = "datadoghq.com"
+    datadog_service: str = "sark"
+    datadog_environment: str = "production"
+    datadog_hostname: str | None = None
+    datadog_verify_ssl: bool = True
+    datadog_batch_size: int = 100
+    datadog_batch_timeout_seconds: int = 5
+    datadog_retry_attempts: int = 3
+
     # Observability
     metrics_enabled: bool = True
     metrics_port: int = 9090
