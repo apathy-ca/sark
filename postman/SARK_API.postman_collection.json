@@ -1,0 +1,731 @@
+{
+	"info": {
+		"_postman_id": "sark-api-v1",
+		"name": "SARK API Collection",
+		"description": "Complete SARK (Secure Agent Runtime Kit) API collection covering authentication, server management, policy evaluation, bulk operations, and monitoring.\n\nVersion: 1.0\nBase URL: {{baseUrl}}",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{accessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"description": "Authentication endpoints for LDAP, OIDC, SAML, JWT, and API key management",
+			"item": [
+				{
+					"name": "LDAP Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"accessToken\", jsonData.access_token);",
+									"    pm.environment.set(\"refreshToken\", jsonData.refresh_token);",
+									"    console.log(\"Access token saved:\", jsonData.access_token.substring(0, 20) + \"...\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"{{ldapUsername}}\",\n  \"password\": \"{{ldapPassword}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login/ldap",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login", "ldap"]
+						},
+						"description": "Authenticate via LDAP/Active Directory and receive JWT tokens"
+					},
+					"response": []
+				},
+				{
+					"name": "OIDC Login - Initiate",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/oidc/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "oidc", "login"]
+						},
+						"description": "Initiate OIDC authentication flow. Redirects to identity provider."
+					},
+					"response": []
+				},
+				{
+					"name": "OIDC Callback",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"accessToken\", jsonData.access_token);",
+									"    pm.environment.set(\"refreshToken\", jsonData.refresh_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/oidc/callback?code={{authCode}}&state={{state}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "oidc", "callback"],
+							"query": [
+								{
+									"key": "code",
+									"value": "{{authCode}}",
+									"description": "Authorization code from IdP"
+								},
+								{
+									"key": "state",
+									"value": "{{state}}",
+									"description": "State parameter for CSRF protection"
+								}
+							]
+						},
+						"description": "Handle OIDC callback and complete authentication"
+					},
+					"response": []
+				},
+				{
+					"name": "SAML Login - Initiate",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/saml/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "saml", "login"]
+						},
+						"description": "Initiate SAML 2.0 authentication flow. Redirects to IdP."
+					},
+					"response": []
+				},
+				{
+					"name": "SAML Metadata",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/saml/metadata",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "saml", "metadata"]
+						},
+						"description": "Get SAML Service Provider metadata XML"
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"accessToken\", jsonData.access_token);",
+									"    if (jsonData.refresh_token) {",
+									"        pm.environment.set(\"refreshToken\", jsonData.refresh_token);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refresh_token\": \"{{refreshToken}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/refresh",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "refresh"]
+						},
+						"description": "Exchange refresh token for new access token"
+					},
+					"response": []
+				},
+				{
+					"name": "Revoke Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refresh_token\": \"{{refreshToken}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/revoke",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "revoke"]
+						},
+						"description": "Revoke a refresh token (logout)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "me"]
+						},
+						"description": "Get information about the currently authenticated user"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "API Keys",
+			"description": "API key management endpoints",
+			"item": [
+				{
+					"name": "Create API Key",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"apiKey\", jsonData.key);",
+									"    pm.environment.set(\"apiKeyId\", jsonData.id);",
+									"    console.log(\"API Key created:\", jsonData.prefix);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"My API Key\",\n  \"scopes\": [\"server:read\", \"server:write\"],\n  \"rate_limit\": 1000,\n  \"expires_at\": null\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/api-keys",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "api-keys"]
+						},
+						"description": "Create a new API key with scoped permissions"
+					},
+					"response": []
+				},
+				{
+					"name": "List API Keys",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/api-keys",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "api-keys"]
+						},
+						"description": "List all API keys for the current user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get API Key",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/api-keys/{{apiKeyId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "api-keys", "{{apiKeyId}}"]
+						},
+						"description": "Get details of a specific API key"
+					},
+					"response": []
+				},
+				{
+					"name": "Rotate API Key",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"apiKey\", jsonData.new_key);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/api-keys/{{apiKeyId}}/rotate",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "api-keys", "{{apiKeyId}}", "rotate"]
+						},
+						"description": "Rotate an API key (invalidate old, create new)"
+					},
+					"response": []
+				},
+				{
+					"name": "Revoke API Key",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/api-keys/{{apiKeyId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "api-keys", "{{apiKeyId}}"]
+						},
+						"description": "Revoke (delete) an API key"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Servers",
+			"description": "MCP server management endpoints",
+			"item": [
+				{
+					"name": "Register Server",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"serverId\", jsonData.server.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"analytics-server\",\n  \"description\": \"Analytics MCP Server\",\n  \"mcp_version\": \"1.0\",\n  \"endpoint_url\": \"http://analytics.example.com\",\n  \"sensitivity_level\": \"MEDIUM\",\n  \"team\": \"data-engineering\",\n  \"tags\": [\"analytics\", \"production\"]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/servers",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "servers"]
+						},
+						"description": "Register a new MCP server. Requires policy authorization."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Server",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/servers/{{serverId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "servers", "{{serverId}}"]
+						},
+						"description": "Get details of a specific server"
+					},
+					"response": []
+				},
+				{
+					"name": "List Servers (Paginated)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/servers?limit=50&cursor=",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "servers"],
+							"query": [
+								{
+									"key": "limit",
+									"value": "50",
+									"description": "Page size (1-200)"
+								},
+								{
+									"key": "cursor",
+									"value": "",
+									"description": "Pagination cursor from previous response"
+								}
+							]
+						},
+						"description": "List all servers with cursor-based pagination"
+					},
+					"response": []
+				},
+				{
+					"name": "Search and Filter Servers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/servers?status=active&sensitivity=MEDIUM&team=data-engineering&search=analytics&limit=50",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "servers"],
+							"query": [
+								{
+									"key": "status",
+									"value": "active",
+									"description": "Filter by status: active, inactive, maintenance"
+								},
+								{
+									"key": "sensitivity",
+									"value": "MEDIUM",
+									"description": "Filter by sensitivity: LOW, MEDIUM, HIGH, CRITICAL"
+								},
+								{
+									"key": "team",
+									"value": "data-engineering",
+									"description": "Filter by team"
+								},
+								{
+									"key": "search",
+									"value": "analytics",
+									"description": "Full-text search on name/description"
+								},
+								{
+									"key": "limit",
+									"value": "50"
+								}
+							]
+						},
+						"description": "Search and filter servers by multiple criteria"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Bulk Operations",
+			"description": "Bulk server operations",
+			"item": [
+				{
+					"name": "Bulk Register Servers",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"mode\": \"transactional\",\n  \"servers\": [\n    {\n      \"name\": \"server-1\",\n      \"description\": \"First server\",\n      \"mcp_version\": \"1.0\",\n      \"endpoint_url\": \"http://server1.example.com\",\n      \"sensitivity_level\": \"LOW\",\n      \"team\": \"platform\"\n    },\n    {\n      \"name\": \"server-2\",\n      \"description\": \"Second server\",\n      \"mcp_version\": \"1.0\",\n      \"endpoint_url\": \"http://server2.example.com\",\n      \"sensitivity_level\": \"MEDIUM\",\n      \"team\": \"platform\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/bulk/servers/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "bulk", "servers", "register"]
+						},
+						"description": "Register multiple servers in a single request. Mode can be 'transactional' (all or nothing) or 'best-effort' (partial success allowed)."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Policy Evaluation",
+			"description": "OPA policy evaluation endpoints",
+			"item": [
+				{
+					"name": "Evaluate Policy",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"action\": \"tool:invoke\",\n  \"resource\": {\n    \"type\": \"tool\",\n    \"id\": \"tool_delete_user\",\n    \"sensitivity\": \"HIGH\"\n  },\n  \"context\": {\n    \"ip_address\": \"192.168.1.100\",\n    \"time_of_day\": \"14:30\",\n    \"mfa_verified\": true\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/policy/evaluate",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "policy", "evaluate"]
+						},
+						"description": "Evaluate an OPA policy decision. Returns allow/deny with reasons and filtered parameters."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tools",
+			"description": "Tool sensitivity management",
+			"item": [
+				{
+					"name": "Get Tool Sensitivity",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/tools/{{toolId}}/sensitivity",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "tools", "{{toolId}}", "sensitivity"]
+						},
+						"description": "Get sensitivity classification for a specific tool"
+					},
+					"response": []
+				},
+				{
+					"name": "Set Tool Sensitivity",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"sensitivity_level\": \"HIGH\",\n  \"reason\": \"Handles user deletion operations\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tools/{{toolId}}/sensitivity",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "tools", "{{toolId}}", "sensitivity"]
+						},
+						"description": "Manually set sensitivity level for a tool (overrides auto-detection)"
+					},
+					"response": []
+				},
+				{
+					"name": "Detect Tool Sensitivity",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"tool_name\": \"delete_user_account\",\n  \"description\": \"Permanently deletes a user account and all associated data\",\n  \"parameters\": [\"user_id\"]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tools/detect-sensitivity",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "tools", "detect-sensitivity"]
+						},
+						"description": "Auto-detect sensitivity level based on tool name and description"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Tool Sensitivity History",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/tools/{{toolId}}/sensitivity/history",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "tools", "{{toolId}}", "sensitivity", "history"]
+						},
+						"description": "Get history of sensitivity changes for a tool"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Sensitivity Statistics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/tools/statistics/sensitivity",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "tools", "statistics", "sensitivity"]
+						},
+						"description": "Get aggregate statistics on tool sensitivity levels"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Health & Monitoring",
+			"description": "Health check and monitoring endpoints",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/health",
+							"host": ["{{baseUrl}}"],
+							"path": ["health"]
+						},
+						"description": "Basic health check (returns 200 if service is up)"
+					},
+					"response": []
+				},
+				{
+					"name": "Detailed Health Check",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/health/detailed",
+							"host": ["{{baseUrl}}"],
+							"path": ["health", "detailed"]
+						},
+						"description": "Detailed health check including database, Redis, OPA, and SIEM status"
+					},
+					"response": []
+				},
+				{
+					"name": "Liveness Probe",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/health/live",
+							"host": ["{{baseUrl}}"],
+							"path": ["health", "live"]
+						},
+						"description": "Kubernetes liveness probe endpoint"
+					},
+					"response": []
+				},
+				{
+					"name": "Readiness Probe",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/health/ready",
+							"host": ["{{baseUrl}}"],
+							"path": ["health", "ready"]
+						},
+						"description": "Kubernetes readiness probe endpoint"
+					},
+					"response": []
+				},
+				{
+					"name": "Startup Probe",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/health/startup",
+							"host": ["{{baseUrl}}"],
+							"path": ["health", "startup"]
+						},
+						"description": "Kubernetes startup probe endpoint"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8000",
+			"type": "string"
+		}
+	]
+}

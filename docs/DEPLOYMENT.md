@@ -327,15 +327,479 @@ docker push sarkregistry.azurecr.io/sark:0.1.0
 
 ## Configuration
 
-### Environment Variables
+### Redis Session Store Setup
 
-Configure via ConfigMap (`k8s/configmap.yaml`) or Helm values:
+SARK uses Redis for session management (refresh tokens) and policy caching.
 
-- `APP_VERSION`: Application version
-- `ENVIRONMENT`: Environment (development, staging, production)
-- `LOG_LEVEL`: Logging level (DEBUG, INFO, WARNING, ERROR)
-- `JSON_LOGS`: Enable JSON logging (true for cloud)
-- `ENABLE_METRICS`: Enable Prometheus metrics
+#### Deploy Redis
+
+**Option 1: Using Helm (Recommended)**
+
+```bash
+# Add Bitnami repo
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+
+# Install Redis
+helm install redis bitnami/redis \
+  --namespace production \
+  --set auth.enabled=true \
+  --set auth.password="your-redis-password" \
+  --set master.persistence.enabled=true \
+  --set master.persistence.size=10Gi \
+  --set replica.replicaCount=2 \
+  --set master.resources.requests.memory=2Gi \
+  --set master.resources.limits.memory=4Gi
+```
+
+**Option 2: Using kubectl manifests**
+
+```yaml
+# redis-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: production
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+        command:
+        - redis-server
+        - --maxmemory 4gb
+        - --maxmemory-policy allkeys-lru
+        - --requirepass $(REDIS_PASSWORD)
+        env:
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: sark-secrets
+              key: redis_password
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "500m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: redis-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: production
+spec:
+  selector:
+    app: redis
+  ports:
+  - port: 6379
+    targetPort: 6379
+```
+
+#### Configure SARK to Use Redis
+
+```bash
+# Add to secrets
+kubectl create secret generic sark-secrets \
+  --from-literal=redis_password='your-redis-password' \
+  --namespace production
+
+# Configure connection string
+REDIS_DSN=redis://:your-redis-password@redis:6379/0
+```
+
+#### Redis Configuration for Production
+
+```bash
+# Memory management
+REDIS_MAX_MEMORY=4gb
+REDIS_MAXMEMORY_POLICY=allkeys-lru  # Evict least recently used keys
+
+# Persistence (optional for cache-only use)
+REDIS_SAVE=""  # Disable RDB snapshots for pure cache
+REDIS_APPENDONLY=no  # Disable AOF
+
+# Connection pooling
+REDIS_POOL_SIZE=50  # Per SARK pod
+REDIS_POOL_TIMEOUT=5  # seconds
+
+# Monitoring
+REDIS_ENABLE_METRICS=true
+```
+
+---
+
+### SIEM Configuration
+
+SARK supports forwarding audit events to Splunk and Datadog for security monitoring.
+
+#### Splunk HEC Integration
+
+**1. Create HEC Token in Splunk**
+
+```bash
+# In Splunk Web UI:
+# Settings → Data Inputs → HTTP Event Collector → New Token
+# - Name: SARK Audit Events
+# - Source type: _json
+# - Index: sark_audit
+```
+
+**2. Configure SARK**
+
+```bash
+kubectl create secret generic sark-siem-secrets \
+  --from-literal=splunk_hec_token='your-hec-token' \
+  --namespace production
+
+# ConfigMap or environment variables
+SIEM_ENABLED=true
+SIEM_TYPE=splunk  # or "datadog" or "both"
+
+# Splunk settings
+SPLUNK_HEC_URL=https://splunk.example.com:8088
+SPLUNK_INDEX=sark_audit
+SPLUNK_SOURCETYPE=sark:audit
+SPLUNK_VERIFY_SSL=true
+
+# Performance settings
+SIEM_BATCH_SIZE=100
+SIEM_BATCH_TIMEOUT_SECONDS=5
+SIEM_MAX_QUEUE_SIZE=20000
+SIEM_RETRY_ATTEMPTS=3
+```
+
+**3. Create Splunk Index**
+
+```bash
+# In Splunk Web UI or CLI:
+splunk add index sark_audit \
+  -auth admin:password \
+  -datatype event \
+  -maxTotalDataSizeMB 50000
+```
+
+**4. Verify Events**
+
+```spl
+# Splunk search query
+index=sark_audit sourcetype=sark:audit
+| stats count by event_type, severity
+```
+
+#### Datadog Logs Integration
+
+**1. Get API Key**
+
+```bash
+# From Datadog: Organization Settings → API Keys
+DD_API_KEY=your-datadog-api-key
+DD_APP_KEY=your-datadog-app-key  # Optional
+```
+
+**2. Configure SARK**
+
+```bash
+kubectl create secret generic sark-siem-secrets \
+  --from-literal=datadog_api_key='your-api-key' \
+  --namespace production
+
+# ConfigMap
+DATADOG_SITE=datadoghq.com  # Or datadoghq.eu
+DATADOG_SERVICE=sark
+DATADOG_ENV=production
+DATADOG_VERSION=0.1.0
+```
+
+**3. Verify in Datadog**
+
+```
+# Datadog Logs Explorer
+service:sark env:production
+```
+
+#### Dual SIEM Configuration
+
+Forward to both Splunk and Datadog simultaneously:
+
+```bash
+SIEM_ENABLED=true
+SIEM_SPLUNK_ENABLED=true
+SIEM_DATADOG_ENABLED=true
+
+# Both will receive events in parallel
+```
+
+---
+
+### Advanced OPA Policy Deployment
+
+#### Policy Structure
+
+```
+opa/
+├── policies/
+│   ├── defaults/         # Built-in policies
+│   │   ├── main.rego
+│   │   ├── rbac.rego
+│   │   ├── sensitivity.rego
+│   │   └── team_access.rego
+│   └── custom/           # Organization-specific policies
+│       ├── time_based.rego
+│       ├── ip_filtering.rego
+│       └── mfa_required.rego
+└── data/                 # Policy data
+    ├── role_permissions.json
+    └── team_mappings.json
+```
+
+#### Deploy OPA Server
+
+```bash
+# Using Helm
+helm repo add open-policy-agent https://open-policy-agent.github.io/helm-charts
+helm repo update
+
+helm install opa open-policy-agent/opa \
+  --namespace production \
+  --set replicas=3 \
+  --set resources.requests.memory=512Mi \
+  --set resources.limits.memory=2Gi \
+  --set authz.enabled=false  # Disable auth for internal use
+```
+
+#### Load Policies into OPA
+
+**Method 1: ConfigMap**
+
+```bash
+# Create ConfigMap from policy files
+kubectl create configmap opa-policies \
+  --from-file=opa/policies/defaults/ \
+  --namespace production
+
+# Mount in OPA pod
+volumeMounts:
+- name: policies
+  mountPath: /policies
+volumes:
+- name: policies
+  configMap:
+    name: opa-policies
+```
+
+**Method 2: OPA Bundle Server**
+
+```bash
+# Configure OPA to pull policies from bundle server
+OPA_BUNDLE_URL=https://bundle-server.example.com/bundles/sark
+OPA_BUNDLE_POLLING_INTERVAL=60s  # Check for updates every 60s
+```
+
+**Method 3: Direct Upload**
+
+```bash
+# Upload policy via OPA API
+curl -X PUT http://opa:8181/v1/policies/sark \
+  -H "Content-Type: text/plain" \
+  --data-binary @opa/policies/defaults/main.rego
+```
+
+#### Environment-Specific Policies
+
+```bash
+# Development (permissive)
+OPA_POLICY_BUNDLE=dev
+OPA_LOG_LEVEL=debug
+
+# Staging (moderate)
+OPA_POLICY_BUNDLE=staging
+OPA_LOG_LEVEL=info
+
+# Production (strict)
+OPA_POLICY_BUNDLE=production
+OPA_LOG_LEVEL=warn
+OPA_DECISION_LOG_ENABLED=true
+```
+
+#### Configure SARK to Use OPA
+
+```bash
+# OPA connection
+OPA_URL=http://opa:8181
+OPA_TIMEOUT_SECONDS=30
+OPA_RETRY_ATTEMPTS=3
+
+# Policy caching
+POLICY_CACHE_ENABLED=true
+POLICY_CACHE_TTL_LOW=600      # 10 min
+POLICY_CACHE_TTL_MEDIUM=300   # 5 min
+POLICY_CACHE_TTL_HIGH=60      # 1 min
+POLICY_CACHE_TTL_CRITICAL=30  # 30 sec
+```
+
+---
+
+### Environment Variables Reference
+
+#### Application Settings
+
+```bash
+# Core
+APP_VERSION=0.1.0
+ENVIRONMENT=production  # development, staging, production
+LOG_LEVEL=INFO  # DEBUG, INFO, WARNING, ERROR
+JSON_LOGS=true
+ENABLE_METRICS=true
+
+# Server
+HOST=0.0.0.0
+PORT=8000
+WORKERS=4  # Number of Uvicorn workers
+```
+
+#### Database Configuration
+
+```bash
+# PostgreSQL
+DATABASE_URL=postgresql://user:pass@postgres:5432/sark
+DATABASE_POOL_SIZE=20
+DATABASE_MAX_OVERFLOW=10
+DATABASE_POOL_TIMEOUT=30
+DATABASE_POOL_RECYCLE=3600
+DATABASE_ECHO=false  # Disable SQL logging in production
+```
+
+#### Redis Configuration
+
+```bash
+# Connection
+REDIS_DSN=redis://:password@redis:6379/0
+REDIS_POOL_SIZE=50
+REDIS_POOL_TIMEOUT=5
+REDIS_SOCKET_KEEPALIVE=true
+
+# Session store
+REDIS_SESSION_DB=1  # Separate DB for sessions
+```
+
+#### Authentication Settings
+
+```bash
+# JWT
+JWT_SECRET_KEY=your-256-bit-secret
+JWT_ALGORITHM=HS256  # or RS256 for asymmetric
+JWT_EXPIRATION_MINUTES=60
+JWT_ISSUER=sark-api
+JWT_AUDIENCE=sark-users
+
+# Refresh tokens
+REFRESH_TOKEN_EXPIRATION_DAYS=7
+REFRESH_TOKEN_ROTATION_ENABLED=true
+MAX_SESSIONS_PER_USER=5
+
+# LDAP
+LDAP_ENABLED=true
+LDAP_SERVER=ldap://ldap.example.com:389
+LDAP_BIND_DN=cn=admin,dc=example,dc=com
+LDAP_BIND_PASSWORD=admin-password
+LDAP_USER_BASE_DN=ou=users,dc=example,dc=com
+LDAP_GROUP_BASE_DN=ou=groups,dc=example,dc=com
+
+# OIDC
+OIDC_ENABLED=true
+OIDC_CLIENT_ID=sark-client
+OIDC_CLIENT_SECRET=client-secret
+OIDC_DISCOVERY_URL=https://idp.example.com/.well-known/openid-configuration
+OIDC_REDIRECT_URI=https://sark.example.com/api/auth/oidc/callback
+OIDC_USE_PKCE=true
+
+# SAML
+SAML_ENABLED=true
+SAML_SP_ENTITY_ID=https://sark.example.com
+SAML_SP_ACS_URL=https://sark.example.com/api/auth/saml/acs
+SAML_IDP_METADATA_URL=https://idp.example.com/metadata
+```
+
+#### Policy/OPA Settings
+
+```bash
+# OPA Connection
+OPA_URL=http://opa:8181
+OPA_TIMEOUT_SECONDS=30
+OPA_RETRY_ATTEMPTS=3
+
+# Policy Caching
+POLICY_CACHE_ENABLED=true
+POLICY_CACHE_TTL_LOW=600
+POLICY_CACHE_TTL_MEDIUM=300
+POLICY_CACHE_TTL_HIGH=60
+POLICY_CACHE_TTL_CRITICAL=30
+POLICY_CACHE_DEFAULT_TTL=120
+```
+
+#### SIEM Settings
+
+```bash
+# General
+SIEM_ENABLED=true
+SIEM_SPLUNK_ENABLED=true
+SIEM_DATADOG_ENABLED=true
+
+# Splunk
+SPLUNK_HEC_URL=https://splunk.example.com:8088
+SPLUNK_HEC_TOKEN=your-hec-token
+SPLUNK_INDEX=sark_audit
+SPLUNK_SOURCETYPE=sark:audit
+SPLUNK_VERIFY_SSL=true
+
+# Datadog
+DATADOG_API_KEY=your-api-key
+DATADOG_SITE=datadoghq.com
+DATADOG_SERVICE=sark
+DATADOG_ENV=production
+
+# Performance
+SIEM_BATCH_SIZE=100
+SIEM_BATCH_TIMEOUT_SECONDS=5
+SIEM_MAX_QUEUE_SIZE=20000
+SIEM_RETRY_ATTEMPTS=3
+SIEM_RETRY_BACKOFF_BASE=2.0
+SIEM_RETRY_BACKOFF_MAX=60.0
+SIEM_TIMEOUT_SECONDS=30
+SIEM_COMPRESS_PAYLOADS=true
+```
+
+#### API Key Settings
+
+```bash
+# Key generation
+API_KEY_PREFIX=sark
+API_KEY_SECRET_LENGTH=32
+API_KEY_DEFAULT_RATE_LIMIT=1000  # requests/hour
+API_KEY_DEFAULT_EXPIRATION_DAYS=90
+```
+
+---
 
 ### Secrets Management
 
