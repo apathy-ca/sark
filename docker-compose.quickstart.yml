@@ -1,0 +1,381 @@
+# ============================================================================
+# SARK Quick Start - Docker Compose Configuration
+# ============================================================================
+#
+# This is a simplified configuration for getting started with SARK quickly.
+# It includes all essential services pre-configured with sensible defaults.
+#
+# Usage:
+#   docker compose -f docker-compose.quickstart.yml up -d
+#
+# Services included:
+#   - SARK API (port 8000)
+#   - PostgreSQL database (port 5432)
+#   - Redis (sessions & cache) (port 6379)
+#   - OPA (authorization) (port 8181)
+#   - Prometheus (metrics) (port 9090)
+#   - Grafana (dashboards) (port 3000)
+#   - TimescaleDB (audit logs) (port 5433)
+#   - Consul (service discovery) (port 8500)
+#
+# Access points:
+#   API Docs:    http://localhost:8000/docs
+#   Grafana:     http://localhost:3000 (admin/admin)
+#   Prometheus:  http://localhost:9090
+#   Consul:      http://localhost:8500
+#   OPA:         http://localhost:8181
+#
+# For production deployment, see docs/DEPLOYMENT.md
+# ============================================================================
+
+version: '3.9'
+
+services:
+  # ============================================================================
+  # SARK API - Main Application
+  # ============================================================================
+  api:
+    image: sark:latest
+    container_name: sark-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    ports:
+      - "8000:8000"
+    environment:
+      # Application
+      - ENVIRONMENT=development
+      - LOG_LEVEL=INFO
+      - DEBUG=true
+
+      # Database
+      - DATABASE_URL=postgresql://sark:sark_password@postgres:5432/sark
+      - DATABASE_POOL_SIZE=20
+      - DATABASE_MAX_OVERFLOW=10
+
+      # Redis (Session store & cache)
+      - REDIS_DSN=redis://:redis_password@redis:6379/0
+      - REDIS_SESSION_DB=1
+      - REDIS_POOL_SIZE=50
+
+      # Authentication
+      - JWT_SECRET_KEY=dev-secret-change-in-production-32-chars-minimum
+      - JWT_EXPIRATION_MINUTES=60
+      - REFRESH_TOKEN_EXPIRATION_DAYS=7
+      - REFRESH_TOKEN_ROTATION_ENABLED=true
+      - MAX_SESSIONS_PER_USER=5
+
+      # LDAP (Optional - configure if needed)
+      - LDAP_ENABLED=false
+      - LDAP_SERVER=ldap://openldap:389
+      - LDAP_BIND_DN=cn=admin,dc=example,dc=com
+      - LDAP_BIND_PASSWORD=admin
+      - LDAP_USER_BASE_DN=ou=users,dc=example,dc=com
+
+      # OPA (Policy evaluation)
+      - OPA_URL=http://opa:8181
+      - OPA_TIMEOUT_SECONDS=30
+      - OPA_RETRY_ATTEMPTS=3
+
+      # Policy Caching
+      - POLICY_CACHE_ENABLED=true
+      - POLICY_CACHE_TTL_LOW=600
+      - POLICY_CACHE_TTL_MEDIUM=300
+      - POLICY_CACHE_TTL_HIGH=60
+      - POLICY_CACHE_TTL_CRITICAL=30
+
+      # Rate Limiting
+      - RATE_LIMIT_ENABLED=true
+      - RATE_LIMIT_USER_REQUESTS_PER_MINUTE=5000
+      - RATE_LIMIT_USER_BURST=100
+      - RATE_LIMIT_API_KEY_REQUESTS_PER_MINUTE=1000
+      - RATE_LIMIT_API_KEY_BURST=50
+      - RATE_LIMIT_IP_REQUESTS_PER_MINUTE=100
+      - RATE_LIMIT_IP_BURST=20
+      - RATE_LIMIT_STORAGE=redis
+      - RATE_LIMIT_REDIS_DB=2
+
+      # SIEM (Audit event forwarding)
+      - SIEM_ENABLED=false
+      - SIEM_BATCH_SIZE=100
+      - SIEM_BATCH_TIMEOUT_SECONDS=5
+
+      # Metrics
+      - ENABLE_METRICS=true
+      - PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus
+    volumes:
+      - ./src:/app/src:ro
+      - ./opa/policies:/app/opa/policies:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      opa:
+        condition: service_started
+    networks:
+      - sark-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    command: uvicorn sark.api.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # ============================================================================
+  # PostgreSQL - Primary Database
+  # ============================================================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: sark-postgres
+    environment:
+      - POSTGRES_USER=sark
+      - POSTGRES_PASSWORD=sark_password
+      - POSTGRES_DB=sark
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./scripts/db/init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - sark-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sark"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  # ============================================================================
+  # TimescaleDB - Audit Logs (Time-series database)
+  # ============================================================================
+  timescaledb:
+    image: timescale/timescaledb:latest-pg15
+    container_name: sark-timescaledb
+    environment:
+      - POSTGRES_USER=sark
+      - POSTGRES_PASSWORD=sark_password
+      - POSTGRES_DB=sark_audit
+    volumes:
+      - timescale-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - sark-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sark"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  # ============================================================================
+  # Redis - Session Store & Cache
+  # ============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: sark-redis
+    command: >
+      redis-server
+      --requirepass redis_password
+      --maxmemory 2gb
+      --maxmemory-policy allkeys-lru
+      --save ""
+      --appendonly no
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - sark-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "redis_password", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
+
+  # ============================================================================
+  # OPA - Open Policy Agent (Authorization)
+  # ============================================================================
+  opa:
+    image: openpolicyagent/opa:latest
+    container_name: sark-opa
+    command:
+      - "run"
+      - "--server"
+      - "--addr=0.0.0.0:8181"
+      - "--log-level=info"
+      - "--log-format=json"
+      - "/policies"
+    volumes:
+      - ./opa/policies:/policies:ro
+    ports:
+      - "8181:8181"
+    networks:
+      - sark-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8181/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
+
+  # ============================================================================
+  # Consul - Service Discovery & Configuration
+  # ============================================================================
+  consul:
+    image: consul:latest
+    container_name: sark-consul
+    command: agent -server -ui -bootstrap-expect=1 -client=0.0.0.0
+    environment:
+      - CONSUL_BIND_INTERFACE=eth0
+    volumes:
+      - consul-data:/consul/data
+    ports:
+      - "8500:8500"  # HTTP API & UI
+      - "8600:8600/udp"  # DNS
+    networks:
+      - sark-network
+    healthcheck:
+      test: ["CMD", "consul", "info"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  # ============================================================================
+  # Prometheus - Metrics Collection
+  # ============================================================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: sark-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - sark-network
+    depends_on:
+      - api
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/healthy"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  # ============================================================================
+  # Grafana - Metrics Visualization
+  # ============================================================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: sark-grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=http://localhost:3000
+      - GF_INSTALL_PLUGINS=
+    volumes:
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - sark-network
+    depends_on:
+      - prometheus
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+
+  # ============================================================================
+  # Optional: OpenLDAP - For LDAP authentication testing
+  # ============================================================================
+  # Uncomment to enable LDAP authentication
+  # openldap:
+  #   image: osixia/openldap:latest
+  #   container_name: sark-openldap
+  #   environment:
+  #     - LDAP_ORGANISATION=Example Inc.
+  #     - LDAP_DOMAIN=example.com
+  #     - LDAP_ADMIN_PASSWORD=admin
+  #   volumes:
+  #     - ldap-data:/var/lib/ldap
+  #     - ldap-config:/etc/ldap/slapd.d
+  #   ports:
+  #     - "389:389"
+  #     - "636:636"
+  #   networks:
+  #     - sark-network
+  #   restart: unless-stopped
+
+  # ============================================================================
+  # Optional: phpLDAPadmin - Web UI for LDAP management
+  # ============================================================================
+  # Uncomment to enable LDAP admin interface
+  # phpldapadmin:
+  #   image: osixia/phpldapadmin:latest
+  #   container_name: sark-phpldapadmin
+  #   environment:
+  #     - PHPLDAPADMIN_LDAP_HOSTS=openldap
+  #     - PHPLDAPADMIN_HTTPS=false
+  #   ports:
+  #     - "8080:80"
+  #   networks:
+  #     - sark-network
+  #   depends_on:
+  #     - openldap
+  #   restart: unless-stopped
+
+# ============================================================================
+# Networks
+# ============================================================================
+networks:
+  sark-network:
+    name: sark-network
+    driver: bridge
+
+# ============================================================================
+# Volumes (Persistent Data)
+# ============================================================================
+volumes:
+  postgres-data:
+    name: sark-postgres-data
+  timescale-data:
+    name: sark-timescale-data
+  redis-data:
+    name: sark-redis-data
+  consul-data:
+    name: sark-consul-data
+  prometheus-data:
+    name: sark-prometheus-data
+  grafana-data:
+    name: sark-grafana-data
+  # ldap-data:
+  #   name: sark-ldap-data
+  # ldap-config:
+  #   name: sark-ldap-config

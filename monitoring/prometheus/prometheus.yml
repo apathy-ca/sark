@@ -1,0 +1,100 @@
+# Prometheus Configuration for SARK
+# This configuration scrapes metrics from SARK API and other services
+
+global:
+  scrape_interval: 15s  # Scrape targets every 15 seconds
+  evaluation_interval: 15s  # Evaluate rules every 15 seconds
+  external_labels:
+    cluster: 'sark-dev'
+    environment: 'development'
+
+# Alertmanager configuration (optional)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets:
+#           - alertmanager:9093
+
+# Load and evaluate rules in this file every 'evaluation_interval'
+# rule_files:
+#   - "alerts/*.yml"
+
+# Scrape configuration
+scrape_configs:
+  # ============================================================================
+  # Prometheus self-monitoring
+  # ============================================================================
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+          tier: 'monitoring'
+
+  # ============================================================================
+  # SARK API metrics
+  # ============================================================================
+  - job_name: 'sark-api'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['api:8000']
+        labels:
+          service: 'sark-api'
+          tier: 'application'
+    # Scrape API every 10 seconds for faster dashboard updates
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  # ============================================================================
+  # Redis Exporter (if deployed)
+  # ============================================================================
+  # - job_name: 'redis'
+  #   static_configs:
+  #     - targets: ['redis-exporter:9121']
+  #       labels:
+  #         service: 'redis'
+  #         tier: 'cache'
+
+  # ============================================================================
+  # PostgreSQL Exporter (if deployed)
+  # ============================================================================
+  # - job_name: 'postgres'
+  #   static_configs:
+  #     - targets: ['postgres-exporter:9187']
+  #       labels:
+  #         service: 'postgres'
+  #         tier: 'database'
+
+  # ============================================================================
+  # Node Exporter (if deployed for host metrics)
+  # ============================================================================
+  # - job_name: 'node'
+  #   static_configs:
+  #     - targets: ['node-exporter:9100']
+  #       labels:
+  #         service: 'node-exporter'
+  #         tier: 'system'
+
+  # ============================================================================
+  # OPA Metrics (if exposed)
+  # ============================================================================
+  # - job_name: 'opa'
+  #   static_configs:
+  #     - targets: ['opa:8181']
+  #       labels:
+  #         service: 'opa'
+  #         tier: 'authorization'
+  #   metrics_path: '/metrics'
+
+  # ============================================================================
+  # Consul metrics
+  # ============================================================================
+  # - job_name: 'consul'
+  #   static_configs:
+  #     - targets: ['consul:8500']
+  #       labels:
+  #         service: 'consul'
+  #         tier: 'service-discovery'
+  #   metrics_path: '/v1/agent/metrics'
+  #   params:
+  #     format: ['prometheus']
