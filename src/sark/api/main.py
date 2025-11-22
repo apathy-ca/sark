@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from prometheus_client import make_asgi_app
 import structlog
 
-from sark.api.routers import health, policy, servers
+from sark.api.routers import health, policy, servers, tools
 from sark.config import get_settings
 from sark.db import init_db
 
@@ -35,6 +35,7 @@ def create_app() -> FastAPI:
     app.include_router(health.router, prefix="/health", tags=["health"])
     app.include_router(servers.router, prefix="/api/v1/servers", tags=["servers"])
     app.include_router(policy.router, prefix="/api/v1/policy", tags=["policy"])
+    app.include_router(tools.router, prefix="/api/v1/tools", tags=["tools"])
 
     # Prometheus metrics endpoint
     if settings.metrics_enabled:

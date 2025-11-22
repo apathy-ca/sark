@@ -88,14 +88,32 @@ class DiscoveryService:
         self.db.add(server)
         await self.db.flush()
 
-        # Create tool records
+        # Create tool records with auto-detection if not specified
+        from sark.services.discovery.tool_registry import ToolRegistry
+
+        tool_registry = ToolRegistry(self.db)
+
         for tool_def in tools:
+            # Auto-detect sensitivity if not provided
+            tool_sensitivity = tool_def.get("sensitivity_level")
+            if not tool_sensitivity:
+                # Import here to avoid circular dependency
+                detected = await tool_registry.detect_sensitivity(
+                    tool_name=tool_def["name"],
+                    tool_description=tool_def.get("description"),
+                    parameters=tool_def.get("parameters", {}),
+                )
+                tool_sensitivity = detected.value
+            elif isinstance(tool_sensitivity, str):
+                # Convert string to enum if needed
+                tool_sensitivity = tool_sensitivity
+
             tool = MCPTool(
                 server_id=server.id,
                 name=tool_def["name"],
                 description=tool_def.get("description"),
                 parameters=tool_def.get("parameters", {}),
-                sensitivity_level=tool_def.get("sensitivity_level", sensitivity_level),
+                sensitivity_level=tool_sensitivity,
                 signature=tool_def.get("signature"),
                 requires_approval=tool_def.get("requires_approval", False),
                 extra_metadata=tool_def.get("metadata", {}),
