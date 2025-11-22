@@ -1,14 +1,25 @@
 # SARK Default Policy Bundle
-# Main policy that combines RBAC, team access, and sensitivity enforcement
+# Main policy that combines RBAC, team access, sensitivity, and advanced policies
 #
 # This policy evaluates all sub-policies and makes a final authorization decision
 # based on the combined results.
+#
+# Policies evaluated:
+# - RBAC: Role-based access control
+# - Team Access: Team ownership and permissions
+# - Sensitivity: Sensitivity level enforcement
+# - Time-based: Business hours and time restrictions
+# - IP Filtering: IP allowlist/blocklist and geo-restrictions
+# - MFA Required: Multi-factor authentication requirements
 
 package sark.defaults.main
 
 import data.sark.defaults.rbac
 import data.sark.defaults.team_access
 import data.sark.defaults.sensitivity
+import data.sark.policies.time_based
+import data.sark.policies.ip_filtering
+import data.sark.policies.mfa_required
 import future.keywords.if
 import future.keywords.in
 
@@ -29,6 +40,15 @@ allow if {
 
     # Sensitivity enforcement must allow
     sensitivity.allow
+
+    # Time-based restrictions must allow
+    time_based.allow
+
+    # IP filtering must allow
+    ip_filtering.allow
+
+    # MFA requirements must be satisfied
+    mfa_required.allow
 
     # No explicit denies
     not rbac.deny
@@ -97,6 +117,9 @@ policies_evaluated := [
     "rbac",
     "team_access",
     "sensitivity",
+    "time_based",
+    "ip_filtering",
+    "mfa_required",
 ]
 
 policy_results := {
@@ -114,6 +137,24 @@ policy_results := {
         "allow": sensitivity.allow,
         "deny": object.get(sensitivity, "deny", false),
         "reason": sensitivity.reason,
+    },
+    "time_based": {
+        "allow": time_based.decision.allow,
+        "reason": time_based.decision.reason,
+        "violations": time_based.decision.violations,
+        "current_time": time_based.decision.current_time,
+    },
+    "ip_filtering": {
+        "allow": ip_filtering.decision.allow,
+        "reason": ip_filtering.decision.reason,
+        "violations": ip_filtering.decision.violations,
+        "client_ip": ip_filtering.decision.client_ip,
+    },
+    "mfa_required": {
+        "allow": mfa_required.decision.allow,
+        "reason": mfa_required.decision.reason,
+        "violations": mfa_required.decision.violations,
+        "mfa_status": mfa_required.decision.mfa_status,
     },
 }
 
@@ -138,6 +179,33 @@ reason := sprintf("Access denied by sensitivity enforcement: %s", [sensitivity.r
     rbac.allow
     team_access_allows
     not sensitivity.allow
+}
+
+reason := sprintf("Access denied by time restrictions: %s", [time_based.decision.reason]) if {
+    not allow
+    rbac.allow
+    team_access_allows
+    sensitivity.allow
+    not time_based.allow
+}
+
+reason := sprintf("Access denied by IP filtering: %s", [ip_filtering.decision.reason]) if {
+    not allow
+    rbac.allow
+    team_access_allows
+    sensitivity.allow
+    time_based.allow
+    not ip_filtering.allow
+}
+
+reason := sprintf("Access denied by MFA requirements: %s", [mfa_required.decision.reason]) if {
+    not allow
+    rbac.allow
+    team_access_allows
+    sensitivity.allow
+    time_based.allow
+    ip_filtering.allow
+    not mfa_required.allow
 }
 
 reason := sprintf("Access explicitly denied: RBAC=%v, Team=%v, Sensitivity=%v", [
