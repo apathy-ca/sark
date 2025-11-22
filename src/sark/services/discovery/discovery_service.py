@@ -209,9 +209,13 @@ class DiscoveryService:
     async def list_servers_paginated(
         self,
         pagination: PaginationParams,
-        status: ServerStatus | None = None,
+        status: ServerStatus | list[ServerStatus] | None = None,
+        sensitivity: Any | None = None,  # SensitivityLevel | list[SensitivityLevel]
         owner_id: UUID | None = None,
         team_id: UUID | None = None,
+        tags: list[str] | None = None,
+        match_all_tags: bool = False,
+        search: str | None = None,
         count_total: bool = False,
     ) -> tuple[list[MCPServer], str | None, bool, int | None]:
         """
@@ -219,22 +223,36 @@ class DiscoveryService:
 
         Args:
             pagination: Pagination parameters
-            status: Filter by status
+            status: Filter by status (single or list)
+            sensitivity: Filter by sensitivity level (single or list)
             owner_id: Filter by owner
             team_id: Filter by team
+            tags: Filter by tags
+            match_all_tags: If True, match ALL tags; if False, match ANY tag
+            search: Full-text search query
             count_total: Whether to count total items (expensive)
 
         Returns:
             Tuple of (servers, next_cursor, has_more, total)
         """
+        # Import here to avoid circular dependency
+        from sark.services.discovery.search import ServerSearchService
+
+        # Start with base query
         query = select(MCPServer)
 
-        if status:
-            query = query.where(MCPServer.status == status)
-        if owner_id:
-            query = query.where(MCPServer.owner_id == owner_id)
-        if team_id:
-            query = query.where(MCPServer.team_id == team_id)
+        # Apply search and filters
+        search_service = ServerSearchService(self.db)
+        query = search_service.search_servers(
+            query=query,
+            status=status,
+            sensitivity=sensitivity,
+            owner_id=owner_id,
+            team_id=team_id,
+            tags=tags,
+            match_all_tags=match_all_tags,
+            search=search,
+        )
 
         return await CursorPaginator.paginate(
             db=self.db,
