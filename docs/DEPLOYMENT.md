@@ -799,6 +799,48 @@ API_KEY_DEFAULT_RATE_LIMIT=1000  # requests/hour
 API_KEY_DEFAULT_EXPIRATION_DAYS=90
 ```
 
+#### Rate Limiting Settings
+
+```bash
+# Per-user rate limiting (JWT authentication)
+RATE_LIMIT_ENABLED=true
+RATE_LIMIT_USER_REQUESTS_PER_MINUTE=5000
+RATE_LIMIT_USER_BURST=100
+
+# Per-API-key rate limiting
+RATE_LIMIT_API_KEY_REQUESTS_PER_MINUTE=1000
+RATE_LIMIT_API_KEY_BURST=50
+
+# Per-IP rate limiting (unauthenticated endpoints)
+RATE_LIMIT_IP_REQUESTS_PER_MINUTE=100
+RATE_LIMIT_IP_BURST=20
+
+# Admin bypass
+RATE_LIMIT_ADMIN_BYPASS=true
+
+# Storage backend
+RATE_LIMIT_STORAGE=redis  # redis or memory
+RATE_LIMIT_REDIS_DB=2     # Separate Redis DB for rate limits
+
+# Response headers
+RATE_LIMIT_HEADERS_ENABLED=true
+```
+
+**Rate Limit Tiers:**
+- **Admin users**: Unlimited (bypass enabled)
+- **Authenticated users (JWT)**: 5,000 requests/minute
+- **API keys**: Configurable per key (default: 1,000 requests/minute)
+- **Unauthenticated (public endpoints)**: 100 requests/minute per IP
+
+**Rate Limit Response:**
+When limit exceeded, returns HTTP 429 with headers:
+```
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 0
+X-RateLimit-Reset: 1638360000
+Retry-After: 45
+```
+
 ---
 
 ### Secrets Management
