@@ -1,643 +1,692 @@
-"""Authentication API endpoints.
+"""Unified authentication router for multi-provider auth."""
 
-Provides endpoints for authentication operations including:
-- LDAP/AD login
-- Token refresh
-- Token revocation
-- Authentication health checks
-"""
+import logging
+import uuid
+from datetime import datetime
+from typing import Any
+from uuid import UUID
 
-import structlog
-from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, Field
-import redis.asyncio as aioredis
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from pydantic import BaseModel
 
-from sark.api.dependencies import CurrentUser, get_current_user
-from sark.config import get_settings
-from sark.services.auth import TokenService
-from sark.services.auth.providers import LDAPProvider, OIDCProvider
-from sark.services.auth.providers.ldap import (
-    LDAPAuthenticationError,
-    LDAPConnectionError,
-)
-from sark.services.auth.providers.oidc import (
-    OIDCAuthenticationError,
-    OIDCConfigurationError,
-)
+from sark.config.settings import Settings
+from sark.models.session import Session, SessionResponse
+from sark.services.auth.providers import LDAPProvider, OIDCProvider, SAMLProvider
+from sark.services.auth.sessions import SessionService
 
-logger = structlog.get_logger(__name__)
-router = APIRouter()
-settings = get_settings()
+logger = logging.getLogger(__name__)
+
+# Namespace UUID for generating deterministic user UUIDs
+USER_UUID_NAMESPACE = uuid.UUID("6ba7b810-9dad-11d1-80b4-00c04fd430c8")
 
 
-# Pydantic models for request/response
-class LDAPLoginRequest(BaseModel):
-    """Request model for LDAP login."""
+def user_id_to_uuid(user_id: str, provider: str) -> UUID:
+    """Convert arbitrary user ID to deterministic UUID.
 
-    username: str = Field(..., description="LDAP username", min_length=1, max_length=255)
-    password: str = Field(..., description="User password", min_length=1)
+    Uses UUID v5 (name-based) to create consistent UUIDs from user IDs.
+    The namespace includes the provider to avoid collisions.
+
+    Args:
+        user_id: User identifier from auth provider
+        provider: Provider name (oidc, ldap, saml, etc.)
+
+    Returns:
+        Deterministic UUID for the user
+    """
+    # Combine provider and user_id to create a unique name
+    name = f"{provider}:{user_id}"
+    return uuid.uuid5(USER_UUID_NAMESPACE, name)
+
+router = APIRouter(prefix="/api/auth", tags=["authentication"])
+
+
+# Pydantic Models
+
+
+class ProviderInfo(BaseModel):
+    """Information about an authentication provider."""
+
+    id: str
+    name: str
+    type: str  # oidc, saml, ldap, api_key
+    enabled: bool
+    authorization_url: str | None = None
+    description: str | None = None
+
+
+class ProvidersResponse(BaseModel):
+    """List of available authentication providers."""
+
+    providers: list[ProviderInfo]
+    total: int
+
+
+class LoginRequest(BaseModel):
+    """Login request for credential-based auth (LDAP, username/password)."""
+
+    provider: str
+    username: str
+    password: str
+    remember_me: bool = False
 
 
 class LoginResponse(BaseModel):
-    """Response model for successful login."""
+    """Login response with session information."""
 
-    access_token: str = Field(..., description="JWT access token")
-    token_type: str = Field(default="bearer", description="Token type (always 'bearer')")
-    expires_in: int = Field(..., description="Token expiration time in seconds")
-    refresh_token: str = Field(..., description="Refresh token for obtaining new access tokens")
-    user: dict = Field(..., description="User information")
-
-
-class TokenRefreshRequest(BaseModel):
-    """Request model for token refresh."""
-
-    refresh_token: str = Field(..., description="The refresh token to exchange for a new access token", min_length=1)
+    success: bool
+    message: str
+    session: SessionResponse | None = None
+    user_id: UUID | None = None
+    redirect_url: str | None = None
 
 
-class TokenResponse(BaseModel):
-    """Response model for token operations."""
+class AuthStatusResponse(BaseModel):
+    """Current authentication status."""
 
-    access_token: str = Field(..., description="JWT access token")
-    token_type: str = Field(default="bearer", description="Token type (always 'bearer')")
-    expires_in: int = Field(..., description="Token expiration time in seconds")
-    refresh_token: str | None = Field(None, description="New refresh token (if rotation enabled)")
-
-
-class TokenRevokeRequest(BaseModel):
-    """Request model for token revocation."""
-
-    refresh_token: str = Field(..., description="The refresh token to revoke", min_length=1)
+    authenticated: bool
+    user_id: UUID | None = None
+    session_id: str | None = None
+    session: SessionResponse | None = None
+    provider: str | None = None
+    expires_at: datetime | None = None
 
 
-class TokenRevokeResponse(BaseModel):
-    """Response model for token revocation."""
+class LogoutResponse(BaseModel):
+    """Logout response."""
 
-    success: bool = Field(..., description="Whether the revocation was successful")
-    message: str = Field(..., description="Status message")
+    success: bool
+    message: str
+    sessions_invalidated: int = 0
 
 
-# Dependency to get Redis client
-async def get_redis_client() -> aioredis.Redis:
-    """Get Redis client for token storage.
+class OAuthCallbackResponse(BaseModel):
+    """OAuth callback response."""
 
-    Returns:
-        Redis client instance
+    success: bool
+    message: str
+    session: SessionResponse | None = None
+    user_id: UUID | None = None
 
-    Raises:
-        HTTPException: If Redis connection fails
+
+# Dependencies
+
+
+async def get_settings() -> Settings:
+    """Get application settings.
+
+    This is a placeholder for dependency injection.
+    In production, retrieve from app state.
     """
-    try:
-        redis_client = aioredis.from_url(
-            settings.redis_dsn,
-            encoding="utf-8",
-            decode_responses=True,
-        )
-        # Test connection
-        await redis_client.ping()
-        return redis_client
-    except Exception as e:
-        logger.error(
-            "redis_connection_failed",
-            error=str(e),
-            error_type=type(e).__name__,
-        )
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Authentication service temporarily unavailable",
-        ) from e
+    # TODO: Get from app state
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail="Settings dependency not configured",
+    )
 
 
-# Dependency to get token service
-async def get_token_service(
-    redis_client: aioredis.Redis = Depends(get_redis_client),
-) -> TokenService:
-    """Get token service instance.
+async def get_session_service() -> SessionService:
+    """Get session service instance.
+
+    This is a placeholder for dependency injection.
+    In production, retrieve from app state.
+    """
+    # TODO: Get from app state
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail="Session service dependency not configured",
+    )
+
+
+async def get_current_session(
+    request: Request,
+    session_service: SessionService = Depends(get_session_service),
+) -> Session | None:
+    """Get current session from request (optional).
+
+    Checks for session_id in:
+    1. Cookies
+    2. Authorization header (Bearer token)
 
     Args:
-        redis_client: Redis client dependency
+        request: FastAPI request
+        session_service: Session service instance
 
     Returns:
-        Configured TokenService instance
+        Session object if valid, None otherwise
     """
-    return TokenService(settings=settings, redis_client=redis_client)
+    # Check cookie
+    session_id = request.cookies.get("session_id")
+
+    # Check Authorization header if no cookie
+    if not session_id:
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            session_id = auth_header[7:]
+
+    if session_id:
+        return await session_service.validate_session(session_id)
+
+    return None
 
 
-@router.post(
-    "/login/ldap",
-    response_model=LoginResponse,
-    status_code=status.HTTP_200_OK,
-    summary="LDAP/AD login",
-    description="Authenticate user against LDAP/Active Directory and issue JWT tokens",
-    responses={
-        200: {"description": "Login successful"},
-        401: {"description": "Invalid credentials"},
-        503: {"description": "LDAP service unavailable"},
-    },
-)
-async def ldap_login(
-    request: LDAPLoginRequest,
-    token_service: TokenService = Depends(get_token_service),
-) -> LoginResponse:
-    """Authenticate user via LDAP/Active Directory.
-
-    This endpoint authenticates the user against an LDAP directory
-    (including Microsoft Active Directory) and returns JWT tokens
-    along with user information.
+async def require_auth(
+    session: Session | None = Depends(get_current_session),
+) -> Session:
+    """Require authentication (session must exist).
 
     Args:
-        request: Login request containing username and password
-        token_service: Token service dependency
+        session: Current session (from dependency)
 
     Returns:
-        Access token, refresh token, and user information
+        Session object
 
     Raises:
-        HTTPException: If authentication fails or LDAP is unavailable
+        401: Not authenticated
     """
-    if not settings.ldap_enabled:
+    if not session:
         raise HTTPException(
-            status_code=status.HTTP_501_NOT_IMPLEMENTED,
-            detail="LDAP authentication is not enabled",
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required",
+        )
+    return session
+
+
+# Endpoints
+
+
+@router.get("/providers", response_model=ProvidersResponse)
+async def list_providers(settings: Settings = Depends(get_settings)):
+    """List all available authentication providers.
+
+    Returns information about each enabled provider including
+    authorization URLs for OAuth/OIDC providers.
+
+    Args:
+        settings: Application settings
+
+    Returns:
+        List of available providers with metadata
+    """
+    providers = []
+
+    # OIDC Provider
+    if settings.oidc_enabled:
+        # Create temporary provider instance to get authorization URL
+        oidc_provider = OIDCProvider(
+            client_id=settings.oidc_client_id,
+            client_secret=settings.oidc_client_secret,
+            provider=settings.oidc_provider,
+            issuer=settings.oidc_issuer,
+            tenant=settings.oidc_azure_tenant,
+            domain=settings.oidc_okta_domain,
         )
 
-    logger.info("ldap_login_attempt", username=request.username)
+        # Get authorization URL (will need state and redirect_uri from frontend)
+        providers.append(
+            ProviderInfo(
+                id="oidc",
+                name=f"OIDC ({settings.oidc_provider.title()})",
+                type="oidc",
+                enabled=True,
+                authorization_url="/api/auth/oidc/authorize",
+                description=f"Login with {settings.oidc_provider.title()}",
+            )
+        )
 
-    try:
-        # Initialize LDAP provider
-        ldap_provider = LDAPProvider(settings=settings)
+    # SAML Provider
+    if settings.saml_enabled:
+        providers.append(
+            ProviderInfo(
+                id="saml",
+                name="SAML SSO",
+                type="saml",
+                enabled=True,
+                authorization_url="/api/auth/saml/login",
+                description="Enterprise SSO via SAML 2.0",
+            )
+        )
 
-        # Authenticate user and get user info
-        user_info = ldap_provider.authenticate(request.username, request.password)
+    # LDAP Provider
+    if settings.ldap_enabled:
+        providers.append(
+            ProviderInfo(
+                id="ldap",
+                name="LDAP / Active Directory",
+                type="ldap",
+                enabled=True,
+                authorization_url=None,  # Credential-based, no redirect
+                description="Login with corporate credentials",
+            )
+        )
 
-        # Create access token
-        access_token = await token_service.create_access_token(user_info)
+    # API Key (always available)
+    providers.append(
+        ProviderInfo(
+            id="api_key",
+            name="API Key",
+            type="api_key",
+            enabled=True,
+            authorization_url=None,
+            description="Programmatic access with API keys",
+        )
+    )
 
-        # Create refresh token
-        refresh_token, _ = await token_service.create_refresh_token(user_info["user_id"])
+    return ProvidersResponse(
+        providers=providers,
+        total=len(providers),
+    )
 
-        # Calculate expiry in seconds
-        expires_in = settings.jwt_expiration_minutes * 60
 
-        # Prepare user info for response (remove sensitive data)
-        user_response = {
-            "user_id": user_info["user_id"],
-            "username": user_info.get("username"),
-            "email": user_info.get("email"),
-            "name": user_info.get("name"),
-            "roles": user_info.get("roles", []),
-            "teams": user_info.get("teams", []),
-        }
+@router.post("/login", response_model=LoginResponse)
+async def login(
+    login_request: LoginRequest,
+    request: Request,
+    settings: Settings = Depends(get_settings),
+    session_service: SessionService = Depends(get_session_service),
+):
+    """Login with username and password (LDAP/AD).
 
-        logger.info(
-            "ldap_login_success",
-            username=request.username,
-            user_id=user_info["user_id"],
-            roles=user_info.get("roles", []),
+    This endpoint handles credential-based authentication.
+    OAuth/OIDC providers should use the authorize endpoint instead.
+
+    Args:
+        login_request: Login credentials
+        request: FastAPI request
+        settings: Application settings
+        session_service: Session service instance
+
+    Returns:
+        Login response with session information
+
+    Raises:
+        400: Invalid provider
+        401: Authentication failed
+    """
+    if login_request.provider == "ldap":
+        if not settings.ldap_enabled:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="LDAP authentication is not enabled",
+            )
+
+        # Create LDAP provider
+        ldap_provider = LDAPProvider(
+            server_uri=settings.ldap_server,
+            bind_dn=settings.ldap_bind_dn,
+            bind_password=settings.ldap_bind_password,
+            user_base_dn=settings.ldap_user_base_dn,
+            group_base_dn=settings.ldap_group_base_dn,
+        )
+
+        # Authenticate
+        user_info = await ldap_provider.authenticate(
+            {
+                "username": login_request.username,
+                "password": login_request.password,
+            }
+        )
+
+        if not user_info:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid credentials",
+            )
+
+        # Create session
+        timeout = settings.session_timeout_seconds
+        if login_request.remember_me:
+            timeout = timeout * 30  # Extend to 30 days for remember me
+
+        # Convert user_id to UUID
+        user_uuid = user_id_to_uuid(user_info.user_id, "ldap")
+
+        session, session_id = await session_service.create_session(
+            user_id=user_uuid,
+            ip_address=request.client.host,
+            user_agent=request.headers.get("User-Agent", ""),
+            timeout_seconds=timeout,
+            metadata={
+                "provider": "ldap",
+                "email": user_info.email,
+                "original_user_id": user_info.user_id,
+            },
         )
 
         return LoginResponse(
-            access_token=access_token,
-            token_type="bearer",
-            expires_in=expires_in,
-            refresh_token=refresh_token,
-            user=user_response,
+            success=True,
+            message="Login successful",
+            session=SessionResponse(
+                session_id=session.session_id,
+                user_id=session.user_id,
+                created_at=session.created_at,
+                expires_at=session.expires_at,
+                last_activity=session.last_activity,
+                ip_address=session.ip_address,
+                user_agent=session.user_agent,
+                is_expired=False,
+            ),
+            user_id=session.user_id,
         )
 
-    except LDAPAuthenticationError as e:
-        logger.warning(
-            "ldap_login_failed",
-            username=request.username,
-            error=str(e),
-        )
+    else:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid username or password",
-        ) from e
-
-    except LDAPConnectionError as e:
-        logger.error(
-            "ldap_connection_error",
-            username=request.username,
-            error=str(e),
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Unsupported provider: {login_request.provider}",
         )
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Authentication service temporarily unavailable",
-        ) from e
-
-    except Exception as e:
-        logger.error(
-            "ldap_login_error_unexpected",
-            username=request.username,
-            error=str(e),
-            error_type=type(e).__name__,
-        )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Login failed due to internal error",
-        ) from e
 
 
-@router.get(
-    "/oidc/login",
-    status_code=status.HTTP_307_TEMPORARY_REDIRECT,
-    summary="Initiate OIDC login",
-    description="Redirect user to OIDC identity provider for authentication",
-    responses={
-        307: {"description": "Redirect to identity provider"},
-        503: {"description": "OIDC service unavailable"},
-    },
-)
-async def oidc_login(
-    redis_client: aioredis.Redis = Depends(get_redis_client),
+@router.get("/oidc/authorize")
+async def oidc_authorize(
+    redirect_uri: str,
+    state: str | None = None,
+    settings: Settings = Depends(get_settings),
 ):
-    """Initiate OIDC authentication flow.
+    """Get OIDC authorization URL.
 
-    This endpoint generates an authorization URL and redirects the user
-    to the identity provider for authentication.
+    Returns the authorization URL to redirect the user to the OIDC provider.
 
     Args:
-        redis_client: Redis client for storing state and PKCE verifier
+        redirect_uri: Callback URL after authentication
+        state: CSRF protection state parameter
+        settings: Application settings
 
     Returns:
-        Redirect response to IdP authorization endpoint
+        Redirect response to OIDC provider
 
     Raises:
-        HTTPException: If OIDC is not enabled or configuration fails
+        400: OIDC not enabled
     """
     if not settings.oidc_enabled:
         raise HTTPException(
-            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="OIDC authentication is not enabled",
         )
 
-    logger.info("oidc_login_initiated")
+    # Create OIDC provider
+    oidc_provider = OIDCProvider(
+        client_id=settings.oidc_client_id,
+        client_secret=settings.oidc_client_secret,
+        provider=settings.oidc_provider,
+        issuer=settings.oidc_issuer,
+        tenant=settings.oidc_azure_tenant,
+        domain=settings.oidc_okta_domain,
+    )
 
-    try:
-        from fastapi.responses import RedirectResponse
+    # Get authorization URL
+    auth_url = await oidc_provider.get_authorization_url(
+        state=state or "default_state",
+        redirect_uri=redirect_uri,
+    )
 
-        # Initialize OIDC provider
-        oidc_provider = OIDCProvider(settings=settings)
-
-        # Generate authorization URL with state and PKCE
-        authorization_url, state, code_verifier = await oidc_provider.get_authorization_url()
-
-        # Store state and code_verifier in Redis (5 minute TTL)
-        await redis_client.setex(f"oidc_state:{state}", 300, "1")
-        if code_verifier:
-            await redis_client.setex(f"oidc_verifier:{state}", 300, code_verifier)
-
-        logger.info("oidc_redirect_to_idp", state=state[:8] + "...")
-
-        return RedirectResponse(url=authorization_url, status_code=status.HTTP_307_TEMPORARY_REDIRECT)
-
-    except OIDCConfigurationError as e:
-        logger.error("oidc_configuration_error", error=str(e))
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="OIDC configuration error",
-        ) from e
-
-    except Exception as e:
-        logger.error(
-            "oidc_login_error",
-            error=str(e),
-            error_type=type(e).__name__,
-        )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to initiate OIDC login",
-        ) from e
+    # Redirect to authorization URL
+    return Response(
+        status_code=status.HTTP_307_TEMPORARY_REDIRECT,
+        headers={"Location": auth_url},
+    )
 
 
-@router.get(
-    "/oidc/callback",
-    response_model=LoginResponse,
-    status_code=status.HTTP_200_OK,
-    summary="OIDC callback",
-    description="Handle callback from OIDC identity provider and complete authentication",
-    responses={
-        200: {"description": "Login successful"},
-        401: {"description": "Authentication failed"},
-        503: {"description": "OIDC service unavailable"},
-    },
-)
+@router.get("/oidc/callback", response_model=OAuthCallbackResponse)
 async def oidc_callback(
     code: str,
     state: str,
-    redis_client: aioredis.Redis = Depends(get_redis_client),
-    token_service: TokenService = Depends(get_token_service),
+    request: Request,
+    settings: Settings = Depends(get_settings),
+    session_service: SessionService = Depends(get_session_service),
 ):
-    """Handle OIDC callback and complete authentication.
+    """Handle OIDC callback after authentication.
 
-    This endpoint receives the authorization code from the identity provider,
-    exchanges it for tokens, validates the ID token, and issues SARK tokens.
+    Exchanges authorization code for tokens and creates a session.
 
     Args:
-        code: Authorization code from IdP
-        state: State parameter for CSRF protection
-        redis_client: Redis client for retrieving state and PKCE verifier
-        token_service: Token service for issuing tokens
+        code: Authorization code
+        state: State parameter for CSRF validation
+        request: FastAPI request
+        settings: Application settings
+        session_service: Session service instance
 
     Returns:
-        Access token, refresh token, and user information
+        OAuth callback response with session
 
     Raises:
-        HTTPException: If authentication fails
+        400: OIDC not enabled
+        401: Authentication failed
     """
     if not settings.oidc_enabled:
         raise HTTPException(
-            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="OIDC authentication is not enabled",
         )
 
-    logger.info("oidc_callback_received", state=state[:8] + "...")
+    # Create OIDC provider
+    oidc_provider = OIDCProvider(
+        client_id=settings.oidc_client_id,
+        client_secret=settings.oidc_client_secret,
+        provider=settings.oidc_provider,
+        issuer=settings.oidc_issuer,
+        tenant=settings.oidc_azure_tenant,
+        domain=settings.oidc_okta_domain,
+    )
 
-    try:
-        # Validate state (CSRF protection)
-        state_valid = await redis_client.get(f"oidc_state:{state}")
-        if not state_valid:
-            logger.warning("oidc_invalid_state", state=state[:8] + "...")
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid or expired state parameter",
-            )
+    # TODO: Validate state parameter against stored value
 
-        # Get code_verifier if PKCE was used
-        code_verifier = None
-        if settings.oidc_use_pkce:
-            code_verifier_bytes = await redis_client.get(f"oidc_verifier:{state}")
-            if code_verifier_bytes:
-                code_verifier = (
-                    code_verifier_bytes.decode("utf-8")
-                    if isinstance(code_verifier_bytes, bytes)
-                    else code_verifier_bytes
-                )
+    # Handle callback and get tokens
+    redirect_uri = request.url_for("oidc_callback").replace(query=None)
+    tokens = await oidc_provider.handle_callback(code, state, redirect_uri)
 
-        # Clean up state and verifier from Redis
-        await redis_client.delete(f"oidc_state:{state}", f"oidc_verifier:{state}")
-
-        # Initialize OIDC provider
-        oidc_provider = OIDCProvider(settings=settings)
-
-        # Complete authentication
-        user_info = await oidc_provider.authenticate(
-            code=code,
-            code_verifier=code_verifier,
-        )
-
-        # Create access token
-        access_token = await token_service.create_access_token(user_info)
-
-        # Create refresh token
-        refresh_token, _ = await token_service.create_refresh_token(user_info["user_id"])
-
-        # Calculate expiry in seconds
-        expires_in = settings.jwt_expiration_minutes * 60
-
-        # Prepare user info for response
-        user_response = {
-            "user_id": user_info["user_id"],
-            "username": user_info.get("username"),
-            "email": user_info.get("email"),
-            "name": user_info.get("name"),
-            "roles": user_info.get("roles", []),
-            "teams": user_info.get("teams", []),
-        }
-
-        logger.info(
-            "oidc_login_success",
-            user_id=user_info["user_id"],
-            email=user_info.get("email"),
-            roles=user_info.get("roles", []),
-        )
-
-        return LoginResponse(
-            access_token=access_token,
-            token_type="bearer",
-            expires_in=expires_in,
-            refresh_token=refresh_token,
-            user=user_response,
-        )
-
-    except OIDCAuthenticationError as e:
-        logger.warning("oidc_authentication_failed", error=str(e))
+    if not tokens:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="OIDC authentication failed",
-        ) from e
-
-    except OIDCConfigurationError as e:
-        logger.error("oidc_configuration_error", error=str(e))
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="OIDC configuration error",
-        ) from e
-
-    except Exception as e:
-        logger.error(
-            "oidc_callback_error",
-            error=str(e),
-            error_type=type(e).__name__,
+            detail="Failed to authenticate with OIDC provider",
         )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="OIDC authentication failed",
-        ) from e
 
+    # Validate token and get user info
+    user_info = await oidc_provider.validate_token(tokens.get("access_token", ""))
 
-@router.post(
-    "/refresh",
-    response_model=TokenResponse,
-    status_code=status.HTTP_200_OK,
-    summary="Refresh access token",
-    description="Exchange a valid refresh token for a new access token. "
-    "If token rotation is enabled, a new refresh token is also issued.",
-    responses={
-        200: {"description": "Tokens refreshed successfully"},
-        401: {"description": "Invalid or expired refresh token"},
-        503: {"description": "Authentication service unavailable"},
-    },
-)
-async def refresh_token(
-    request: TokenRefreshRequest,
-    token_service: TokenService = Depends(get_token_service),
-) -> TokenResponse:
-    """Refresh access token using a refresh token.
-
-    This endpoint allows clients to obtain a new access token without
-    requiring the user to re-authenticate.
-
-    If `refresh_token_rotation_enabled` is True, the old refresh token
-    is revoked and a new one is issued for enhanced security.
-
-    Args:
-        request: Token refresh request containing the refresh token
-        token_service: Token service dependency
-
-    Returns:
-        New access token and optionally a new refresh token
-
-    Raises:
-        HTTPException: If refresh token is invalid or expired
-    """
-    logger.info("token_refresh_requested")
-
-    # Validate refresh token and get user ID
-    user_id = await token_service.validate_refresh_token(request.refresh_token)
-
-    if not user_id:
-        logger.warning("token_refresh_failed", reason="invalid_refresh_token")
+    if not user_info:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired refresh token",
+            detail="Failed to get user information",
         )
 
-    try:
-        # TODO: Fetch full user context from database/cache
-        # For now, use minimal context with just user_id
-        # This will be enhanced in TASK-202 (User Context Service)
-        user_context = {
-            "user_id": user_id,
-            "roles": [],
-            "teams": [],
-            "permissions": [],
-        }
+    # Convert user_id to UUID
+    user_uuid = user_id_to_uuid(user_info.user_id, "oidc")
 
-        # Create new access token
-        access_token = await token_service.create_access_token(user_context)
+    # Create session
+    session, session_id = await session_service.create_session(
+        user_id=user_uuid,
+        ip_address=request.client.host,
+        user_agent=request.headers.get("User-Agent", ""),
+        metadata={
+            "provider": "oidc",
+            "email": user_info.email,
+            "name": user_info.name,
+            "original_user_id": user_info.user_id,
+        },
+    )
 
-        # Calculate expiry in seconds
-        expires_in = settings.jwt_expiration_minutes * 60
-
-        response_data = {
-            "access_token": access_token,
-            "token_type": "bearer",
-            "expires_in": expires_in,
-        }
-
-        # Rotate refresh token if enabled
-        if settings.refresh_token_rotation_enabled:
-            rotation_result = await token_service.rotate_refresh_token(
-                request.refresh_token, user_id
-            )
-
-            if rotation_result:
-                new_refresh_token, _ = rotation_result
-                response_data["refresh_token"] = new_refresh_token
-                logger.info("token_refresh_success_with_rotation", user_id=user_id)
-            else:
-                logger.warning(
-                    "token_rotation_failed",
-                    user_id=user_id,
-                    message="Failed to rotate refresh token",
-                )
-                # Continue with access token issuance even if rotation failed
-        else:
-            logger.info("token_refresh_success", user_id=user_id)
-
-        return TokenResponse(**response_data)
-
-    except Exception as e:
-        logger.error(
-            "token_refresh_error",
-            user_id=user_id,
-            error=str(e),
-            error_type=type(e).__name__,
-        )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to refresh token",
-        ) from e
+    return OAuthCallbackResponse(
+        success=True,
+        message="Authentication successful",
+        session=SessionResponse(
+            session_id=session.session_id,
+            user_id=session.user_id,
+            created_at=session.created_at,
+            expires_at=session.expires_at,
+            last_activity=session.last_activity,
+            ip_address=session.ip_address,
+            user_agent=session.user_agent,
+            is_expired=False,
+        ),
+        user_id=session.user_id,
+    )
 
 
-@router.post(
-    "/revoke",
-    response_model=TokenRevokeResponse,
-    status_code=status.HTTP_200_OK,
-    summary="Revoke refresh token",
-    description="Revoke a refresh token to prevent it from being used again. "
-    "This is useful for logout functionality.",
-    responses={
-        200: {"description": "Token revoked successfully"},
-        401: {"description": "Authentication required"},
-        503: {"description": "Authentication service unavailable"},
-    },
-)
-async def revoke_token(
-    request: TokenRevokeRequest,
-    user: CurrentUser,  # Require authentication to revoke tokens
-    token_service: TokenService = Depends(get_token_service),
-) -> TokenRevokeResponse:
-    """Revoke a refresh token.
+@router.get("/status", response_model=AuthStatusResponse)
+async def auth_status(
+    session: Session | None = Depends(get_current_session),
+):
+    """Get current authentication status.
 
-    This endpoint allows users to revoke their own refresh tokens,
-    effectively logging them out from that session.
+    Returns information about the current session if authenticated.
 
     Args:
-        request: Token revocation request containing the refresh token
-        user: Current authenticated user (from access token)
-        token_service: Token service dependency
+        session: Current session (from dependency)
 
     Returns:
-        Revocation status
-
-    Raises:
-        HTTPException: If revocation fails
+        Authentication status with session information
     """
-    logger.info("token_revoke_requested", user_id=user.user_id)
-
-    try:
-        # Revoke the refresh token
-        success = await token_service.revoke_refresh_token(request.refresh_token)
-
-        if success:
-            return TokenRevokeResponse(
-                success=True,
-                message="Refresh token revoked successfully",
-            )
-        else:
-            # Token was not found, but this isn't necessarily an error
-            # (could already be revoked or expired)
-            return TokenRevokeResponse(
-                success=True,
-                message="Refresh token not found (may already be revoked or expired)",
-            )
-
-    except Exception as e:
-        logger.error(
-            "token_revoke_error",
-            user_id=user.user_id,
-            error=str(e),
-            error_type=type(e).__name__,
+    if not session:
+        return AuthStatusResponse(
+            authenticated=False,
+            user_id=None,
+            session_id=None,
+            session=None,
+            provider=None,
+            expires_at=None,
         )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to revoke token",
-        ) from e
+
+    return AuthStatusResponse(
+        authenticated=True,
+        user_id=session.user_id,
+        session_id=session.session_id,
+        session=SessionResponse(
+            session_id=session.session_id,
+            user_id=session.user_id,
+            created_at=session.created_at,
+            expires_at=session.expires_at,
+            last_activity=session.last_activity,
+            ip_address=session.ip_address,
+            user_agent=session.user_agent,
+            is_expired=session.is_expired(),
+        ),
+        provider=session.metadata.get("provider"),
+        expires_at=session.expires_at,
+    )
 
 
-@router.get(
-    "/me",
-    summary="Get current user",
-    description="Get information about the currently authenticated user",
-    responses={
-        200: {"description": "Current user information"},
-        401: {"description": "Authentication required"},
-    },
-)
-async def get_current_user_info(user: CurrentUser) -> dict:
-    """Get current authenticated user information.
-
-    This endpoint returns information about the user from their JWT token.
-    Useful for verifying authentication and retrieving user details.
+@router.post("/logout", response_model=LogoutResponse)
+async def logout(
+    response: Response,
+    session: Session = Depends(require_auth),
+    session_service: SessionService = Depends(get_session_service),
+):
+    """Logout and invalidate current session.
 
     Args:
-        user: Current authenticated user
+        response: FastAPI response
+        session: Current session (required)
+        session_service: Session service instance
 
     Returns:
-        User information dictionary
+        Logout confirmation
     """
-    logger.debug("user_info_requested", user_id=user.user_id)
+    # Invalidate session
+    await session_service.invalidate_session(session.session_id)
 
-    return user.to_dict()
+    # Clear session cookie
+    response.delete_cookie("session_id")
+
+    return LogoutResponse(
+        success=True,
+        message="Logout successful",
+        sessions_invalidated=1,
+    )
+
+
+@router.post("/logout/all", response_model=LogoutResponse)
+async def logout_all(
+    response: Response,
+    session: Session = Depends(require_auth),
+    session_service: SessionService = Depends(get_session_service),
+):
+    """Logout from all devices (invalidate all user sessions).
+
+    Args:
+        response: FastAPI response
+        session: Current session (required)
+        session_service: Session service instance
+
+    Returns:
+        Logout confirmation with count of invalidated sessions
+    """
+    # Invalidate all user sessions
+    count = await session_service.invalidate_all_user_sessions(session.user_id)
+
+    # Clear session cookie
+    response.delete_cookie("session_id")
+
+    return LogoutResponse(
+        success=True,
+        message=f"Logged out from all devices",
+        sessions_invalidated=count,
+    )
+
+
+@router.get("/health")
+async def auth_health(
+    settings: Settings = Depends(get_settings),
+):
+    """Health check for authentication providers.
+
+    Checks connectivity to all enabled auth providers.
+
+    Args:
+        settings: Application settings
+
+    Returns:
+        Health status of each provider
+    """
+    health_status = {}
+
+    # Check OIDC
+    if settings.oidc_enabled:
+        try:
+            oidc_provider = OIDCProvider(
+                client_id=settings.oidc_client_id,
+                client_secret=settings.oidc_client_secret,
+                provider=settings.oidc_provider,
+            )
+            health_status["oidc"] = await oidc_provider.health_check()
+        except Exception as e:
+            logger.error(f"OIDC health check failed: {e}")
+            health_status["oidc"] = False
+
+    # Check SAML
+    if settings.saml_enabled:
+        try:
+            saml_provider = SAMLProvider(
+                sp_entity_id=settings.saml_sp_entity_id,
+                sp_acs_url=settings.saml_sp_acs_url,
+                sp_sls_url=settings.saml_sp_sls_url,
+                idp_entity_id=settings.saml_idp_entity_id,
+                idp_sso_url=settings.saml_idp_sso_url,
+            )
+            health_status["saml"] = await saml_provider.health_check()
+        except Exception as e:
+            logger.error(f"SAML health check failed: {e}")
+            health_status["saml"] = False
+
+    # Check LDAP
+    if settings.ldap_enabled:
+        try:
+            ldap_provider = LDAPProvider(
+                server_uri=settings.ldap_server,
+                bind_dn=settings.ldap_bind_dn,
+                bind_password=settings.ldap_bind_password,
+                user_base_dn=settings.ldap_user_base_dn,
+            )
+            health_status["ldap"] = await ldap_provider.health_check()
+        except Exception as e:
+            logger.error(f"LDAP health check failed: {e}")
+            health_status["ldap"] = False
+
+    # Overall health
+    healthy_count = sum(1 for v in health_status.values() if v)
+    total_count = len(health_status)
+
+    return {
+        "status": "healthy" if healthy_count == total_count else "degraded",
+        "providers": health_status,
+        "healthy": healthy_count,
+        "total": total_count,
+    }
