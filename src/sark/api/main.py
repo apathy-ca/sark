@@ -6,7 +6,7 @@ from prometheus_client import make_asgi_app
 import structlog
 
 from sark.api.middleware import AuthMiddleware
-from sark.api.routers import auth, health, policy, servers, tools
+from sark.api.routers import auth, bulk, health, policy, servers, tools
 from sark.config import get_settings
 from sark.db import init_db
 
@@ -42,6 +42,7 @@ def create_app() -> FastAPI:
     app.include_router(servers.router, prefix="/api/v1/servers", tags=["servers"])
     app.include_router(policy.router, prefix="/api/v1/policy", tags=["policy"])
     app.include_router(tools.router, prefix="/api/v1/tools", tags=["tools"])
+    app.include_router(bulk.router, prefix="/api/v1/bulk", tags=["bulk"])
 
     # Prometheus metrics endpoint
     if settings.metrics_enabled:
