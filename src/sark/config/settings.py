@@ -112,6 +112,12 @@ class Settings(BaseSettings):
     ldap_use_ssl: bool = False
     ldap_pool_size: int = 10
 
+    # Session Management
+    session_timeout_seconds: int = 86400  # 24 hours
+    session_max_concurrent: int = 5  # Maximum concurrent sessions per user
+    session_extend_on_activity: bool = True  # Extend session on activity
+    session_cleanup_interval_seconds: int = 3600  # Clean up expired sessions every hour
+
     # PostgreSQL Database
     postgres_host: str = "localhost"
     postgres_port: int = 5432
