@@ -188,3 +188,50 @@ class OPAClient:
     async def close(self) -> None:
         """Close HTTP client."""
         await self.client.aclose()
+
+    async def health_check(self) -> bool:
+        """
+        Check OPA health status.
+
+        Returns:
+            True if OPA is healthy, False otherwise
+        """
+        try:
+            # OPA health endpoint
+            response = await self.client.get(
+                f"{self.opa_url}/health",
+                timeout=self.timeout,
+            )
+            return response.status_code == 200
+        except Exception as e:
+            logger.warning("opa_health_check_failed", error=str(e))
+            return False
+
+    async def authorize(
+        self,
+        user_id: str,
+        action: str,
+        resource: str,
+        context: dict[str, Any] | None = None,
+    ) -> bool:
+        """
+        Quick authorization check.
+
+        Args:
+            user_id: User ID
+            action: Action to authorize
+            resource: Resource to access
+            context: Additional context
+
+        Returns:
+            True if authorized, False otherwise
+        """
+        user_context = context.get("user", {}) if context else {}
+        auth_input = AuthorizationInput(
+            user={"id": user_id, **user_context},
+            action=action,
+            context=context or {},
+        )
+
+        decision = await self.evaluate_policy(auth_input)
+        return decision.allow

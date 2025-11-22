@@ -14,6 +14,7 @@ def sample_fixture() -> str:
 @pytest.fixture(autouse=True)
 def mock_database(monkeypatch: pytest.MonkeyPatch) -> None:
     """Mock database initialization for all tests."""
+
     # Mock init_db to prevent actual database connections during tests
     async def mock_init_db() -> None:
         """Mock database initialization."""

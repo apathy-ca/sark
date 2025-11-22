@@ -77,7 +77,7 @@ class MCPServer(Base):
     # Service discovery
     consul_id = Column(String(255), nullable=True, unique=True)
     tags = Column(JSON, nullable=False, default=list)
-    metadata = Column(JSON, nullable=False, default=dict)
+    extra_metadata = Column(JSON, nullable=False, default=dict)
 
     created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC))
     updated_at = Column(
@@ -122,7 +122,7 @@ class MCPTool(Base):
     invocation_count = Column(Integer, default=0, nullable=False)
     last_invoked = Column(DateTime(timezone=True), nullable=True)
 
-    metadata = Column(JSON, nullable=False, default=dict)
+    extra_metadata = Column(JSON, nullable=False, default=dict)
 
     created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC))
     updated_at = Column(

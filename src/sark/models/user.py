@@ -30,7 +30,7 @@ class User(Base):
     is_active = Column(Boolean, default=True, nullable=False)
     is_admin = Column(Boolean, default=False, nullable=False)
     role = Column(String(50), nullable=False, default="developer")
-    metadata = Column(JSON, nullable=False, default=dict)
+    extra_metadata = Column(JSON, nullable=False, default=dict)
 
     created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC))
     updated_at = Column(
@@ -57,7 +57,7 @@ class Team(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     name = Column(String(255), unique=True, nullable=False, index=True)
     description = Column(String(1000), nullable=True)
-    metadata = Column(JSON, nullable=False, default=dict)
+    extra_metadata = Column(JSON, nullable=False, default=dict)
 
     created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC))
     updated_at = Column(
