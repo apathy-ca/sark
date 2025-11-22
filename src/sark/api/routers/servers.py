@@ -12,7 +12,9 @@ from sark.db import get_db, get_timescale_db
 from sark.models.audit import AuditEventType, SeverityLevel
 from sark.models.mcp_server import TransportType
 from sark.services.audit import AuditService
+from sark.services.auth import UserContext, get_current_user
 from sark.services.discovery import DiscoveryService
+from sark.services.policy import OPAClient
 
 logger = structlog.get_logger()
 router = APIRouter()
@@ -56,6 +58,7 @@ class ServerResponse(BaseModel):
 @router.post("/", response_model=ServerResponse, status_code=status.HTTP_201_CREATED)
 async def register_server(
     request: ServerRegistrationRequest,
+    user: UserContext = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
     audit_db: AsyncSession = Depends(get_timescale_db),
 ) -> ServerResponse:
@@ -64,18 +67,39 @@ async def register_server(
 
     This endpoint allows registration of MCP servers with the governance system.
     The server will be added to the service registry and subject to policy controls.
+
+    Requires authentication via JWT token.
     """
     try:
         discovery_service = DiscoveryService(db)
         audit_service = AuditService(audit_db)
+        opa_client = OPAClient()
 
-        # TODO: Extract user from authentication token
-        # For now, using placeholder values
-        user_id = UUID("00000000-0000-0000-0000-000000000000")
-        user_email = "system@sark.local"
+        # Check authorization via OPA
+        authorization_allowed = await opa_client.authorize(
+            user_id=str(user.user_id),
+            action="server:register",
+            resource=f"server:{request.name}",
+            context={
+                "user_role": user.role,
+                "user_teams": user.teams,
+                "server_name": request.name,
+                "sensitivity_level": request.sensitivity_level,
+                "transport": request.transport,
+            },
+        )
 
-        # TODO: Check authorization via OPA
-        # For MVP, allow all registrations
+        if not authorization_allowed:
+            logger.warning(
+                "server_registration_denied",
+                user_id=str(user.user_id),
+                server_name=request.name,
+                reason="policy_denied",
+            )
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Server registration denied by policy",
+            )
 
         # Register server
         server = await discovery_service.register_server(
@@ -96,13 +120,14 @@ async def register_server(
         await audit_service.log_event(
             event_type=AuditEventType.SERVER_REGISTERED,
             severity=SeverityLevel.MEDIUM,
-            user_id=user_id,
-            user_email=user_email,
+            user_id=user.user_id,
+            user_email=user.email,
             server_id=server.id,
             details={
                 "server_name": server.name,
                 "transport": request.transport,
                 "tool_count": len(request.tools),
+                "sensitivity_level": request.sensitivity_level,
             },
         )
 
@@ -155,7 +180,7 @@ async def get_server(
             }
             for tool in tools
         ],
-        "metadata": server.metadata,
+        "metadata": server.extra_metadata,
         "created_at": server.created_at.isoformat(),
     }
 

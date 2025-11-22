@@ -82,7 +82,7 @@ class DiscoveryService:
             owner_id=owner_id,
             team_id=team_id,
             tags=tags or [],
-            metadata=metadata or {},
+            extra_metadata=metadata or {},
         )
 
         self.db.add(server)
@@ -98,7 +98,7 @@ class DiscoveryService:
                 sensitivity_level=tool_def.get("sensitivity_level", sensitivity_level),
                 signature=tool_def.get("signature"),
                 requires_approval=tool_def.get("requires_approval", False),
-                metadata=tool_def.get("metadata", {}),
+                extra_metadata=tool_def.get("metadata", {}),
             )
             self.db.add(tool)
 

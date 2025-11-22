@@ -1,7 +1,5 @@
 """Entry point for running SARK as a module."""
 
-import sys
-
 from sark.main import app
 
 
@@ -18,4 +16,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
