@@ -900,6 +900,607 @@ annotations:
   cert-manager.io/cluster-issuer: "letsencrypt-prod"
 ```
 
+## Performance Optimization
+
+### Overview
+
+For production deployments, follow these optimization guides to ensure optimal performance, security, and reliability:
+
+- **[DATABASE_OPTIMIZATION.md](./DATABASE_OPTIMIZATION.md)** - Database indexing, query tuning, connection pooling
+- **[REDIS_OPTIMIZATION.md](./REDIS_OPTIMIZATION.md)** - Redis connection pooling, cache tuning, memory management
+- **[SECURITY_HARDENING.md](./SECURITY_HARDENING.md)** - Security headers, hardening checklist, production security
+- **[PERFORMANCE_TUNING.md](./PERFORMANCE_TUNING.md)** - Application and infrastructure performance tuning
+
+### Resource Sizing Recommendations
+
+#### Application Pods (SARK API)
+
+**Small Deployment (< 100 req/s)**:
+```yaml
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "1Gi"
+    cpu: "500m"
+
+replicas: 2
+```
+
+**Medium Deployment (100-500 req/s)**:
+```yaml
+resources:
+  requests:
+    memory: "1Gi"
+    cpu: "500m"
+  limits:
+    memory: "2Gi"
+    cpu: "1000m"
+
+replicas: 4
+```
+
+**Large Deployment (500-1000 req/s)**:
+```yaml
+resources:
+  requests:
+    memory: "2Gi"
+    cpu: "1000m"
+  limits:
+    memory: "4Gi"
+    cpu: "2000m"
+
+replicas: 8
+```
+
+**Very Large Deployment (> 1000 req/s)**:
+```yaml
+resources:
+  requests:
+    memory: "4Gi"
+    cpu: "2000m"
+  limits:
+    memory: "8Gi"
+    cpu: "4000m"
+
+replicas: 16
+```
+
+#### Database (PostgreSQL)
+
+**Small Deployment**:
+```yaml
+resources:
+  requests:
+    memory: "2Gi"
+    cpu: "500m"
+  limits:
+    memory: "4Gi"
+    cpu: "1000m"
+
+# postgresql.conf
+shared_buffers = 1GB
+effective_cache_size = 3GB
+max_connections = 100
+```
+
+**Medium Deployment**:
+```yaml
+resources:
+  requests:
+    memory: "4Gi"
+    cpu: "1000m"
+  limits:
+    memory: "8Gi"
+    cpu: "2000m"
+
+# postgresql.conf
+shared_buffers = 2GB
+effective_cache_size = 6GB
+max_connections = 200
+```
+
+**Large Deployment**:
+```yaml
+resources:
+  requests:
+    memory: "8Gi"
+    cpu: "2000m"
+  limits:
+    memory: "16Gi"
+    cpu: "4000m"
+
+# postgresql.conf
+shared_buffers = 4GB
+effective_cache_size = 12GB
+max_connections = 300
+work_mem = 32MB
+maintenance_work_mem = 1GB
+```
+
+#### Redis
+
+**Small Deployment**:
+```yaml
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "1Gi"
+    cpu: "500m"
+
+command:
+  - redis-server
+  - --maxmemory 512mb
+  - --maxmemory-policy allkeys-lru
+```
+
+**Medium Deployment**:
+```yaml
+resources:
+  requests:
+    memory: "1Gi"
+    cpu: "500m"
+  limits:
+    memory: "2Gi"
+    cpu: "1000m"
+
+command:
+  - redis-server
+  - --maxmemory 1gb
+  - --maxmemory-policy allkeys-lru
+  - --io-threads 2
+```
+
+**Large Deployment**:
+```yaml
+resources:
+  requests:
+    memory: "2Gi"
+    cpu: "1000m"
+  limits:
+    memory: "4Gi"
+    cpu: "2000m"
+
+command:
+  - redis-server
+  - --maxmemory 2gb
+  - --maxmemory-policy allkeys-lru
+  - --io-threads 4
+  - --tcp-backlog 511
+```
+
+### Horizontal Pod Autoscaling (HPA)
+
+**Configure HPA for automatic scaling**:
+
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: sark-hpa
+  namespace: production
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: sark
+  minReplicas: 4
+  maxReplicas: 20
+  metrics:
+  # CPU-based scaling
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  # Memory-based scaling
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  # Custom metric: Request rate
+  - type: Pods
+    pods:
+      metric:
+        name: http_requests_per_second
+      target:
+        type: AverageValue
+        averageValue: "100"
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300  # Wait 5 min before scaling down
+      policies:
+      - type: Percent
+        value: 50  # Scale down max 50% at a time
+        periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 0  # Scale up immediately
+      policies:
+      - type: Percent
+        value: 100  # Double capacity if needed
+        periodSeconds: 60
+      - type: Pods
+        value: 4  # Or add 4 pods at a time
+        periodSeconds: 60
+      selectPolicy: Max  # Use whichever scales faster
+```
+
+**Apply HPA**:
+```bash
+kubectl apply -f k8s/hpa.yaml
+kubectl get hpa sark -n production --watch
+```
+
+### Pod Disruption Budget (PDB)
+
+**Ensure availability during updates and maintenance**:
+
+```yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: sark-pdb
+  namespace: production
+spec:
+  minAvailable: 2  # Always keep 2 pods running
+  selector:
+    matchLabels:
+      app: sark
+```
+
+**Or use percentage**:
+```yaml
+spec:
+  minAvailable: 50%  # Keep 50% of pods running
+```
+
+### Database Connection Pooling
+
+**Application-level pooling (SQLAlchemy)**:
+
+```python
+# In application configuration
+DATABASE_POOL_SIZE=20          # Normal pool size per pod
+DATABASE_MAX_OVERFLOW=10       # Extra connections during spikes
+DATABASE_POOL_TIMEOUT=30       # Wait 30s for connection
+DATABASE_POOL_RECYCLE=3600     # Recycle connections after 1 hour
+
+# Total connections = (pods × pool_size) + (pods × max_overflow)
+# Example: 4 pods × (20 + 10) = 120 connections
+# PostgreSQL max_connections should be 200+ (with headroom)
+```
+
+**PgBouncer (optional for > 10 pods)**:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgbouncer
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pgbouncer
+  template:
+    spec:
+      containers:
+      - name: pgbouncer
+        image: pgbouncer/pgbouncer:latest
+        ports:
+        - containerPort: 6432
+        volumeMounts:
+        - name: config
+          mountPath: /etc/pgbouncer
+        env:
+        - name: DATABASES_HOST
+          value: postgres
+        - name: DATABASES_PORT
+          value: "5432"
+        - name: DATABASES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: username
+        - name: DATABASES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: password
+      volumes:
+      - name: config
+        configMap:
+          name: pgbouncer-config
+```
+
+**pgbouncer.ini**:
+```ini
+[pgbouncer]
+pool_mode = transaction
+max_client_conn = 1000
+default_pool_size = 25
+reserve_pool_size = 5
+max_db_connections = 100
+```
+
+### Redis Connection Pooling
+
+**Application configuration**:
+
+```python
+REDIS_POOL_SIZE=20             # Connections per pod
+REDIS_SOCKET_TIMEOUT=5         # 5 second timeout
+REDIS_SOCKET_CONNECT_TIMEOUT=2 # 2 second connect timeout
+REDIS_HEALTH_CHECK_INTERVAL=30 # Health check every 30s
+
+# Total connections = pods × pool_size
+# Example: 4 pods × 20 = 80 connections
+# Redis maxclients: 10000 (default, plenty of headroom)
+```
+
+### Database Optimization Checklist
+
+See [DATABASE_OPTIMIZATION.md](./DATABASE_OPTIMIZATION.md) for complete guide.
+
+**Quick Checklist**:
+- [ ] Create indexes on frequently queried columns (username, email, created_at)
+- [ ] Enable pg_stat_statements for query analysis
+- [ ] Configure appropriate shared_buffers (25% of RAM)
+- [ ] Set work_mem for sort/hash operations (16MB recommended)
+- [ ] Enable autovacuum with appropriate thresholds
+- [ ] Configure connection pooling (20-30 per pod)
+- [ ] Set query timeouts (30 seconds recommended)
+- [ ] Monitor slow queries (> 1 second)
+- [ ] Enable SSL/TLS for database connections
+
+**Example PostgreSQL configuration**:
+```sql
+-- Enable pg_stat_statements
+CREATE EXTENSION pg_stat_statements;
+
+-- Create critical indexes
+CREATE INDEX idx_users_username ON users(username);
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_servers_owner ON servers(owner_id);
+CREATE INDEX idx_sessions_user ON sessions(user_id);
+CREATE INDEX idx_sessions_expires ON sessions(expires_at) WHERE expires_at > NOW();
+
+-- Set statement timeout (30 seconds)
+ALTER DATABASE sark SET statement_timeout = '30s';
+```
+
+### Redis Optimization Checklist
+
+See [REDIS_OPTIMIZATION.md](./REDIS_OPTIMIZATION.md) for complete guide.
+
+**Quick Checklist**:
+- [ ] Set maxmemory limit (512MB-2GB recommended)
+- [ ] Configure eviction policy (allkeys-lru for cache)
+- [ ] Disable persistence for pure cache (save "")
+- [ ] Configure connection pooling (20 per pod)
+- [ ] Enable I/O threading for high concurrency (io-threads 4)
+- [ ] Set appropriate TTLs for cached data (5 min - 1 hour)
+- [ ] Monitor memory usage and eviction rate
+- [ ] Configure Redis Sentinel for high availability
+- [ ] Use password authentication (requirepass)
+
+**Example Redis configuration**:
+```conf
+maxmemory 1gb
+maxmemory-policy allkeys-lru
+save ""
+appendonly no
+requirepass your-strong-password
+io-threads 4
+tcp-backlog 511
+```
+
+### Security Hardening Checklist
+
+See [SECURITY_HARDENING.md](./SECURITY_HARDENING.md) for complete guide.
+
+**Pre-Production Checklist**:
+- [ ] All secrets rotated and stored in Vault/K8s Secrets
+- [ ] TLS 1.3 enforced on all endpoints
+- [ ] Security headers configured (HSTS, CSP, X-Frame-Options)
+- [ ] Rate limiting enabled for all endpoints
+- [ ] Input validation on all API endpoints
+- [ ] SQL injection prevention verified
+- [ ] Password complexity enforced (12+ chars)
+- [ ] MFA enabled for admin accounts
+- [ ] Firewall rules configured
+- [ ] Container security: non-root user, read-only filesystem
+- [ ] Kubernetes RBAC configured (least privilege)
+- [ ] Network policies configured
+- [ ] Audit logging enabled and forwarded to SIEM
+- [ ] Security scanning passed (OWASP ZAP, Trivy)
+- [ ] Penetration testing completed
+
+### Monitoring and Observability
+
+**Install Prometheus and Grafana**:
+
+```bash
+# Add Prometheus community Helm repo
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+# Install Prometheus + Grafana stack
+helm install prometheus prometheus-community/kube-prometheus-stack \
+  --namespace monitoring \
+  --create-namespace \
+  --set prometheus.prometheusSpec.retention=30d \
+  --set prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage=50Gi \
+  --set grafana.adminPassword='your-admin-password'
+```
+
+**Configure ServiceMonitor for SARK**:
+
+```yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: sark-metrics
+  namespace: production
+spec:
+  selector:
+    matchLabels:
+      app: sark
+  endpoints:
+  - port: metrics
+    interval: 30s
+    path: /metrics
+```
+
+**Key Metrics to Monitor**:
+
+| Metric | Target | Alert Threshold |
+|--------|--------|-----------------|
+| API Response Time (p95) | < 100ms | > 200ms |
+| API Response Time (p99) | < 200ms | > 500ms |
+| Error Rate | < 0.1% | > 1% |
+| Request Rate | Baseline | 10× baseline |
+| CPU Utilization | 50-70% | > 85% |
+| Memory Utilization | 60-80% | > 90% |
+| Database Connections | < 80% max | > 90% max |
+| Redis Memory Usage | < 70% | > 90% |
+| Cache Hit Ratio | > 90% | < 80% |
+| Pod Availability | 100% | < 90% |
+
+**Example Prometheus Alerts**:
+
+```yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: sark-alerts
+  namespace: production
+spec:
+  groups:
+  - name: sark
+    interval: 30s
+    rules:
+    # High error rate
+    - alert: HighErrorRate
+      expr: |
+        sum(rate(http_requests_total{status=~"5.*"}[5m])) /
+        sum(rate(http_requests_total[5m])) > 0.01
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "High error rate detected"
+        description: "Error rate is {{ $value | humanizePercentage }}"
+
+    # High latency
+    - alert: HighLatency
+      expr: |
+        histogram_quantile(0.95,
+          rate(http_request_duration_seconds_bucket[5m])
+        ) > 0.2
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High API latency"
+        description: "p95 latency is {{ $value }}s"
+
+    # Low cache hit ratio
+    - alert: LowCacheHitRatio
+      expr: |
+        sum(rate(redis_keyspace_hits_total[5m])) /
+        (sum(rate(redis_keyspace_hits_total[5m])) +
+         sum(rate(redis_keyspace_misses_total[5m]))) < 0.8
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Low cache hit ratio"
+        description: "Cache hit ratio is {{ $value | humanizePercentage }}"
+
+    # Database connection pool exhaustion
+    - alert: DatabaseConnectionPoolHigh
+      expr: |
+        pg_stat_activity_count /
+        pg_settings_max_connections > 0.9
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Database connection pool nearly exhausted"
+        description: "{{ $value | humanizePercentage }} of connections in use"
+```
+
+**Grafana Dashboards**:
+
+Import these dashboard IDs in Grafana:
+- **Kubernetes Cluster Monitoring**: Dashboard ID 7249
+- **PostgreSQL Database**: Dashboard ID 9628
+- **Redis Dashboard**: Dashboard ID 11835
+- **NGINX Ingress Controller**: Dashboard ID 9614
+
+### Log Aggregation
+
+**Deploy Loki for log aggregation**:
+
+```bash
+helm install loki prometheus-community/loki-stack \
+  --namespace monitoring \
+  --set loki.persistence.enabled=true \
+  --set loki.persistence.size=100Gi \
+  --set promtail.enabled=true
+```
+
+**Configure structured logging in SARK**:
+
+```python
+import logging
+from pythonjsonlogger import jsonlogger
+
+logHandler = logging.StreamHandler()
+formatter = jsonlogger.JsonFormatter(
+    '%(timestamp)s %(level)s %(name)s %(message)s'
+)
+logHandler.setFormatter(formatter)
+
+logger = logging.getLogger()
+logger.addHandler(logHandler)
+logger.setLevel(logging.INFO)
+```
+
+### Performance Testing
+
+**Before production deployment**:
+
+```bash
+# Install Locust
+pip install locust
+
+# Run load test
+locust -f tests/performance/locustfile.py \
+  --host https://sark.yourdomain.com \
+  --users 100 \
+  --spawn-rate 10 \
+  --run-time 10m \
+  --html reports/load-test.html
+
+# Verify targets:
+# - p95 latency < 100ms
+# - p99 latency < 200ms
+# - Error rate < 0.1%
+# - Throughput > 1000 req/s
+```
+
+See [PERFORMANCE_TESTING.md](./PERFORMANCE_TESTING.md) for complete testing guide.
+
+---
+
 ## Rollback Procedures
 
 ### Using Helm
