@@ -8,6 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 import structlog
 
+from sark.api.pagination import CursorPaginator, PaginationParams
 from sark.config import get_settings
 from sark.models.mcp_server import MCPServer, MCPTool, ServerStatus, TransportType
 
@@ -186,6 +187,44 @@ class DiscoveryService:
 
         result = await self.db.execute(query)
         return list(result.scalars().all())
+
+    async def list_servers_paginated(
+        self,
+        pagination: PaginationParams,
+        status: ServerStatus | None = None,
+        owner_id: UUID | None = None,
+        team_id: UUID | None = None,
+        count_total: bool = False,
+    ) -> tuple[list[MCPServer], str | None, bool, int | None]:
+        """
+        List servers with pagination and optional filters.
+
+        Args:
+            pagination: Pagination parameters
+            status: Filter by status
+            owner_id: Filter by owner
+            team_id: Filter by team
+            count_total: Whether to count total items (expensive)
+
+        Returns:
+            Tuple of (servers, next_cursor, has_more, total)
+        """
+        query = select(MCPServer)
+
+        if status:
+            query = query.where(MCPServer.status == status)
+        if owner_id:
+            query = query.where(MCPServer.owner_id == owner_id)
+        if team_id:
+            query = query.where(MCPServer.team_id == team_id)
+
+        return await CursorPaginator.paginate(
+            db=self.db,
+            query=query,
+            cursor_column=MCPServer.created_at,
+            params=pagination,
+            count_total=count_total,
+        )
 
     async def get_server_tools(self, server_id: UUID) -> list[MCPTool]:
         """
