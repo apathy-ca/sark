@@ -6,6 +6,7 @@ from prometheus_client import make_asgi_app
 import structlog
 
 from sark.api.routers import health, policy, servers
+from sark.api.middleware.security_headers import add_security_middleware
 from sark.config import get_settings
 from sark.db import init_db
 
@@ -29,6 +30,15 @@ def create_app() -> FastAPI:
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
+    )
+
+    # Security headers and CSRF protection
+    add_security_middleware(
+        app,
+        enable_hsts=(settings.environment == "production"),
+        enable_csrf=True,
+        csp_policy="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'",
+        csrf_exempt_paths=["/health", "/metrics", "/docs", "/redoc", "/openapi.json"],
     )
 
     # Include routers
