@@ -22,8 +22,8 @@ Skip if no credentials:
 """
 
 import asyncio
-import os
 from datetime import UTC, datetime
+import os
 from uuid import uuid4
 
 import pytest
@@ -109,7 +109,7 @@ class TestDatadogConnection:
         assert health.latency_ms < 5000  # Should be under 5 seconds
         assert health.error_message is None
 
-        print(f"\n✅ Datadog health check passed")
+        print("\n✅ Datadog health check passed")
         print(f"   Latency: {health.latency_ms:.2f}ms")
         print(f"   Site: {datadog_siem.datadog_config.site}")
         print(f"   Service: {datadog_siem.datadog_config.service}")
@@ -129,7 +129,7 @@ class TestDatadogConnection:
         assert health.healthy is False
         assert health.error_message is not None
 
-        print(f"\n✅ Error handling works correctly")
+        print("\n✅ Error handling works correctly")
         print(f"   Error: {health.error_message}")
 
 
@@ -144,7 +144,7 @@ class TestDatadogEventFormatting:
 
         assert result is True
 
-        print(f"\n✅ Single event sent successfully")
+        print("\n✅ Single event sent successfully")
         print(f"   Event ID: {test_event.id}")
         print(f"   Type: {test_event.event_type.value}")
         print(f"   Search in Datadog: service:{datadog_siem.datadog_config.service} @event_id:{test_event.id}")
@@ -176,7 +176,7 @@ class TestDatadogEventFormatting:
         assert "event_type:" in tags
         assert "severity:" in tags
 
-        print(f"\n✅ Event format structure verified")
+        print("\n✅ Event format structure verified")
         print(f"   Tags: {tags}")
         print(f"   Nested data keys: {list(formatted['sark'].keys())}")
 
@@ -235,7 +235,7 @@ class TestDatadogEventFormatting:
 
         assert result is True
 
-        print(f"\n✅ Event with all fields sent successfully")
+        print("\n✅ Event with all fields sent successfully")
         print(f"   Event ID: {event.id}")
         print(f"   Search: service:{datadog_siem.datadog_config.service} @event_id:{event.id}")
 
@@ -279,7 +279,7 @@ class TestDatadogWithOptimizations:
             assert metrics["health"]["is_healthy"] is True
             assert metrics["circuit_breaker"]["state"] == "closed"
 
-            print(f"\n✅ Optimizer integration working")
+            print("\n✅ Optimizer integration working")
             print(f"   Health: {metrics['health']['is_healthy']}")
             print(f"   Circuit: {metrics['circuit_breaker']['state']}")
             print(f"   Compression rate: {metrics['compression']['compression_rate']:.2%}")
@@ -323,7 +323,7 @@ class TestDatadogWithOptimizations:
         assert result is True
 
         metrics = optimizer.get_metrics()
-        print(f"\n✅ Compression test completed")
+        print("\n✅ Compression test completed")
         print(f"   Events sent: {len(events)}")
         print(f"   Total bytes saved: {metrics['compression']['total_bytes_saved']}")
         print(f"   Compression rate: {metrics['compression']['compression_rate']:.2%}")
@@ -353,7 +353,7 @@ class TestDatadogWithOptimizations:
         try:
             result = await datadog_siem.send_event(test_event)
             assert result is True
-            print(f"\n✅ Event sent successfully with error handler")
+            print("\n✅ Event sent successfully with error handler")
 
         except Exception as e:
             # If it fails, error handler should handle it
@@ -363,7 +363,7 @@ class TestDatadogWithOptimizations:
             metrics = error_handler.get_metrics()
             assert metrics["total_errors"] > 0
 
-            print(f"\n⚠️  Error occurred but handled gracefully")
+            print("\n⚠️  Error occurred but handled gracefully")
             print(f"   Total errors: {metrics['total_errors']}")
             print(f"   Fallback count: {metrics['fallback_count']}")
 
@@ -423,7 +423,7 @@ class TestDatadogLoadPerformance:
             elapsed = time.time() - start_time
             throughput = events_sent / elapsed * 60  # events per minute
 
-            print(f"\n✅ Load test completed")
+            print("\n✅ Load test completed")
             print(f"   Events sent: {events_sent}/1000")
             print(f"   Time: {elapsed:.2f}s")
             print(f"   Throughput: {throughput:.0f} events/min")
@@ -471,7 +471,7 @@ class TestDatadogLoadPerformance:
         elapsed = time.time() - start_time
         total_sent = sum(results)
 
-        print(f"\n✅ Concurrent sending test completed")
+        print("\n✅ Concurrent sending test completed")
         print(f"   Total sent: {total_sent}/100")
         print(f"   Time: {elapsed:.2f}s")
         print(f"   Rate: {total_sent/elapsed:.1f} events/sec")
@@ -485,29 +485,29 @@ class TestDatadogQueries:
     @requires_credentials
     def test_search_query_examples(self, datadog_config: DatadogConfig):
         """Print example Datadog log search queries."""
-        print(f"\n📊 Datadog Log Search Queries:")
-        print(f"\n1. View all SARK events:")
+        print("\n📊 Datadog Log Search Queries:")
+        print("\n1. View all SARK events:")
         print(f"   service:{datadog_config.service} source:sark")
 
-        print(f"\n2. View integration test events:")
+        print("\n2. View integration test events:")
         print(f"   service:{datadog_config.service} env:integration_test")
 
-        print(f"\n3. View recent events (last hour):")
+        print("\n3. View recent events (last hour):")
         print(f"   service:{datadog_config.service} @sark.details.test_run:true")
 
-        print(f"\n4. Count events by type:")
+        print("\n4. Count events by type:")
         print(f"   service:{datadog_config.service} | group by @event_type")
 
-        print(f"\n5. View high severity events:")
+        print("\n5. View high severity events:")
         print(f"   service:{datadog_config.service} @severity:(high OR critical)")
 
-        print(f"\n6. View events for specific user:")
+        print("\n6. View events for specific user:")
         print(f"   service:{datadog_config.service} @user_email:integration-test@example.com")
 
-        print(f"\n7. View load test events:")
+        print("\n7. View load test events:")
         print(f"   service:{datadog_config.service} @sark.details.load_test:true")
 
-        print(f"\n8. View batch test events:")
+        print("\n8. View batch test events:")
         print(f"   service:{datadog_config.service} @sark.details.test_batch:true")
 
 

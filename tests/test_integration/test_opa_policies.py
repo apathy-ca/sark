@@ -4,10 +4,11 @@ Tests the actual OPA policies to ensure they work correctly with real
 policy evaluation scenarios.
 """
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from sark.services.policy.opa_client import OPAClient, AuthorizationInput
+import pytest
+
+from sark.services.policy.opa_client import AuthorizationInput, OPAClient
 
 
 @pytest.fixture

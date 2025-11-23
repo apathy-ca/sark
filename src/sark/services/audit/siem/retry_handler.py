@@ -1,8 +1,9 @@
 """Retry handler with exponential backoff for SIEM operations."""
 
 import asyncio
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable, TypeVar
+from typing import Any, TypeVar
 
 import structlog
 
@@ -158,7 +159,7 @@ class RetryHandler:
         """
         try:
             return await asyncio.wait_for(operation(), timeout=timeout_seconds)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             self._logger.error(
                 "operation_timeout",
                 operation=operation_name,

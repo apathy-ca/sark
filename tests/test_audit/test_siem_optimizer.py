@@ -1,8 +1,8 @@
 """Tests for SIEM optimizer with compression and health monitoring."""
 
 import asyncio
-import gzip
 from datetime import UTC, datetime
+import gzip
 from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
@@ -127,7 +127,7 @@ class TestSIEMOptimizer:
         optimizer.siem.send_event.side_effect = Exception("Network error")
 
         # Fail 3 times to open circuit
-        for i in range(3):
+        for _i in range(3):
             with pytest.raises(Exception):
                 await optimizer.send_event(audit_event)
 
@@ -180,7 +180,7 @@ class TestSIEMOptimizer:
     def test_compress_payload_bytes_input(self, optimizer: SIEMOptimizer):
         """Test compression with bytes input."""
         data = b"x" * 200
-        compressed, metadata = optimizer.compress_payload(data)
+        _compressed, metadata = optimizer.compress_payload(data)
 
         assert metadata["compressed"] is True
         assert metadata["original_size"] == 200

@@ -1,7 +1,6 @@
 """Health check endpoints with dependency validation."""
 
 import asyncio
-from typing import Any
 
 from fastapi import APIRouter
 from pydantic import BaseModel

@@ -1,7 +1,7 @@
 """Tests for SAML authentication provider."""
 
 import base64
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -527,7 +527,7 @@ class TestLogout:
             mock_auth.process_slo = MagicMock(return_value="https://app.example.com/")
             mock_auth_class.return_value = mock_auth
 
-            logout_response = await azure_saml_provider.process_logout_request(
+            await azure_saml_provider.process_logout_request(
                 "base64EncodedLogoutRequest"
             )
 

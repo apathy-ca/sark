@@ -3,11 +3,12 @@
 Tests time-based access, IP filtering, and MFA requirements.
 """
 
-import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
 import time
+from unittest.mock import MagicMock, patch
 
-from sark.services.policy.opa_client import OPAClient, AuthorizationInput
+import pytest
+
+from sark.services.policy.opa_client import AuthorizationInput, OPAClient
 
 
 @pytest.fixture

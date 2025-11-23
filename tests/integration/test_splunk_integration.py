@@ -20,8 +20,8 @@ Skip if no credentials:
 """
 
 import asyncio
-import os
 from datetime import UTC, datetime
+import os
 from uuid import uuid4
 
 import pytest
@@ -110,7 +110,7 @@ class TestSplunkConnection:
         assert health.latency_ms < 5000  # Should be under 5 seconds
         assert health.error_message is None
 
-        print(f"\n✅ Splunk health check passed")
+        print("\n✅ Splunk health check passed")
         print(f"   Latency: {health.latency_ms:.2f}ms")
 
     @requires_credentials
@@ -128,7 +128,7 @@ class TestSplunkConnection:
         assert health.healthy is False
         assert health.error_message is not None
 
-        print(f"\n✅ Error handling works correctly")
+        print("\n✅ Error handling works correctly")
         print(f"   Error: {health.error_message}")
 
 
@@ -143,7 +143,7 @@ class TestSplunkEventFormatting:
 
         assert result is True
 
-        print(f"\n✅ Single event sent successfully")
+        print("\n✅ Single event sent successfully")
         print(f"   Event ID: {test_event.id}")
         print(f"   Type: {test_event.event_type.value}")
         print(f"   Search in Splunk: index={splunk_siem.splunk_config.index} event_id={test_event.id}")
@@ -203,7 +203,7 @@ class TestSplunkEventFormatting:
 
         assert result is True
 
-        print(f"\n✅ Event with all fields sent successfully")
+        print("\n✅ Event with all fields sent successfully")
         print(f"   Event ID: {event.id}")
 
 
@@ -246,7 +246,7 @@ class TestSplunkWithOptimizations:
             assert metrics["health"]["is_healthy"] is True
             assert metrics["circuit_breaker"]["state"] == "closed"
 
-            print(f"\n✅ Optimizer integration working")
+            print("\n✅ Optimizer integration working")
             print(f"   Health: {metrics['health']['is_healthy']}")
             print(f"   Circuit: {metrics['circuit_breaker']['state']}")
             print(f"   Compression rate: {metrics['compression']['compression_rate']:.2%}")
@@ -279,7 +279,7 @@ class TestSplunkWithOptimizations:
         try:
             result = await splunk_siem.send_event(test_event)
             assert result is True
-            print(f"\n✅ Event sent successfully with error handler")
+            print("\n✅ Event sent successfully with error handler")
 
         except Exception as e:
             # If it fails, error handler should handle it
@@ -289,7 +289,7 @@ class TestSplunkWithOptimizations:
             metrics = error_handler.get_metrics()
             assert metrics["total_errors"] > 0
 
-            print(f"\n⚠️  Error occurred but handled gracefully")
+            print("\n⚠️  Error occurred but handled gracefully")
             print(f"   Total errors: {metrics['total_errors']}")
             print(f"   Fallback count: {metrics['fallback_count']}")
 
@@ -349,7 +349,7 @@ class TestSplunkLoadPerformance:
             elapsed = time.time() - start_time
             throughput = events_sent / elapsed * 60  # events per minute
 
-            print(f"\n✅ Load test completed")
+            print("\n✅ Load test completed")
             print(f"   Events sent: {events_sent}/1000")
             print(f"   Time: {elapsed:.2f}s")
             print(f"   Throughput: {throughput:.0f} events/min")
@@ -369,23 +369,23 @@ class TestSplunkQueries:
     @requires_credentials
     def test_search_query_examples(self, splunk_config: SplunkConfig):
         """Print example Splunk search queries."""
-        print(f"\n📊 Splunk Search Queries:")
-        print(f"\n1. View all SARK events:")
+        print("\n📊 Splunk Search Queries:")
+        print("\n1. View all SARK events:")
         print(f"   index={splunk_config.index} sourcetype={splunk_config.sourcetype}")
 
-        print(f"\n2. View integration test events:")
+        print("\n2. View integration test events:")
         print(f"   index={splunk_config.index} source={splunk_config.source}")
 
-        print(f"\n3. View recent events (last hour):")
+        print("\n3. View recent events (last hour):")
         print(f"   index={splunk_config.index} earliest=-1h")
 
-        print(f"\n4. Count events by type:")
+        print("\n4. Count events by type:")
         print(f"   index={splunk_config.index} | stats count by event_type")
 
-        print(f"\n5. View high severity events:")
+        print("\n5. View high severity events:")
         print(f"   index={splunk_config.index} severity=high OR severity=critical")
 
-        print(f"\n6. View events for specific user:")
+        print("\n6. View events for specific user:")
         print(f"   index={splunk_config.index} user_email=integration-test@example.com")
 
 

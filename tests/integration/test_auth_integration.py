@@ -10,19 +10,19 @@ Tests complete authentication workflows including:
 - Role-based access control
 """
 
-import pytest
-from datetime import datetime, timedelta, UTC
-from unittest.mock import AsyncMock, patch, MagicMock
+from datetime import UTC, datetime, timedelta
+from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
 from fastapi import HTTPException, status
 from jose import jwt
+import pytest
 
-from sark.services.auth.jwt import JWTHandler, get_current_user
-from sark.services.auth.api_key import APIKeyService
-from sark.services.auth.session import SessionService
-from sark.services.policy.opa_client import OPAClient, AuthorizationDecision
 from sark.models.user import User
+from sark.services.auth.api_key import APIKeyService
+from sark.services.auth.jwt import JWTHandler
+from sark.services.auth.session import SessionService
+from sark.services.policy.opa_client import OPAClient
 
 
 @pytest.fixture

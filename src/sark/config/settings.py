@@ -3,7 +3,7 @@
 from functools import lru_cache
 from typing import Any
 
-from pydantic import Field, validator
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -260,21 +260,24 @@ class Settings(BaseSettings):
     tracing_enabled: bool = False
     tracing_endpoint: str | None = None
 
-    @validator("cors_origins", pre=True)
+    @field_validator("cors_origins", mode="before")
+    @classmethod
     def parse_cors_origins(cls, v: Any) -> list[str]:
         """Parse CORS origins from comma-separated string or list."""
         if isinstance(v, str):
             return [origin.strip() for origin in v.split(",")]
         return v
 
-    @validator("oidc_scopes", pre=True)
+    @field_validator("oidc_scopes", mode="before")
+    @classmethod
     def parse_oidc_scopes(cls, v: Any) -> list[str]:
         """Parse OIDC scopes from comma-separated string or list."""
         if isinstance(v, str):
             return [scope.strip() for scope in v.split(",")]
         return v
 
-    @validator("kafka_bootstrap_servers", pre=True)
+    @field_validator("kafka_bootstrap_servers", mode="before")
+    @classmethod
     def parse_kafka_servers(cls, v: Any) -> list[str]:
         """Parse Kafka bootstrap servers from comma-separated string or list."""
         if isinstance(v, str):

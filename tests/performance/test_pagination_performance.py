@@ -5,8 +5,8 @@ to ensure the implementation meets performance targets.
 """
 
 import asyncio
-import time
 from datetime import UTC, datetime
+import time
 from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
@@ -54,7 +54,7 @@ class TestPaginationPerformance:
 
         params = PaginationParams(limit=50)
 
-        items, next_cursor, has_more, total = await CursorPaginator.paginate(
+        items, next_cursor, has_more, _total = await CursorPaginator.paginate(
             db=mock_db,
             query=select(MCPServer),
             cursor_column=MCPServer.created_at,
@@ -83,7 +83,6 @@ class TestPaginationPerformance:
         mock_db = AsyncMock()
 
         # Simulate 100,000 records
-        num_records = 100_000
 
         # Mock paginated results
         mock_result = MagicMock()
@@ -109,7 +108,7 @@ class TestPaginationPerformance:
 
         params = PaginationParams(limit=50)
 
-        items, next_cursor, has_more, total = await CursorPaginator.paginate(
+        items, _next_cursor, has_more, _total = await CursorPaginator.paginate(
             db=mock_db,
             query=select(MCPServer),
             cursor_column=MCPServer.created_at,
@@ -136,7 +135,7 @@ class TestPaginationPerformance:
         test_cursors = (
             [uuid4() for _ in range(1000)]
             + [datetime.now(UTC) for _ in range(1000)]
-            + [i for i in range(1000)]
+            + list(range(1000))
             + [f"string-cursor-{i}" for i in range(1000)]
         )
 
@@ -201,7 +200,7 @@ class TestPaginationPerformance:
 
             params = PaginationParams(limit=page_size)
 
-            items, next_cursor, has_more_result, _ = await CursorPaginator.paginate(
+            items, _next_cursor, _has_more_result, _ = await CursorPaginator.paginate(
                 db=mock_db,
                 query=select(MCPServer),
                 cursor_column=MCPServer.created_at,
@@ -255,7 +254,7 @@ class TestPaginationPerformance:
 
         params = PaginationParams(limit=200)  # Maximum allowed
 
-        items, next_cursor, has_more, _ = await CursorPaginator.paginate(
+        items, _next_cursor, has_more, _ = await CursorPaginator.paginate(
             db=mock_db,
             query=select(MCPServer),
             cursor_column=MCPServer.created_at,

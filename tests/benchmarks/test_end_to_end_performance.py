@@ -7,14 +7,15 @@ Tests complete authorization workflow including:
 - Overall p95 latency <50ms
 """
 
-import pytest
-import time
 import statistics
+import time
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
+
 from sark.services.discovery.tool_registry import ToolRegistry
-from sark.services.policy.opa_client import OPAClient, AuthorizationInput
 from sark.services.policy.cache import PolicyCache
+from sark.services.policy.opa_client import AuthorizationInput, OPAClient
 
 
 @pytest.fixture
@@ -63,8 +64,9 @@ async def test_end_to_end_tool_invocation_latency(
     4. Evaluate OPA policy (on cache miss)
     5. Return authorization decision
     """
-    import json
     import asyncio
+    import json
+
     from sark.models.mcp_server import SensitivityLevel
 
     # Setup OPA response (simulated 30ms latency)
@@ -93,7 +95,7 @@ async def test_end_to_end_tool_invocation_latency(
 
     # Run 100 iterations (25 per tool)
     for iteration in range(25):
-        for tool_name, tool_desc, expected_level in test_tools:
+        for tool_name, tool_desc, _expected_level in test_tools:
             # === CACHE MISS FLOW ===
             mock_redis.get.return_value = None
 
@@ -205,8 +207,8 @@ async def test_end_to_end_mixed_workload(
 
     Simulates realistic production scenario with 80% cache hit rate.
     """
-    import json
     import asyncio
+    import json
 
     # Setup OPA response
     async def mock_opa_call(*args, **kwargs):
@@ -283,7 +285,7 @@ async def test_end_to_end_mixed_workload(
 
     # Get cache metrics
     metrics = opa_client.get_cache_metrics()
-    print(f"\nCache Metrics:")
+    print("\nCache Metrics:")
     print(f"  Hit Rate: {metrics['hit_rate']:.1f}%")
     print(f"  Hits:     {metrics['hits']}")
     print(f"  Misses:   {metrics['misses']}")
@@ -306,8 +308,8 @@ async def test_end_to_end_throughput(mock_post, opa_client, tool_registry, mock_
 
     Tests how many complete authorization flows can be processed per second.
     """
-    import json
     import asyncio
+    import json
 
     # Setup fast OPA mock
     opa_response = MagicMock()
@@ -378,8 +380,8 @@ async def test_concurrent_users_performance(
 
     Simulates 100 concurrent users making authorization requests.
     """
-    import json
     import asyncio
+    import json
 
     opa_response = MagicMock()
     opa_response.status_code = 200
@@ -426,7 +428,7 @@ async def test_concurrent_users_performance(
                 context={"request": i},
             )
 
-            decision = await opa_client.evaluate_policy(auth_input)
+            await opa_client.evaluate_policy(auth_input)
 
             end = time.perf_counter()
 
@@ -544,7 +546,6 @@ async def test_sustained_load(mock_post, opa_client, tool_registry, mock_redis):
     Tests that performance remains consistent over 10,000 requests.
     """
     import json
-    import asyncio
 
     opa_response = MagicMock()
     opa_response.status_code = 200

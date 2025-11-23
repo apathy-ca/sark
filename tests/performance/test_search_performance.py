@@ -5,8 +5,8 @@ to ensure the implementation meets the <100ms performance target.
 """
 
 import asyncio
-import time
 from datetime import UTC, datetime
+import time
 from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
@@ -30,7 +30,7 @@ class TestSearchPerformance:
 
         # Create 10,000+ test servers
         num_records = 10_000
-        test_servers = [
+        [
             MCPServer(
                 id=uuid4(),
                 name=f"server-{i:05d}",
@@ -136,7 +136,7 @@ class TestSearchPerformance:
         start_time = time.perf_counter()
 
         params = PaginationParams(limit=50)
-        items, next_cursor, has_more, _ = await CursorPaginator.paginate(
+        items, _next_cursor, has_more, _ = await CursorPaginator.paginate(
             db=mock_db,
             query=query,
             cursor_column=MCPServer.created_at,

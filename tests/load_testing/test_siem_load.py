@@ -4,22 +4,18 @@ This script tests event forwarding performance with 10k events/min throughput.
 """
 
 import asyncio
+from datetime import UTC, datetime
 import json
+from pathlib import Path
 import statistics
 import time
-from datetime import UTC, datetime
-from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
 from sark.models.audit import AuditEvent, AuditEventType, SeverityLevel
 from sark.services.audit.siem import (
-    BatchConfig,
-    BatchHandler,
     DatadogConfig,
-    DatadogSIEM,
     SplunkConfig,
-    SplunkSIEM,
 )
 
 
@@ -137,7 +133,7 @@ class SIEMLoadTester:
         print(f"{'='*80}")
 
         # Configure Splunk (using mock for load testing)
-        splunk_config = SplunkConfig(
+        SplunkConfig(
             hec_url="http://localhost:8088/services/collector",
             hec_token="mock-token-for-testing",
             index="sark_load_test",
@@ -236,7 +232,7 @@ class SIEMLoadTester:
         print(f"Success Rate: {success_rate:.2f}%")
         print(f"Actual Throughput: {actual_throughput:.2f} events/min ({actual_throughput/60:.2f} events/sec)")
         print(f"Throughput Achievement: {results['throughput_percentage']:.2f}%")
-        print(f"\nLatency Statistics:")
+        print("\nLatency Statistics:")
         print(f"  Average: {results['latency_avg_ms']:.2f}ms")
         print(f"  Median (P50): {results['latency_p50_ms']:.2f}ms")
         print(f"  P95: {results['latency_p95_ms']:.2f}ms")
@@ -267,7 +263,7 @@ class SIEMLoadTester:
         print(f"{'='*80}")
 
         # Configure Datadog (using mock for load testing)
-        datadog_config = DatadogConfig(
+        DatadogConfig(
             api_key="mock-api-key-for-testing",
             site="datadoghq.com",
             service="sark-load-test",
@@ -366,7 +362,7 @@ class SIEMLoadTester:
         print(f"Success Rate: {success_rate:.2f}%")
         print(f"Actual Throughput: {actual_throughput:.2f} events/min ({actual_throughput/60:.2f} events/sec)")
         print(f"Throughput Achievement: {results['throughput_percentage']:.2f}%")
-        print(f"\nLatency Statistics:")
+        print("\nLatency Statistics:")
         print(f"  Average: {results['latency_avg_ms']:.2f}ms")
         print(f"  Median (P50): {results['latency_p50_ms']:.2f}ms")
         print(f"  P95: {results['latency_p95_ms']:.2f}ms")

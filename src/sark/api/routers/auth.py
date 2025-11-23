@@ -1,9 +1,8 @@
 """Unified authentication router for multi-provider auth."""
 
+from datetime import datetime
 import logging
 import uuid
-from datetime import datetime
-from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
@@ -212,7 +211,7 @@ async def list_providers(settings: Settings = Depends(get_settings)):
     # OIDC Provider
     if settings.oidc_enabled:
         # Create temporary provider instance to get authorization URL
-        oidc_provider = OIDCProvider(
+        OIDCProvider(
             client_id=settings.oidc_client_id,
             client_secret=settings.oidc_client_secret,
             provider=settings.oidc_provider,
@@ -340,7 +339,7 @@ async def login(
         # Convert user_id to UUID
         user_uuid = user_id_to_uuid(user_info.user_id, "ldap")
 
-        session, session_id = await session_service.create_session(
+        session, _session_id = await session_service.create_session(
             user_id=user_uuid,
             ip_address=request.client.host,
             user_agent=request.headers.get("User-Agent", ""),
@@ -492,7 +491,7 @@ async def oidc_callback(
     user_uuid = user_id_to_uuid(user_info.user_id, "oidc")
 
     # Create session
-    session, session_id = await session_service.create_session(
+    session, _session_id = await session_service.create_session(
         user_id=user_uuid,
         ip_address=request.client.host,
         user_agent=request.headers.get("User-Agent", ""),
@@ -617,7 +616,7 @@ async def logout_all(
 
     return LogoutResponse(
         success=True,
-        message=f"Logged out from all devices",
+        message="Logged out from all devices",
         sessions_invalidated=count,
     )
 

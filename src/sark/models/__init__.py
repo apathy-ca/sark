@@ -3,7 +3,7 @@
 from sark.models.audit import AuditEvent
 from sark.models.mcp_server import MCPServer, MCPTool
 from sark.models.policy import Policy, PolicyVersion
-from sark.models.session import Session, SessionCreateRequest, SessionResponse, SessionListResponse
+from sark.models.session import Session, SessionCreateRequest, SessionListResponse, SessionResponse
 from sark.models.user import Team, User
 
 __all__ = [
@@ -14,8 +14,8 @@ __all__ = [
     "PolicyVersion",
     "Session",
     "SessionCreateRequest",
-    "SessionResponse",
     "SessionListResponse",
+    "SessionResponse",
     "Team",
     "User",
 ]

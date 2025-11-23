@@ -1,14 +1,13 @@
 """Comprehensive tests for JWT token handling and validation."""
 
-import time
 from datetime import UTC, datetime, timedelta
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 from uuid import UUID, uuid4
 
-import pytest
 from fastapi import HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
 from jose import jwt
+import pytest
 
 from sark.services.auth.jwt import JWTHandler, get_current_user
 from sark.services.auth.user_context import UserContext
@@ -108,7 +107,7 @@ class TestJWTHandler:
             email=sample_user_data["email"],
             role=sample_user_data["role"],
         )
-        after_create = datetime.now(UTC)
+        datetime.now(UTC)
 
         payload = jwt.decode(token, handler.secret_key, algorithms=[handler.algorithm])
         exp_time = datetime.fromtimestamp(payload["exp"], UTC)
@@ -147,7 +146,7 @@ class TestJWTHandler:
             user_id=sample_user_data["user_id"],
             email=sample_user_data["email"],
         )
-        after_create = datetime.now(UTC)
+        datetime.now(UTC)
 
         payload = jwt.decode(token, handler.secret_key, algorithms=[handler.algorithm])
         exp_time = datetime.fromtimestamp(payload["exp"], UTC)

@@ -1,9 +1,8 @@
 """Rate limiting service using Redis."""
 
+from dataclasses import dataclass
 import logging
 import time
-from dataclasses import dataclass
-from typing import Any
 
 import redis.asyncio as aioredis
 

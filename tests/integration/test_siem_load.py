@@ -29,11 +29,10 @@ Run specific SIEM:
     pytest tests/integration/test_siem_load.py::TestDatadogLoad -v -s
 """
 
-import asyncio
-import os
-import time
 from datetime import UTC, datetime
+import os
 from pathlib import Path
+import time
 from uuid import uuid4
 
 import pytest
@@ -142,20 +141,20 @@ class LoadTestMetrics:
         print(f"\n{'='*70}")
         print(f"📊 {siem_name} Load Test Report")
         print(f"{'='*70}")
-        print(f"\n⏱️  Timing:")
+        print("\n⏱️  Timing:")
         print(f"   Duration: {self.duration_seconds:.2f}s")
-        print(f"\n📈 Throughput:")
+        print("\n📈 Throughput:")
         print(f"   Events sent: {self.events_sent:,}")
         print(f"   Events failed: {self.events_failed:,}")
         print(f"   Success rate: {self.success_rate:.2f}%")
         print(f"   Events/second: {self.events_per_second:.1f}")
         print(f"   Events/minute: {self.events_per_minute:.0f} {'✅' if self.events_per_minute >= MIN_THROUGHPUT_PER_MINUTE else '❌'}")
         print(f"   Target: {TOTAL_EVENTS:,} events in ~{TARGET_DURATION_SECONDS}s")
-        print(f"\n📦 Batching:")
+        print("\n📦 Batching:")
         print(f"   Batches sent: {self.batches_sent:,}")
         print(f"   Batches failed: {self.batches_failed:,}")
         print(f"   Avg batch size: {self.events_sent / self.batches_sent if self.batches_sent > 0 else 0:.1f}")
-        print(f"\n🗜️  Compression:")
+        print("\n🗜️  Compression:")
         if self.total_bytes_compressed > 0:
             compression_rate = (
                 (self.total_bytes_sent - self.total_bytes_compressed) / self.total_bytes_sent * 100
@@ -165,7 +164,7 @@ class LoadTestMetrics:
             print(f"   Compression rate: {compression_rate:.1f}%")
         else:
             print(f"   Total bytes sent: {self.total_bytes_sent:,}")
-        print(f"\n⚡ Latency:")
+        print("\n⚡ Latency:")
         print(f"   Average: {self.avg_latency_ms:.2f}ms")
         print(f"   P95: {self.p95_latency_ms:.2f}ms")
         if self.errors:
@@ -536,7 +535,7 @@ if __name__ == "__main__":
     if HAS_DATADOG:
         print(f"\n✅ Datadog configured: {os.getenv('DATADOG_SITE', 'datadoghq.com')}")
 
-    print(f"\nTest configuration:")
+    print("\nTest configuration:")
     print(f"  Total events: {TOTAL_EVENTS:,}")
     print(f"  Target duration: ~{TARGET_DURATION_SECONDS}s")
     print(f"  Batch size: {BATCH_SIZE}")

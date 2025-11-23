@@ -1,7 +1,7 @@
 """Comprehensive tests for LDAP authentication provider."""
 
-from unittest.mock import AsyncMock, patch
-from uuid import UUID, uuid5
+from unittest.mock import patch
+from uuid import UUID
 
 import pytest
 

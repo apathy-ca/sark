@@ -3,10 +3,10 @@
 Handles creation, validation, rotation, and rate limiting of API keys.
 """
 
-import secrets
-import uuid
 from datetime import datetime, timedelta
-from typing import Any
+import secrets
+from typing import Any, ClassVar
+import uuid
 
 import bcrypt
 from sqlalchemy import select
@@ -26,7 +26,7 @@ class APIKeyService:
     SECRET_LENGTH = 32  # Secret portion length
 
     # Scope definitions
-    VALID_SCOPES = {
+    VALID_SCOPES: ClassVar[set[str]] = {
         "server:read",  # Read server information
         "server:write",  # Register/update servers
         "server:delete",  # Delete servers

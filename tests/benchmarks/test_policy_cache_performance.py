@@ -3,13 +3,14 @@
 Tests cache performance to ensure <5ms cache hits and overall <50ms p95 latency.
 """
 
-import pytest
-import time
 import statistics
+import time
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
+
 from sark.services.policy.cache import PolicyCache
-from sark.services.policy.opa_client import OPAClient, AuthorizationInput
+from sark.services.policy.opa_client import AuthorizationInput, OPAClient
 
 
 @pytest.fixture
@@ -73,7 +74,7 @@ async def test_cache_hit_latency(policy_cache, redis_mock):
     print("\n" + "=" * 60)
     print("CACHE HIT LATENCY BENCHMARK")
     print("=" * 60)
-    print(f"Iterations: 1000")
+    print("Iterations: 1000")
     print(f"Average:    {avg_latency:.2f}ms")
     print(f"P50:        {p50_latency:.2f}ms")
     print(f"P95:        {p95_latency:.2f}ms")
@@ -115,7 +116,7 @@ async def test_cache_miss_latency(policy_cache, redis_mock):
     print("\n" + "=" * 60)
     print("CACHE MISS LATENCY BENCHMARK")
     print("=" * 60)
-    print(f"Iterations: 1000")
+    print("Iterations: 1000")
     print(f"Average:    {avg_latency:.2f}ms")
     print(f"P95:        {p95_latency:.2f}ms")
     print("=" * 60)
@@ -151,7 +152,7 @@ async def test_cache_set_latency(policy_cache, redis_mock):
     print("\n" + "=" * 60)
     print("CACHE SET LATENCY BENCHMARK")
     print("=" * 60)
-    print(f"Iterations: 1000")
+    print("Iterations: 1000")
     print(f"Average:    {avg_latency:.2f}ms")
     print(f"P95:        {p95_latency:.2f}ms")
     print("=" * 60)
@@ -167,8 +168,6 @@ async def test_cache_set_latency(policy_cache, redis_mock):
 @pytest.mark.benchmark
 def test_cache_key_generation_performance(policy_cache):
     """Benchmark: Cache key generation should be very fast."""
-    import hashlib
-    import json
 
     context = {
         "timestamp": 1234567890,
@@ -200,7 +199,7 @@ def test_cache_key_generation_performance(policy_cache):
     print("\n" + "=" * 60)
     print("CACHE KEY GENERATION BENCHMARK")
     print("=" * 60)
-    print(f"Iterations: 10000")
+    print("Iterations: 10000")
     print(f"Average:    {avg_latency:.4f}ms")
     print(f"P95:        {p95_latency:.4f}ms")
     print("=" * 60)
@@ -263,7 +262,7 @@ async def test_opa_client_cache_hit_performance(mock_post, redis_mock):
     print("\n" + "=" * 60)
     print("OPA CLIENT CACHE HIT PERFORMANCE")
     print("=" * 60)
-    print(f"Iterations: 1000")
+    print("Iterations: 1000")
     print(f"Average:    {avg_latency:.2f}ms")
     print(f"P50:        {p50_latency:.2f}ms")
     print(f"P95:        {p95_latency:.2f}ms")
@@ -327,7 +326,7 @@ async def test_opa_client_cache_miss_performance(mock_post, redis_mock):
     print("\n" + "=" * 60)
     print("OPA CLIENT CACHE MISS PERFORMANCE (with 30ms OPA)")
     print("=" * 60)
-    print(f"Iterations: 100")
+    print("Iterations: 100")
     print(f"Average:    {avg_latency:.2f}ms")
     print(f"P50:        {p50_latency:.2f}ms")
     print(f"P95:        {p95_latency:.2f}ms")
@@ -347,8 +346,8 @@ async def test_opa_client_cache_miss_performance(mock_post, redis_mock):
 @patch("httpx.AsyncClient.post")
 async def test_mixed_cache_hit_miss_workload(mock_post, redis_mock):
     """Benchmark: Mixed cache hit/miss workload (80% hit rate)."""
-    import json
     import asyncio
+    import json
 
     cache = PolicyCache(redis_client=redis_mock, enabled=True)
     opa_client = OPAClient(cache=cache)
@@ -393,7 +392,7 @@ async def test_mixed_cache_hit_miss_workload(mock_post, redis_mock):
         )
 
         start = time.perf_counter()
-        decision = await opa_client.evaluate_policy(auth_input)
+        await opa_client.evaluate_policy(auth_input)
         end = time.perf_counter()
 
         latency_ms = (end - start) * 1000
@@ -416,7 +415,7 @@ async def test_mixed_cache_hit_miss_workload(mock_post, redis_mock):
     print("\n" + "=" * 60)
     print("MIXED WORKLOAD (80% HIT, 20% MISS)")
     print("=" * 60)
-    print(f"Total iterations: 500")
+    print("Total iterations: 500")
     print(f"Hit iterations:   {len(latencies_hit)}")
     print(f"Miss iterations:  {len(latencies_miss)}")
     print("")
@@ -435,7 +434,7 @@ async def test_mixed_cache_hit_miss_workload(mock_post, redis_mock):
 
     # Verify metrics
     metrics = opa_client.get_cache_metrics()
-    print(f"\nCache Metrics:")
+    print("\nCache Metrics:")
     print(f"  Hit Rate:  {metrics['hit_rate']:.1f}%")
     print(f"  Hits:      {metrics['hits']}")
     print(f"  Misses:    {metrics['misses']}")
@@ -455,8 +454,8 @@ async def test_mixed_cache_hit_miss_workload(mock_post, redis_mock):
 @pytest.mark.asyncio
 async def test_cache_hit_throughput(policy_cache, redis_mock):
     """Benchmark: Cache hit throughput (requests/second)."""
-    import json
     import asyncio
+    import json
 
     decision = {"allow": True, "reason": "Test"}
     redis_mock.get.return_value = json.dumps(decision)

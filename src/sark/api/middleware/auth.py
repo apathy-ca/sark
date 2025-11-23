@@ -7,14 +7,15 @@ This middleware handles:
 - User context extraction and attachment to request state
 """
 
+from collections.abc import Callable
 from datetime import UTC, datetime
-from typing import Callable
+from typing import ClassVar
 
-import structlog
 from fastapi import Request, Response, status
 from fastapi.responses import JSONResponse
 from jose import JWTError, jwt
 from starlette.middleware.base import BaseHTTPMiddleware
+import structlog
 
 from sark.config import get_settings
 
@@ -38,7 +39,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
     """
 
     # Public endpoints that don't require authentication
-    PUBLIC_PATHS = {
+    PUBLIC_PATHS: ClassVar[set[str]] = {
         "/health",
         "/health/live",
         "/health/ready",
@@ -155,11 +156,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
             return True
 
         # Prefix match for paths like /health/*
-        for public_path in self.PUBLIC_PATHS:
-            if path.startswith(public_path):
-                return True
-
-        return False
+        return any(path.startswith(public_path) for public_path in self.PUBLIC_PATHS)
 
     def _extract_token(self, request: Request) -> str | None:
         """Extract JWT token from Authorization header.

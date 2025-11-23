@@ -8,19 +8,17 @@ This service provides comprehensive audit trail functionality including:
 """
 
 import csv
+from datetime import UTC, datetime
 import hashlib
 import io
 import json
-from datetime import UTC, datetime, timedelta
-from typing import Any, Dict, List, Optional
-from uuid import UUID
+from typing import Any
 
-import structlog
 from sqlalchemy import and_, desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+import structlog
 
 from sark.models.policy_audit import (
-    PolicyAnalyticsSummary,
     PolicyChangeLog,
     PolicyChangeType,
     PolicyDecisionLog,
@@ -54,9 +52,9 @@ class PolicyAuditService:
         self,
         auth_input: AuthorizationInput,
         decision: PolicyDecision,
-        duration_ms: Optional[float] = None,
+        duration_ms: float | None = None,
         cache_hit: bool = False,
-        request_context: Optional[Dict[str, Any]] = None,
+        request_context: dict[str, Any] | None = None,
     ) -> PolicyDecisionLog:
         """Log a policy evaluation decision.
 
@@ -199,10 +197,10 @@ class PolicyAuditService:
         policy_name: str,
         change_type: PolicyChangeType,
         changed_by_user_id: str,
-        policy_content: Optional[str] = None,
-        previous_content: Optional[str] = None,
-        change_reason: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        policy_content: str | None = None,
+        previous_content: str | None = None,
+        change_reason: str | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> PolicyChangeLog:
         """Log a policy change for versioning and compliance.
 
@@ -318,14 +316,14 @@ class PolicyAuditService:
 
     async def get_decision_logs(
         self,
-        start_time: Optional[datetime] = None,
-        end_time: Optional[datetime] = None,
-        user_id: Optional[str] = None,
-        action: Optional[str] = None,
-        result: Optional[PolicyDecisionResult] = None,
+        start_time: datetime | None = None,
+        end_time: datetime | None = None,
+        user_id: str | None = None,
+        action: str | None = None,
+        result: PolicyDecisionResult | None = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> List[PolicyDecisionLog]:
+    ) -> list[PolicyDecisionLog]:
         """Query policy decision logs with filters.
 
         Args:
@@ -362,12 +360,12 @@ class PolicyAuditService:
 
     async def get_policy_changes(
         self,
-        policy_name: Optional[str] = None,
-        start_time: Optional[datetime] = None,
-        end_time: Optional[datetime] = None,
-        change_type: Optional[PolicyChangeType] = None,
+        policy_name: str | None = None,
+        start_time: datetime | None = None,
+        end_time: datetime | None = None,
+        change_type: PolicyChangeType | None = None,
         limit: int = 100,
-    ) -> List[PolicyChangeLog]:
+    ) -> list[PolicyChangeLog]:
         """Query policy change logs.
 
         Args:
@@ -403,9 +401,9 @@ class PolicyAuditService:
 
     async def export_decisions_csv(
         self,
-        start_time: Optional[datetime] = None,
-        end_time: Optional[datetime] = None,
-        filters: Optional[Dict[str, Any]] = None,
+        start_time: datetime | None = None,
+        end_time: datetime | None = None,
+        filters: dict[str, Any] | None = None,
     ) -> str:
         """Export policy decisions to CSV format.
 
@@ -472,9 +470,9 @@ class PolicyAuditService:
 
     async def export_decisions_json(
         self,
-        start_time: Optional[datetime] = None,
-        end_time: Optional[datetime] = None,
-        filters: Optional[Dict[str, Any]] = None,
+        start_time: datetime | None = None,
+        end_time: datetime | None = None,
+        filters: dict[str, Any] | None = None,
     ) -> str:
         """Export policy decisions to JSON format.
 
@@ -540,8 +538,8 @@ class PolicyAuditService:
         self,
         start_time: datetime,
         end_time: datetime,
-        group_by: Optional[List[str]] = None,
-    ) -> Dict[str, Any]:
+        group_by: list[str] | None = None,
+    ) -> dict[str, Any]:
         """Get analytics for policy decisions.
 
         Args:
@@ -629,7 +627,7 @@ class PolicyAuditService:
         start_time: datetime,
         end_time: datetime,
         limit: int = 10,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Get top denial reasons with counts.
 
         Args:
