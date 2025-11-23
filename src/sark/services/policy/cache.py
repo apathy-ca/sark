@@ -2,13 +2,21 @@
 
 Implements Redis-based caching for OPA policy decisions to improve performance
 and reduce load on the OPA server.
+
+Features:
+- Sensitivity-based TTL tuning
+- Stale-while-revalidate pattern for critical tools
+- Redis pipelining for batch operations
+- Cache preloading support
+- Comprehensive performance metrics
 """
 
+import asyncio
 import hashlib
 import json
 import time
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Callable, Awaitable
 
 import redis.asyncio as redis
 import structlog
@@ -25,6 +33,9 @@ class CacheMetrics:
 
     hits: int = 0
     misses: int = 0
+    stale_hits: int = 0  # Stale-while-revalidate hits
+    revalidations: int = 0  # Background revalidations
+    batch_operations: int = 0  # Batch cache operations
     total_requests: int = 0
     cache_latency_ms: float = 0.0
     opa_latency_ms: float = 0.0
@@ -37,6 +48,13 @@ class CacheMetrics:
         return (self.hits / self.total_requests) * 100
 
     @property
+    def effective_hit_rate(self) -> float:
+        """Calculate effective hit rate including stale hits."""
+        if self.total_requests == 0:
+            return 0.0
+        return ((self.hits + self.stale_hits) / self.total_requests) * 100
+
+    @property
     def miss_rate(self) -> float:
         """Calculate cache miss rate as percentage."""
         return 100.0 - self.hit_rate
@@ -46,8 +64,12 @@ class CacheMetrics:
         return {
             "hits": self.hits,
             "misses": self.misses,
+            "stale_hits": self.stale_hits,
+            "revalidations": self.revalidations,
+            "batch_operations": self.batch_operations,
             "total_requests": self.total_requests,
             "hit_rate": round(self.hit_rate, 2),
+            "effective_hit_rate": round(self.effective_hit_rate, 2),
             "miss_rate": round(self.miss_rate, 2),
             "avg_cache_latency_ms": round(self.cache_latency_ms, 2),
             "avg_opa_latency_ms": round(self.opa_latency_ms, 2),
@@ -55,13 +77,25 @@ class CacheMetrics:
 
 
 class PolicyCache:
-    """Redis-based cache for OPA policy decisions."""
+    """Redis-based cache for OPA policy decisions with advanced optimization features."""
 
     # Cache key prefix
     KEY_PREFIX = "policy:decision"
 
     # Default TTL (5 minutes)
     DEFAULT_TTL_SECONDS = 300
+
+    # Optimized TTL settings based on performance analysis
+    OPTIMIZED_TTL = {
+        "critical": 60,  # Increased from 30s to reduce revalidation overhead
+        "confidential": 120,  # Increased from 60s
+        "internal": 180,  # Same as medium
+        "public": 300,  # 5 minutes
+        "default": 120,  # Default 2 minutes
+    }
+
+    # Stale-while-revalidate threshold (30% of TTL)
+    STALE_THRESHOLD_RATIO = 0.3
 
     # Metrics key
     METRICS_KEY = "policy:cache:metrics"
@@ -71,18 +105,27 @@ class PolicyCache:
         redis_client: redis.Redis | None = None,
         ttl_seconds: int | None = None,
         enabled: bool = True,
+        stale_while_revalidate: bool = True,
+        use_optimized_ttl: bool = True,
     ) -> None:
         """
-        Initialize policy cache.
+        Initialize policy cache with optimization features.
 
         Args:
             redis_client: Redis client instance (creates new if None)
             ttl_seconds: Time-to-live for cache entries (default: 300s)
             enabled: Whether caching is enabled (default: True)
+            stale_while_revalidate: Enable stale-while-revalidate pattern (default: True)
+            use_optimized_ttl: Use optimized TTL settings (default: True)
         """
         self.ttl_seconds = ttl_seconds or self.DEFAULT_TTL_SECONDS
         self.enabled = enabled
+        self.stale_while_revalidate = stale_while_revalidate
+        self.use_optimized_ttl = use_optimized_ttl
         self.metrics = CacheMetrics()
+
+        # Revalidation callback (set by OPA client)
+        self.revalidate_callback: Callable[[str, str, str, dict], Awaitable[dict]] | None = None
 
         # Initialize Redis client
         if redis_client:
@@ -101,6 +144,8 @@ class PolicyCache:
             "policy_cache_initialized",
             ttl_seconds=self.ttl_seconds,
             enabled=self.enabled,
+            stale_while_revalidate=self.stale_while_revalidate,
+            use_optimized_ttl=self.use_optimized_ttl,
             redis_host=settings.redis_host,
             redis_port=settings.redis_port,
         )
@@ -145,15 +190,17 @@ class PolicyCache:
         action: str,
         resource: str,
         context: dict[str, Any] | None = None,
+        sensitivity: str | None = None,
     ) -> dict[str, Any] | None:
         """
-        Get cached policy decision.
+        Get cached policy decision with stale-while-revalidate support.
 
         Args:
             user_id: User identifier
             action: Action being performed
             resource: Resource being accessed
             context: Additional context
+            sensitivity: Sensitivity level for determining revalidation threshold
 
         Returns:
             Cached decision or None if not found/expired
@@ -165,28 +212,75 @@ class PolicyCache:
 
         try:
             key = self._generate_cache_key(user_id, action, resource, context)
-            cached_value = await self.redis.get(key)
+
+            # Use Redis pipeline to get value and TTL in single round-trip
+            pipe = self.redis.pipeline()
+            pipe.get(key)
+            pipe.ttl(key)
+            cached_value, ttl_remaining = await pipe.execute()
 
             latency_ms = (time.time() - start_time) * 1000
 
             if cached_value:
-                # Cache hit
-                self.metrics.hits += 1
-                self.metrics.total_requests += 1
-                self.metrics.cache_latency_ms = (
-                    (self.metrics.cache_latency_ms * (self.metrics.hits - 1))
-                    + latency_ms
-                ) / self.metrics.hits
-
                 decision = json.loads(cached_value)
 
-                logger.debug(
-                    "cache_hit",
-                    user_id=user_id,
-                    action=action,
-                    resource=resource,
-                    latency_ms=round(latency_ms, 2),
-                )
+                # Check if we should trigger background revalidation
+                if (
+                    self.stale_while_revalidate
+                    and self.revalidate_callback
+                    and sensitivity in ["critical", "confidential"]
+                    and ttl_remaining > 0
+                ):
+                    # Get full TTL for this sensitivity
+                    full_ttl = self.OPTIMIZED_TTL.get(sensitivity, self.ttl_seconds)
+                    stale_threshold = full_ttl * self.STALE_THRESHOLD_RATIO
+
+                    # If TTL is in the last 30%, trigger background revalidation
+                    if ttl_remaining < stale_threshold:
+                        # Serve stale cache, revalidate in background
+                        self.metrics.stale_hits += 1
+                        asyncio.create_task(
+                            self._background_revalidate(
+                                user_id, action, resource, context
+                            )
+                        )
+
+                        logger.debug(
+                            "cache_stale_hit",
+                            user_id=user_id,
+                            action=action,
+                            resource=resource,
+                            ttl_remaining=ttl_remaining,
+                            latency_ms=round(latency_ms, 2),
+                        )
+                    else:
+                        # Fresh cache hit
+                        self.metrics.hits += 1
+
+                        logger.debug(
+                            "cache_hit",
+                            user_id=user_id,
+                            action=action,
+                            resource=resource,
+                            latency_ms=round(latency_ms, 2),
+                        )
+                else:
+                    # Standard cache hit (no revalidation)
+                    self.metrics.hits += 1
+
+                    logger.debug(
+                        "cache_hit",
+                        user_id=user_id,
+                        action=action,
+                        resource=resource,
+                        latency_ms=round(latency_ms, 2),
+                    )
+
+                self.metrics.total_requests += 1
+                self.metrics.cache_latency_ms = (
+                    (self.metrics.cache_latency_ms * (self.metrics.hits + self.metrics.stale_hits - 1))
+                    + latency_ms
+                ) / (self.metrics.hits + self.metrics.stale_hits)
 
                 return decision
 
@@ -213,6 +307,54 @@ class PolicyCache:
             )
             # On error, return None (cache miss)
             return None
+
+    async def _background_revalidate(
+        self,
+        user_id: str,
+        action: str,
+        resource: str,
+        context: dict[str, Any] | None = None,
+    ) -> None:
+        """
+        Background task to revalidate stale cache entries.
+
+        Args:
+            user_id: User identifier
+            action: Action being performed
+            resource: Resource being accessed
+            context: Additional context
+        """
+        if not self.revalidate_callback:
+            return
+
+        try:
+            # Call revalidation callback (OPA evaluation)
+            new_decision = await self.revalidate_callback(
+                user_id, action, resource, context
+            )
+
+            # Update cache with fresh decision
+            if new_decision:
+                key = self._generate_cache_key(user_id, action, resource, context)
+                decision_json = json.dumps(new_decision)
+                await self.redis.setex(key, self.ttl_seconds, decision_json)
+
+                self.metrics.revalidations += 1
+
+                logger.debug(
+                    "cache_revalidated",
+                    user_id=user_id,
+                    action=action,
+                    resource=resource,
+                )
+
+        except Exception as e:
+            logger.warning(
+                "cache_revalidation_error",
+                error=str(e),
+                user_id=user_id,
+                action=action,
+            )
 
     async def set(
         self,
@@ -266,6 +408,119 @@ class PolicyCache:
                 action=action,
             )
             return False
+
+    async def get_batch(
+        self,
+        requests: list[tuple[str, str, str, dict[str, Any] | None]],
+    ) -> list[dict[str, Any] | None]:
+        """
+        Get multiple cached policy decisions in a single round-trip using Redis pipelining.
+
+        Args:
+            requests: List of (user_id, action, resource, context) tuples
+
+        Returns:
+            List of cached decisions (None for cache misses) in same order as requests
+        """
+        if not self.enabled or not requests:
+            return [None] * len(requests)
+
+        start_time = time.time()
+
+        try:
+            # Generate all cache keys
+            keys = [
+                self._generate_cache_key(user_id, action, resource, context)
+                for user_id, action, resource, context in requests
+            ]
+
+            # Use pipeline to get all values in single round-trip
+            pipe = self.redis.pipeline()
+            for key in keys:
+                pipe.get(key)
+
+            cached_values = await pipe.execute()
+
+            latency_ms = (time.time() - start_time) * 1000
+
+            # Parse results
+            results = []
+            hits = 0
+            misses = 0
+
+            for cached_value in cached_values:
+                if cached_value:
+                    results.append(json.loads(cached_value))
+                    hits += 1
+                else:
+                    results.append(None)
+                    misses += 1
+
+            # Update metrics
+            self.metrics.hits += hits
+            self.metrics.misses += misses
+            self.metrics.total_requests += len(requests)
+            self.metrics.batch_operations += 1
+
+            logger.debug(
+                "cache_batch_get",
+                requests=len(requests),
+                hits=hits,
+                misses=misses,
+                hit_rate=round((hits / len(requests)) * 100, 2),
+                latency_ms=round(latency_ms, 2),
+            )
+
+            return results
+
+        except Exception as e:
+            logger.warning("cache_batch_get_error", error=str(e))
+            return [None] * len(requests)
+
+    async def set_batch(
+        self,
+        entries: list[tuple[str, str, str, dict[str, Any], dict[str, Any] | None, int | None]],
+    ) -> int:
+        """
+        Set multiple cached policy decisions in a single round-trip using Redis pipelining.
+
+        Args:
+            entries: List of (user_id, action, resource, decision, context, ttl_seconds) tuples
+
+        Returns:
+            Number of entries successfully cached
+        """
+        if not self.enabled or not entries:
+            return 0
+
+        try:
+            # Use pipeline to set all values
+            pipe = self.redis.pipeline()
+
+            for user_id, action, resource, decision, context, ttl_seconds in entries:
+                key = self._generate_cache_key(user_id, action, resource, context)
+                decision_json = json.dumps(decision)
+                ttl = ttl_seconds or self.ttl_seconds
+                pipe.setex(key, ttl, decision_json)
+
+            results = await pipe.execute()
+
+            # Count successes (setex returns True on success)
+            success_count = sum(1 for r in results if r)
+
+            self.metrics.batch_operations += 1
+
+            logger.debug(
+                "cache_batch_set",
+                entries=len(entries),
+                successful=success_count,
+            )
+
+            return success_count
+
+        except Exception as e:
+            logger.warning("cache_batch_set_error", error=str(e))
+            return 0
 
     async def invalidate(
         self,
@@ -428,6 +683,61 @@ class PolicyCache:
         except Exception as e:
             logger.error("cache_health_check_failed", error=str(e))
             return False
+
+    async def preload_cache(
+        self,
+        preload_data: list[tuple[str, str, str, dict[str, Any], dict[str, Any] | None]],
+    ) -> int:
+        """
+        Preload cache with frequently accessed policy decisions on startup.
+
+        This improves cold-start performance by pre-populating the cache with
+        common user-tool combinations.
+
+        Args:
+            preload_data: List of (user_id, action, resource, decision, context) tuples
+
+        Returns:
+            Number of entries successfully preloaded
+        """
+        if not self.enabled or not preload_data:
+            return 0
+
+        try:
+            # Convert to batch set format (add TTL)
+            entries = [
+                (user_id, action, resource, decision, context, self.ttl_seconds)
+                for user_id, action, resource, decision, context in preload_data
+            ]
+
+            # Use batch set for efficient preloading
+            success_count = await self.set_batch(entries)
+
+            logger.info(
+                "cache_preloaded",
+                total_entries=len(preload_data),
+                successful=success_count,
+            )
+
+            return success_count
+
+        except Exception as e:
+            logger.warning("cache_preload_error", error=str(e))
+            return 0
+
+    def set_revalidate_callback(
+        self,
+        callback: Callable[[str, str, str, dict], Awaitable[dict]],
+    ) -> None:
+        """
+        Set callback function for cache revalidation.
+
+        Args:
+            callback: Async function that takes (user_id, action, resource, context)
+                     and returns fresh policy decision
+        """
+        self.revalidate_callback = callback
+        logger.info("cache_revalidate_callback_set")
 
     async def close(self) -> None:
         """Close Redis connection."""

@@ -15,29 +15,44 @@ _async_timescale_session_local: sessionmaker | None = None
 
 
 def get_postgres_engine() -> AsyncEngine:
-    """Get or create PostgreSQL engine."""
+    """Get or create PostgreSQL engine with optimized connection pooling."""
     global _postgres_engine
     if _postgres_engine is None:
         settings = get_settings()
         _postgres_engine = create_async_engine(
             settings.postgres_dsn,
+            # Connection pool settings
             pool_size=settings.postgres_pool_size,
             max_overflow=settings.postgres_max_overflow,
+            pool_timeout=settings.postgres_pool_timeout,
+            pool_recycle=settings.postgres_pool_recycle,
+            pool_pre_ping=settings.postgres_pool_pre_ping,
+            # Logging
             echo=settings.debug,
+            echo_pool=settings.postgres_echo_pool,
+            # Performance optimizations
+            # Use prepared statements for better performance
+            # executemany_mode="values_plus_batch",  # Async doesn't support this
         )
     return _postgres_engine
 
 
 def get_timescale_engine() -> AsyncEngine:
-    """Get or create TimescaleDB engine."""
+    """Get or create TimescaleDB engine with optimized connection pooling."""
     global _timescale_engine
     if _timescale_engine is None:
         settings = get_settings()
         _timescale_engine = create_async_engine(
             settings.timescale_dsn,
+            # Connection pool settings
             pool_size=settings.postgres_pool_size,
             max_overflow=settings.postgres_max_overflow,
+            pool_timeout=settings.postgres_pool_timeout,
+            pool_recycle=settings.postgres_pool_recycle,
+            pool_pre_ping=settings.postgres_pool_pre_ping,
+            # Logging
             echo=settings.debug,
+            echo_pool=settings.postgres_echo_pool,
         )
     return _timescale_engine
 

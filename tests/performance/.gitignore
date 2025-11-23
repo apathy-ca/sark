@@ -1,0 +1,31 @@
+# Performance test artifacts
+reports/
+*.html
+*.csv
+*.json
+*.log
+
+# Test API keys
+.test_api_key
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,164 @@
+{
+  "scan_date": "2025-11-22",
+  "tools": {
+    "bandit": "1.9.1",
+    "pip-audit": "2.9.0",
+    "trufflehog": "2.2.1"
+  },
+  "summary": {
+    "total_issues": 43,
+    "by_severity": {
+      "critical": 0,
+      "high": 4,
+      "medium": 31,
+      "low": 8
+    },
+    "by_category": {
+      "code_security": 4,
+      "dependencies": 15,
+      "secrets": 24
+    }
+  },
+  "code_security": {
+    "tool": "bandit",
+    "total_issues": 4,
+    "severity": {
+      "medium": 3,
+      "low": 1
+    },
+    "issues": [
+      {
+        "id": "B104",
+        "severity": "MEDIUM",
+        "title": "Binding to all interfaces",
+        "count": 2,
+        "status": "accepted",
+        "priority": "low"
+      },
+      {
+        "id": "B105",
+        "severity": "LOW",
+        "title": "Hardcoded password (false positive)",
+        "count": 1,
+        "status": "false_positive",
+        "priority": "none"
+      },
+      {
+        "id": "B108",
+        "severity": "MEDIUM",
+        "title": "Hardcoded temp directory",
+        "count": 1,
+        "status": "needs_fix",
+        "priority": "medium"
+      }
+    ]
+  },
+  "dependency_vulnerabilities": {
+    "tool": "pip-audit",
+    "total_vulnerabilities": 15,
+    "vulnerable_packages": 6,
+    "packages": [
+      {
+        "name": "cryptography",
+        "current_version": "41.0.7",
+        "fixed_version": "43.0.1",
+        "vulnerabilities": 4,
+        "severity": "HIGH",
+        "priority": "high"
+      },
+      {
+        "name": "gitpython",
+        "current_version": "3.0.6",
+        "fixed_version": "3.1.41",
+        "vulnerabilities": 5,
+        "severity": "HIGH",
+        "priority": "high",
+        "note": "Transitive dependency via TruffleHog, not used in production"
+      },
+      {
+        "name": "ecdsa",
+        "current_version": "0.19.1",
+        "fixed_version": "unfixed",
+        "vulnerabilities": 1,
+        "severity": "MEDIUM",
+        "priority": "low",
+        "note": "No fix available, not directly used"
+      },
+      {
+        "name": "pip",
+        "current_version": "24.0",
+        "fixed_version": "25.3",
+        "vulnerabilities": 1,
+        "severity": "HIGH",
+        "priority": "medium"
+      },
+      {
+        "name": "setuptools",
+        "current_version": "68.1.2",
+        "fixed_version": "78.1.1",
+        "vulnerabilities": 2,
+        "severity": "HIGH",
+        "priority": "high"
+      },
+      {
+        "name": "urllib3",
+        "current_version": "2.3.0",
+        "fixed_version": "2.5.0",
+        "vulnerabilities": 2,
+        "severity": "MEDIUM",
+        "priority": "medium"
+      }
+    ]
+  },
+  "secrets_detection": {
+    "tool": "trufflehog",
+    "total_findings": 24,
+    "types": {
+      "password_in_url": 21,
+      "high_entropy": 3
+    },
+    "assessment": {
+      "real_secrets": 0,
+      "false_positives": 24,
+      "confidence": "high"
+    },
+    "notes": "All findings appear to be documentation examples and test fixtures"
+  },
+  "risk_assessment": {
+    "overall_risk": "MEDIUM",
+    "code_security_risk": "LOW",
+    "dependency_risk": "MEDIUM",
+    "secrets_risk": "LOW"
+  },
+  "immediate_actions": [
+    {
+      "action": "Update cryptography to >=43.0.1",
+      "priority": "HIGH",
+      "reason": "4 security vulnerabilities affecting SSL/TLS"
+    },
+    {
+      "action": "Update setuptools to >=78.1.1",
+      "priority": "HIGH",
+      "reason": "Remote code execution vulnerability"
+    },
+    {
+      "action": "Update pip to >=25.3",
+      "priority": "MEDIUM",
+      "reason": "Path traversal vulnerability"
+    },
+    {
+      "action": "Update urllib3 to >=2.5.0",
+      "priority": "MEDIUM",
+      "reason": "SSRF mitigation bypass"
+    },
+    {
+      "action": "Fix temp directory usage in error_handler.py",
+      "priority": "MEDIUM",
+      "reason": "Use secure temp directory location"
+    }
+  ],
+  "false_positives": {
+    "code_security": 1,
+    "secrets": 24
+  }
+}

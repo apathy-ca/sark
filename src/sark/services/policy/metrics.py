@@ -42,6 +42,24 @@ opa_request_duration = Histogram(
     buckets=(0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0),
 )
 
+# Batch evaluation metrics
+batch_policy_evaluations_total = Counter(
+    "sark_batch_policy_evaluations_total",
+    "Total number of batch policy evaluations",
+)
+
+batch_evaluation_size = Histogram(
+    "sark_batch_evaluation_size",
+    "Number of policies in batch evaluation",
+    buckets=(1, 5, 10, 25, 50, 100, 250, 500, 1000),
+)
+
+batch_evaluation_duration = Histogram(
+    "sark_batch_evaluation_duration_seconds",
+    "Batch policy evaluation total duration in seconds",
+    buckets=(0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0),
+)
+
 # ============================================================================
 # CACHE METRICS
 # ============================================================================
@@ -79,6 +97,38 @@ cache_size_bytes = Gauge(
 cache_entries = Gauge(
     "sark_policy_cache_entries",
     "Current number of entries in policy cache",
+)
+
+# Cache optimization metrics (v2)
+cache_stale_hits_total = Counter(
+    "sark_policy_cache_stale_hits_total",
+    "Total number of stale cache hits (stale-while-revalidate)",
+    ["sensitivity_level"],
+)
+
+cache_revalidations_total = Counter(
+    "sark_policy_cache_revalidations_total",
+    "Total number of background cache revalidations",
+    ["status"],  # success, failure
+)
+
+cache_batch_operations_total = Counter(
+    "sark_policy_cache_batch_operations_total",
+    "Total number of batch cache operations",
+    ["operation"],  # get_batch, set_batch
+)
+
+cache_batch_items = Histogram(
+    "sark_policy_cache_batch_items",
+    "Number of items in batch cache operations",
+    ["operation"],
+    buckets=(1, 5, 10, 25, 50, 100, 250, 500, 1000),
+)
+
+cache_batch_hit_rate = Histogram(
+    "sark_policy_cache_batch_hit_rate",
+    "Hit rate for batch cache operations (percentage)",
+    buckets=(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100),
 )
 
 # ============================================================================
