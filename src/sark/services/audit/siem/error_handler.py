@@ -8,13 +8,13 @@ Provides robust error handling with:
 - Structured error tracking and metrics
 """
 
-import asyncio
-import json
 from collections import deque
+from collections.abc import Callable
 from datetime import UTC, datetime
 from enum import Enum
+import json
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 import structlog
 

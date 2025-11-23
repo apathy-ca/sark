@@ -1,7 +1,7 @@
 """Rate limiting middleware for FastAPI."""
 
+from collections.abc import Callable
 import logging
-from typing import Callable
 
 from fastapi import Request, Response, status
 from fastapi.responses import JSONResponse

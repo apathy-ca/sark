@@ -1,17 +1,17 @@
 """Tests for unified authentication router."""
 
-import pytest
-import uuid
 from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, Mock, patch
+import uuid
+
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+import pytest
 
 from sark.api.routers.auth import router
+from sark.config.settings import Settings
 from sark.models.session import Session
 from sark.services.auth.providers.base import UserInfo
-from sark.config.settings import Settings
-
 
 # Test App Setup
 
@@ -136,7 +136,7 @@ class TestLogin:
         self, client, app, mock_settings, mock_session_service, mock_session
     ):
         """Test successful LDAP login."""
-        from sark.api.routers.auth import get_settings, get_session_service
+        from sark.api.routers.auth import get_session_service, get_settings
 
         mock_user_info = UserInfo(
             user_id="uid=jdoe,ou=users,dc=example,dc=com",
@@ -174,7 +174,7 @@ class TestLogin:
         self, client, app, mock_settings, mock_session_service
     ):
         """Test LDAP login with invalid credentials."""
-        from sark.api.routers.auth import get_settings, get_session_service
+        from sark.api.routers.auth import get_session_service, get_settings
 
         app.dependency_overrides[get_settings] = lambda: mock_settings
         app.dependency_overrides[get_session_service] = lambda: mock_session_service
@@ -197,7 +197,7 @@ class TestLogin:
 
     def test_login_ldap_disabled(self, client, app, mock_settings, mock_session_service):
         """Test login when LDAP is disabled."""
-        from sark.api.routers.auth import get_settings, get_session_service
+        from sark.api.routers.auth import get_session_service, get_settings
 
         mock_settings.ldap_enabled = False
 
@@ -219,7 +219,7 @@ class TestLogin:
         self, client, app, mock_settings, mock_session_service
     ):
         """Test login with unsupported provider."""
-        from sark.api.routers.auth import get_settings, get_session_service
+        from sark.api.routers.auth import get_session_service, get_settings
 
         app.dependency_overrides[get_settings] = lambda: mock_settings
         app.dependency_overrides[get_session_service] = lambda: mock_session_service
@@ -291,7 +291,7 @@ class TestOIDCCallback:
         self, client, app, mock_settings, mock_session_service, mock_session
     ):
         """Test successful OIDC callback."""
-        from sark.api.routers.auth import get_settings, get_session_service
+        from sark.api.routers.auth import get_session_service, get_settings
 
         mock_user_info = UserInfo(
             user_id="google_user123",
@@ -324,7 +324,7 @@ class TestOIDCCallback:
         self, client, app, mock_settings, mock_session_service
     ):
         """Test OIDC callback when authentication fails."""
-        from sark.api.routers.auth import get_settings, get_session_service
+        from sark.api.routers.auth import get_session_service, get_settings
 
         app.dependency_overrides[get_settings] = lambda: mock_settings
         app.dependency_overrides[get_session_service] = lambda: mock_session_service

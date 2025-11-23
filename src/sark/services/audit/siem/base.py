@@ -6,8 +6,8 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
-import structlog
 from pydantic import BaseModel, Field
+import structlog
 
 from sark.models.audit import AuditEvent
 

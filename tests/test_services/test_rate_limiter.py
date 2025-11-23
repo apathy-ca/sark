@@ -2,12 +2,11 @@
 
 import asyncio
 import time
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from sark.services.rate_limiter import RateLimiter, RateLimitInfo
-
+from sark.services.rate_limiter import RateLimiter
 
 # Helper Functions
 

@@ -361,4 +361,4 @@ class TestServerListPagination:
 
         # Verify PaginatedResponse schema exists
         components = schema.get("components", {}).get("schemas", {})
-        assert any("Paginated" in key for key in components.keys())
+        assert any("Paginated" in key for key in components)

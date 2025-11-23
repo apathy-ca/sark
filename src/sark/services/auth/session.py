@@ -1,7 +1,7 @@
 """Session management for user authentication."""
 
-import secrets
 from datetime import UTC, datetime, timedelta
+import secrets
 from typing import Any
 from uuid import UUID
 

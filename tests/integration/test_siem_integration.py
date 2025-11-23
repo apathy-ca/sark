@@ -31,15 +31,13 @@ Run tests:
 """
 
 import asyncio
+import contextlib
+from datetime import UTC, datetime
 import gzip
 import json
 import os
-from datetime import UTC, datetime
-from typing import Any
-from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
-import httpx
 import pytest
 from pytest_httpx import HTTPXMock
 
@@ -51,16 +49,11 @@ from sark.services.audit.siem import (
     CircuitBreakerConfig,
     CircuitBreakerError,
     CircuitState,
-    CompressionConfig,
     DatadogConfig,
     DatadogSIEM,
-    ErrorAlert,
-    HealthMonitorConfig,
     SIEMErrorHandler,
-    SIEMOptimizer,
     SplunkConfig,
     SplunkSIEM,
-    high_error_rate_condition,
 )
 
 # ============================================================================
@@ -707,7 +700,7 @@ class TestCircuitBreaker:
             raise Exception("Operation failed")
 
         # Trigger failures
-        for i in range(3):
+        for _i in range(3):
             try:
                 await breaker.call(failing_operation)
             except Exception:
@@ -736,11 +729,9 @@ class TestCircuitBreaker:
         async def failing_operation():
             raise Exception("Operation failed")
 
-        for i in range(2):
-            try:
+        for _i in range(2):
+            with contextlib.suppress(Exception):
                 await breaker.call(failing_operation)
-            except Exception:
-                pass
 
         assert breaker.state == CircuitState.OPEN
 
@@ -775,10 +766,8 @@ class TestCircuitBreaker:
             raise Exception("fail")
 
         for _ in range(2):
-            try:
+            with contextlib.suppress(Exception):
                 await breaker.call(failing_operation)
-            except Exception:
-                pass
 
         assert breaker.state == CircuitState.OPEN
 

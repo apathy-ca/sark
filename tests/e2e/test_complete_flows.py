@@ -5,22 +5,17 @@ Tests complete application flows from user registration through
 authentication, server management, policy enforcement, and auditing.
 """
 
-import pytest
-from datetime import datetime, UTC
-from unittest.mock import AsyncMock, patch, MagicMock
+from datetime import UTC, datetime
+from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
-from fastapi import status
+import pytest
 
-from sark.models.user import User, Team
-from sark.models.mcp_server import MCPServer, TransportType, SensitivityLevel
-from sark.models.policy import Policy, PolicyStatus
 from sark.models.audit import AuditEvent, AuditEventType, SeverityLevel
+from sark.models.mcp_server import MCPServer, SensitivityLevel, ServerStatus, TransportType
+from sark.models.policy import Policy, PolicyStatus
+from sark.models.user import Team, User
 from sark.services.auth.jwt import JWTHandler
-from sark.services.discovery.discovery_service import DiscoveryService
-from sark.services.policy.policy_service import PolicyService
-from sark.services.audit.audit_service import AuditService
-
 
 # ============================================================================
 # User Registration & Authentication Flow
@@ -217,7 +212,7 @@ async def test_admin_policy_creation_to_enforcement():
         access_token_expire_minutes=30
     )
 
-    admin_token = jwt_handler.create_access_token(
+    jwt_handler.create_access_token(
         user_id=admin_user.id,
         email=admin_user.email,
         role=admin_user.role
@@ -245,39 +240,7 @@ async def test_admin_policy_creation_to_enforcement():
     assert created_policy.created_by == admin_user.id
 
     # Step 3: Create Policy Version with Rego Code
-    rego_code = """
-    package sark.authorization
 
-    default allow = false
-
-    # Allow developers to register low/medium sensitivity servers
-    allow {
-        input.user.role == "developer"
-        input.action == "register"
-        input.resource.type == "server"
-        input.resource.sensitivity in ["low", "medium"]
-    }
-
-    # Allow admins to register any server
-    allow {
-        input.user.role == "admin"
-        input.action == "register"
-        input.resource.type == "server"
-    }
-
-    # Deny reason for failed authorization
-    reason = msg {
-        not allow
-        msg := sprintf("User with role '%s' cannot register %s sensitivity servers",
-            [input.user.role, input.resource.sensitivity])
-    }
-    """
-
-    version_data = {
-        "policy_id": policy_id,
-        "rego_code": rego_code,
-        "change_description": "Initial policy version"
-    }
 
     # Mock policy version creation
     policy_version_created = True
@@ -306,12 +269,8 @@ async def test_admin_policy_creation_to_enforcement():
     )
 
     # Attempt 1: Register medium sensitivity server (should succeed)
-    server_data_medium = {
-        "name": "medium-server",
-        "sensitivity": "medium"
-    }
 
-    policy_input_medium = {
+    {
         "user": {"id": str(regular_user.id), "role": regular_user.role},
         "action": "register",
         "resource": {"type": "server", "sensitivity": "medium"}
@@ -329,12 +288,8 @@ async def test_admin_policy_creation_to_enforcement():
     assert policy_decision_medium["allow"] is True
 
     # Attempt 2: Register high sensitivity server (should be denied)
-    server_data_high = {
-        "name": "high-server",
-        "sensitivity": "high"
-    }
 
-    policy_input_high = {
+    {
         "user": {"id": str(regular_user.id), "role": regular_user.role},
         "action": "register",
         "resource": {"type": "server", "sensitivity": "high"}
@@ -461,7 +416,7 @@ async def test_multi_team_server_sharing():
         updated_at=datetime.now(UTC)
     )
 
-    data_science_server = MCPServer(
+    MCPServer(
         id=uuid4(),
         name="ml-model-server",
         description="ML Model serving server",
@@ -476,21 +431,6 @@ async def test_multi_team_server_sharing():
     )
 
     # Step 4: Configure Team-Scoped Access Policy
-    team_policy_rego = """
-    package sark.team_access
-
-    default allow = false
-
-    # Allow users to access servers from their team
-    allow {
-        input.user.team_id == input.resource.team_id
-    }
-
-    # Allow admins to access all servers
-    allow {
-        input.user.role == "admin"
-    }
-    """
 
     # Mock policy evaluation for team access
     # Engineer tries to access engineering server
@@ -527,7 +467,7 @@ async def test_multi_team_server_sharing():
 
     # Step 7: Test Server Sharing Between Teams
     # Share engineering server with data science team
-    shared_server_metadata = {
+    {
         **engineering_server.__dict__,
         "extra_metadata": {"shared_with_teams": [str(data_science_team.id)]}
     }
@@ -688,7 +628,7 @@ async def test_bulk_registration_with_validation():
     6. Retry with best-effort mode
     7. Verify partial success is allowed
     """
-    user = User(
+    User(
         id=uuid4(),
         email="bulk@example.com",
         full_name="Bulk User",

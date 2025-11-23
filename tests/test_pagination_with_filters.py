@@ -149,7 +149,7 @@ class TestPaginationWithFilters:
 
         # Apply pagination
         params = PaginationParams(limit=50)
-        items, next_cursor, has_more, _ = await CursorPaginator.paginate(
+        items, _next_cursor, has_more, _ = await CursorPaginator.paginate(
             db=mock_db,
             query=query,
             cursor_column=MCPServer.created_at,
@@ -200,7 +200,7 @@ class TestPaginationWithFilters:
 
         # Apply pagination
         params = PaginationParams(limit=50)
-        items, next_cursor, has_more, _ = await CursorPaginator.paginate(
+        items, _next_cursor, has_more, _ = await CursorPaginator.paginate(
             db=mock_db,
             query=query,
             cursor_column=MCPServer.created_at,

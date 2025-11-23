@@ -104,7 +104,7 @@ async def list_sessions(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to list sessions",
-        )
+        ) from e
 
 
 @router.get("/{session_id}", response_model=SessionResponse)
@@ -161,7 +161,7 @@ async def get_session(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve session",
-        )
+        ) from e
 
 
 @router.delete("/{session_id}", response_model=SessionDeleteResponse)
@@ -222,7 +222,7 @@ async def delete_session(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to invalidate session",
-        )
+        ) from e
 
 
 @router.delete("/all", response_model=SessionDeleteResponse)
@@ -246,7 +246,7 @@ async def delete_all_sessions(
 
         return SessionDeleteResponse(
             success=True,
-            message=f"All sessions invalidated successfully",
+            message="All sessions invalidated successfully",
             sessions_deleted=count,
         )
 
@@ -255,7 +255,7 @@ async def delete_all_sessions(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to invalidate sessions",
-        )
+        ) from e
 
 
 @router.post("/{session_id}/extend", response_model=SessionResponse)
@@ -332,4 +332,4 @@ async def extend_session(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to extend session",
-        )
+        ) from e

@@ -5,7 +5,7 @@ and exporting audit data for compliance and analytics.
 """
 
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from pydantic import BaseModel, Field
@@ -31,16 +31,16 @@ class PolicyDecisionLogResponse(BaseModel):
     result: str
     allow: bool
     user_id: str
-    user_role: Optional[str]
+    user_role: str | None
     action: str
-    resource_type: Optional[str]
-    tool_name: Optional[str]
-    sensitivity_level: Optional[str]
-    reason: Optional[str]
-    evaluation_duration_ms: Optional[float]
+    resource_type: str | None
+    tool_name: str | None
+    sensitivity_level: str | None
+    reason: str | None
+    evaluation_duration_ms: float | None
     cache_hit: bool
-    client_ip: Optional[str]
-    mfa_verified: Optional[bool]
+    client_ip: str | None
+    mfa_verified: bool | None
 
     class Config:
         from_attributes = True
@@ -55,9 +55,9 @@ class PolicyChangeLogResponse(BaseModel):
     policy_name: str
     policy_version: int
     changed_by_user_id: str
-    change_reason: Optional[str]
+    change_reason: str | None
     breaking_change: bool
-    deployed_at: Optional[datetime]
+    deployed_at: datetime | None
 
     class Config:
         from_attributes = True
@@ -66,11 +66,11 @@ class PolicyChangeLogResponse(BaseModel):
 class PolicyAnalyticsResponse(BaseModel):
     """Response model for policy analytics."""
 
-    period: Dict[str, str]
-    summary: Dict[str, Any]
-    cache_performance: Dict[str, Any]
-    latency: Dict[str, float]
-    grouped: Optional[Dict[str, Any]] = None
+    period: dict[str, str]
+    summary: dict[str, Any]
+    cache_performance: dict[str, Any]
+    latency: dict[str, float]
+    grouped: dict[str, Any] | None = None
 
 
 class DenialReasonResponse(BaseModel):
@@ -83,14 +83,14 @@ class DenialReasonResponse(BaseModel):
 class ExportRequest(BaseModel):
     """Request model for export operations."""
 
-    start_time: Optional[datetime] = Field(
+    start_time: datetime | None = Field(
         None, description="Start of time range (defaults to 24h ago)"
     )
-    end_time: Optional[datetime] = Field(
+    end_time: datetime | None = Field(
         None, description="End of time range (defaults to now)"
     )
     format: str = Field("json", description="Export format: 'json' or 'csv'")
-    filters: Optional[Dict[str, Any]] = Field(None, description="Additional filters")
+    filters: dict[str, Any] | None = Field(None, description="Additional filters")
 
 
 # ============================================================================
@@ -98,15 +98,15 @@ class ExportRequest(BaseModel):
 # ============================================================================
 
 
-@router.get("/decisions", response_model=List[PolicyDecisionLogResponse])
+@router.get("/decisions", response_model=list[PolicyDecisionLogResponse])
 async def get_decision_logs(
-    start_time: Optional[datetime] = Query(
+    start_time: datetime | None = Query(
         None, description="Start of time range (ISO 8601)"
     ),
-    end_time: Optional[datetime] = Query(None, description="End of time range (ISO 8601)"),
-    user_id: Optional[str] = Query(None, description="Filter by user ID"),
-    action: Optional[str] = Query(None, description="Filter by action"),
-    result: Optional[PolicyDecisionResult] = Query(None, description="Filter by result"),
+    end_time: datetime | None = Query(None, description="End of time range (ISO 8601)"),
+    user_id: str | None = Query(None, description="Filter by user ID"),
+    action: str | None = Query(None, description="Filter by action"),
+    result: PolicyDecisionResult | None = Query(None, description="Filter by result"),
     limit: int = Query(100, ge=1, le=1000, description="Maximum number of results"),
     offset: int = Query(0, ge=0, description="Offset for pagination"),
     db: AsyncSession = Depends(get_db),
@@ -160,7 +160,7 @@ async def get_decision_logs(
     ]
 
 
-@router.get("/decisions/{decision_id}", response_model=Dict[str, Any])
+@router.get("/decisions/{decision_id}", response_model=dict[str, Any])
 async def get_decision_detail(
     decision_id: str,
     db: AsyncSession = Depends(get_db),
@@ -175,7 +175,7 @@ async def get_decision_detail(
     GET /api/v1/policy/audit/decisions/550e8400-e29b-41d4-a716-446655440000
     ```
     """
-    audit_service = PolicyAuditService(db)
+    PolicyAuditService(db)
 
     from uuid import UUID
 
@@ -238,12 +238,12 @@ async def get_decision_detail(
 # ============================================================================
 
 
-@router.get("/policy-changes", response_model=List[PolicyChangeLogResponse])
+@router.get("/policy-changes", response_model=list[PolicyChangeLogResponse])
 async def get_policy_changes(
-    policy_name: Optional[str] = Query(None, description="Filter by policy name"),
-    start_time: Optional[datetime] = Query(None, description="Start of time range"),
-    end_time: Optional[datetime] = Query(None, description="End of time range"),
-    change_type: Optional[PolicyChangeType] = Query(None, description="Filter by change type"),
+    policy_name: str | None = Query(None, description="Filter by policy name"),
+    start_time: datetime | None = Query(None, description="Start of time range"),
+    end_time: datetime | None = Query(None, description="End of time range"),
+    change_type: PolicyChangeType | None = Query(None, description="Filter by change type"),
     limit: int = Query(100, ge=1, le=1000, description="Maximum number of results"),
     db: AsyncSession = Depends(get_db),
 ):
@@ -288,7 +288,7 @@ async def get_policy_changes(
     ]
 
 
-@router.get("/policy-changes/{change_id}", response_model=Dict[str, Any])
+@router.get("/policy-changes/{change_id}", response_model=dict[str, Any])
 async def get_policy_change_detail(
     change_id: str,
     include_diff: bool = Query(False, description="Include policy diff"),
@@ -433,9 +433,9 @@ async def export_decisions_json(
 
 @router.get("/analytics", response_model=PolicyAnalyticsResponse)
 async def get_analytics(
-    start_time: Optional[datetime] = Query(None, description="Start of time range"),
-    end_time: Optional[datetime] = Query(None, description="End of time range"),
-    group_by: Optional[List[str]] = Query(
+    start_time: datetime | None = Query(None, description="Start of time range"),
+    end_time: datetime | None = Query(None, description="End of time range"),
+    group_by: list[str] | None = Query(
         None,
         description="Group by dimensions (action, sensitivity_level, user_role)",
     ),
@@ -468,10 +468,10 @@ async def get_analytics(
     return PolicyAnalyticsResponse(**analytics)
 
 
-@router.get("/analytics/denial-reasons", response_model=List[DenialReasonResponse])
+@router.get("/analytics/denial-reasons", response_model=list[DenialReasonResponse])
 async def get_top_denial_reasons(
-    start_time: Optional[datetime] = Query(None, description="Start of time range"),
-    end_time: Optional[datetime] = Query(None, description="End of time range"),
+    start_time: datetime | None = Query(None, description="Start of time range"),
+    end_time: datetime | None = Query(None, description="End of time range"),
     limit: int = Query(10, ge=1, le=50, description="Number of top reasons to return"),
     db: AsyncSession = Depends(get_db),
 ):
@@ -508,8 +508,8 @@ async def get_analytics_trends(
         "allow_rate", description="Metric to analyze (allow_rate, deny_rate, cache_hit_rate)"
     ),
     interval: str = Query("1h", description="Time interval (1h, 6h, 1d)"),
-    start_time: Optional[datetime] = Query(None, description="Start of time range"),
-    end_time: Optional[datetime] = Query(None, description="End of time range"),
+    start_time: datetime | None = Query(None, description="Start of time range"),
+    end_time: datetime | None = Query(None, description="End of time range"),
     db: AsyncSession = Depends(get_db),
 ):
     """Get trends for policy evaluation metrics over time.

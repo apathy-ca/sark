@@ -6,7 +6,7 @@ Provides SAML 2.0 authentication endpoints:
 - Single Logout Service (SLS)
 """
 
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Query, Request, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -72,7 +72,7 @@ async def get_metadata(
             headers={"Content-Disposition": 'attachment; filename="sp_metadata.xml"'},
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to generate metadata: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate metadata: {e!s}") from e
 
 
 @router.get("/login")
@@ -100,7 +100,7 @@ async def saml_login(
         return RedirectResponse(url=sso_url, status_code=302)
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to initiate login: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to initiate login: {e!s}") from e
 
 
 @router.post("/acs", response_class=HTMLResponse)
@@ -160,8 +160,8 @@ async def assertion_consumer_service(
         raise
     except Exception as e:
         raise HTTPException(
-            status_code=500, detail=f"Failed to process SAML response: {str(e)}"
-        )
+            status_code=500, detail=f"Failed to process SAML response: {e!s}"
+        ) from e
 
 
 @router.get("/slo")
@@ -223,7 +223,7 @@ async def single_logout_service(
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Logout failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Logout failed: {e!s}") from e
 
 
 @router.post("/logout/initiate")
@@ -250,7 +250,7 @@ async def initiate_logout(
         return RedirectResponse(url=logout_url, status_code=302)
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to initiate logout: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to initiate logout: {e!s}") from e
 
 
 @router.get("/health")

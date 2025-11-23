@@ -1,15 +1,14 @@
 """Tests for rate limiting middleware."""
 
-import pytest
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock, Mock
+
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+import pytest
 from starlette.testclient import TestClient
 
 from sark.api.middleware.rate_limit import RateLimitMiddleware
 from sark.config.settings import Settings
 from sark.services.rate_limiter import RateLimiter, RateLimitInfo
-
 
 # Fixtures
 

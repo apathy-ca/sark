@@ -4,7 +4,6 @@ import time
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from authlib.jose import JsonWebToken
 
 from sark.services.auth.providers.base import UserInfo
 from sark.services.auth.providers.oidc import OIDCProvider, OIDCProviderConfig

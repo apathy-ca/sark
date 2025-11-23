@@ -1,10 +1,9 @@
 """Tests for API key management."""
 
-import uuid
 from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
+import uuid
 
-import bcrypt
 import pytest
 
 from sark.models.api_key import APIKey

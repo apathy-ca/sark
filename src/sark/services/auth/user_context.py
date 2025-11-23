@@ -1,6 +1,5 @@
 """User context extraction and management."""
 
-from dataclasses import dataclass
 from uuid import UUID
 
 from pydantic import BaseModel

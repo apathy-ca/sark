@@ -1,13 +1,14 @@
 """Tests for session management service."""
 
-import pytest
-import uuid
 from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
 import json
+from unittest.mock import AsyncMock, patch
+import uuid
 
-from sark.services.auth.sessions import SessionService
+import pytest
+
 from sark.models.session import Session
+from sark.services.auth.sessions import SessionService
 
 
 @pytest.fixture
@@ -377,12 +378,11 @@ class TestConcurrentSessionLimits:
 
         with patch.object(
             session_service, "list_user_sessions", return_value=existing_sessions
-        ):
-            with patch.object(session_service, "invalidate_session", new=AsyncMock()) as mock_invalidate:
-                await session_service._enforce_session_limit(user_id)
+        ), patch.object(session_service, "invalidate_session", new=AsyncMock()) as mock_invalidate:
+            await session_service._enforce_session_limit(user_id)
 
-                # Should invalidate oldest session
-                assert mock_invalidate.call_count == 1
+            # Should invalidate oldest session
+            assert mock_invalidate.call_count == 1
 
     @pytest.mark.asyncio
     async def test_no_enforcement_under_limit(self, session_service, mock_redis):
@@ -406,12 +406,11 @@ class TestConcurrentSessionLimits:
 
         with patch.object(
             session_service, "list_user_sessions", return_value=existing_sessions
-        ):
-            with patch.object(session_service, "invalidate_session", new=AsyncMock()) as mock_invalidate:
-                await session_service._enforce_session_limit(user_id)
+        ), patch.object(session_service, "invalidate_session", new=AsyncMock()) as mock_invalidate:
+            await session_service._enforce_session_limit(user_id)
 
-                # Should not invalidate any sessions
-                assert mock_invalidate.call_count == 0
+            # Should not invalidate any sessions
+            assert mock_invalidate.call_count == 0
 
 
 # Test Session Validation
@@ -549,12 +548,11 @@ class TestSessionCleanup:
 
         with patch.object(
             session_service, "list_user_sessions", return_value=sessions
-        ):
-            with patch.object(session_service, "invalidate_session", new=AsyncMock()) as mock_invalidate:
-                count = await session_service.cleanup_expired_sessions(user_id)
+        ), patch.object(session_service, "invalidate_session", new=AsyncMock()) as mock_invalidate:
+            count = await session_service.cleanup_expired_sessions(user_id)
 
-                assert count == 1
-                assert mock_invalidate.call_count == 1
+            assert count == 1
+            assert mock_invalidate.call_count == 1
 
     @pytest.mark.asyncio
     async def test_get_active_session_count(self, session_service, mock_redis):

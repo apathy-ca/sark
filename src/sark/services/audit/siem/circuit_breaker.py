@@ -17,10 +17,11 @@ Configuration:
 """
 
 import asyncio
-import time
+from collections.abc import Callable
 from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Callable, TypeVar
+import time
+from typing import Any, TypeVar
 
 import structlog
 
@@ -161,7 +162,7 @@ class CircuitBreaker:
 
             return result
 
-        except asyncio.TimeoutError as e:
+        except TimeoutError:
             async with self._lock:
                 self._on_failure()
             logger.error(

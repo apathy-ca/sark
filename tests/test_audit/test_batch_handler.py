@@ -215,7 +215,7 @@ class TestBatchHandler:
 
         # Don't start the worker so queue fills up
         # Fill the queue
-        for i in range(3):
+        for _i in range(3):
             result = await handler.enqueue(audit_event)
             assert result is True
 

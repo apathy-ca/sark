@@ -1,8 +1,7 @@
 """API Key authentication for service-to-service communication."""
 
-import secrets
 from datetime import UTC, datetime, timedelta
-from typing import Any
+import secrets
 from uuid import UUID
 
 from fastapi import Depends, HTTPException, Security, status

@@ -1,7 +1,7 @@
 """Tests for BaseSIEM abstract class and related components."""
 
 from datetime import UTC, datetime
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import AsyncMock
 from uuid import uuid4
 
 import pytest

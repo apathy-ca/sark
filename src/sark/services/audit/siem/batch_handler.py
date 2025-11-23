@@ -1,9 +1,10 @@
 """Batch handler for aggregating and forwarding audit events."""
 
 import asyncio
+from collections.abc import Callable
+import contextlib
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from typing import Callable
 
 import structlog
 
@@ -88,10 +89,8 @@ class BatchHandler:
 
         if self._worker_task:
             self._worker_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._worker_task
-            except asyncio.CancelledError:
-                pass
 
         self._logger.info(
             "batch_handler_stopped",
@@ -156,7 +155,7 @@ class BatchHandler:
                     if len(self._current_batch) >= self.config.batch_size:
                         await self._flush_current_batch()
 
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     # Timeout occurred, check if we should flush
                     if len(self._current_batch) > 0:
                         await self._flush_current_batch()

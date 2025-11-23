@@ -2,7 +2,6 @@
 
 from prometheus_client import Counter, Gauge, Histogram
 
-
 # Event forwarding metrics
 siem_events_sent_total = Counter(
     "siem_events_sent_total",

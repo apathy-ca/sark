@@ -4,11 +4,10 @@ This module provides comprehensive metrics collection for policy evaluation
 including latency, cache performance, and policy decision tracking.
 """
 
-from prometheus_client import Counter, Histogram, Gauge, Info
-import time
-from typing import Optional
 from functools import wraps
+import time
 
+from prometheus_client import Counter, Gauge, Histogram, Info
 
 # ============================================================================
 # POLICY EVALUATION METRICS
@@ -288,7 +287,7 @@ def track_cache_operation(operation: str):
 
                 return result
 
-            except Exception as e:
+            except Exception:
                 # Track errors
                 cache_operations_total.labels(operation=operation, result="error").inc()
                 redis_connection_errors.inc()

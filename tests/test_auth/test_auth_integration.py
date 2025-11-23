@@ -1,17 +1,16 @@
 """Integration tests for all authentication flows and provider failover."""
 
-import pytest
-from unittest.mock import Mock, patch, AsyncMock
-from datetime import datetime, timedelta
+from datetime import datetime
+from unittest.mock import AsyncMock, Mock, patch
 import uuid
 
+import pytest
+
+from sark.models.api_key import APIKey
+from sark.services.auth.api_keys import APIKeyService
+from sark.services.auth.providers.ldap import LDAPProvider
 from sark.services.auth.providers.oidc import OIDCProvider
 from sark.services.auth.providers.saml import SAMLProvider
-from sark.services.auth.providers.ldap import LDAPProvider
-from sark.services.auth.providers.base import UserInfo
-from sark.services.auth.api_keys import APIKeyService
-from sark.models.api_key import APIKey
-
 
 # Fixtures
 

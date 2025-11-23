@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class Session(BaseModel):
@@ -25,13 +25,10 @@ class Session(BaseModel):
         default_factory=dict, description="Additional session metadata"
     )
 
-    class Config:
-        """Pydantic configuration."""
-
-        json_encoders = {
-            datetime: lambda v: v.isoformat(),
-            UUID: lambda v: str(v),
-        }
+    model_config = ConfigDict(
+        # JSON serialization handled by to_dict() method
+        ser_json_timedelta="iso8601",
+    )
 
     def is_expired(self, current_time: datetime | None = None) -> bool:
         """Check if session is expired.
@@ -106,13 +103,10 @@ class SessionResponse(BaseModel):
     user_agent: str | None = None
     is_expired: bool = False
 
-    class Config:
-        """Pydantic configuration."""
-
-        json_encoders = {
-            datetime: lambda v: v.isoformat(),
-            UUID: lambda v: str(v),
-        }
+    model_config = ConfigDict(
+        # JSON serialization uses Pydantic V2 defaults
+        ser_json_timedelta="iso8601",
+    )
 
 
 class SessionListResponse(BaseModel):

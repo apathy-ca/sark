@@ -1,12 +1,13 @@
 """Tests for LDAP authentication provider."""
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
-from ldap3 import Server, Connection, SUBTREE
-from ldap3.core.exceptions import LDAPException, LDAPBindError
+from unittest.mock import Mock, patch
 
-from sark.services.auth.providers.ldap import LDAPProvider, LDAPProviderConfig
+from ldap3 import Connection
+from ldap3.core.exceptions import LDAPBindError, LDAPException
+import pytest
+
 from sark.services.auth.providers.base import UserInfo
+from sark.services.auth.providers.ldap import LDAPProvider, LDAPProviderConfig
 
 
 @pytest.fixture
@@ -183,18 +184,17 @@ class TestAuthentication:
 
         mock_user_conn = Mock(spec=Connection)
 
-        with patch.object(ldap_provider, "_get_connection") as mock_get_conn:
-            with patch.object(
-                ldap_provider, "_get_user_groups", return_value=["developers", "admins"]
-            ):
-                mock_get_conn.side_effect = [mock_service_conn, mock_user_conn]
+        with patch.object(ldap_provider, "_get_connection") as mock_get_conn, patch.object(
+            ldap_provider, "_get_user_groups", return_value=["developers", "admins"]
+        ):
+            mock_get_conn.side_effect = [mock_service_conn, mock_user_conn]
 
-                user_info = await ldap_provider.authenticate(
-                    {"username": "jdoe", "password": "secret"}
-                )
+            user_info = await ldap_provider.authenticate(
+                {"username": "jdoe", "password": "secret"}
+            )
 
-                assert user_info is not None
-                assert user_info.groups == ["developers", "admins"]
+            assert user_info is not None
+            assert user_info.groups == ["developers", "admins"]
 
 
 # Test Group Lookup

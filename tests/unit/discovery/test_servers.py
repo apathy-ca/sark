@@ -5,7 +5,6 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
 import pytest
-from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from sark.models.mcp_server import MCPServer, MCPTool, SensitivityLevel, ServerStatus, TransportType
@@ -258,7 +257,7 @@ class TestServerRegistration:
 
         mock_db.flush.side_effect = flush_side_effect
 
-        server = await discovery_service.register_server(
+        await discovery_service.register_server(
             name="complex-tools-server",
             transport=TransportType.HTTP,
             mcp_version="2025-06-18",

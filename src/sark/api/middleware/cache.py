@@ -9,10 +9,10 @@ Performance Impact:
 - Reduces database connection pool usage
 """
 
+from collections.abc import Callable
 import hashlib
 import json
 import logging
-from typing import Callable
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware

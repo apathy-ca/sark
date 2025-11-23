@@ -223,8 +223,8 @@ class SAMLProvider(AuthProvider):
         Returns:
             Base64-encoded SAML AuthnRequest
         """
-        import uuid
         from datetime import UTC, datetime
+        import uuid
 
         request_id = f"_{uuid.uuid4()}"
         issue_instant = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")

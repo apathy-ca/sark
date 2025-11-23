@@ -1,15 +1,14 @@
 """Session management service with Redis backend."""
 
+from datetime import datetime, timedelta
 import json
 import logging
-import uuid
-from datetime import datetime, timedelta
 from typing import Any
+import uuid
 
-import redis.asyncio as aioredis
 from redis.asyncio import Redis
 
-from sark.models.session import Session, SessionCreateRequest, SessionResponse
+from sark.models.session import Session
 
 logger = logging.getLogger(__name__)
 

@@ -1,8 +1,8 @@
 """API Key management endpoints."""
 
-import uuid
 from datetime import datetime
 from typing import Annotated
+import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
@@ -144,7 +144,7 @@ async def create_api_key(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e),
-        )
+        ) from e
 
 
 @router.get("", response_model=list[APIKeyResponse])
@@ -217,7 +217,7 @@ async def update_api_key(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e),
-        )
+        ) from e
 
 
 @router.post("/{key_id}/rotate", response_model=APIKeyRotateResponse)
