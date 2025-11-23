@@ -6,7 +6,6 @@ from ldap3 import Connection
 from ldap3.core.exceptions import LDAPBindError, LDAPException
 import pytest
 
-from sark.services.auth.providers.base import UserInfo
 from sark.services.auth.providers.ldap import LDAPProvider, LDAPProviderConfig
 
 
