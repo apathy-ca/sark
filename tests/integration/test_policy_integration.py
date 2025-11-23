@@ -27,7 +27,7 @@ from sark.models.user import User
 @pytest.fixture
 async def opa_client():
     """OPA client for policy tests."""
-    return OPAClient(base_url="http://localhost:8181")
+    return OPAClient(opa_url="http://localhost:8181")
 
 
 @pytest.fixture

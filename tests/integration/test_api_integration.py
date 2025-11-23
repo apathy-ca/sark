@@ -74,14 +74,18 @@ def admin_user():
 @pytest.fixture
 def auth_headers(jwt_handler, test_user):
     """Generate authentication headers."""
-    token = jwt_handler.create_access_token(user_id=test_user.id)
+    token = jwt_handler.create_access_token(
+        user_id=test_user.id, email=test_user.email, role=test_user.role
+    )
     return {"Authorization": f"Bearer {token}"}
 
 
 @pytest.fixture
 def admin_headers(jwt_handler, admin_user):
     """Generate admin authentication headers."""
-    token = jwt_handler.create_access_token(user_id=admin_user.id)
+    token = jwt_handler.create_access_token(
+        user_id=admin_user.id, email=admin_user.email, role=admin_user.role
+    )
     return {"Authorization": f"Bearer {token}"}
 
 

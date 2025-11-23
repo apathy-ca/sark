@@ -85,7 +85,7 @@ def admin_user():
 @pytest.fixture
 async def opa_client():
     """OPA client for policy tests."""
-    client = OPAClient(base_url="http://localhost:8181")
+    client = OPAClient(opa_url="http://localhost:8181")
     return client
 
 
