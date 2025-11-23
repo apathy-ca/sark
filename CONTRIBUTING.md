@@ -519,10 +519,50 @@ Update relevant docs when changing:
 
 ### Documentation Files
 
+SARK maintains comprehensive operational documentation:
+
+**Core Documentation:**
 - `README.md` - Project overview and quick start
 - `CONTRIBUTING.md` - This file
-- `docs/` - Detailed documentation (add as needed)
-- Docstrings - In-code documentation
+- `SECURITY.md` - Security policy and vulnerability reporting
+- `CHANGELOG.md` - Version history and changes
+
+**Operational Documentation** (docs/):
+- `QUICK_START.md` - 15-minute getting started guide
+- `API_REFERENCE.md` - Complete API documentation
+- `ARCHITECTURE.md` - System architecture with diagrams
+- `DEPLOYMENT.md` - Kubernetes deployment guide
+- `OPERATIONS_RUNBOOK.md` - Day-to-day operational procedures
+- `DISASTER_RECOVERY.md` - DR procedures and backup strategy
+- `TROUBLESHOOTING.md` - Master troubleshooting guide
+
+**Performance & Optimization:**
+- `PERFORMANCE_TESTING.md` - Performance testing methodology
+- `DATABASE_OPTIMIZATION.md` - Database optimization guide
+- `REDIS_OPTIMIZATION.md` - Redis optimization guide
+
+**Security:**
+- `SECURITY_BEST_PRACTICES.md` - Security development practices
+- `SECURITY_HARDENING.md` - Security hardening checklist
+- `INCIDENT_RESPONSE.md` - Incident response playbooks
+
+**Project Documentation:**
+- `PHASE2_COMPLETION_REPORT.md` - Phase 2 summary
+- `DEVELOPMENT_LOG.md` - Complete development history
+- `PRODUCTION_HANDOFF.md` - Production deployment handoff
+- `KNOWN_ISSUES.md` - Known issues and limitations
+
+**Complete documentation index**: See `docs/PHASE2_COMPLETION_REPORT.md` for full documentation suite.
+
+### Documentation Standards
+
+When contributing documentation:
+1. Follow existing templates and structure
+2. Include code examples that actually work
+3. Add diagrams for complex flows (use Mermaid)
+4. Cross-reference related documentation
+5. Test all commands and procedures
+6. Update table of contents
 
 ## Additional Resources
 
