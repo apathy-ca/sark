@@ -34,6 +34,10 @@ class AuthorizationDecision(BaseModel):
     audit_id: str | None = None
 
 
+# Alias for backward compatibility
+PolicyDecision = AuthorizationDecision
+
+
 class OPAClient:
     """Client for interacting with Open Policy Agent."""
 

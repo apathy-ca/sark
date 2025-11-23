@@ -1,0 +1,472 @@
+{
+  "dashboard": {
+    "title": "SARK - SIEM & Security Events",
+    "tags": ["sark", "siem", "security"],
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 1,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "SIEM Events Rate",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "sum(rate(sark_siem_events_total[5m])) by (event_type)",
+            "legendFormat": "{{event_type}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "reqps", "label": "Events/sec"},
+          {"format": "short"}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2,
+        "stack": true
+      },
+      {
+        "id": 2,
+        "title": "SIEM Export Status",
+        "type": "gauge",
+        "gridPos": {"h": 8, "w": 6, "x": 12, "y": 0},
+        "targets": [
+          {
+            "expr": "sum(rate(sark_siem_exports_total{status=\"success\"}[5m])) / sum(rate(sark_siem_exports_total[5m])) * 100",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "showThresholdLabels": true,
+          "showThresholdMarkers": true
+        },
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 90, "color": "yellow"},
+                {"value": 98, "color": "green"}
+              ]
+            },
+            "unit": "percent",
+            "min": 0,
+            "max": 100
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "SIEM Export Failures",
+        "type": "stat",
+        "gridPos": {"h": 8, "w": 6, "x": 18, "y": 0},
+        "targets": [
+          {
+            "expr": "sum(increase(sark_siem_exports_total{status=\"failed\"}[1h]))",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "graphMode": "area",
+          "colorMode": "background",
+          "textMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 1, "color": "yellow"},
+                {"value": 10, "color": "red"}
+              ]
+            }
+          }
+        },
+        "alert": {
+          "name": "SIEM Export Failures",
+          "conditions": [
+            {
+              "evaluator": {"params": [5], "type": "gt"},
+              "operator": {"type": "and"},
+              "query": {"params": ["A", "5m", "now"]},
+              "reducer": {"params": [], "type": "sum"},
+              "type": "query"
+            }
+          ],
+          "executionErrorState": "alerting",
+          "frequency": "5m",
+          "handler": 1,
+          "message": "SIEM export failures detected",
+          "noDataState": "alerting"
+        }
+      },
+      {
+        "id": 4,
+        "title": "Security Events by Severity",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "targets": [
+          {
+            "expr": "sum(rate(sark_siem_events_total[5m])) by (severity)",
+            "legendFormat": "{{severity}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "reqps", "label": "Events/sec"},
+          {"format": "short"}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2,
+        "stack": true,
+        "seriesOverrides": [
+          {"alias": "critical", "color": "#C4162A"},
+          {"alias": "high", "color": "#FF7383"},
+          {"alias": "medium", "color": "#FADE2A"},
+          {"alias": "low", "color": "#73BF69"}
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Failed Login Attempts (Potential Brute Force)",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "targets": [
+          {
+            "expr": "sum(rate(sark_auth_attempts_total{status=\"failed\"}[5m])) by (user_id)",
+            "legendFormat": "{{user_id}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "reqps", "label": "Failed Attempts/sec"},
+          {"format": "short"}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2,
+        "thresholds": [
+          {"value": 5, "colorMode": "critical", "op": "gt", "fill": true, "line": true}
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Anomalous Access Patterns",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+        "targets": [
+          {
+            "expr": "sum(rate(sark_siem_events_total{event_type=\"anomalous_access\"}[5m]))",
+            "legendFormat": "Anomalous Access",
+            "refId": "A"
+          },
+          {
+            "expr": "sum(rate(sark_siem_events_total{event_type=\"unusual_time_access\"}[5m]))",
+            "legendFormat": "Unusual Time Access",
+            "refId": "B"
+          },
+          {
+            "expr": "sum(rate(sark_siem_events_total{event_type=\"geo_anomaly\"}[5m]))",
+            "legendFormat": "Geographic Anomaly",
+            "refId": "C"
+          }
+        ],
+        "yaxes": [
+          {"format": "reqps", "label": "Events/sec"},
+          {"format": "short"}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2
+      },
+      {
+        "id": 7,
+        "title": "Policy Violations",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+        "targets": [
+          {
+            "expr": "sum(rate(sark_policy_violations_total[5m])) by (policy_name)",
+            "legendFormat": "{{policy_name}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "reqps", "label": "Violations/sec"},
+          {"format": "short"}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2
+      },
+      {
+        "id": 8,
+        "title": "Suspicious IP Addresses",
+        "type": "table",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24},
+        "targets": [
+          {
+            "expr": "topk(20, sum(rate(sark_siem_events_total{event_type=\"suspicious_ip\"}[5m])) by (ip_address))",
+            "refId": "A",
+            "format": "table",
+            "instant": true
+          }
+        ],
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {"Time": true},
+              "renameByName": {
+                "ip_address": "IP Address",
+                "Value": "Events/sec"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Top Security Events by Type",
+        "type": "bargauge",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24},
+        "targets": [
+          {
+            "expr": "topk(15, sum(rate(sark_siem_events_total[5m])) by (event_type))",
+            "refId": "A",
+            "format": "time_series"
+          }
+        ],
+        "options": {
+          "orientation": "horizontal",
+          "displayMode": "gradient",
+          "showUnfilled": true
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps"
+          }
+        }
+      },
+      {
+        "id": 10,
+        "title": "SIEM Export Latency",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 32},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(sark_siem_export_duration_seconds_bucket[5m])) by (le, destination)) * 1000",
+            "legendFormat": "{{destination}} P95",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "ms", "label": "Latency"},
+          {"format": "short"}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2,
+        "thresholds": [
+          {"value": 1000, "colorMode": "critical", "op": "gt", "fill": true, "line": true}
+        ]
+      },
+      {
+        "id": 11,
+        "title": "SIEM Queue Depth",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 32},
+        "targets": [
+          {
+            "expr": "sark_siem_queue_depth",
+            "legendFormat": "Queue Depth",
+            "refId": "A"
+          },
+          {
+            "expr": "sark_siem_queue_capacity",
+            "legendFormat": "Queue Capacity",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {"format": "short", "label": "Events"},
+          {"format": "short"}
+        ],
+        "lines": true,
+        "fill": 1,
+        "linewidth": 2,
+        "alert": {
+          "name": "SIEM Queue Near Capacity",
+          "conditions": [
+            {
+              "evaluator": {"params": [0.8], "type": "gt"},
+              "operator": {"type": "and"},
+              "query": {"params": ["A", "5m", "now"]},
+              "reducer": {"params": [], "type": "avg"},
+              "type": "query"
+            }
+          ],
+          "executionErrorState": "alerting",
+          "frequency": "1m",
+          "handler": 1,
+          "message": "SIEM queue near capacity (>80%)",
+          "noDataState": "no_data"
+        }
+      },
+      {
+        "id": 12,
+        "title": "MFA Bypass Attempts",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 0, "y": 40},
+        "targets": [
+          {
+            "expr": "sum(increase(sark_siem_events_total{event_type=\"mfa_bypass_attempt\"}[1h]))",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "graphMode": "area",
+          "colorMode": "background",
+          "textMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 1, "color": "red"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 13,
+        "title": "Privilege Escalation Attempts",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 6, "y": 40},
+        "targets": [
+          {
+            "expr": "sum(increase(sark_siem_events_total{event_type=\"privilege_escalation\"}[1h]))",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "graphMode": "area",
+          "colorMode": "background",
+          "textMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 1, "color": "red"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 14,
+        "title": "Data Exfiltration Alerts",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 12, "y": 40},
+        "targets": [
+          {
+            "expr": "sum(increase(sark_siem_events_total{event_type=\"data_exfiltration\"}[1h]))",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "graphMode": "area",
+          "colorMode": "background",
+          "textMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 1, "color": "red"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 15,
+        "title": "Unauthorized Access Attempts",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 18, "y": 40},
+        "targets": [
+          {
+            "expr": "sum(increase(sark_policy_denials_total{denial_reason=\"unauthorized\"}[1h]))",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "graphMode": "area",
+          "colorMode": "background",
+          "textMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 10, "color": "yellow"},
+                {"value": 50, "color": "red"}
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "datasource",
+          "type": "datasource",
+          "query": "prometheus",
+          "current": {"text": "Prometheus", "value": "Prometheus"}
+        },
+        {
+          "name": "severity",
+          "type": "custom",
+          "query": "critical,high,medium,low",
+          "multi": true,
+          "includeAll": true
+        }
+      ]
+    },
+    "time": {"from": "now-1h", "to": "now"},
+    "timepicker": {
+      "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h"]
+    },
+    "annotations": {
+      "list": [
+        {
+          "datasource": "Prometheus",
+          "enable": true,
+          "expr": "ALERTS{job=\"sark\",alertstate=\"firing\",severity=~\"critical|high\"}",
+          "name": "Security Alerts",
+          "step": "60s",
+          "tagKeys": "alertname,severity",
+          "titleFormat": "Security Alert: {{alertname}}",
+          "textFormat": "{{annotations.description}}"
+        }
+      ]
+    }
+  }
+}

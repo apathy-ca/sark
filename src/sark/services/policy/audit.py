@@ -26,7 +26,10 @@ from sark.models.policy_audit import (
     PolicyDecisionLog,
     PolicyDecisionResult,
 )
-from sark.services.policy.opa_client import AuthorizationInput, PolicyDecision
+from sark.services.policy.opa_client import AuthorizationDecision, AuthorizationInput
+
+# Alias for backward compatibility
+PolicyDecision = AuthorizationDecision
 
 logger = structlog.get_logger(__name__)
 
