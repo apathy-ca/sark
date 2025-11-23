@@ -1,13 +1,12 @@
 """Unit tests for Bulk Operations Service."""
 
-from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from sark.models.mcp_server import ServerStatus, TransportType
+from sark.models.mcp_server import ServerStatus
 from sark.services.bulk import BulkOperationResult, BulkOperationsService
 
 
@@ -175,18 +174,17 @@ class TestBulkRegisterServers:
                 bulk_service.discovery_service,
                 "register_server",
                 new=AsyncMock(return_value=mock_server),
+            ), patch.object(
+                bulk_service.audit_service, "log_event", new=AsyncMock()
             ):
-                with patch.object(
-                    bulk_service.audit_service, "log_event", new=AsyncMock()
-                ):
-                    result = await bulk_service.bulk_register_servers(
-                        servers=servers,
-                        fail_on_first_error=False,
-                    )
+                result = await bulk_service.bulk_register_servers(
+                    servers=servers,
+                    fail_on_first_error=False,
+                )
 
-                    assert result.total == 3
-                    assert result.success_count == 3
-                    assert result.failure_count == 0
+                assert result.total == 3
+                assert result.success_count == 3
+                assert result.failure_count == 0
 
     @pytest.mark.asyncio
     async def test_bulk_register_best_effort_partial_failure(
@@ -220,19 +218,18 @@ class TestBulkRegisterServers:
                 bulk_service.discovery_service,
                 "register_server",
                 new=AsyncMock(return_value=mock_server),
+            ), patch.object(
+                bulk_service.audit_service, "log_event", new=AsyncMock()
             ):
-                with patch.object(
-                    bulk_service.audit_service, "log_event", new=AsyncMock()
-                ):
-                    result = await bulk_service.bulk_register_servers(
-                        servers=servers,
-                        fail_on_first_error=False,
-                    )
+                result = await bulk_service.bulk_register_servers(
+                    servers=servers,
+                    fail_on_first_error=False,
+                )
 
-                    assert result.total == 3
-                    assert result.success_count == 2
-                    assert result.failure_count == 1
-                    assert "Policy denied" in result.failed[0]["error"]
+                assert result.total == 3
+                assert result.success_count == 2
+                assert result.failure_count == 1
+                assert "Policy denied" in result.failed[0]["error"]
 
     @pytest.mark.asyncio
     async def test_bulk_register_best_effort_registration_error(
@@ -264,18 +261,17 @@ class TestBulkRegisterServers:
                 bulk_service.discovery_service,
                 "register_server",
                 new=AsyncMock(side_effect=[mock_server, Exception("DB error")]),
+            ), patch.object(
+                bulk_service.audit_service, "log_event", new=AsyncMock()
             ):
-                with patch.object(
-                    bulk_service.audit_service, "log_event", new=AsyncMock()
-                ):
-                    result = await bulk_service.bulk_register_servers(
-                        servers=servers,
-                        fail_on_first_error=False,
-                    )
+                result = await bulk_service.bulk_register_servers(
+                    servers=servers,
+                    fail_on_first_error=False,
+                )
 
-                    assert result.total == 2
-                    assert result.success_count == 1
-                    assert result.failure_count == 1
+                assert result.total == 2
+                assert result.success_count == 1
+                assert result.failure_count == 1
 
     @pytest.mark.asyncio
     async def test_bulk_register_transactional_all_success(
@@ -312,18 +308,17 @@ class TestBulkRegisterServers:
                 bulk_service.discovery_service,
                 "register_server",
                 new=AsyncMock(return_value=mock_server),
+            ), patch.object(
+                bulk_service.audit_service, "log_event", new=AsyncMock()
             ):
-                with patch.object(
-                    bulk_service.audit_service, "log_event", new=AsyncMock()
-                ):
-                    result = await bulk_service.bulk_register_servers(
-                        servers=servers,
-                        fail_on_first_error=True,
-                    )
+                result = await bulk_service.bulk_register_servers(
+                    servers=servers,
+                    fail_on_first_error=True,
+                )
 
-                    assert result.total == 2
-                    assert result.success_count == 2
-                    assert result.failure_count == 0
+                assert result.total == 2
+                assert result.success_count == 2
+                assert result.failure_count == 0
 
     @pytest.mark.asyncio
     async def test_bulk_register_transactional_policy_denied(
@@ -420,16 +415,15 @@ class TestBulkUpdateServerStatus:
             bulk_service.discovery_service,
             "update_server_status",
             new=AsyncMock(return_value=mock_server),
-        ):
-            with patch.object(bulk_service.audit_service, "log_event", new=AsyncMock()):
-                result = await bulk_service.bulk_update_server_status(
-                    updates=updates,
-                    fail_on_first_error=False,
-                )
+        ), patch.object(bulk_service.audit_service, "log_event", new=AsyncMock()):
+            result = await bulk_service.bulk_update_server_status(
+                updates=updates,
+                fail_on_first_error=False,
+            )
 
-                assert result.total == 3
-                assert result.success_count == 3
-                assert result.failure_count == 0
+            assert result.total == 3
+            assert result.success_count == 3
+            assert result.failure_count == 0
 
     @pytest.mark.asyncio
     async def test_bulk_update_status_best_effort_partial_failure(self, bulk_service):
@@ -455,16 +449,15 @@ class TestBulkUpdateServerStatus:
             bulk_service.discovery_service,
             "update_server_status",
             new=AsyncMock(side_effect=update_side_effect),
-        ):
-            with patch.object(bulk_service.audit_service, "log_event", new=AsyncMock()):
-                result = await bulk_service.bulk_update_server_status(
-                    updates=updates,
-                    fail_on_first_error=False,
-                )
+        ), patch.object(bulk_service.audit_service, "log_event", new=AsyncMock()):
+            result = await bulk_service.bulk_update_server_status(
+                updates=updates,
+                fail_on_first_error=False,
+            )
 
-                assert result.total == 3
-                assert result.success_count == 2
-                assert result.failure_count == 1
+            assert result.total == 3
+            assert result.success_count == 2
+            assert result.failure_count == 1
 
     @pytest.mark.asyncio
     async def test_bulk_update_status_transactional_all_success(self, bulk_service, mock_db):
@@ -488,16 +481,15 @@ class TestBulkUpdateServerStatus:
             bulk_service.discovery_service,
             "update_server_status",
             new=AsyncMock(return_value=mock_server),
-        ):
-            with patch.object(bulk_service.audit_service, "log_event", new=AsyncMock()):
-                result = await bulk_service.bulk_update_server_status(
-                    updates=updates,
-                    fail_on_first_error=True,
-                )
+        ), patch.object(bulk_service.audit_service, "log_event", new=AsyncMock()):
+            result = await bulk_service.bulk_update_server_status(
+                updates=updates,
+                fail_on_first_error=True,
+            )
 
-                assert result.total == 2
-                assert result.success_count == 2
-                assert result.failure_count == 0
+            assert result.total == 2
+            assert result.success_count == 2
+            assert result.failure_count == 0
 
     @pytest.mark.asyncio
     async def test_bulk_update_status_transactional_error(self, bulk_service, mock_db):

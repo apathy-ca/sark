@@ -4,6 +4,7 @@ These tests prepare for future SIEM integration implementations
 and test graceful degradation when SIEM services are unavailable.
 """
 
+import contextlib
 from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
@@ -137,7 +138,7 @@ class TestSplunkIntegration:
     ):
         """Test event formatting for Splunk HEC."""
         # Mock future Splunk HEC client
-        mock_splunk = AsyncMock()
+        AsyncMock()
 
         # Expected Splunk HEC format
         expected_payload = {
@@ -286,12 +287,11 @@ class TestDatadogIntegration:
 
         with patch.object(
             audit_service, "_forward_to_siem", new=mock_datadog_network_error
-        ):
-            with pytest.raises(ConnectionError):
-                await audit_service.log_event(
-                    event_type=AuditEventType.SECURITY_VIOLATION,
-                    severity=SeverityLevel.HIGH,
-                )
+        ), pytest.raises(ConnectionError):
+            await audit_service.log_event(
+                event_type=AuditEventType.SECURITY_VIOLATION,
+                severity=SeverityLevel.HIGH,
+            )
 
 
 class TestCircuitBreakerPattern:
@@ -315,7 +315,7 @@ class TestCircuitBreakerPattern:
             audit_service, "_forward_to_siem", new=mock_siem_with_circuit_breaker
         ):
             # First 3 failures should increment counter
-            for i in range(max_failures):
+            for _i in range(max_failures):
                 with pytest.raises(ConnectionError):
                     await audit_service.log_event(
                         event_type=AuditEventType.SECURITY_VIOLATION,
@@ -417,10 +417,8 @@ class TestGracefulDegradation:
                 raise
 
         with patch.object(audit_service, "_forward_to_siem", new=mock_siem_with_fallback):
-            try:
+            with contextlib.suppress(ConnectionError):
                 await audit_service._forward_to_siem(high_severity_event)
-            except ConnectionError:
-                pass
 
             # Verify event was queued for retry
             assert len(failed_events_queue) == 1
@@ -449,10 +447,8 @@ class TestGracefulDegradation:
         with patch.object(
             audit_service, "_forward_to_siem", new=mock_siem_with_local_fallback
         ):
-            try:
+            with contextlib.suppress(ConnectionError):
                 await audit_service._forward_to_siem(critical_severity_event)
-            except ConnectionError:
-                pass
 
             # Verify fallback logging occurred
             assert len(local_log) == 1
@@ -472,16 +468,12 @@ class TestMultipleSIEMTargets:
             nonlocal splunk_called, datadog_called
 
             # Simulate forwarding to Splunk
-            try:
+            with contextlib.suppress(Exception):
                 splunk_called = True
-            except Exception:
-                pass
 
             # Simulate forwarding to Datadog
-            try:
+            with contextlib.suppress(Exception):
                 datadog_called = True
-            except Exception:
-                pass
 
         with patch.object(
             audit_service, "_forward_to_siem", new=mock_forward_to_multiple
@@ -510,17 +502,16 @@ class TestMultipleSIEMTargets:
 
         with patch.object(
             audit_service, "_forward_to_siem", new=mock_partial_siem_failure
-        ):
-            with pytest.raises(ConnectionError):
-                await audit_service._forward_to_siem(
-                    AuditEvent(
-                        id=uuid4(),
-                        timestamp=datetime.now(UTC),
-                        event_type=AuditEventType.SECURITY_VIOLATION,
-                        severity=SeverityLevel.HIGH,
-                        details={},
-                    )
+        ), pytest.raises(ConnectionError):
+            await audit_service._forward_to_siem(
+                AuditEvent(
+                    id=uuid4(),
+                    timestamp=datetime.now(UTC),
+                    event_type=AuditEventType.SECURITY_VIOLATION,
+                    severity=SeverityLevel.HIGH,
+                    details={},
                 )
+            )
 
         assert results["splunk"] is True
         assert results["datadog"] is False

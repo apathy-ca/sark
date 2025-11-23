@@ -1,9 +1,8 @@
 """Tests for SIEM error handler."""
 
 import asyncio
-import json
-import tempfile
 from datetime import UTC, datetime
+import json
 from pathlib import Path
 from uuid import uuid4
 

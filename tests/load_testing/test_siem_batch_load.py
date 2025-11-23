@@ -5,23 +5,18 @@ the actual BatchHandler implementation.
 """
 
 import asyncio
+from datetime import UTC, datetime
 import json
+from pathlib import Path
 import statistics
 import time
-from datetime import UTC, datetime
-from pathlib import Path
 from typing import Any
-from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
 from sark.models.audit import AuditEvent, AuditEventType, SeverityLevel
 from sark.services.audit.siem import (
     BatchConfig,
     BatchHandler,
-    DatadogConfig,
-    DatadogSIEM,
-    SplunkConfig,
-    SplunkSIEM,
 )
 
 
@@ -226,7 +221,7 @@ class BatchLoadTester:
         print(f"Success Rate: {results['success_rate_percentage']:.2f}%")
         print(f"Actual Throughput: {actual_throughput:,.2f} events/min ({actual_throughput/60:.2f} events/sec)")
         print(f"Throughput Achievement: {results['throughput_percentage']:.2f}%")
-        print(f"\nBatch Latency Statistics:")
+        print("\nBatch Latency Statistics:")
         print(f"  Average: {results['batch_latency_avg_ms']:.2f}ms")
         print(f"  Median (P50): {results['batch_latency_p50_ms']:.2f}ms")
         print(f"  P95: {results['batch_latency_p95_ms']:.2f}ms")
@@ -370,7 +365,7 @@ class BatchLoadTester:
         print(f"Success Rate: {results['success_rate_percentage']:.2f}%")
         print(f"Actual Throughput: {actual_throughput:,.2f} events/min ({actual_throughput/60:.2f} events/sec)")
         print(f"Throughput Achievement: {results['throughput_percentage']:.2f}%")
-        print(f"\nBatch Latency Statistics:")
+        print("\nBatch Latency Statistics:")
         print(f"  Average: {results['batch_latency_avg_ms']:.2f}ms")
         print(f"  Median (P50): {results['batch_latency_p50_ms']:.2f}ms")
         print(f"  P95: {results['batch_latency_p95_ms']:.2f}ms")

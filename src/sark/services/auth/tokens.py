@@ -7,13 +7,11 @@ This service handles:
 - Token revocation via Redis
 """
 
-import secrets
 from datetime import UTC, datetime, timedelta
-from typing import Tuple
+import secrets
 
-import redis.asyncio as aioredis
-import structlog
 from jose import JWTError, jwt
+import structlog
 
 from sark.config import get_settings
 
@@ -112,7 +110,7 @@ class TokenService:
 
         return token
 
-    async def create_refresh_token(self, user_id: str) -> Tuple[str, datetime]:
+    async def create_refresh_token(self, user_id: str) -> tuple[str, datetime]:
         """Create a new refresh token and store it in Redis.
 
         Args:
@@ -230,7 +228,7 @@ class TokenService:
 
     async def rotate_refresh_token(
         self, old_refresh_token: str, user_id: str
-    ) -> Tuple[str, datetime] | None:
+    ) -> tuple[str, datetime] | None:
         """Rotate a refresh token (revoke old, issue new).
 
         Args:

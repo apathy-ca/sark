@@ -12,11 +12,12 @@ Features:
 """
 
 import asyncio
+from collections.abc import Awaitable, Callable
+from dataclasses import dataclass
 import hashlib
 import json
 import time
-from dataclasses import dataclass
-from typing import Any, Callable, Awaitable
+from typing import Any, ClassVar
 
 import redis.asyncio as redis
 import structlog
@@ -86,7 +87,7 @@ class PolicyCache:
     DEFAULT_TTL_SECONDS = 300
 
     # Optimized TTL settings based on performance analysis
-    OPTIMIZED_TTL = {
+    OPTIMIZED_TTL: ClassVar[dict[str, int]] = {
         "critical": 60,  # Increased from 30s to reduce revalidation overhead
         "confidential": 120,  # Increased from 60s
         "internal": 180,  # Same as medium

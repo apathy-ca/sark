@@ -6,8 +6,8 @@ user context extraction from authenticated requests.
 
 from typing import Annotated
 
-import structlog
 from fastapi import Depends, HTTPException, Request, status
+import structlog
 
 logger = structlog.get_logger(__name__)
 

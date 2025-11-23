@@ -30,12 +30,11 @@ Usage:
 
 import random
 import time
+from typing import ClassVar
 import uuid
-from typing import Any
 
-from locust import HttpUser, TaskSet, between, task
+from locust import TaskSet, between, task
 from locust.contrib.fasthttp import FastHttpUser
-
 from utils.test_data import TestDataGenerator
 
 # Test data generator
@@ -238,7 +237,7 @@ class MixedWorkloadUser(FastHttpUser):
     simulating real-world usage patterns.
     """
     wait_time = between(1, 3)  # Wait 1-3 seconds between requests
-    tasks = {
+    tasks: ClassVar = {
         ServerManagementTasks: 3,  # 30% server management
         PolicyEvaluationTasks: 6,  # 60% policy evaluation (most common)
         HealthCheckTasks: 1,  # 10% health checks
@@ -254,7 +253,7 @@ class ServerRegistrationUser(FastHttpUser):
     Expected p95: < 200ms
     """
     wait_time = between(0.5, 2)
-    tasks = [ServerManagementTasks]
+    tasks: ClassVar = [ServerManagementTasks]
 
 
 class PolicyEvaluationUser(FastHttpUser):
@@ -265,7 +264,7 @@ class PolicyEvaluationUser(FastHttpUser):
     Expected p95: < 50ms
     """
     wait_time = between(0.1, 0.5)  # Fast policy evaluation
-    tasks = [PolicyEvaluationTasks]
+    tasks: ClassVar = [PolicyEvaluationTasks]
 
 
 class BurstTrafficUser(FastHttpUser):

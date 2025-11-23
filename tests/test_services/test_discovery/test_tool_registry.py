@@ -1,8 +1,8 @@
 """Tests for Tool Registry and Sensitivity Classification Service."""
 
-import pytest
-from datetime import UTC, datetime
 from uuid import uuid4
+
+import pytest
 
 from sark.models.mcp_server import MCPServer, MCPTool, SensitivityLevel, ServerStatus, TransportType
 from sark.services.discovery.tool_registry import ToolRegistry

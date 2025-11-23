@@ -1,8 +1,8 @@
 """Test data generators for performance tests."""
 
 import random
-import uuid
 from typing import Any
+import uuid
 
 from faker import Faker
 

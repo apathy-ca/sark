@@ -50,7 +50,7 @@ class TestPolicyService:
         policy_id = uuid4()
         version_id = uuid4()
 
-        created_policy = Policy(
+        Policy(
             id=policy_id,
             name=sample_policy_data["name"],
             description=sample_policy_data["description"],
@@ -72,7 +72,7 @@ class TestPolicyService:
         # Create policy
         with patch.object(service, "db", mock_db):
             # Manually set the attributes since we're mocking
-            policy = await service.create_policy(**sample_policy_data)
+            await service.create_policy(**sample_policy_data)
 
             # Verify database calls
             assert mock_db.add.call_count == 2  # Policy + PolicyVersion
@@ -272,7 +272,7 @@ class TestPolicyService:
         mock_db.get = AsyncMock(side_effect=get_side_effect)
         mock_db.refresh.side_effect = lambda obj: None
 
-        policy = await service.activate_version(policy_id, version_id)
+        await service.activate_version(policy_id, version_id)
 
         # Verify version was activated
         assert mock_version.is_active is True

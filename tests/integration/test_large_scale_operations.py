@@ -7,10 +7,9 @@ This module contains comprehensive integration tests that validate:
 - Performance targets are met
 """
 
-import asyncio
-import time
 from datetime import UTC, datetime
-from unittest.mock import AsyncMock, MagicMock, patch
+import time
+from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
 import pytest
@@ -101,7 +100,7 @@ class TestPaginationIntegration:
             start_time = time.perf_counter()
 
             params = PaginationParams(limit=page_size)
-            items, next_cursor, has_more, _ = await CursorPaginator.paginate(
+            items, _next_cursor, has_more, _ = await CursorPaginator.paginate(
                 db=mock_db,
                 query=select(MCPServer),
                 cursor_column=MCPServer.created_at,
@@ -154,7 +153,7 @@ class TestPaginationIntegration:
             mock_db.execute = AsyncMock(return_value=mock_result)
 
             params = PaginationParams(limit=page_size)
-            items, next_cursor, has_more, _ = await CursorPaginator.paginate(
+            items, _next_cursor, has_more, _ = await CursorPaginator.paginate(
                 db=mock_db,
                 query=select(MCPServer),
                 cursor_column=MCPServer.created_at,
@@ -182,7 +181,6 @@ class TestSearchFilterIntegration:
     async def test_search_with_10k_servers(self, large_server_dataset) -> None:
         """Test search across 10,000 servers."""
         mock_db = AsyncMock()
-        servers = large_server_dataset
 
         # Test search for "analytics" - should match every 5th server
         search_service = ServerSearchService(mock_db)
@@ -209,7 +207,6 @@ class TestSearchFilterIntegration:
     async def test_filter_combinations_with_large_dataset(self, large_server_dataset) -> None:
         """Test various filter combinations with large dataset."""
         mock_db = AsyncMock()
-        servers = large_server_dataset
 
         search_service = ServerSearchService(mock_db)
 
@@ -274,7 +271,7 @@ class TestSearchFilterIntegration:
             page_start = time.perf_counter()
 
             params = PaginationParams(limit=page_size)
-            items, next_cursor, has_more, _ = await CursorPaginator.paginate(
+            items, _next_cursor, _has_more, _ = await CursorPaginator.paginate(
                 db=mock_db,
                 query=query,
                 cursor_column=MCPServer.created_at,

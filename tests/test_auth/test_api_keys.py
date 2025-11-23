@@ -1,10 +1,9 @@
 """Tests for API key management."""
 
+from datetime import UTC, datetime, timedelta
+from unittest.mock import AsyncMock, MagicMock
 import uuid
-from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
 
-import bcrypt
 import pytest
 
 from sark.models.api_key import APIKey
@@ -47,8 +46,8 @@ def sample_api_key(sample_user_id):
         rate_limit=1000,
         is_active=True,
         usage_count=0,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow(),
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
     )
 
 
@@ -83,12 +82,12 @@ class TestAPIKeyModel:
 
     def test_is_expired_future_date(self, sample_api_key):
         """Test is_expired with future expiration."""
-        sample_api_key.expires_at = datetime.utcnow() + timedelta(days=30)
+        sample_api_key.expires_at = datetime.now(UTC) + timedelta(days=30)
         assert sample_api_key.is_expired is False
 
     def test_is_expired_past_date(self, sample_api_key):
         """Test is_expired with past expiration."""
-        sample_api_key.expires_at = datetime.utcnow() - timedelta(days=1)
+        sample_api_key.expires_at = datetime.now(UTC) - timedelta(days=1)
         assert sample_api_key.is_expired is True
 
     def test_is_valid_active_key(self, sample_api_key):
@@ -105,7 +104,7 @@ class TestAPIKeyModel:
 
     def test_is_valid_revoked_key(self, sample_api_key):
         """Test is_valid for revoked key."""
-        sample_api_key.revoked_at = datetime.utcnow()
+        sample_api_key.revoked_at = datetime.now(UTC)
         assert sample_api_key.is_valid is False
 
     def test_revoke_key(self, sample_api_key, sample_user_id):
@@ -223,7 +222,7 @@ class TestAPIKeyServiceCreate:
         )
 
         assert api_key.expires_at is not None
-        assert api_key.expires_at > datetime.utcnow()
+        assert api_key.expires_at > datetime.now(UTC)
 
     @pytest.mark.asyncio
     async def test_create_api_key_invalid_scopes(self, api_key_service, sample_user_id):
@@ -334,7 +333,7 @@ class TestAPIKeyServiceValidation:
         """Test validation of revoked key."""
         full_key = "sark_sk_live_abc12345_secret"
         sample_api_key.key_hash = APIKeyService._hash_key(full_key)
-        sample_api_key.revoked_at = datetime.utcnow()
+        sample_api_key.revoked_at = datetime.now(UTC)
 
         result = MagicMock()
         result.scalar_one_or_none.return_value = sample_api_key
@@ -350,7 +349,7 @@ class TestAPIKeyServiceValidation:
         """Test validation of expired key."""
         full_key = "sark_sk_live_abc12345_secret"
         sample_api_key.key_hash = APIKeyService._hash_key(full_key)
-        sample_api_key.expires_at = datetime.utcnow() - timedelta(days=1)
+        sample_api_key.expires_at = datetime.now(UTC) - timedelta(days=1)
 
         result = MagicMock()
         result.scalar_one_or_none.return_value = sample_api_key

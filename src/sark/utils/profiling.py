@@ -8,17 +8,18 @@ This module provides utilities for profiling application performance including:
 - Cache hit rate analysis
 """
 
+from collections.abc import Callable
+from contextlib import contextmanager
 import cProfile
+from functools import wraps
 import io
 import pstats
 import time
-from contextlib import contextmanager
-from functools import wraps
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any
 
-import structlog
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
+import structlog
 
 logger = structlog.get_logger(__name__)
 
@@ -33,7 +34,7 @@ class FunctionProfiler:
 
     def __init__(self):
         """Initialize profiler."""
-        self.profiles: Dict[str, pstats.Stats] = {}
+        self.profiles: dict[str, pstats.Stats] = {}
         self.enabled = False
 
     def profile(self, func: Callable) -> Callable:
@@ -120,7 +121,7 @@ class QueryProfiler:
 
     def __init__(self):
         """Initialize query profiler."""
-        self.queries: List[Dict[str, Any]] = []
+        self.queries: list[dict[str, Any]] = []
         self.enabled = False
         self.slow_query_threshold = 0.1  # 100ms
 
@@ -137,7 +138,7 @@ class QueryProfiler:
         statement: str,
         parameters: Any,
         duration: float,
-        context: Optional[str] = None,
+        context: str | None = None,
     ):
         """Record a query execution.
 
@@ -161,7 +162,7 @@ class QueryProfiler:
             }
         )
 
-    def get_slow_queries(self, limit: int = 20) -> List[Dict[str, Any]]:
+    def get_slow_queries(self, limit: int = 20) -> list[dict[str, Any]]:
         """Get slow queries.
 
         Args:
@@ -174,7 +175,7 @@ class QueryProfiler:
         slow_queries.sort(key=lambda x: x["duration"], reverse=True)
         return slow_queries[:limit]
 
-    def get_query_stats(self) -> Dict[str, Any]:
+    def get_query_stats(self) -> dict[str, Any]:
         """Get query statistics.
 
         Returns:
@@ -198,14 +199,14 @@ class QueryProfiler:
             "slow_query_threshold": self.slow_query_threshold,
         }
 
-    def detect_n_plus_one(self) -> List[Dict[str, Any]]:
+    def detect_n_plus_one(self) -> list[dict[str, Any]]:
         """Detect potential N+1 query problems.
 
         Returns:
             List of potential N+1 patterns
         """
         # Group queries by statement pattern
-        patterns: Dict[str, List[Dict[str, Any]]] = {}
+        patterns: dict[str, list[dict[str, Any]]] = {}
 
         for query in self.queries:
             # Normalize statement (remove parameter values)
@@ -292,7 +293,7 @@ class ConnectionPoolMonitor:
             pool: SQLAlchemy connection pool
         """
         self.pool = pool
-        self.samples: List[Dict[str, Any]] = []
+        self.samples: list[dict[str, Any]] = []
 
     def sample(self):
         """Take a sample of pool statistics."""
@@ -308,7 +309,7 @@ class ConnectionPoolMonitor:
         self.samples.append(sample)
         return sample
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Get connection pool statistics.
 
         Returns:
@@ -343,14 +344,14 @@ class CacheAnalyzer:
 
     def __init__(self):
         """Initialize analyzer."""
-        self.cache_operations: List[Dict[str, Any]] = []
+        self.cache_operations: list[dict[str, Any]] = []
 
     def record_operation(
         self,
         cache_key: str,
         operation: str,
         hit: bool,
-        duration: Optional[float] = None,
+        duration: float | None = None,
     ):
         """Record a cache operation.
 
@@ -384,7 +385,7 @@ class CacheAnalyzer:
         hits = len([op for op in get_ops if op["hit"]])
         return (hits / len(get_ops)) * 100
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Get cache statistics.
 
         Returns:
@@ -420,13 +421,13 @@ class CacheAnalyzer:
             ),
         }
 
-    def get_key_patterns(self) -> Dict[str, Dict[str, Any]]:
+    def get_key_patterns(self) -> dict[str, dict[str, Any]]:
         """Analyze cache key patterns.
 
         Returns:
             Dictionary with pattern statistics
         """
-        patterns: Dict[str, List[Dict[str, Any]]] = {}
+        patterns: dict[str, list[dict[str, Any]]] = {}
 
         for op in self.cache_operations:
             # Extract pattern (e.g., "policy:user:*")
@@ -502,7 +503,7 @@ def profile_block(name: str):
 # ============================================================================
 
 
-def generate_performance_report() -> Dict[str, Any]:
+def generate_performance_report() -> dict[str, Any]:
     """Generate comprehensive performance report.
 
     Returns:

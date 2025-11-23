@@ -1,11 +1,12 @@
 """Tests for Policy Cache Service."""
 
-import pytest
 import hashlib
 import json
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock
 
-from sark.services.policy.cache import PolicyCache, CacheMetrics, get_policy_cache
+import pytest
+
+from sark.services.policy.cache import CacheMetrics, PolicyCache, get_policy_cache
 
 
 @pytest.fixture
@@ -540,7 +541,6 @@ async def test_concurrent_cache_operations(cache, mock_redis):
     """Test cache handles concurrent operations."""
     import asyncio
 
-    decision = {"allow": True}
 
     # Simulate concurrent gets
     tasks = [

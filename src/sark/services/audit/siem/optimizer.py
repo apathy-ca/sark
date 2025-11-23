@@ -9,9 +9,10 @@ Provides advanced performance optimization features for SIEM integrations:
 """
 
 import asyncio
+import contextlib
+from datetime import UTC, datetime
 import gzip
 import json
-from datetime import UTC, datetime
 from typing import Any
 
 import structlog
@@ -296,10 +297,8 @@ class SIEMOptimizer:
         self._health_check_running = False
         if self._health_monitor_task:
             self._health_monitor_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._health_monitor_task
-            except asyncio.CancelledError:
-                pass
 
         logger.info("health_monitoring_stopped", siem=self.name)
 

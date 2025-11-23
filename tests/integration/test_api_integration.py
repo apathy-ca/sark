@@ -11,16 +11,14 @@ Tests API workflows including:
 - Authentication and authorization
 """
 
-import pytest
+from datetime import UTC, datetime
 import time
-from datetime import datetime, UTC
-from unittest.mock import AsyncMock, patch, MagicMock
 from uuid import uuid4
 
 from fastapi import status
-from fastapi.testclient import TestClient
+import pytest
 
-from sark.models.mcp_server import MCPServer, TransportType, SensitivityLevel, ServerStatus
+from sark.models.mcp_server import SensitivityLevel, ServerStatus
 from sark.models.user import User
 from sark.services.auth.jwt import JWTHandler
 from sark.services.discovery.search import ServerSearchFilter
@@ -74,14 +72,18 @@ def admin_user():
 @pytest.fixture
 def auth_headers(jwt_handler, test_user):
     """Generate authentication headers."""
-    token = jwt_handler.create_access_token(user_id=test_user.id)
+    token = jwt_handler.create_access_token(
+        user_id=test_user.id, email=test_user.email, role=test_user.role
+    )
     return {"Authorization": f"Bearer {token}"}
 
 
 @pytest.fixture
 def admin_headers(jwt_handler, admin_user):
     """Generate admin authentication headers."""
-    token = jwt_handler.create_access_token(user_id=admin_user.id)
+    token = jwt_handler.create_access_token(
+        user_id=admin_user.id, email=admin_user.email, role=admin_user.role
+    )
     return {"Authorization": f"Bearer {token}"}
 
 
@@ -141,7 +143,6 @@ async def test_register_server_requires_authentication(sample_server_data):
     # This would be tested with actual HTTP client
 
     # Simulate unauthenticated request
-    headers = {}  # No auth token
 
     # Would expect 401 Unauthorized
     expected_status = status.HTTP_401_UNAUTHORIZED
@@ -154,11 +155,6 @@ async def test_register_server_requires_authentication(sample_server_data):
 @pytest.mark.requires_db
 async def test_register_server_validates_input(auth_headers):
     """Test that server registration validates input."""
-    invalid_data = {
-        "name": "",  # Empty name - invalid
-        "transport": "invalid_transport",  # Invalid transport
-        "endpoint": "not-a-url"  # Invalid URL
-    }
 
     # Would expect 422 Unprocessable Entity
     expected_status = status.HTTP_422_UNPROCESSABLE_ENTITY
@@ -219,7 +215,7 @@ async def test_update_server_endpoint(auth_headers):
 @pytest.mark.requires_db
 async def test_delete_server_endpoint(admin_headers):
     """Test server deletion endpoint (requires admin)."""
-    server_id = uuid4()
+    uuid4()
 
     # Simulate deletion (returns 204 No Content)
     expected_status = status.HTTP_204_NO_CONTENT
@@ -236,7 +232,7 @@ async def test_delete_server_endpoint(admin_headers):
 @pytest.mark.requires_db
 async def test_search_servers_by_name(auth_headers):
     """Test searching servers by name."""
-    search_filter = ServerSearchFilter().with_search("test")
+    ServerSearchFilter().with_search("test")
 
     # Simulate search results
     results = [
@@ -254,7 +250,7 @@ async def test_search_servers_by_name(auth_headers):
 @pytest.mark.requires_db
 async def test_filter_servers_by_status(auth_headers):
     """Test filtering servers by status."""
-    search_filter = ServerSearchFilter().with_status(is_active=True)
+    ServerSearchFilter().with_status(is_active=True)
 
     # Simulate filtered results
     results = [
@@ -270,7 +266,7 @@ async def test_filter_servers_by_status(auth_headers):
 @pytest.mark.requires_db
 async def test_filter_servers_by_sensitivity(auth_headers):
     """Test filtering servers by sensitivity level."""
-    search_filter = ServerSearchFilter().with_sensitivity(SensitivityLevel.HIGH)
+    ServerSearchFilter().with_sensitivity(SensitivityLevel.HIGH)
 
     # Simulate filtered results
     results = [
@@ -359,7 +355,7 @@ async def test_pagination_empty_results(auth_headers):
 @pytest.mark.requires_db
 async def test_bulk_register_servers_transactional(auth_headers):
     """Test bulk server registration (transactional mode)."""
-    servers = [
+    [
         {"name": f"server-{i}", "transport": "http", "endpoint": f"http://example.com/{i}"}
         for i in range(3)
     ]
@@ -385,11 +381,6 @@ async def test_bulk_register_servers_transactional(auth_headers):
 @pytest.mark.requires_db
 async def test_bulk_register_servers_best_effort(auth_headers):
     """Test bulk server registration (best-effort mode)."""
-    servers = [
-        {"name": "valid-server", "transport": "http", "endpoint": "http://example.com"},
-        {"name": "", "transport": "invalid", "endpoint": "bad-url"},  # Invalid
-        {"name": "another-valid", "transport": "http", "endpoint": "http://example2.com"}
-    ]
 
     # Simulate best-effort with partial success
     result = {
@@ -414,10 +405,6 @@ async def test_bulk_register_servers_best_effort(auth_headers):
 @pytest.mark.requires_db
 async def test_bulk_operation_rollback_on_error(auth_headers):
     """Test that transactional bulk operations rollback on error."""
-    servers = [
-        {"name": "server-1", "transport": "http", "endpoint": "http://example.com"},
-        {"name": "", "transport": "http", "endpoint": "http://example.com"},  # Invalid - causes rollback
-    ]
 
     # Simulate transactional rollback
     result = {
@@ -442,11 +429,10 @@ async def test_bulk_operation_rollback_on_error(auth_headers):
 @pytest.mark.api
 async def test_404_for_nonexistent_server(auth_headers):
     """Test 404 response for nonexistent server."""
-    nonexistent_id = uuid4()
+    uuid4()
 
     # Would expect 404 Not Found
     expected_status = status.HTTP_404_NOT_FOUND
-    expected_detail = f"Server {nonexistent_id} not found"
 
     assert expected_status == 404
 
@@ -478,7 +464,6 @@ async def test_validation_error_response(auth_headers):
 async def test_unauthorized_access_response():
     """Test unauthorized access response."""
     expected_status = status.HTTP_401_UNAUTHORIZED
-    expected_detail = "Could not validate credentials"
 
     assert expected_status == 401
 
@@ -489,7 +474,6 @@ async def test_unauthorized_access_response():
 async def test_forbidden_access_response(auth_headers):
     """Test forbidden access response (authenticated but not authorized)."""
     expected_status = status.HTTP_403_FORBIDDEN
-    expected_detail = "Insufficient permissions"
 
     assert expected_status == 403
 
@@ -506,7 +490,7 @@ async def test_forbidden_access_response(auth_headers):
 async def test_pagination_with_10k_records(auth_headers):
     """
     Test pagination with 10,000+ records.
-    
+
     Verifies:
     - Correct page calculations
     - Consistent results across pages
@@ -517,12 +501,12 @@ async def test_pagination_with_10k_records(auth_headers):
     total_servers = 10000
     page_size = 100
     expected_pages = total_servers // page_size
-    
+
     # Test first page
     start_time = time.time()
     page_1_response = {
         "items": [
-            {"id": str(uuid4()), "name": f"server-{i}"} 
+            {"id": str(uuid4()), "name": f"server-{i}"}
             for i in range(page_size)
         ],
         "total": total_servers,
@@ -531,17 +515,17 @@ async def test_pagination_with_10k_records(auth_headers):
         "pages": expected_pages
     }
     elapsed = time.time() - start_time
-    
+
     assert len(page_1_response["items"]) == page_size
     assert page_1_response["total"] == total_servers
     assert page_1_response["pages"] == expected_pages
     assert elapsed < 0.1, f"Page fetch took {elapsed}s, expected <100ms"
-    
+
     # Test middle page
     start_time = time.time()
     page_50_response = {
         "items": [
-            {"id": str(uuid4()), "name": f"server-{i+4900}"} 
+            {"id": str(uuid4()), "name": f"server-{i+4900}"}
             for i in range(page_size)
         ],
         "total": total_servers,
@@ -550,15 +534,15 @@ async def test_pagination_with_10k_records(auth_headers):
         "pages": expected_pages
     }
     elapsed = time.time() - start_time
-    
+
     assert len(page_50_response["items"]) == page_size
     assert page_50_response["page"] == 50
     assert elapsed < 0.1, f"Middle page fetch took {elapsed}s, expected <100ms"
-    
+
     # Test last page
     page_100_response = {
         "items": [
-            {"id": str(uuid4()), "name": f"server-{i+9900}"} 
+            {"id": str(uuid4()), "name": f"server-{i+9900}"}
             for i in range(page_size)
         ],
         "total": total_servers,
@@ -566,7 +550,7 @@ async def test_pagination_with_10k_records(auth_headers):
         "page_size": page_size,
         "pages": expected_pages
     }
-    
+
     assert len(page_100_response["items"]) == page_size
     assert page_100_response["page"] == expected_pages
 
@@ -578,41 +562,41 @@ async def test_pagination_with_10k_records(auth_headers):
 async def test_pagination_performance_consistency(auth_headers):
     """
     Test pagination performance remains consistent across pages.
-    
+
     Verifies p95 latency <100ms for all pages.
     """
     total_servers = 5000
     page_size = 50
     pages_to_test = 20
     latencies = []
-    
+
     for page in range(1, pages_to_test + 1):
         start_time = time.time()
-        
+
         # Simulate page fetch
-        response = {
+        {
             "items": [{"id": str(uuid4())} for _ in range(page_size)],
             "total": total_servers,
             "page": page,
             "page_size": page_size
         }
-        
+
         elapsed = time.time() - start_time
         latencies.append(elapsed)
-    
+
     # Calculate p95
     sorted_latencies = sorted(latencies)
     p95_index = int(len(sorted_latencies) * 0.95)
     p95_latency = sorted_latencies[p95_index]
-    
+
     avg_latency = sum(latencies) / len(latencies)
     max_latency = max(latencies)
-    
+
     assert p95_latency < 0.1, f"P95 latency {p95_latency}s exceeds 100ms target"
     assert avg_latency < 0.05, f"Average latency {avg_latency}s exceeds 50ms"
-    
+
     # Performance metrics for documentation
-    print(f"\nPagination Performance Metrics:")
+    print("\nPagination Performance Metrics:")
     print(f"  Total pages tested: {pages_to_test}")
     print(f"  Average latency: {avg_latency*1000:.2f}ms")
     print(f"  P95 latency: {p95_latency*1000:.2f}ms")
@@ -634,7 +618,7 @@ async def test_pagination_edge_cases(auth_headers):
     }
     assert len(empty_response["items"]) == 0
     assert empty_response["pages"] == 0
-    
+
     # Single page
     single_page_response = {
         "items": [{"id": str(uuid4())} for _ in range(25)],
@@ -645,7 +629,7 @@ async def test_pagination_edge_cases(auth_headers):
     }
     assert len(single_page_response["items"]) == 25
     assert single_page_response["pages"] == 1
-    
+
     # Partial last page
     partial_last_response = {
         "items": [{"id": str(uuid4())} for _ in range(37)],
@@ -668,7 +652,7 @@ async def test_pagination_edge_cases(auth_headers):
 async def test_search_performance_with_large_dataset(auth_headers):
     """
     Test search performance with large dataset.
-    
+
     Verifies:
     - Search completes <100ms
     - Results are accurate
@@ -677,24 +661,24 @@ async def test_search_performance_with_large_dataset(auth_headers):
     # Simulate searching through 10k servers
     total_servers = 10000
     search_query = "api-gateway"
-    
+
     start_time = time.time()
-    
+
     # Simulate search
     matching_servers = [
         {"id": str(uuid4()), "name": f"api-gateway-{i}"}
         for i in range(50)  # 50 matches
     ]
-    
+
     search_response = {
         "items": matching_servers,
         "total": 50,
         "query": search_query,
         "searched_total": total_servers
     }
-    
+
     elapsed = time.time() - start_time
-    
+
     assert len(search_response["items"]) == 50
     assert all(search_query in item["name"] for item in search_response["items"])
     assert elapsed < 0.1, f"Search took {elapsed}s, expected <100ms"
@@ -711,25 +695,25 @@ async def test_multi_filter_performance(auth_headers):
         {"team_id": str(uuid4()), "transport": "http"},
         {"owner_id": str(uuid4()), "status": ServerStatus.ACTIVE},
     ]
-    
+
     latencies = []
-    
+
     for filter_combo in filters:
         start_time = time.time()
-        
+
         # Simulate filtered search
-        results = {
+        {
             "items": [{"id": str(uuid4())} for _ in range(100)],
             "total": 100,
             "filters": filter_combo
         }
-        
+
         elapsed = time.time() - start_time
         latencies.append(elapsed)
-    
+
     avg_latency = sum(latencies) / len(latencies)
     max_latency = max(latencies)
-    
+
     assert max_latency < 0.1, f"Max filter latency {max_latency}s exceeds 100ms"
     assert avg_latency < 0.05, f"Average filter latency {avg_latency}s exceeds 50ms"
 
@@ -742,15 +726,15 @@ async def test_complex_search_filters(auth_headers):
     # Test sensitivity level filtering
     sensitivity_filter = ServerSearchFilter().with_sensitivity(SensitivityLevel.HIGH)
     assert sensitivity_filter is not None
-    
+
     # Test status filtering
     status_filter = ServerSearchFilter().with_status(status=ServerStatus.ACTIVE)
     assert status_filter is not None
-    
+
     # Test team filtering
     team_filter = ServerSearchFilter().with_team(uuid4())
     assert team_filter is not None
-    
+
     # Test combined filters
     combined_filter = (ServerSearchFilter()
                       .with_search("api")
@@ -771,7 +755,7 @@ async def test_complex_search_filters(auth_headers):
 async def test_bulk_register_100_servers_transactional(auth_headers):
     """
     Test bulk registration of 100+ servers (transactional mode).
-    
+
     Verifies:
     - All-or-nothing behavior
     - Performance <5 seconds
@@ -788,9 +772,9 @@ async def test_bulk_register_100_servers_transactional(auth_headers):
         }
         for i in range(150)
     ]
-    
+
     start_time = time.time()
-    
+
     # Simulate successful bulk registration
     result = {
         "mode": "transactional",
@@ -802,14 +786,14 @@ async def test_bulk_register_100_servers_transactional(auth_headers):
             for s in servers
         ]
     }
-    
+
     elapsed = time.time() - start_time
-    
+
     assert result["successful"] == 150
     assert result["failed"] == 0
     assert elapsed < 5.0, f"Bulk registration took {elapsed}s, expected <5s"
-    
-    print(f"\nBulk Registration Performance:")
+
+    print("\nBulk Registration Performance:")
     print(f"  Servers registered: {result['successful']}")
     print(f"  Time taken: {elapsed:.2f}s")
     print(f"  Throughput: {result['successful']/elapsed:.1f} servers/sec")
@@ -837,13 +821,13 @@ async def test_bulk_register_best_effort_mode(auth_headers):
                 "endpoint": f"http://server{i}.example.com",
                 "sensitivity_level": "medium"
             })
-    
+
     start_time = time.time()
-    
+
     # Simulate best-effort registration
     successful_count = 190  # 10 invalid servers
     failed_count = 10
-    
+
     result = {
         "mode": "best_effort",
         "total": 200,
@@ -851,7 +835,7 @@ async def test_bulk_register_best_effort_mode(auth_headers):
         "failed": failed_count,
         "results": []
     }
-    
+
     # Add results
     for i in range(200):
         if i % 20 == 0:
@@ -866,17 +850,17 @@ async def test_bulk_register_best_effort_mode(auth_headers):
                 "server_id": str(uuid4()),
                 "name": f"bulk-server-{i}"
             })
-    
+
     elapsed = time.time() - start_time
-    
+
     assert result["successful"] == 190
     assert result["failed"] == 10
     assert elapsed < 5.0, f"Bulk registration took {elapsed}s, expected <5s"
-    
+
     # Verify partial success
     successful_results = [r for r in result["results"] if r.get("success")]
     failed_results = [r for r in result["results"] if not r.get("success")]
-    
+
     assert len(successful_results) == 190
     assert len(failed_results) == 10
 
@@ -887,20 +871,19 @@ async def test_bulk_register_best_effort_mode(auth_headers):
 async def test_bulk_update_servers(auth_headers):
     """Test bulk server updates."""
     # Simulate updating 50 servers
-    server_ids = [uuid4() for _ in range(50)]
-    updates = {"status": ServerStatus.INACTIVE, "description": "Bulk updated"}
-    
+    [uuid4() for _ in range(50)]
+
     start_time = time.time()
-    
+
     result = {
         "mode": "bulk_update",
         "total": 50,
         "successful": 50,
         "failed": 0
     }
-    
+
     elapsed = time.time() - start_time
-    
+
     assert result["successful"] == 50
     assert elapsed < 2.0, f"Bulk update took {elapsed}s, expected <2s"
 
@@ -911,19 +894,19 @@ async def test_bulk_update_servers(auth_headers):
 async def test_bulk_delete_servers(admin_headers):
     """Test bulk server deletion (admin only)."""
     # Simulate deleting 30 servers
-    server_ids = [uuid4() for _ in range(30)]
-    
+    [uuid4() for _ in range(30)]
+
     start_time = time.time()
-    
+
     result = {
         "mode": "bulk_delete",
         "total": 30,
         "successful": 30,
         "failed": 0
     }
-    
+
     elapsed = time.time() - start_time
-    
+
     assert result["successful"] == 30
     assert elapsed < 1.0, f"Bulk delete took {elapsed}s, expected <1s"
 
@@ -946,8 +929,8 @@ async def test_authentication_required_for_all_endpoints():
         ("GET", "/api/servers/search"),
         ("POST", "/api/servers/bulk"),
     ]
-    
-    for method, endpoint in endpoints:
+
+    for _method, _endpoint in endpoints:
         # Without authentication, should get 401
         expected_status = status.HTTP_401_UNAUTHORIZED
         assert expected_status == 401
@@ -963,9 +946,9 @@ async def test_valid_jwt_token_grants_access(jwt_handler, test_user):
         email=test_user.email,
         role=test_user.role
     )
-    
+
     headers = {"Authorization": f"Bearer {token}"}
-    
+
     # Should allow access
     assert headers["Authorization"].startswith("Bearer ")
     assert len(token) > 0
@@ -978,8 +961,7 @@ async def test_expired_token_rejected():
     """Test that expired tokens are rejected."""
     # Simulate expired token
     expected_status = status.HTTP_401_UNAUTHORIZED
-    expected_detail = "Token has expired"
-    
+
     assert expected_status == 401
 
 
@@ -988,9 +970,7 @@ async def test_expired_token_rejected():
 @pytest.mark.api
 async def test_invalid_token_rejected():
     """Test that invalid tokens are rejected."""
-    invalid_token = "invalid.token.here"
-    headers = {"Authorization": f"Bearer {invalid_token}"}
-    
+
     expected_status = status.HTTP_401_UNAUTHORIZED
     assert expected_status == 401
 
@@ -1002,10 +982,10 @@ async def test_admin_only_endpoints_require_admin_role(admin_headers, auth_heade
     """Test that admin-only endpoints require admin role."""
     # Regular user trying to access admin endpoint
     regular_user_status = status.HTTP_403_FORBIDDEN
-    
+
     # Admin user accessing admin endpoint
     admin_user_status = status.HTTP_200_OK
-    
+
     assert regular_user_status == 403
     assert admin_user_status == 200
 
@@ -1026,8 +1006,8 @@ async def test_malformed_json_rejected(auth_headers):
         '{"name": "test"',  # Missing closing brace
         '',  # Empty body
     ]
-    
-    for payload in malformed_payloads:
+
+    for _payload in malformed_payloads:
         expected_status = status.HTTP_400_BAD_REQUEST
         assert expected_status == 400
 
@@ -1043,8 +1023,8 @@ async def test_missing_required_fields(auth_headers):
         {"transport": "http"},  # Missing name
         {"name": "test", "transport": "http"},  # Missing endpoint
     ]
-    
-    for payload in invalid_payloads:
+
+    for _payload in invalid_payloads:
         expected_status = status.HTTP_422_UNPROCESSABLE_ENTITY
         assert expected_status == 422
 
@@ -1060,8 +1040,8 @@ async def test_invalid_field_types(auth_headers):
         {"name": "test", "transport": "http", "endpoint": 123},  # endpoint should be string
         {"name": "test", "transport": "http", "endpoint": "not-a-url"},  # invalid URL
     ]
-    
-    for payload in invalid_payloads:
+
+    for _payload in invalid_payloads:
         expected_status = status.HTTP_422_UNPROCESSABLE_ENTITY
         assert expected_status == 422
 
@@ -1072,13 +1052,7 @@ async def test_invalid_field_types(auth_headers):
 async def test_field_length_validation(auth_headers):
     """Test field length validation."""
     # Name too long (>255 characters)
-    long_name = "a" * 300
-    payload = {
-        "name": long_name,
-        "transport": "http",
-        "endpoint": "http://example.com"
-    }
-    
+
     expected_status = status.HTTP_422_UNPROCESSABLE_ENTITY
     assert expected_status == 422
 
@@ -1088,19 +1062,13 @@ async def test_field_length_validation(auth_headers):
 @pytest.mark.api
 async def test_duplicate_name_rejected(auth_headers):
     """Test that duplicate server names are rejected."""
-    server_data = {
-        "name": "duplicate-test-server",
-        "transport": "http",
-        "endpoint": "http://example.com"
-    }
-    
+
     # First registration succeeds
     first_status = status.HTTP_201_CREATED
-    
+
     # Second registration with same name fails
     second_status = status.HTTP_409_CONFLICT
-    expected_detail = "Server with name 'duplicate-test-server' already exists"
-    
+
     assert first_status == 201
     assert second_status == 409
 
@@ -1110,13 +1078,7 @@ async def test_duplicate_name_rejected(auth_headers):
 @pytest.mark.api
 async def test_invalid_sensitivity_level(auth_headers):
     """Test that invalid sensitivity levels are rejected."""
-    payload = {
-        "name": "test-server",
-        "transport": "http",
-        "endpoint": "http://example.com",
-        "sensitivity_level": "super-secret"  # Invalid
-    }
-    
+
     expected_status = status.HTTP_422_UNPROCESSABLE_ENTITY
     assert expected_status == 422
 
@@ -1131,8 +1093,8 @@ async def test_sql_injection_attempts_blocked(auth_headers):
         {"name": "test' OR '1'='1"},
         {"description": "test'; DELETE FROM mcp_servers WHERE '1'='1'; --"},
     ]
-    
-    for payload in malicious_payloads:
+
+    for _payload in malicious_payloads:
         # Should either be safely escaped or rejected
         # SQL injection should NOT succeed
         assert True  # Payload should be safely handled
@@ -1148,8 +1110,8 @@ async def test_xss_attempts_sanitized(auth_headers):
         {"description": "<img src=x onerror=alert('XSS')>"},
         {"name": "test<iframe src='javascript:alert(1)'></iframe>"},
     ]
-    
-    for payload in xss_payloads:
+
+    for _payload in xss_payloads:
         # XSS should be sanitized or rejected
         # JSON responses should not execute scripts
         assert True  # Payload should be safely handled
@@ -1166,25 +1128,25 @@ async def test_xss_attempts_sanitized(auth_headers):
 async def test_api_latency_p95_under_100ms(auth_headers):
     """
     Test that API p95 latency is under 100ms.
-    
+
     Runs 100 requests and measures latency distribution.
     """
     num_requests = 100
     latencies = []
-    
+
     for i in range(num_requests):
         start_time = time.time()
-        
+
         # Simulate API request
-        response = {
+        {
             "id": str(uuid4()),
             "name": f"server-{i}",
             "status": ServerStatus.ACTIVE
         }
-        
+
         elapsed = time.time() - start_time
         latencies.append(elapsed)
-    
+
     # Calculate percentiles
     sorted_latencies = sorted(latencies)
     p50 = sorted_latencies[int(len(sorted_latencies) * 0.50)]
@@ -1192,11 +1154,11 @@ async def test_api_latency_p95_under_100ms(auth_headers):
     p99 = sorted_latencies[int(len(sorted_latencies) * 0.99)]
     avg = sum(latencies) / len(latencies)
     max_latency = max(latencies)
-    
+
     # Verify performance targets
     assert p95 < 0.1, f"P95 latency {p95*1000:.2f}ms exceeds 100ms target"
     assert avg < 0.05, f"Average latency {avg*1000:.2f}ms exceeds 50ms target"
-    
+
     # Performance report
     print(f"\nAPI Performance Metrics ({num_requests} requests):")
     print(f"  Average: {avg*1000:.2f}ms")
@@ -1214,18 +1176,18 @@ async def test_concurrent_request_handling(auth_headers):
     """Test API handles concurrent requests efficiently."""
     # Simulate 50 concurrent requests
     num_concurrent = 50
-    
+
     start_time = time.time()
-    
+
     # In real implementation, would use asyncio.gather
-    results = [{"id": str(uuid4())} for _ in range(num_concurrent)]
-    
+    [{"id": str(uuid4())} for _ in range(num_concurrent)]
+
     elapsed = time.time() - start_time
     throughput = num_concurrent / elapsed
-    
+
     assert throughput > 100, f"Throughput {throughput:.1f} req/s is below target of 100 req/s"
-    
-    print(f"\nConcurrency Performance:")
+
+    print("\nConcurrency Performance:")
     print(f"  Concurrent requests: {num_concurrent}")
     print(f"  Total time: {elapsed:.2f}s")
     print(f"  Throughput: {throughput:.1f} requests/sec")

@@ -1,12 +1,12 @@
 """Tests for bulk operations service."""
 
 from datetime import UTC, datetime
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
 import pytest
 
-from sark.models.mcp_server import MCPServer, ServerStatus, TransportType, SensitivityLevel
+from sark.models.mcp_server import MCPServer, SensitivityLevel, ServerStatus, TransportType
 from sark.services.bulk import BulkOperationResult, BulkOperationsService
 
 

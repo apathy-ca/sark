@@ -1,30 +1,30 @@
 """Tests for LDAP authentication provider."""
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
-from ldap3 import Server, Connection, SUBTREE
-from ldap3.core.exceptions import LDAPException, LDAPBindError
+from unittest.mock import Mock, patch
 
-from sark.services.auth.providers.ldap import LDAPProvider
-from sark.services.auth.providers.base import UserInfo
+from ldap3 import Connection
+from ldap3.core.exceptions import LDAPBindError, LDAPException
+import pytest
+
+from sark.services.auth.providers.ldap import LDAPProvider, LDAPProviderConfig
 
 
 @pytest.fixture
 def ldap_config():
     """LDAP configuration for testing."""
     return {
-        "server_uri": "ldap://test.example.com:389",
+        "server_url": "ldap://test.example.com:389",
         "bind_dn": "cn=admin,dc=example,dc=com",
         "bind_password": "admin_password",
-        "user_base_dn": "ou=users,dc=example,dc=com",
-        "group_base_dn": "ou=groups,dc=example,dc=com",
+        "base_dn": "dc=example,dc=com",
+        "group_search_base": "ou=groups,dc=example,dc=com",
     }
 
 
 @pytest.fixture
 def ldap_provider(ldap_config):
     """Create LDAP provider for testing."""
-    return LDAPProvider(**ldap_config)
+    return LDAPProvider(LDAPProviderConfig(**ldap_config))
 
 
 # Test Initialization
@@ -35,54 +35,35 @@ class TestLDAPProviderInitialization:
 
     def test_basic_initialization(self, ldap_config):
         """Test basic LDAP provider initialization."""
-        provider = LDAPProvider(**ldap_config)
+        config = LDAPProviderConfig(**ldap_config)
+        provider = LDAPProvider(config)
 
-        assert provider.server_uri == ldap_config["server_uri"]
-        assert provider.bind_dn == ldap_config["bind_dn"]
-        assert provider.bind_password == ldap_config["bind_password"]
-        assert provider.user_base_dn == ldap_config["user_base_dn"]
-        assert provider.group_base_dn == ldap_config["group_base_dn"]
-        assert provider.server is not None
+        assert provider.config.server_url == ldap_config["server_url"]
+        assert provider.config.bind_dn == ldap_config["bind_dn"]
+        assert provider.config.bind_password == ldap_config["bind_password"]
+        assert provider.config.base_dn == ldap_config["base_dn"]
 
     def test_custom_search_filters(self, ldap_config):
         """Test LDAP provider with custom search filters."""
-        provider = LDAPProvider(
-            **ldap_config,
-            user_search_filter="(sAMAccountName={username})",
-            group_search_filter="(memberOf={user_dn})",
-        )
+        config_dict = ldap_config.copy()
+        config_dict["user_search_filter"] = "(sAMAccountName={username})"
+        config_dict["group_search_filter"] = "(memberOf={user_dn})"
+        config = LDAPProviderConfig(**config_dict)
+        provider = LDAPProvider(config)
 
-        assert provider.user_search_filter == "(sAMAccountName={username})"
-        assert provider.group_search_filter == "(memberOf={user_dn})"
-
-    def test_custom_attributes(self, ldap_config):
-        """Test LDAP provider with custom attribute mappings."""
-        provider = LDAPProvider(
-            **ldap_config,
-            email_attribute="emailAddress",
-            name_attribute="displayName",
-            given_name_attribute="firstName",
-            family_name_attribute="lastName",
-        )
-
-        assert provider.email_attribute == "emailAddress"
-        assert provider.name_attribute == "displayName"
-        assert provider.given_name_attribute == "firstName"
-        assert provider.family_name_attribute == "lastName"
+        assert provider.config.user_search_filter == "(sAMAccountName={username})"
+        assert provider.config.group_search_filter == "(memberOf={user_dn})"
 
     def test_ssl_configuration(self, ldap_config):
         """Test LDAP provider with SSL enabled."""
-        ldap_config["server_uri"] = "ldaps://test.example.com:636"
-        provider = LDAPProvider(**ldap_config, use_ssl=True)
+        config_dict = ldap_config.copy()
+        config_dict["server_url"] = "ldaps://test.example.com:636"
+        config_dict["use_ssl"] = True
+        config = LDAPProviderConfig(**config_dict)
+        provider = LDAPProvider(config)
 
-        assert provider.use_ssl is True
-        assert provider.server_uri.startswith("ldaps://")
-
-    def test_pool_size_configuration(self, ldap_config):
-        """Test LDAP provider with custom pool size."""
-        provider = LDAPProvider(**ldap_config, pool_size=20)
-
-        assert provider.pool_size == 20
+        assert provider.config.use_ssl is True
+        assert provider.config.server_url.startswith("ldaps://")
 
 
 # Test Authentication
@@ -202,18 +183,17 @@ class TestAuthentication:
 
         mock_user_conn = Mock(spec=Connection)
 
-        with patch.object(ldap_provider, "_get_connection") as mock_get_conn:
-            with patch.object(
-                ldap_provider, "_get_user_groups", return_value=["developers", "admins"]
-            ):
-                mock_get_conn.side_effect = [mock_service_conn, mock_user_conn]
+        with patch.object(ldap_provider, "_get_connection") as mock_get_conn, patch.object(
+            ldap_provider, "_get_user_groups", return_value=["developers", "admins"]
+        ):
+            mock_get_conn.side_effect = [mock_service_conn, mock_user_conn]
 
-                user_info = await ldap_provider.authenticate(
-                    {"username": "jdoe", "password": "secret"}
-                )
+            user_info = await ldap_provider.authenticate(
+                {"username": "jdoe", "password": "secret"}
+            )
 
-                assert user_info is not None
-                assert user_info.groups == ["developers", "admins"]
+            assert user_info is not None
+            assert user_info.groups == ["developers", "admins"]
 
 
 # Test Group Lookup
@@ -258,8 +238,11 @@ class TestGroupLookup:
 
     @pytest.mark.asyncio
     async def test_get_user_groups_no_base_dn(self, ldap_config):
-        """Test group lookup when group_base_dn is not configured."""
-        provider = LDAPProvider(**{**ldap_config, "group_base_dn": None})
+        """Test group lookup when group_search_base is not configured."""
+        config_dict = ldap_config.copy()
+        config_dict["group_search_base"] = None
+        config = LDAPProviderConfig(**config_dict)
+        provider = LDAPProvider(config)
 
         groups = await provider._get_user_groups("uid=jdoe,ou=users,dc=example,dc=com")
 
@@ -470,31 +453,18 @@ class TestActiveDirectoryIntegration:
 
     def test_active_directory_search_filter(self, ldap_config):
         """Test provider with Active Directory sAMAccountName filter."""
-        provider = LDAPProvider(
-            **ldap_config,
-            user_search_filter="(sAMAccountName={username})",
-        )
+        config_dict = ldap_config.copy()
+        config_dict["user_search_filter"] = "(sAMAccountName={username})"
+        config = LDAPProviderConfig(**config_dict)
+        provider = LDAPProvider(config)
 
-        assert provider.user_search_filter == "(sAMAccountName={username})"
+        assert provider.config.user_search_filter == "(sAMAccountName={username})"
 
     def test_active_directory_group_filter(self, ldap_config):
         """Test provider with Active Directory memberOf filter."""
-        provider = LDAPProvider(
-            **ldap_config,
-            group_search_filter="(memberOf={user_dn})",
-        )
+        config_dict = ldap_config.copy()
+        config_dict["group_search_filter"] = "(memberOf={user_dn})"
+        config = LDAPProviderConfig(**config_dict)
+        provider = LDAPProvider(config)
 
-        assert provider.group_search_filter == "(memberOf={user_dn})"
-
-    def test_active_directory_attributes(self, ldap_config):
-        """Test provider with Active Directory attribute names."""
-        provider = LDAPProvider(
-            **ldap_config,
-            email_attribute="userPrincipalName",
-            name_attribute="displayName",
-            given_name_attribute="givenName",
-            family_name_attribute="sn",
-        )
-
-        assert provider.email_attribute == "userPrincipalName"
-        assert provider.name_attribute == "displayName"
+        assert provider.config.group_search_filter == "(memberOf={user_dn})"

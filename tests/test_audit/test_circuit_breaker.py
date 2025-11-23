@@ -1,7 +1,6 @@
 """Tests for circuit breaker pattern."""
 
 import asyncio
-import time
 from unittest.mock import AsyncMock
 
 import pytest
@@ -90,7 +89,7 @@ class TestCircuitBreaker:
         mock_op = AsyncMock(side_effect=Exception("Test error"))
 
         # Fail 3 times (threshold)
-        for i in range(3):
+        for _i in range(3):
             with pytest.raises(Exception):
                 await breaker.call(mock_op)
 
@@ -104,7 +103,7 @@ class TestCircuitBreaker:
         mock_op = AsyncMock(side_effect=Exception("Test error"))
 
         # Open the circuit
-        for i in range(3):
+        for _i in range(3):
             with pytest.raises(Exception):
                 await breaker.call(mock_op)
 
@@ -121,7 +120,7 @@ class TestCircuitBreaker:
         mock_op = AsyncMock(side_effect=Exception("Test error"))
 
         # Open the circuit
-        for i in range(3):
+        for _i in range(3):
             with pytest.raises(Exception):
                 await breaker.call(mock_op)
 
@@ -144,7 +143,7 @@ class TestCircuitBreaker:
         mock_op = AsyncMock(side_effect=Exception("Test error"))
 
         # Open the circuit
-        for i in range(3):
+        for _i in range(3):
             with pytest.raises(Exception):
                 await breaker.call(mock_op)
 
@@ -185,7 +184,7 @@ class TestCircuitBreaker:
 
         # Fail twice
         mock_op.side_effect = Exception("Error")
-        for i in range(2):
+        for _i in range(2):
             with pytest.raises(Exception):
                 await breaker.call(mock_op)
 
@@ -220,7 +219,7 @@ class TestCircuitBreaker:
         mock_op = AsyncMock(side_effect=Exception("Error"))
 
         # Open the circuit
-        for i in range(3):
+        for _i in range(3):
             with pytest.raises(Exception):
                 await breaker.call(mock_op)
 
@@ -237,7 +236,7 @@ class TestCircuitBreaker:
         mock_op = AsyncMock(side_effect=Exception("Error"))
 
         # Open the circuit
-        for i in range(3):
+        for _i in range(3):
             with pytest.raises(Exception):
                 await breaker.call(mock_op)
 
@@ -257,7 +256,7 @@ class TestCircuitBreaker:
         mock_op = AsyncMock(side_effect=Exception("Error"))
 
         # Open the circuit
-        for i in range(3):
+        for _i in range(3):
             with pytest.raises(Exception):
                 await breaker.call(mock_op)
 
@@ -296,7 +295,7 @@ class TestCircuitBreaker:
         mock_op = AsyncMock(side_effect=Exception("Error"))
 
         # Open the circuit
-        for i in range(3):
+        for _i in range(3):
             with pytest.raises(Exception):
                 await breaker.call(mock_op)
 

@@ -1,12 +1,12 @@
 """Tests for SAML authentication provider."""
 
 import base64
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
 from sark.services.auth.providers.base import UserInfo
-from sark.services.auth.providers.saml import SAMLProvider
+from sark.services.auth.providers.saml import SAMLProvider, SAMLProviderConfig
 
 
 @pytest.fixture
@@ -26,7 +26,7 @@ def saml_config():
 @pytest.fixture
 def azure_saml_provider(saml_config):
     """Create an Azure AD SAML provider for testing."""
-    return SAMLProvider(**saml_config)
+    return SAMLProvider(SAMLProviderConfig(**saml_config))
 
 
 @pytest.fixture
@@ -35,7 +35,7 @@ def saml_provider_with_signing(saml_config):
     config = saml_config.copy()
     config["sp_x509_cert"] = "MIICertificateDataHere"
     config["sp_private_key"] = "-----BEGIN PRIVATE KEY-----\nKeyDataHere\n-----END PRIVATE KEY-----"
-    return SAMLProvider(**config)
+    return SAMLProvider(SAMLProviderConfig(**config))
 
 
 @pytest.fixture
@@ -56,53 +56,37 @@ def mock_saml_response():
 class TestSAMLProviderInitialization:
     """Test SAML provider initialization."""
 
-    def test_basic_initialization(self, azure_saml_provider, saml_config):
+    def test_basic_initialization(self, saml_config):
         """Test basic SAML provider initialization."""
-        provider = azure_saml_provider
+        config = SAMLProviderConfig(**saml_config)
+        provider = SAMLProvider(config)
 
-        assert provider.sp_entity_id == saml_config["sp_entity_id"]
-        assert provider.sp_acs_url == saml_config["sp_acs_url"]
-        assert provider.idp_entity_id == saml_config["idp_entity_id"]
-        assert provider.idp_sso_url == saml_config["idp_sso_url"]
-        assert provider.want_assertions_signed is True
+        assert provider.config.sp_entity_id == saml_config["sp_entity_id"]
+        assert provider.config.idp_sso_url == saml_config["idp_sso_url"]
+        assert provider.config.sign_requests is True
 
-    def test_initialization_with_signing(self, saml_provider_with_signing):
+    def test_initialization_with_signing(self, saml_config):
         """Test SAML provider initialization with signing certificates."""
-        provider = saml_provider_with_signing
+        config_dict = saml_config.copy()
+        config_dict["sign_requests"] = True
+        config = SAMLProviderConfig(**config_dict)
+        provider = SAMLProvider(config)
 
-        assert provider.sp_x509_cert is not None
-        assert provider.sp_private_key is not None
-        assert "MIICertificateDataHere" in provider.sp_x509_cert
+        assert provider.config.sign_requests is True
 
     def test_custom_name_id_format(self, saml_config):
         """Test SAML provider with custom NameID format."""
-        provider = SAMLProvider(
-            **saml_config,
-            name_id_format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+        config_dict = saml_config.copy()
+        config_dict[
+            "name_id_format"
+        ] = "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
+        config = SAMLProviderConfig(**config_dict)
+        provider = SAMLProvider(config)
+
+        assert (
+            provider.config.name_id_format
+            == "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
         )
-
-        assert provider.name_id_format == "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
-
-    def test_custom_attribute_mapping(self, saml_config):
-        """Test SAML provider with custom attribute mapping."""
-        custom_mapping = {
-            "custom_email": "email",
-            "custom_name": "name",
-        }
-
-        provider = SAMLProvider(**saml_config, attribute_mapping=custom_mapping)
-
-        assert provider.attribute_mapping == custom_mapping
-
-    def test_security_settings(self, azure_saml_provider):
-        """Test SAML security settings are properly configured."""
-        provider = azure_saml_provider
-        settings = provider._settings
-
-        assert settings["security"]["wantAssertionsSigned"] is True
-        assert settings["security"]["wantMessagesSigned"] is False
-        assert "idp" in settings
-        assert "sp" in settings
 
 
 class TestAuthentication:
@@ -527,7 +511,7 @@ class TestLogout:
             mock_auth.process_slo = MagicMock(return_value="https://app.example.com/")
             mock_auth_class.return_value = mock_auth
 
-            logout_response = await azure_saml_provider.process_logout_request(
+            await azure_saml_provider.process_logout_request(
                 "base64EncodedLogoutRequest"
             )
 

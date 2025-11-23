@@ -17,25 +17,25 @@ from sark.services.auth.session import (
 from sark.services.auth.user_context import UserContext, extract_user_context
 
 __all__ = [
-    # JWT
-    "JWTHandler",
-    "get_current_user",
-    # User Context
-    "UserContext",
-    "extract_user_context",
     # API Keys
     "APIKey",
     "APIKeyService",
-    "get_api_key",
-    "require_scope",
+    # Providers
+    "AuthProvider",
+    # JWT
+    "JWTHandler",
+    "LDAPProvider",
+    "OIDCProvider",
+    "SAMLProvider",
     # Sessions
     "Session",
     "SessionService",
     "SessionStore",
+    # User Context
+    "UserContext",
+    "extract_user_context",
+    "get_api_key",
+    "get_current_user",
     "get_session_store",
-    # Providers
-    "AuthProvider",
-    "LDAPProvider",
-    "OIDCProvider",
-    "SAMLProvider",
+    "require_scope",
 ]

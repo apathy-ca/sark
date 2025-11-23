@@ -1,10 +1,10 @@
 """Session model for authentication session management."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class Session(BaseModel):
@@ -25,13 +25,10 @@ class Session(BaseModel):
         default_factory=dict, description="Additional session metadata"
     )
 
-    class Config:
-        """Pydantic configuration."""
-
-        json_encoders = {
-            datetime: lambda v: v.isoformat(),
-            UUID: lambda v: str(v),
-        }
+    model_config = ConfigDict(
+        # JSON serialization handled by to_dict() method
+        ser_json_timedelta="iso8601",
+    )
 
     def is_expired(self, current_time: datetime | None = None) -> bool:
         """Check if session is expired.
@@ -43,7 +40,7 @@ class Session(BaseModel):
             True if session is expired, False otherwise
         """
         if current_time is None:
-            current_time = datetime.utcnow()
+            current_time = datetime.now(UTC)
         return current_time >= self.expires_at
 
     def to_dict(self) -> dict[str, Any]:
@@ -106,13 +103,10 @@ class SessionResponse(BaseModel):
     user_agent: str | None = None
     is_expired: bool = False
 
-    class Config:
-        """Pydantic configuration."""
-
-        json_encoders = {
-            datetime: lambda v: v.isoformat(),
-            UUID: lambda v: str(v),
-        }
+    model_config = ConfigDict(
+        # JSON serialization uses Pydantic V2 defaults
+        ser_json_timedelta="iso8601",
+    )
 
 
 class SessionListResponse(BaseModel):

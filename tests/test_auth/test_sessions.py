@@ -1,13 +1,14 @@
 """Tests for session management service."""
 
-import pytest
-import uuid
-from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
+from datetime import UTC, datetime, timedelta
 import json
+from unittest.mock import AsyncMock, patch
+import uuid
 
-from sark.services.auth.sessions import SessionService
+import pytest
+
 from sark.models.session import Session
+from sark.services.auth.sessions import SessionService
 
 
 @pytest.fixture
@@ -106,7 +107,7 @@ class TestSessionRetrieval:
         """Test successful session retrieval."""
         session_id = str(uuid.uuid4())
         user_id = uuid.uuid4()
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
 
         session_data = {
             "session_id": session_id,
@@ -140,7 +141,7 @@ class TestSessionRetrieval:
     async def test_get_session_expired(self, session_service, mock_redis):
         """Test retrieving expired session."""
         session_id = str(uuid.uuid4())
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
 
         # Session expired 1 hour ago
         session_data = {
@@ -173,7 +174,7 @@ class TestSessionUpdate:
     async def test_update_activity_success(self, session_service, mock_redis):
         """Test successful activity update."""
         session_id = str(uuid.uuid4())
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
 
         session_data = {
             "session_id": session_id,
@@ -197,7 +198,7 @@ class TestSessionUpdate:
     async def test_update_activity_with_ip_change(self, session_service, mock_redis):
         """Test activity update with IP address change."""
         session_id = str(uuid.uuid4())
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         new_ip = "10.0.0.1"
 
         session_data = {
@@ -238,7 +239,7 @@ class TestSessionInvalidation:
         """Test successful session invalidation."""
         session_id = str(uuid.uuid4())
         user_id = uuid.uuid4()
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
 
         session_data = {
             "session_id": session_id,
@@ -268,7 +269,7 @@ class TestSessionInvalidation:
         mock_redis.smembers.return_value = {sid.encode() for sid in session_ids}
 
         # Mock session retrieval for each session
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         session_data = {
             "session_id": "temp",
             "user_id": str(user_id),
@@ -303,7 +304,7 @@ class TestSessionListing:
         mock_redis.smembers.return_value = {sid.encode() for sid in session_ids}
 
         # Mock session data for each session
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
 
         async def mock_get_session_side_effect(session_id):
             return Session(
@@ -359,7 +360,7 @@ class TestConcurrentSessionLimits:
     async def test_enforce_session_limit(self, session_service, mock_redis):
         """Test that old sessions are removed when limit is reached."""
         user_id = uuid.uuid4()
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
 
         # Create 3 existing sessions (at the limit)
         existing_sessions = [
@@ -377,18 +378,17 @@ class TestConcurrentSessionLimits:
 
         with patch.object(
             session_service, "list_user_sessions", return_value=existing_sessions
-        ):
-            with patch.object(session_service, "invalidate_session", new=AsyncMock()) as mock_invalidate:
-                await session_service._enforce_session_limit(user_id)
+        ), patch.object(session_service, "invalidate_session", new=AsyncMock()) as mock_invalidate:
+            await session_service._enforce_session_limit(user_id)
 
-                # Should invalidate oldest session
-                assert mock_invalidate.call_count == 1
+            # Should invalidate oldest session
+            assert mock_invalidate.call_count == 1
 
     @pytest.mark.asyncio
     async def test_no_enforcement_under_limit(self, session_service, mock_redis):
         """Test that sessions are not removed when under limit."""
         user_id = uuid.uuid4()
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
 
         # Only 2 sessions (under limit of 3)
         existing_sessions = [
@@ -406,12 +406,11 @@ class TestConcurrentSessionLimits:
 
         with patch.object(
             session_service, "list_user_sessions", return_value=existing_sessions
-        ):
-            with patch.object(session_service, "invalidate_session", new=AsyncMock()) as mock_invalidate:
-                await session_service._enforce_session_limit(user_id)
+        ), patch.object(session_service, "invalidate_session", new=AsyncMock()) as mock_invalidate:
+            await session_service._enforce_session_limit(user_id)
 
-                # Should not invalidate any sessions
-                assert mock_invalidate.call_count == 0
+            # Should not invalidate any sessions
+            assert mock_invalidate.call_count == 0
 
 
 # Test Session Validation
@@ -424,7 +423,7 @@ class TestSessionValidation:
     async def test_validate_session_success(self, session_service, mock_redis):
         """Test successful session validation."""
         session_id = str(uuid.uuid4())
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
 
         session_data = {
             "session_id": session_id,
@@ -449,7 +448,7 @@ class TestSessionValidation:
     async def test_validate_expired_session(self, session_service, mock_redis):
         """Test validating an expired session."""
         session_id = str(uuid.uuid4())
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
 
         # Expired session
         session_data = {
@@ -482,7 +481,7 @@ class TestSessionExtension:
     async def test_extend_session_success(self, session_service, mock_redis):
         """Test successful session extension."""
         session_id = str(uuid.uuid4())
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
 
         session_data = {
             "session_id": session_id,
@@ -523,7 +522,7 @@ class TestSessionCleanup:
     async def test_cleanup_expired_sessions(self, session_service, mock_redis):
         """Test cleaning up expired sessions."""
         user_id = uuid.uuid4()
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
 
         # Mix of active and expired sessions
         sessions = [
@@ -549,12 +548,11 @@ class TestSessionCleanup:
 
         with patch.object(
             session_service, "list_user_sessions", return_value=sessions
-        ):
-            with patch.object(session_service, "invalidate_session", new=AsyncMock()) as mock_invalidate:
-                count = await session_service.cleanup_expired_sessions(user_id)
+        ), patch.object(session_service, "invalidate_session", new=AsyncMock()) as mock_invalidate:
+            count = await session_service.cleanup_expired_sessions(user_id)
 
-                assert count == 1
-                assert mock_invalidate.call_count == 1
+            assert count == 1
+            assert mock_invalidate.call_count == 1
 
     @pytest.mark.asyncio
     async def test_get_active_session_count(self, session_service, mock_redis):

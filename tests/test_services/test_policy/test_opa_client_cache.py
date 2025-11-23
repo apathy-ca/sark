@@ -1,10 +1,11 @@
 """Tests for OPA Client with Cache Integration."""
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from sark.services.policy.opa_client import OPAClient, AuthorizationInput, AuthorizationDecision
+import pytest
+
 from sark.services.policy.cache import PolicyCache
+from sark.services.policy.opa_client import AuthorizationInput, OPAClient
 
 
 @pytest.fixture

@@ -1,10 +1,10 @@
 """Unit tests for Server Search and Filtering."""
 
 from unittest.mock import MagicMock
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import pytest
-from sqlalchemy import Select, and_, or_, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from sark.models.mcp_server import MCPServer, SensitivityLevel, ServerStatus

@@ -1,12 +1,12 @@
 """Tests for policy audit service."""
 
+from datetime import UTC, datetime, timedelta
+
 import pytest
-from datetime import datetime, timedelta, UTC
-from unittest.mock import AsyncMock
 
 from sark.models.policy_audit import PolicyChangeType, PolicyDecisionResult
 from sark.services.policy.audit import PolicyAuditService
-from sark.services.policy.opa_client import AuthorizationInput, AuthorizationDecision
+from sark.services.policy.opa_client import AuthorizationDecision, AuthorizationInput
 
 
 @pytest.fixture

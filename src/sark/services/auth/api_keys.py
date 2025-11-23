@@ -3,10 +3,10 @@
 Handles creation, validation, rotation, and rate limiting of API keys.
 """
 
+from datetime import UTC, datetime, timedelta
 import secrets
+from typing import Any, ClassVar
 import uuid
-from datetime import datetime, timedelta
-from typing import Any
 
 import bcrypt
 from sqlalchemy import select
@@ -26,7 +26,7 @@ class APIKeyService:
     SECRET_LENGTH = 32  # Secret portion length
 
     # Scope definitions
-    VALID_SCOPES = {
+    VALID_SCOPES: ClassVar[set[str]] = {
         "server:read",  # Read server information
         "server:write",  # Register/update servers
         "server:delete",  # Delete servers
@@ -158,7 +158,7 @@ class APIKeyService:
         # Calculate expiration
         expires_at = None
         if expires_in_days:
-            expires_at = datetime.utcnow() + timedelta(days=expires_in_days)
+            expires_at = datetime.now(UTC) + timedelta(days=expires_in_days)
 
         # Create database record
         api_key = APIKey(
@@ -316,7 +316,7 @@ class APIKeyService:
         # Update the key
         api_key.key_prefix = prefix
         api_key.key_hash = key_hash
-        api_key.updated_at = datetime.utcnow()
+        api_key.updated_at = datetime.now(UTC)
 
         await self.db.flush()
 
@@ -393,7 +393,7 @@ class APIKeyService:
         if is_active is not None:
             api_key.is_active = is_active
 
-        api_key.updated_at = datetime.utcnow()
+        api_key.updated_at = datetime.now(UTC)
         await self.db.flush()
 
         return api_key

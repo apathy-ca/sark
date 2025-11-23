@@ -4,8 +4,8 @@ from datetime import UTC, datetime
 from typing import Any
 
 import httpx
+from pydantic import Field
 import structlog
-from pydantic import BaseModel, Field
 
 from sark.models.audit import AuditEvent
 from sark.services.audit.siem.base import BaseSIEM, SIEMConfig, SIEMHealth
@@ -276,14 +276,14 @@ class DatadogSIEM(BaseSIEM):
             self._logger.error("datadog_health_check_timeout", error=str(e))
             return SIEMHealth(
                 healthy=False,
-                error_message=f"Timeout: {str(e)}",
+                error_message=f"Timeout: {e!s}",
                 details={"logs_url": self._logs_url},
             )
         except httpx.ConnectError as e:
             self._logger.error("datadog_health_check_connection_error", error=str(e))
             return SIEMHealth(
                 healthy=False,
-                error_message=f"Connection error: {str(e)}",
+                error_message=f"Connection error: {e!s}",
                 details={"logs_url": self._logs_url},
             )
         except Exception as e:
@@ -294,7 +294,7 @@ class DatadogSIEM(BaseSIEM):
             )
             return SIEMHealth(
                 healthy=False,
-                error_message=f"{type(e).__name__}: {str(e)}",
+                error_message=f"{type(e).__name__}: {e!s}",
                 details={"logs_url": self._logs_url},
             )
 

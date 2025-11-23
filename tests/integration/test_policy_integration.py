@@ -10,24 +10,23 @@ Tests policy evaluation workflows including:
 - Fail-closed behavior verification
 """
 
-import pytest
-from datetime import datetime, UTC
-from unittest.mock import AsyncMock, patch, MagicMock
+from datetime import UTC, datetime
+from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
-from fastapi import HTTPException, status
+import pytest
 
-from sark.services.policy.opa_client import OPAClient, AuthorizationDecision
-from sark.services.policy.policy_service import PolicyService
-from sark.models.policy import Policy, PolicyVersion, PolicyStatus
-from sark.models.mcp_server import MCPServer, TransportType, SensitivityLevel
+from sark.models.mcp_server import MCPServer, SensitivityLevel, TransportType
+from sark.models.policy import Policy, PolicyStatus, PolicyVersion
 from sark.models.user import User
+from sark.services.policy.opa_client import OPAClient
+from sark.services.policy.policy_service import PolicyService
 
 
 @pytest.fixture
 async def opa_client():
     """OPA client for policy tests."""
-    return OPAClient(base_url="http://localhost:8181")
+    return OPAClient(opa_url="http://localhost:8181")
 
 
 @pytest.fixture

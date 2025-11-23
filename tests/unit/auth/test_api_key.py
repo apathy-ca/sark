@@ -1,11 +1,11 @@
 """Comprehensive tests for API key authentication."""
 
 from datetime import UTC, datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 from uuid import uuid4
 
-import pytest
 from fastapi import HTTPException
+import pytest
 
 from sark.services.auth.api_key import (
     APIKey,
@@ -127,7 +127,7 @@ class TestAPIKeyService:
     def test_create_api_key_with_scopes(self, service, sample_owner_id):
         """Test creating API key with scopes."""
         scopes = ["read:servers", "write:servers"]
-        plain_key, api_key = service.create_api_key(
+        _plain_key, api_key = service.create_api_key(
             name="scoped-key",
             owner_id=sample_owner_id,
             scopes=scopes,
@@ -137,7 +137,7 @@ class TestAPIKeyService:
 
     def test_create_api_key_with_description(self, service, sample_owner_id):
         """Test creating API key with description."""
-        plain_key, api_key = service.create_api_key(
+        _plain_key, api_key = service.create_api_key(
             name="described-key",
             owner_id=sample_owner_id,
             description="This is a test key",
@@ -148,12 +148,12 @@ class TestAPIKeyService:
     def test_create_api_key_with_expiration(self, service, sample_owner_id):
         """Test creating API key with expiration."""
         before_create = datetime.now(UTC)
-        plain_key, api_key = service.create_api_key(
+        _plain_key, api_key = service.create_api_key(
             name="expiring-key",
             owner_id=sample_owner_id,
             expires_in_days=30,
         )
-        after_create = datetime.now(UTC)
+        datetime.now(UTC)
 
         assert api_key.expires_at is not None
         expected_expiry = before_create + timedelta(days=30)
@@ -178,7 +178,7 @@ class TestAPIKeyService:
     def test_create_api_key_timestamps(self, service, sample_owner_id):
         """Test created API key has correct timestamps."""
         before_create = datetime.now(UTC)
-        plain_key, api_key = service.create_api_key(
+        _plain_key, api_key = service.create_api_key(
             name="timestamp-key",
             owner_id=sample_owner_id,
         )
@@ -433,7 +433,7 @@ class TestRequireScope:
         """Test require_scope passes when key has required scope."""
         from sark.services.auth.api_key import _api_key_store
 
-        plain_key, api_key = service.create_api_key(
+        _plain_key, api_key = service.create_api_key(
             "scoped-key",
             sample_owner_id,
             scopes=["read:servers"],
@@ -454,7 +454,7 @@ class TestRequireScope:
         """Test require_scope raises when key lacks required scope."""
         from sark.services.auth.api_key import _api_key_store
 
-        plain_key, api_key = service.create_api_key(
+        _plain_key, api_key = service.create_api_key(
             "scoped-key",
             sample_owner_id,
             scopes=["read:servers"],
@@ -477,7 +477,7 @@ class TestRequireScope:
         """Test require_scope passes with wildcard scope."""
         from sark.services.auth.api_key import _api_key_store
 
-        plain_key, api_key = service.create_api_key(
+        _plain_key, api_key = service.create_api_key(
             "admin-key",
             sample_owner_id,
             scopes=["*"],

@@ -3,9 +3,10 @@
 Tests sensitivity detection performance to ensure <5ms detection time.
 """
 
-import pytest
-import time
 import statistics
+import time
+
+import pytest
 
 from sark.services.discovery.tool_registry import ToolRegistry
 
@@ -93,7 +94,7 @@ async def test_detection_with_parameters_performance(tool_registry):
     # Run 1000 detections with parameters
     for i in range(1000):
         start = time.perf_counter()
-        level = await tool_registry.detect_sensitivity(
+        await tool_registry.detect_sensitivity(
             tool_name=f"manage_account_{i}",
             tool_description="Account management operations",
             parameters=parameters,
@@ -121,7 +122,6 @@ async def test_detection_with_parameters_performance(tool_registry):
 @pytest.mark.asyncio
 async def test_keyword_matching_performance(tool_registry):
     """Benchmark: Keyword matching with regex should be fast."""
-    import re
 
     text = "this is a test string with delete and admin keywords in it for testing"
 
@@ -132,7 +132,7 @@ async def test_keyword_matching_performance(tool_registry):
         start = time.perf_counter()
 
         # Simulate keyword matching
-        matched = tool_registry._contains_keywords(text, tool_registry.HIGH_KEYWORDS)
+        tool_registry._contains_keywords(text, tool_registry.HIGH_KEYWORDS)
 
         end = time.perf_counter()
 
@@ -290,14 +290,13 @@ async def test_detection_throughput(tool_registry):
 @pytest.mark.asyncio
 async def test_detection_memory_efficiency(tool_registry):
     """Benchmark: Ensure detection doesn't leak memory."""
-    import sys
 
     # Get initial memory usage
     initial_refs = len(tool_registry.HIGH_KEYWORDS)
 
     # Run many detections
     for i in range(10000):
-        level = await tool_registry.detect_sensitivity(
+        await tool_registry.detect_sensitivity(
             f"tool_{i}",
             f"Test tool {i} with various operations",
         )
@@ -336,7 +335,7 @@ async def test_detection_long_descriptions(tool_registry):
     # Run 100 detections with long descriptions
     for i in range(100):
         start = time.perf_counter()
-        level = await tool_registry.detect_sensitivity(
+        await tool_registry.detect_sensitivity(
             f"tool_{i}",
             long_desc,
         )
@@ -376,7 +375,7 @@ async def test_detection_many_parameters(tool_registry):
     # Run 100 detections with many parameters
     for i in range(100):
         start = time.perf_counter()
-        level = await tool_registry.detect_sensitivity(
+        await tool_registry.detect_sensitivity(
             f"tool_{i}",
             "Test tool",
             parameters=parameters,

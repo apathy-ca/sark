@@ -1,8 +1,7 @@
 """Comprehensive tests for SAML authentication provider."""
 
 import base64
-from unittest.mock import AsyncMock, patch
-from uuid import UUID, uuid5
+from uuid import UUID
 
 import pytest
 

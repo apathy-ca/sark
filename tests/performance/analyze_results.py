@@ -13,10 +13,10 @@ Usage:
 
 import argparse
 import csv
-import json
-import sys
 from dataclasses import dataclass
+import json
 from pathlib import Path
+import sys
 from typing import Any
 
 
@@ -60,7 +60,7 @@ class ResultsAnalyzer:
         """Load Locust CSV stats file."""
         print(f"Loading results from {csv_path}...")
 
-        with open(csv_path, "r") as f:
+        with open(csv_path) as f:
             reader = csv.DictReader(f)
 
             for row in reader:

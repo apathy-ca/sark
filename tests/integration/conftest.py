@@ -9,17 +9,17 @@ Provides common test fixtures including:
 - SIEM mocks
 """
 
-import pytest
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
-from sark.models.user import User
-from sark.models.mcp_server import MCPServer, TransportType, SensitivityLevel
-from sark.services.auth.jwt import JWTHandler
-from sark.services.auth.api_key import APIKeyService
-from sark.services.policy.opa_client import OPAClient
+import pytest
 
+from sark.models.mcp_server import MCPServer, SensitivityLevel, TransportType
+from sark.models.user import User
+from sark.services.auth.api_key import APIKeyService
+from sark.services.auth.jwt import JWTHandler
+from sark.services.policy.opa_client import OPAClient
 
 # ============================================================================
 # Database Fixtures

@@ -5,19 +5,17 @@ Quick verification tests (~10 seconds total) that validate
 essential system functionality is working.
 """
 
-import pytest
+from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import UUID, uuid4
-from datetime import datetime, UTC
 
-import httpx
+import pytest
 
-from sark.services.auth.jwt import JWTHandler
-from sark.services.auth.api_key import APIKeyService
-from sark.services.policy.opa_client import OPAClient, AuthorizationInput
+from sark.models.mcp_server import MCPServer, SensitivityLevel, ServerStatus, TransportType
 from sark.models.user import User
-from sark.models.mcp_server import MCPServer, TransportType, SensitivityLevel, ServerStatus
-
+from sark.services.auth.api_key import APIKeyService
+from sark.services.auth.jwt import JWTHandler
+from sark.services.policy.opa_client import AuthorizationInput, OPAClient
 
 # ============================================================================
 # System Health Checks

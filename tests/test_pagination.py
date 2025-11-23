@@ -282,7 +282,7 @@ class TestCursorPaginator:
         params = PaginationParams(limit=50, sort_order="asc")
 
         # Execute pagination
-        items, next_cursor, has_more, total = await CursorPaginator.paginate(
+        items, _next_cursor, has_more, _total = await CursorPaginator.paginate(
             db=mock_db,
             query=select(TestModel),
             cursor_column=TestModel.created_at,
@@ -343,7 +343,7 @@ class TestCursorPaginator:
         params = PaginationParams(limit=50, cursor="invalid!!!cursor")
 
         # Execute pagination - should not raise error
-        items, next_cursor, has_more, total = await CursorPaginator.paginate(
+        items, _next_cursor, has_more, _total = await CursorPaginator.paginate(
             db=mock_db,
             query=select(TestModel),
             cursor_column=TestModel.created_at,

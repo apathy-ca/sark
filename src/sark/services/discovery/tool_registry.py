@@ -4,9 +4,9 @@ This service provides automatic sensitivity detection for MCP tools based on
 keyword analysis, as well as manual override capabilities.
 """
 
-import re
 from datetime import UTC, datetime
-from typing import Any
+import re
+from typing import Any, ClassVar
 from uuid import UUID
 
 from sqlalchemy import select
@@ -24,7 +24,7 @@ class ToolRegistry:
     """Service for tool sensitivity classification and management."""
 
     # Keyword-based sensitivity detection rules
-    HIGH_KEYWORDS = [
+    HIGH_KEYWORDS: ClassVar[list[str]] = [
         "delete",
         "drop",
         "exec",
@@ -39,7 +39,7 @@ class ToolRegistry:
         "truncate",
     ]
 
-    MEDIUM_KEYWORDS = [
+    MEDIUM_KEYWORDS: ClassVar[list[str]] = [
         "write",
         "update",
         "modify",
@@ -54,7 +54,7 @@ class ToolRegistry:
         "patch",
     ]
 
-    LOW_KEYWORDS = [
+    LOW_KEYWORDS: ClassVar[list[str]] = [
         "read",
         "get",
         "list",
@@ -69,7 +69,7 @@ class ToolRegistry:
     ]
 
     # Critical keywords that always result in critical sensitivity
-    CRITICAL_KEYWORDS = [
+    CRITICAL_KEYWORDS: ClassVar[list[str]] = [
         "payment",
         "transaction",
         "credit_card",

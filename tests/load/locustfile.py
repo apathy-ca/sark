@@ -16,10 +16,10 @@ Usage:
            --html locust_report.html
 """
 
-from locust import HttpUser, task, between, events
 import random
-import json
 import time
+
+from locust import HttpUser, between, events, task
 
 
 class PolicyEvaluationUser(HttpUser):

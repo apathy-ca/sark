@@ -5,18 +5,16 @@ Provides factories and generators for creating realistic test data
 including users, servers, policies, and audit events.
 """
 
+from datetime import UTC, datetime, timedelta
 import random
-from datetime import datetime, timedelta, UTC
-from typing import List, Optional
-from uuid import uuid4, UUID
+from uuid import UUID, uuid4
 
 from faker import Faker
 
-from sark.models.user import User, Team
-from sark.models.mcp_server import MCPServer, TransportType, SensitivityLevel, ServerStatus
-from sark.models.policy import Policy, PolicyVersion, PolicyStatus
 from sark.models.audit import AuditEvent, AuditEventType, SeverityLevel
-
+from sark.models.mcp_server import MCPServer, SensitivityLevel, ServerStatus, TransportType
+from sark.models.policy import Policy, PolicyStatus
+from sark.models.user import Team, User
 
 # Initialize Faker for realistic data
 fake = Faker()
@@ -29,8 +27,8 @@ fake = Faker()
 def generate_user(
     role: str = "developer",
     is_admin: bool = False,
-    status: ServerStatus = ServerStatus.ACTIVE,
-    team_id: Optional[uuid4] = None
+    is_active: bool = True,
+    team_id: UUID | None = None
 ) -> User:
     """
     Generate a single user with realistic data.
@@ -66,7 +64,7 @@ def generate_user(
     )
 
 
-def generate_users(count: int, **kwargs) -> List[User]:
+def generate_users(count: int, **kwargs) -> list[User]:
     """
     Generate multiple users.
 
@@ -118,8 +116,8 @@ def generate_team(member_count: int = 0) -> Team:
 # ============================================================================
 
 def generate_mcp_server(
-    owner_id: Optional[uuid4] = None,
-    team_id: Optional[uuid4] = None,
+    owner_id: UUID | None = None,
+    team_id: UUID | None = None,
     sensitivity_level: SensitivityLevel = SensitivityLevel.MEDIUM,
     server_status: ServerStatus = ServerStatus.ACTIVE,
     transport: TransportType = TransportType.HTTP
@@ -131,7 +129,7 @@ def generate_mcp_server(
         owner_id: User ID who owns the server
         team_id: Team ID the server belongs to
         sensitivity_level: Security sensitivity level
-        is_active: Whether server is active
+        server_status: Server status
         transport: Transport protocol
 
     Returns:
@@ -167,7 +165,7 @@ def generate_mcp_server(
         sensitivity_level=sensitivity_level,
         owner_id=owner_id,
         team_id=team_id,
-        is_active=is_active,
+        status=server_status,
         health_check_url=f"http://{server_name}.{fake.domain_name()}/health" if transport == TransportType.HTTP else None,
         created_at=datetime.now(UTC) - timedelta(days=random.randint(1, 180)),
         updated_at=datetime.now(UTC)
@@ -177,7 +175,7 @@ def generate_mcp_server(
 def generate_servers(
     count: int,
     **kwargs
-) -> List[MCPServer]:
+) -> list[MCPServer]:
     """
     Generate multiple MCP servers.
 
@@ -270,7 +268,6 @@ def generate_high_sensitivity_server(**kwargs) -> MCPServer:
 def generate_policy(
     policy_type: str = "authorization",
     status: PolicyStatus = PolicyStatus.DRAFT,
-    # No created_by field in Policy = None
 ) -> Policy:
     """
     Generate a policy with realistic data.
@@ -278,7 +275,6 @@ def generate_policy(
     Args:
         policy_type: Type of policy (authorization, validation, etc.)
         status: Policy status
-        created_by: User ID who created the policy
 
     Returns:
         Policy object
@@ -290,9 +286,6 @@ def generate_policy(
         "admin-action-policy",
         "team-collaboration-policy"
     ]
-
-    if not created_by:
-        created_by = uuid4()
 
     return Policy(
         id=uuid4(),
@@ -365,8 +358,8 @@ def generate_validation_policy() -> Policy:
 # ============================================================================
 
 def generate_audit_event(
-    user_id: Optional[uuid4] = None,
-    resource_id: Optional[uuid4] = None,
+    user_id: UUID | None = None,
+    resource_id: UUID | None = None,
     event_type: AuditEventType = AuditEventType.SERVER_REGISTERED,
     severity: SeverityLevel = SeverityLevel.LOW
 ) -> AuditEvent:
@@ -419,7 +412,7 @@ def generate_audit_event(
 def generate_audit_trail(
     user_id: uuid4,
     event_count: int = 10
-) -> List[AuditEvent]:
+) -> list[AuditEvent]:
     """
     Generate a series of related audit events (audit trail).
 
