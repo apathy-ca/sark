@@ -1,6 +1,6 @@
 """Session model for authentication session management."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
@@ -40,7 +40,7 @@ class Session(BaseModel):
             True if session is expired, False otherwise
         """
         if current_time is None:
-            current_time = datetime.utcnow()
+            current_time = datetime.now(UTC)
         return current_time >= self.expires_at
 
     def to_dict(self) -> dict[str, Any]:

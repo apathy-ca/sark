@@ -4,7 +4,7 @@ Provides REST API for querying policy decisions, tracking changes,
 and exporting audit data for compliance and analytics.
 """
 
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
@@ -125,7 +125,7 @@ async def get_decision_logs(
 
     # Default time range: last 24 hours
     if not start_time and not end_time:
-        end_time = datetime.utcnow()
+        end_time = datetime.now(UTC)
         start_time = end_time - timedelta(days=1)
 
     logs = await audit_service.get_decision_logs(
@@ -261,7 +261,7 @@ async def get_policy_changes(
 
     # Default time range: last 30 days
     if not start_time and not end_time:
-        end_time = datetime.utcnow()
+        end_time = datetime.now(UTC)
         start_time = end_time - timedelta(days=30)
 
     changes = await audit_service.get_policy_changes(
@@ -369,8 +369,8 @@ async def export_decisions_csv(
     audit_service = PolicyAuditService(db)
 
     # Default time range
-    start_time = request.start_time or (datetime.utcnow() - timedelta(days=7))
-    end_time = request.end_time or datetime.utcnow()
+    start_time = request.start_time or (datetime.now(UTC) - timedelta(days=7))
+    end_time = request.end_time or datetime.now(UTC)
 
     csv_content = await audit_service.export_decisions_csv(
         start_time=start_time,
@@ -408,8 +408,8 @@ async def export_decisions_json(
     audit_service = PolicyAuditService(db)
 
     # Default time range
-    start_time = request.start_time or (datetime.utcnow() - timedelta(days=7))
-    end_time = request.end_time or datetime.utcnow()
+    start_time = request.start_time or (datetime.now(UTC) - timedelta(days=7))
+    end_time = request.end_time or datetime.now(UTC)
 
     json_content = await audit_service.export_decisions_json(
         start_time=start_time,
@@ -455,9 +455,9 @@ async def get_analytics(
 
     # Default time range: last 24 hours
     if not start_time:
-        start_time = datetime.utcnow() - timedelta(days=1)
+        start_time = datetime.now(UTC) - timedelta(days=1)
     if not end_time:
-        end_time = datetime.utcnow()
+        end_time = datetime.now(UTC)
 
     analytics = await audit_service.get_decision_analytics(
         start_time=start_time,
@@ -489,9 +489,9 @@ async def get_top_denial_reasons(
 
     # Default time range: last 7 days
     if not start_time:
-        start_time = datetime.utcnow() - timedelta(days=7)
+        start_time = datetime.now(UTC) - timedelta(days=7)
     if not end_time:
-        end_time = datetime.utcnow()
+        end_time = datetime.now(UTC)
 
     reasons = await audit_service.get_top_denial_reasons(
         start_time=start_time,
@@ -525,9 +525,9 @@ async def get_analytics_trends(
 
     # Default time range: last 7 days
     if not start_time:
-        start_time = datetime.utcnow() - timedelta(days=7)
+        start_time = datetime.now(UTC) - timedelta(days=7)
     if not end_time:
-        end_time = datetime.utcnow()
+        end_time = datetime.now(UTC)
 
     # Parse interval
     interval_map = {"1h": timedelta(hours=1), "6h": timedelta(hours=6), "1d": timedelta(days=1)}
