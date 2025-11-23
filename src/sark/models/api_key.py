@@ -1,6 +1,6 @@
 """API Key model for authentication."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 import uuid
 
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text
@@ -75,7 +75,7 @@ class APIKey(Base):
         """Check if the API key has expired."""
         if self.expires_at is None:
             return False
-        return datetime.utcnow() > self.expires_at
+        return datetime.now(UTC) > self.expires_at
 
     @property
     def is_valid(self) -> bool:
@@ -89,7 +89,7 @@ class APIKey(Base):
             revoked_by: UUID of the user who revoked the key
         """
         self.is_active = False
-        self.revoked_at = datetime.utcnow()
+        self.revoked_at = datetime.now(UTC)
         self.revoked_by = revoked_by
 
     def record_usage(self, ip_address: str | None = None) -> None:
@@ -98,7 +98,7 @@ class APIKey(Base):
         Args:
             ip_address: IP address of the request
         """
-        self.last_used_at = datetime.utcnow()
+        self.last_used_at = datetime.now(UTC)
         self.usage_count += 1
         if ip_address:
             self.last_used_ip = ip_address

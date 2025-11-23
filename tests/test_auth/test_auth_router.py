@@ -1,6 +1,6 @@
 """Tests for unified authentication router."""
 
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, Mock, patch
 import uuid
 
@@ -70,9 +70,9 @@ def mock_session():
     return Session(
         session_id=str(uuid.uuid4()),
         user_id=uuid.uuid4(),
-        created_at=datetime.utcnow(),
-        expires_at=datetime.utcnow() + timedelta(hours=1),
-        last_activity=datetime.utcnow(),
+        created_at=datetime.now(UTC),
+        expires_at=datetime.now(UTC) + timedelta(hours=1),
+        last_activity=datetime.now(UTC),
         ip_address="192.168.1.100",
         user_agent="Test Agent",
         metadata={"provider": "test"},

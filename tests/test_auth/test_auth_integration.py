@@ -1,6 +1,6 @@
 """Integration tests for all authentication flows and provider failover."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 from unittest.mock import AsyncMock, Mock, patch
 import uuid
 
@@ -169,8 +169,8 @@ class TestCompleteAuthFlows:
             rate_limit=1000,
             is_active=True,
             usage_count=0,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
         )
 
         mock_db_session.first = AsyncMock(return_value=mock_api_key)
@@ -291,8 +291,8 @@ class TestRateLimiting:
             rate_limit=100,
             is_active=True,
             usage_count=0,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
         )
 
         current_usage = 50  # Under limit
@@ -317,8 +317,8 @@ class TestRateLimiting:
             rate_limit=100,
             is_active=True,
             usage_count=0,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
         )
 
         current_usage = 100  # At limit
@@ -341,8 +341,8 @@ class TestRateLimiting:
             rate_limit=100,
             is_active=True,
             usage_count=0,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
         )
 
         current_usage = 150  # Exceeded limit
@@ -366,8 +366,8 @@ class TestRateLimiting:
             rate_limit=100,
             is_active=True,
             usage_count=0,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
         )
 
         key2 = APIKey(
@@ -380,8 +380,8 @@ class TestRateLimiting:
             rate_limit=100,
             is_active=True,
             usage_count=0,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
         )
 
         # Key 1 near limit
@@ -407,8 +407,8 @@ class TestRateLimiting:
             rate_limit=50,
             is_active=True,
             usage_count=0,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
         )
 
         # Test various usage levels
@@ -484,8 +484,8 @@ class TestCrossProviderScenarios:
             rate_limit=1000,
             is_active=True,
             usage_count=0,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
         )
 
         mock_db_session.first = AsyncMock(return_value=api_key)

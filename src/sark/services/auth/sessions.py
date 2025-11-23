@@ -1,6 +1,6 @@
 """Session management service with Redis backend."""
 
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 import json
 import logging
 from typing import Any
@@ -64,7 +64,7 @@ class SessionService:
             Tuple of (Session object, session_id)
         """
         timeout = timeout_seconds or self.default_timeout
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         session_id = str(uuid.uuid4())
 
         # Create session object
@@ -148,13 +148,13 @@ class SessionService:
             return False
 
         # Update last activity
-        session.last_activity = datetime.utcnow()
+        session.last_activity = datetime.now(UTC)
         if ip_address:
             session.ip_address = ip_address
 
         # Update in Redis with refreshed TTL
         session_key = f"session:{session_id}"
-        ttl = int((session.expires_at - datetime.utcnow()).total_seconds())
+        ttl = int((session.expires_at - datetime.now(UTC)).total_seconds())
 
         if ttl > 0:
             await self.redis.setex(
@@ -370,7 +370,7 @@ class SessionService:
 
         # Update in Redis
         session_key = f"session:{session_id}"
-        ttl = int((session.expires_at - datetime.utcnow()).total_seconds())
+        ttl = int((session.expires_at - datetime.now(UTC)).total_seconds())
 
         if ttl > 0:
             await self.redis.setex(
