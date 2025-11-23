@@ -1,0 +1,369 @@
+groups:
+  - name: sark_system_alerts
+    interval: 30s
+    rules:
+      # System Health
+      - alert: SARKServiceDown
+        expr: up{job="sark"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: system
+        annotations:
+          summary: "SARK service is down"
+          description: "SARK service {{ $labels.instance }} has been down for more than 1 minute."
+          runbook_url: "https://docs.sark.dev/runbooks/service-down"
+
+      # High Error Rate
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(http_requests_total{job="sark",status=~"5.."}[5m]))
+          /
+          sum(rate(http_requests_total{job="sark"}[5m]))
+          * 100 > 5
+        for: 5m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "High error rate detected (>5%)"
+          description: "Error rate is {{ $value | humanizePercentage }} for the last 5 minutes."
+          runbook_url: "https://docs.sark.dev/runbooks/high-error-rate"
+
+      # Slow Response Time
+      - alert: SlowResponseTime
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(http_request_duration_seconds_bucket{job="sark"}[5m])) by (le, path)
+          ) * 1000 > 200
+        for: 10m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "Slow API response time (P95 >200ms)"
+          description: "P95 response time for {{ $labels.path }} is {{ $value | humanizeDuration }}."
+          runbook_url: "https://docs.sark.dev/runbooks/slow-response"
+
+      # Database Connection Pool Exhaustion
+      - alert: DatabasePoolExhaustion
+        expr: |
+          sark_db_connections_checked_out
+          /
+          sark_db_connections_pool_size
+          > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "Database connection pool near exhaustion (>90%)"
+          description: "Connection pool is {{ $value | humanizePercentage }} utilized."
+          runbook_url: "https://docs.sark.dev/runbooks/db-pool-exhaustion"
+
+  - name: sark_auth_alerts
+    interval: 30s
+    rules:
+      # Failed Authentication Spike
+      - alert: HighFailedAuthRate
+        expr: |
+          sum(rate(sark_auth_attempts_total{status="failed"}[5m])) > 10
+        for: 5m
+        labels:
+          severity: warning
+          component: auth
+        annotations:
+          summary: "High failed authentication rate (>10/sec)"
+          description: "Failed auth attempts: {{ $value | humanize }}/sec. Possible brute force attack."
+          runbook_url: "https://docs.sark.dev/runbooks/failed-auth-spike"
+
+      # Multiple Failed Logins Same User
+      - alert: BruteForceAttackSuspected
+        expr: |
+          sum(rate(sark_auth_attempts_total{status="failed"}[5m])) by (user_id) > 5
+        for: 2m
+        labels:
+          severity: high
+          component: auth
+        annotations:
+          summary: "Brute force attack suspected for user {{ $labels.user_id }}"
+          description: "User {{ $labels.user_id }} has {{ $value | humanize }} failed login attempts/sec."
+          runbook_url: "https://docs.sark.dev/runbooks/brute-force"
+
+      # MFA Bypass Attempts
+      - alert: MFABypassAttempts
+        expr: |
+          sum(increase(sark_siem_events_total{event_type="mfa_bypass_attempt"}[5m])) > 0
+        for: 1m
+        labels:
+          severity: critical
+          component: auth
+        annotations:
+          summary: "MFA bypass attempts detected"
+          description: "{{ $value }} MFA bypass attempts in the last 5 minutes."
+          runbook_url: "https://docs.sark.dev/runbooks/mfa-bypass"
+
+      # Privilege Escalation
+      - alert: PrivilegeEscalationAttempt
+        expr: |
+          sum(increase(sark_siem_events_total{event_type="privilege_escalation"}[5m])) > 0
+        for: 1m
+        labels:
+          severity: critical
+          component: auth
+        annotations:
+          summary: "Privilege escalation attempt detected"
+          description: "{{ $value }} privilege escalation attempts in the last 5 minutes."
+          runbook_url: "https://docs.sark.dev/runbooks/privilege-escalation"
+
+  - name: sark_policy_alerts
+    interval: 30s
+    rules:
+      # Slow Policy Evaluation
+      - alert: SlowPolicyEvaluation
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(sark_policy_evaluation_duration_seconds_bucket[5m])) by (le)
+          ) * 1000 > 60
+        for: 10m
+        labels:
+          severity: warning
+          component: policy
+        annotations:
+          summary: "Slow policy evaluation (P95 >60ms)"
+          description: "P95 policy evaluation latency is {{ $value | humanizeDuration }}."
+          runbook_url: "https://docs.sark.dev/runbooks/slow-policy-eval"
+
+      # Low Cache Hit Rate
+      - alert: LowPolicyCacheHitRate
+        expr: |
+          (
+            sum(rate(sark_policy_cache_hits_total[5m])) +
+            sum(rate(sark_policy_cache_stale_hits_total[5m]))
+          ) / (
+            sum(rate(sark_policy_cache_hits_total[5m])) +
+            sum(rate(sark_policy_cache_stale_hits_total[5m])) +
+            sum(rate(sark_policy_cache_misses_total[5m]))
+          ) * 100 < 70
+        for: 10m
+        labels:
+          severity: warning
+          component: policy
+        annotations:
+          summary: "Low policy cache hit rate (<70%)"
+          description: "Cache hit rate is {{ $value | humanizePercentage }}. Target: >80%."
+          runbook_url: "https://docs.sark.dev/runbooks/low-cache-hit-rate"
+
+      # High Cache Revalidation Failure Rate
+      - alert: HighCacheRevalidationFailureRate
+        expr: |
+          sum(rate(sark_policy_cache_revalidations_total{status="failure"}[5m]))
+          /
+          sum(rate(sark_policy_cache_revalidations_total[5m]))
+          * 100 > 10
+        for: 5m
+        labels:
+          severity: warning
+          component: policy
+        annotations:
+          summary: "High cache revalidation failure rate (>10%)"
+          description: "Cache revalidation failure rate: {{ $value | humanizePercentage }}."
+          runbook_url: "https://docs.sark.dev/runbooks/cache-revalidation-failures"
+
+      # OPA Connection Issues
+      - alert: OPAConnectionErrors
+        expr: |
+          sum(rate(sark_policy_evaluation_errors_total{error_type="opa_connection"}[5m])) > 1
+        for: 2m
+        labels:
+          severity: critical
+          component: policy
+        annotations:
+          summary: "OPA connection errors detected"
+          description: "{{ $value | humanize }} OPA connection errors/sec."
+          runbook_url: "https://docs.sark.dev/runbooks/opa-connection-errors"
+
+      # Redis Connection Issues
+      - alert: RedisConnectionErrors
+        expr: |
+          sum(rate(sark_redis_connection_errors_total[5m])) > 1
+        for: 2m
+        labels:
+          severity: critical
+          component: cache
+        annotations:
+          summary: "Redis connection errors detected"
+          description: "{{ $value | humanize }} Redis connection errors/sec."
+          runbook_url: "https://docs.sark.dev/runbooks/redis-connection-errors"
+
+  - name: sark_siem_alerts
+    interval: 30s
+    rules:
+      # SIEM Export Failures
+      - alert: SIEMExportFailures
+        expr: |
+          sum(increase(sark_siem_exports_total{status="failed"}[5m])) > 5
+        for: 5m
+        labels:
+          severity: critical
+          component: siem
+        annotations:
+          summary: "SIEM export failures detected (>5 in 5min)"
+          description: "{{ $value }} SIEM export failures in the last 5 minutes."
+          runbook_url: "https://docs.sark.dev/runbooks/siem-export-failures"
+
+      # SIEM Queue Near Capacity
+      - alert: SIEMQueueNearCapacity
+        expr: |
+          sark_siem_queue_depth / sark_siem_queue_capacity > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          component: siem
+        annotations:
+          summary: "SIEM queue near capacity (>80%)"
+          description: "SIEM queue is {{ $value | humanizePercentage }} full."
+          runbook_url: "https://docs.sark.dev/runbooks/siem-queue-capacity"
+
+      # SIEM Queue Full
+      - alert: SIEMQueueFull
+        expr: |
+          sark_siem_queue_depth >= sark_siem_queue_capacity
+        for: 1m
+        labels:
+          severity: critical
+          component: siem
+        annotations:
+          summary: "SIEM queue is full - events may be dropped"
+          description: "SIEM queue is at capacity. Events may be dropped."
+          runbook_url: "https://docs.sark.dev/runbooks/siem-queue-full"
+
+      # High Severity Security Events
+      - alert: HighSeveritySecurityEvents
+        expr: |
+          sum(rate(sark_siem_events_total{severity=~"critical|high"}[5m])) > 5
+        for: 2m
+        labels:
+          severity: high
+          component: siem
+        annotations:
+          summary: "High rate of critical/high severity security events"
+          description: "{{ $value | humanize }} critical/high severity events/sec."
+          runbook_url: "https://docs.sark.dev/runbooks/high-severity-events"
+
+      # Data Exfiltration Alert
+      - alert: DataExfiltrationDetected
+        expr: |
+          sum(increase(sark_siem_events_total{event_type="data_exfiltration"}[5m])) > 0
+        for: 1m
+        labels:
+          severity: critical
+          component: siem
+        annotations:
+          summary: "Potential data exfiltration detected"
+          description: "{{ $value }} data exfiltration events in the last 5 minutes."
+          runbook_url: "https://docs.sark.dev/runbooks/data-exfiltration"
+
+      # Anomalous Access Patterns
+      - alert: AnomalousAccessPatterns
+        expr: |
+          sum(rate(sark_siem_events_total{event_type=~"anomalous_access|unusual_time_access|geo_anomaly"}[5m])) > 10
+        for: 5m
+        labels:
+          severity: warning
+          component: siem
+        annotations:
+          summary: "High rate of anomalous access patterns"
+          description: "{{ $value | humanize }} anomalous access events/sec."
+          runbook_url: "https://docs.sark.dev/runbooks/anomalous-access"
+
+  - name: sark_performance_alerts
+    interval: 30s
+    rules:
+      # High Memory Usage
+      - alert: HighMemoryUsage
+        expr: |
+          process_resident_memory_bytes{job="sark"} / 1024 / 1024 > 1024
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High memory usage (>1GB)"
+          description: "Memory usage is {{ $value | humanize }}MB."
+          runbook_url: "https://docs.sark.dev/runbooks/high-memory"
+
+      # High CPU Usage
+      - alert: HighCPUUsage
+        expr: |
+          rate(process_cpu_seconds_total{job="sark"}[5m]) * 100 > 80
+        for: 10m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High CPU usage (>80%)"
+          description: "CPU usage is {{ $value | humanizePercentage }}."
+          runbook_url: "https://docs.sark.dev/runbooks/high-cpu"
+
+      # Database Query Latency
+      - alert: SlowDatabaseQueries
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(sark_db_query_duration_seconds_bucket[5m])) by (le)
+          ) * 1000 > 100
+        for: 10m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "Slow database queries (P95 >100ms)"
+          description: "P95 database query latency is {{ $value | humanizeDuration }}."
+          runbook_url: "https://docs.sark.dev/runbooks/slow-db-queries"
+
+  - name: sark_business_logic_alerts
+    interval: 1m
+    rules:
+      # Unusual Denial Rate
+      - alert: UnusualAuthorizationDenialRate
+        expr: |
+          sum(rate(sark_policy_denials_total[5m]))
+          /
+          (sum(rate(sark_policy_allows_total[5m])) + sum(rate(sark_policy_denials_total[5m])))
+          * 100 > 50
+        for: 10m
+        labels:
+          severity: warning
+          component: policy
+        annotations:
+          summary: "Unusual authorization denial rate (>50%)"
+          description: "Denial rate is {{ $value | humanizePercentage }}. This may indicate misconfigured policies."
+          runbook_url: "https://docs.sark.dev/runbooks/unusual-denial-rate"
+
+      # No Policy Evaluations
+      - alert: NoPolicyEvaluations
+        expr: |
+          sum(rate(sark_policy_evaluations_total[5m])) == 0
+        for: 5m
+        labels:
+          severity: warning
+          component: policy
+        annotations:
+          summary: "No policy evaluations detected"
+          description: "No policy evaluations in the last 5 minutes. Service may be unhealthy."
+          runbook_url: "https://docs.sark.dev/runbooks/no-policy-evals"
+
+      # Batch Evaluation Not Being Used
+      - alert: BatchEvaluationUnderutilized
+        expr: |
+          sum(rate(sark_batch_policy_evaluations_total[10m])) == 0
+          and
+          sum(rate(sark_policy_evaluations_total[10m])) > 100
+        for: 30m
+        labels:
+          severity: info
+          component: policy
+        annotations:
+          summary: "Batch policy evaluation not being used"
+          description: "Consider using batch evaluation for better performance (current: {{ $value | humanize }} evals/sec)."
+          runbook_url: "https://docs.sark.dev/runbooks/batch-eval-underutilized"
