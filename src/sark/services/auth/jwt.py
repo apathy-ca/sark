@@ -205,6 +205,35 @@ class JWTHandler:
                 headers={"WWW-Authenticate": "Bearer"},
             ) from e
 
+    def verify_token(self, token: str, token_type: str) -> UUID:
+        """
+        Verify a JWT token and return the user ID.
+
+        This is a backward compatibility method for tests and legacy code.
+        New code should use decode_token() or decode_refresh_token() instead.
+
+        Args:
+            token: JWT token string
+            token_type: Expected token type ('access' or 'refresh')
+
+        Returns:
+            User ID from token
+
+        Raises:
+            HTTPException: If token is invalid, expired, or wrong type
+        """
+        if token_type == "access":
+            payload = self.decode_token(token)
+        elif token_type == "refresh":
+            payload = self.decode_refresh_token(token)
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid token type: {token_type}",
+            )
+
+        return UUID(payload["sub"])
+
 
 def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),

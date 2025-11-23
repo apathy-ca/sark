@@ -214,7 +214,9 @@ class SessionService:
         session_ids = await self.redis.smembers(user_sessions_key)
 
         count = 0
-        for session_id_bytes in session_ids:
+        # Convert to list to avoid "RuntimeError: Set changed size during iteration"
+        # since invalidate_session() modifies the same set via srem()
+        for session_id_bytes in list(session_ids):
             session_id = session_id_bytes.decode("utf-8")
             if await self.invalidate_session(session_id):
                 count += 1

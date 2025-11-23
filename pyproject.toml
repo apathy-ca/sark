@@ -194,6 +194,14 @@ markers = [
     "integration: marks tests as integration tests",
     "unit: marks tests as unit tests",
     "benchmark: marks tests as performance benchmarks",
+    "smoke: marks tests as smoke tests (quick critical path validation)",
+    "e2e: marks tests as end-to-end tests",
+    "critical: marks tests as critical for system health",
+    "performance: marks tests as performance tests",
+    "api: marks tests as API tests",
+    "user_flow: marks tests as user flow tests",
+    "admin_flow: marks tests as admin flow tests",
+    "bulk_operations: marks tests as bulk operation tests",
 ]
 
 [tool.coverage.run]

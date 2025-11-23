@@ -99,8 +99,15 @@ async def opa_client():
 async def test_complete_login_flow(jwt_handler, test_user):
     """Test complete login flow with token generation."""
     # Generate access and refresh tokens
-    access_token = jwt_handler.create_access_token(user_id=test_user.id)
-    refresh_token = jwt_handler.create_refresh_token(user_id=test_user.id)
+    access_token = jwt_handler.create_access_token(
+        user_id=test_user.id,
+        email=test_user.email,
+        role=test_user.role
+    )
+    refresh_token = jwt_handler.create_refresh_token(
+        user_id=test_user.id,
+        email=test_user.email
+    )
 
     assert access_token is not None
     assert refresh_token is not None
@@ -120,15 +127,26 @@ async def test_complete_login_flow(jwt_handler, test_user):
 async def test_token_refresh_flow(jwt_handler, test_user):
     """Test token refresh mechanism."""
     # Create initial tokens
-    old_access_token = jwt_handler.create_access_token(user_id=test_user.id)
-    refresh_token = jwt_handler.create_refresh_token(user_id=test_user.id)
+    old_access_token = jwt_handler.create_access_token(
+        user_id=test_user.id,
+        email=test_user.email,
+        role=test_user.role
+    )
+    refresh_token = jwt_handler.create_refresh_token(
+        user_id=test_user.id,
+        email=test_user.email
+    )
 
     # Verify refresh token
     user_id = jwt_handler.verify_token(refresh_token, "refresh")
     assert user_id == test_user.id
 
     # Generate new access token using refresh token
-    new_access_token = jwt_handler.create_access_token(user_id=user_id)
+    new_access_token = jwt_handler.create_access_token(
+        user_id=user_id,
+        email=test_user.email,
+        role=test_user.role
+    )
 
     # Verify new access token works
     verified_user_id = jwt_handler.verify_token(new_access_token, "access")
@@ -201,7 +219,10 @@ async def test_expired_token_rejected(jwt_handler, test_user):
 @pytest.mark.auth
 async def test_wrong_token_type_rejected(jwt_handler, test_user):
     """Test that using refresh token for access fails."""
-    refresh_token = jwt_handler.create_refresh_token(user_id=test_user.id)
+    refresh_token = jwt_handler.create_refresh_token(
+        user_id=test_user.id,
+        email=test_user.email
+    )
 
     # Try to verify refresh token as access token
     with pytest.raises(HTTPException) as exc_info:
