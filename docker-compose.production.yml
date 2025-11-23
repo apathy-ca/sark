@@ -1,0 +1,401 @@
+version: '3.9'
+
+# =============================================================================
+# SARK Production Docker Compose Configuration
+# =============================================================================
+# Full production stack with all services
+#
+# Services included:
+# - SARK API (main application)
+# - PostgreSQL with TimescaleDB (primary database)
+# - Redis (caching and sessions)
+# - Kong (API Gateway) with PostgreSQL
+# - Prometheus (metrics)
+# - Grafana (monitoring)
+#
+# Usage:
+#   docker-compose -f docker-compose.production.yml up -d
+#
+# Security notes:
+# - All secrets should be in .env.production (not committed)
+# - Use Docker secrets in swarm mode for production
+# - Enable TLS/SSL for all services
+# =============================================================================
+
+services:
+  # ===========================================================================
+  # SARK API Application
+  # ===========================================================================
+  sark-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+      target: runtime
+    image: sark:${SARK_VERSION:-latest}
+    container_name: sark-api
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    environment:
+      # Application
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+
+      # Database
+      - POSTGRES_HOST=sark-db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+      # Redis
+      - REDIS_HOST=sark-redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+
+      # Security
+      - SECRET_KEY=${SECRET_KEY}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - CORS_ORIGINS=${CORS_ORIGINS}
+
+      # Authentication
+      - OIDC_CLIENT_ID=${OIDC_CLIENT_ID}
+      - OIDC_CLIENT_SECRET=${OIDC_CLIENT_SECRET}
+      - LDAP_SERVER=${LDAP_SERVER:-}
+      - SAML_SP_ENTITY_ID=${SAML_SP_ENTITY_ID:-}
+
+      # Kong
+      - KONG_ENABLED=${KONG_ENABLED:-true}
+      - KONG_ADMIN_URL=http://sark-kong:8001
+
+      # Observability
+      - PROMETHEUS_ENABLED=true
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_ENDPOINT:-}
+    ports:
+      - "${SARK_PORT:-8000}:8000"
+    networks:
+      - sark-backend
+      - sark-frontend
+    depends_on:
+      sark-db:
+        condition: service_healthy
+      sark-redis:
+        condition: service_healthy
+      sark-migrations:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # Security: Read-only root filesystem
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /app/logs
+    # Security: Drop all capabilities
+    cap_drop:
+      - ALL
+    # Security: No new privileges
+    security_opt:
+      - no-new-privileges:true
+
+  # ===========================================================================
+  # Database Migration Runner
+  # ===========================================================================
+  sark-migrations:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+      target: migrations
+    image: sark-migrations:${SARK_VERSION:-latest}
+    container_name: sark-migrations
+    env_file:
+      - .env.production
+    environment:
+      - POSTGRES_HOST=sark-db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    networks:
+      - sark-backend
+    depends_on:
+      sark-db:
+        condition: service_healthy
+    restart: on-failure
+
+  # ===========================================================================
+  # PostgreSQL Database with TimescaleDB
+  # ===========================================================================
+  sark-db:
+    image: timescale/timescaledb:latest-pg15
+    container_name: sark-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --locale=en_US.UTF-8
+      # Performance tuning
+      - POSTGRES_MAX_CONNECTIONS=200
+      - POSTGRES_SHARED_BUFFERS=256MB
+      - POSTGRES_EFFECTIVE_CACHE_SIZE=1GB
+      - POSTGRES_MAINTENANCE_WORK_MEM=128MB
+      - POSTGRES_WORK_MEM=4MB
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./scripts/db/init:/docker-entrypoint-initdb.d:ro
+      - ./backups:/backups
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    networks:
+      - sark-backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # Security
+    security_opt:
+      - no-new-privileges:true
+
+  # ===========================================================================
+  # Redis Cache and Session Store
+  # ===========================================================================
+  sark-redis:
+    image: redis:7-alpine
+    container_name: sark-redis
+    restart: unless-stopped
+    command: >
+      redis-server
+      --appendonly yes
+      --requirepass ${REDIS_PASSWORD}
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+    volumes:
+      - redis-data:/data
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    networks:
+      - sark-backend
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+
+  # ===========================================================================
+  # Kong API Gateway Database
+  # ===========================================================================
+  sark-kong-db:
+    image: postgres:15-alpine
+    container_name: sark-kong-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=kong
+      - POSTGRES_USER=kong
+      - POSTGRES_PASSWORD=${KONG_DB_PASSWORD}
+    volumes:
+      - kong-data:/var/lib/postgresql/data
+    networks:
+      - sark-backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kong"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+
+  # ===========================================================================
+  # Kong API Gateway Migrations
+  # ===========================================================================
+  sark-kong-migrations:
+    image: kong:3.5-alpine
+    container_name: sark-kong-migrations
+    environment:
+      - KONG_DATABASE=postgres
+      - KONG_PG_HOST=sark-kong-db
+      - KONG_PG_USER=kong
+      - KONG_PG_PASSWORD=${KONG_DB_PASSWORD}
+      - KONG_PG_DATABASE=kong
+    command: kong migrations bootstrap
+    networks:
+      - sark-backend
+    depends_on:
+      sark-kong-db:
+        condition: service_healthy
+    restart: on-failure
+
+  # ===========================================================================
+  # Kong API Gateway
+  # ===========================================================================
+  sark-kong:
+    image: kong:3.5-alpine
+    container_name: sark-kong
+    restart: unless-stopped
+    environment:
+      - KONG_DATABASE=postgres
+      - KONG_PG_HOST=sark-kong-db
+      - KONG_PG_USER=kong
+      - KONG_PG_PASSWORD=${KONG_DB_PASSWORD}
+      - KONG_PG_DATABASE=kong
+      - KONG_PROXY_ACCESS_LOG=/dev/stdout
+      - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+      - KONG_PROXY_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_LISTEN=0.0.0.0:8001
+      - KONG_ADMIN_GUI_URL=http://localhost:8002
+      - KONG_PROXY_LISTEN=0.0.0.0:8000, 0.0.0.0:8443 ssl
+      # Performance
+      - KONG_NGINX_WORKER_PROCESSES=4
+      - KONG_UPSTREAM_KEEPALIVE_POOL_SIZE=60
+      - KONG_UPSTREAM_KEEPALIVE_MAX_REQUESTS=100
+    ports:
+      - "8000:8000"   # HTTP Proxy
+      - "8001:8001"   # Admin API
+      - "8443:8443"   # HTTPS Proxy
+      - "8444:8444"   # HTTPS Admin API
+    networks:
+      - sark-frontend
+      - sark-backend
+    depends_on:
+      sark-kong-db:
+        condition: service_healthy
+      sark-kong-migrations:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "kong", "health"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+
+  # ===========================================================================
+  # Prometheus Metrics Collection
+  # ===========================================================================
+  sark-prometheus:
+    image: prom/prometheus:latest
+    container_name: sark-prometheus
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - sark-backend
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+
+  # ===========================================================================
+  # Grafana Monitoring Dashboard
+  # ===========================================================================
+  sark-grafana:
+    image: grafana/grafana:latest
+    container_name: sark-grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+      - GF_SERVER_ROOT_URL=http://localhost:3000
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    ports:
+      - "3000:3000"
+    networks:
+      - sark-backend
+      - sark-frontend
+    depends_on:
+      - sark-prometheus
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  sark-backend:
+    driver: bridge
+    name: sark-backend
+    internal: true  # Backend network not accessible from host
+  sark-frontend:
+    driver: bridge
+    name: sark-frontend
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  postgres-data:
+    name: sark-postgres-data
+    driver: local
+  redis-data:
+    name: sark-redis-data
+    driver: local
+  kong-data:
+    name: sark-kong-data
+    driver: local
+  prometheus-data:
+    name: sark-prometheus-data
+    driver: local
+  grafana-data:
+    name: sark-grafana-data
+    driver: local

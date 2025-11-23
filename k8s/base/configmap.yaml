@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sark-config
+  namespace: sark
+  labels:
+    app.kubernetes.io/name: sark
+    app.kubernetes.io/component: configuration
+data:
+  # Application Configuration
+  ENVIRONMENT: "production"
+  DEBUG: "false"
+  LOG_LEVEL: "info"
+
+  # Database Configuration
+  POSTGRES_HOST: "sark-postgres"
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: "sark"
+
+  # Redis Configuration
+  REDIS_HOST: "sark-redis"
+  REDIS_PORT: "6379"
+
+  # Kong Configuration
+  KONG_ENABLED: "true"
+  KONG_ADMIN_URL: "http://sark-kong-admin:8001"
+  KONG_PROXY_URL: "http://sark-kong-proxy:8000"
+
+  # Performance Configuration
+  POSTGRES_POOL_SIZE: "20"
+  POSTGRES_MAX_OVERFLOW: "40"
+  REDIS_POOL_SIZE: "50"
+
+  # Rate Limiting
+  RATE_LIMIT_ENABLED: "true"
+  RATE_LIMIT_PER_IP: "1000"
+  RATE_LIMIT_PER_USER: "5000"
+  RATE_LIMIT_PER_API_KEY: "10000"
+
+  # Observability
+  PROMETHEUS_ENABLED: "true"
+  METRICS_PORT: "9090"
+
+  # CORS
+  CORS_ORIGINS: "https://sark.example.com,https://api.example.com"
+
+  # Sessions
+  SESSION_TIMEOUT_SECONDS: "86400"
+  MAX_CONCURRENT_SESSIONS: "5"
