@@ -30,6 +30,10 @@ class AuthResult(BaseModel):
     error_message: str | None = None
 
 
+# Alias for backward compatibility
+UserInfo = AuthResult
+
+
 class AuthProvider(ABC):
     """Abstract base class for authentication providers."""
 
