@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock
 
 from sark.models.policy_audit import PolicyChangeType, PolicyDecisionResult
 from sark.services.policy.audit import PolicyAuditService
-from sark.services.policy.opa_client import AuthorizationInput, PolicyDecision
+from sark.services.policy.opa_client import AuthorizationInput, AuthorizationDecision
 
 
 @pytest.fixture
@@ -42,7 +42,7 @@ def sample_auth_input():
 @pytest.fixture
 def sample_policy_decision():
     """Create sample policy decision."""
-    return PolicyDecision(
+    return AuthorizationDecision(
         allow=True,
         reason="All policies passed",
         policies_evaluated=["rbac", "team_access", "sensitivity"],
@@ -88,7 +88,7 @@ async def test_log_decision_allow(audit_service, sample_auth_input, sample_polic
 @pytest.mark.asyncio
 async def test_log_decision_deny(audit_service, sample_auth_input):
     """Test logging a denied policy decision."""
-    denial_decision = PolicyDecision(
+    denial_decision = AuthorizationDecision(
         allow=False,
         reason="Access denied: RBAC policy violation",
         policies_evaluated=["rbac"],
@@ -231,7 +231,7 @@ async def test_get_decision_logs_with_filters(
     # Create a denial
     denial_input = sample_auth_input.model_copy()
     denial_input.user["id"] = "user-456"
-    denial_decision = PolicyDecision(allow=False, reason="Denied")
+    denial_decision = AuthorizationDecision(allow=False, reason="Denied")
     await audit_service.log_decision(denial_input, denial_decision)
 
     # Query all
@@ -367,7 +367,7 @@ async def test_get_decision_analytics(
     # Create multiple log entries
     for i in range(10):
         decision = (
-            sample_policy_decision if i % 2 == 0 else PolicyDecision(allow=False, reason="Denied")
+            sample_policy_decision if i % 2 == 0 else AuthorizationDecision(allow=False, reason="Denied")
         )
         cache_hit = i % 3 == 0
 
@@ -432,7 +432,7 @@ async def test_get_top_denial_reasons(
     ]
 
     for reason in reasons:
-        decision = PolicyDecision(allow=False, reason=reason)
+        decision = AuthorizationDecision(allow=False, reason=reason)
         await audit_service.log_decision(sample_auth_input, decision)
 
     # Get top denial reasons
@@ -461,7 +461,7 @@ async def test_log_decision_with_minimal_data(audit_service):
         action="test:action",
         context={},
     )
-    decision = PolicyDecision(allow=True, reason="Test")
+    decision = AuthorizationDecision(allow=True, reason="Test")
 
     log_entry = await audit_service.log_decision(auth_input, decision)
 

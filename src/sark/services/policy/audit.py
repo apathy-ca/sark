@@ -26,7 +26,7 @@ from sark.models.policy_audit import (
     PolicyDecisionLog,
     PolicyDecisionResult,
 )
-from sark.services.policy.opa_client import AuthorizationInput, PolicyDecision
+from sark.services.policy.opa_client import AuthorizationInput, AuthorizationDecision
 
 logger = structlog.get_logger(__name__)
 
@@ -50,7 +50,7 @@ class PolicyAuditService:
     async def log_decision(
         self,
         auth_input: AuthorizationInput,
-        decision: PolicyDecision,
+        decision: AuthorizationDecision,
         duration_ms: Optional[float] = None,
         cache_hit: bool = False,
         request_context: Optional[Dict[str, Any]] = None,
