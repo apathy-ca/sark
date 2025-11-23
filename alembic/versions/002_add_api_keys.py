@@ -1,8 +1,8 @@
-"""Add API key model.
+"""Add API key model for authentication.
 
-Revision ID: 001_api_keys
-Revises:
-Create Date: 2025-11-27 14:00:00.000000
+Revision ID: 002_api_keys
+Revises: 001_initial
+Create Date: 2024-11-22 12:30:00.000000
 
 """
 
@@ -11,8 +11,8 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = "001_api_keys"
-down_revision = None
+revision = "002_api_keys"
+down_revision = "001_initial"
 branch_labels = None
 depends_on = None
 
