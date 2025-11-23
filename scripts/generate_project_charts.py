@@ -107,26 +107,26 @@ def create_cost_comparison():
     fig, ax = plt.subplots(figsize=(12, 7))
 
     approaches = ['Traditional\nDevelopment', 'AI-Driven\nDevelopment']
-    costs = [80000, 91]  # Midpoint of 80K-130K
+    costs = [105000, 193]  # Midpoint of 80K-130K vs actual $193 spent
     colors_bar = [COLORS[3], COLORS[4]]
 
     bars = ax.bar(approaches, costs, color=colors_bar, alpha=0.8, edgecolor='black', width=0.6)
 
     # Add value labels
-    ax.text(0, 80000 + 3000, '$80,000', ha='center', va='bottom',
+    ax.text(0, 105000 + 3000, '$105,000', ha='center', va='bottom',
             fontsize=14, fontweight='bold', color=COLORS[3])
-    ax.text(1, 91 + 3000, '$91', ha='center', va='bottom',
+    ax.text(1, 193 + 3000, '$193', ha='center', va='bottom',
             fontsize=14, fontweight='bold', color=COLORS[4])
 
     # Add savings annotation
-    ax.annotate('99.9% Cost Savings', xy=(0.5, 40000), xytext=(0.5, 55000),
+    ax.annotate('99.8% Cost Savings\n($104,807 saved)', xy=(0.5, 52500), xytext=(0.5, 70000),
                 fontsize=16, fontweight='bold', ha='center',
                 arrowprops=dict(arrowstyle='->', lw=2, color='red'),
                 bbox=dict(boxstyle='round,pad=0.5', facecolor='yellow', alpha=0.7))
 
     ax.set_ylabel('Development Cost (USD)', fontsize=12, fontweight='bold')
     ax.set_title('SARK Development: Cost Comparison', fontsize=14, fontweight='bold')
-    ax.set_ylim(0, 90000)
+    ax.set_ylim(0, 115000)
     ax.grid(axis='y', alpha=0.3)
 
     # Format y-axis as currency

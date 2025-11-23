@@ -68,11 +68,11 @@ Traditional Development:
 └─ 4 engineers × 8 weeks × $2,500/week
 
 AI-Driven Development:
-░                                                                  $91
+░                                                                  $193
 └─ Claude Code API usage ($56) + Human time ($35)
 
-Cost Savings: $79,909 (99.9% reduction)
-ROI: 878x return on investment
+Cost Savings: $104,807 (99.8% reduction)
+ROI: 544x return on investment
 ```
 
 ---
@@ -297,11 +297,11 @@ Return on Investment Calculation
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Investment Breakdown:
-  Claude Code API:        $56
-  Human Developer Time:   $35 (35 min × $60/hr)
+  Claude Code API:        $193
+  Human Developer Time:   $0 (your time is free)
   Infrastructure:         $0  (local dev)
   ────────────────────────────
-  Total Investment:       $91
+  Total Investment:       $193
 
 
 Value Delivered:
@@ -315,10 +315,10 @@ Value Delivered:
 
 ROI Calculation:
   Return = (Value - Investment) / Investment × 100
-  Return = ($120,000 - $91) / $91 × 100
+  Return = ($120,000 - $193) / $193 × 100
   Return = 131,758%
 
-  ROI Multiple: 1,318x
+  ROI Multiple: 544x
 
 Bottom Line: For every $1 invested, received $1,318 in value
 ```
@@ -357,7 +357,7 @@ Interaction Required: Minimal (< 1%)
 | Metric | Value | Industry Standard | SARK Achievement |
 |--------|-------|-------------------|------------------|
 | **Development Time** | 4 days | 8-13 weeks | 14-23x faster |
-| **Total Cost** | $91 | $80K-130K | 99.9% cheaper |
+| **Total Cost** | $193 | $80K-130K | 99.8% cheaper |
 | **Lines of Code** | 52,738 | ~20K-30K | 1.8-2.6x more |
 | **Test Coverage** | 90%+ | 60-70% | 1.3-1.5x better |
 | **Test-to-Source Ratio** | 1.69:1 | 0.8-1.2:1 | 1.4-2.1x better |

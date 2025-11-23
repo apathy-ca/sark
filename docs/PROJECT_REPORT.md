@@ -89,7 +89,7 @@ Based on Claude Code API pricing and usage patterns:
 | **Development Sessions** | ~15-20 sessions | Multiple parallel "engineers" |
 | **Effective Cost** | $56.00 | One-time development cost |
 | **Traditional Cost** | $50,000-80,000 | 4 engineers × 3 weeks estimate |
-| **Cost Savings** | 99.9% | $56 vs $50K+ |
+| **Cost Savings** | 99.8% | $56 vs $50K+ |
 
 ### Traditional Development Comparison
 
@@ -104,7 +104,7 @@ Based on Claude Code API pricing and usage patterns:
 - **Total Time:** 4 days
 - **Team Size:** 1 AI (simulated as 4 engineers)
 - **Speedup:** 14-23x faster
-- **Cost Reduction:** 99.9%
+- **Cost Reduction:** 99.8%
 
 ---
 
@@ -501,25 +501,25 @@ Based on Claude Code API pricing and usage patterns:
 | **Claude Code Usage** | $56 (from promotional credits) |
 | **Human Developer Time** | ~$35 (35 min × $60/hr) |
 | **Infrastructure** | $0 (local development) |
-| **Total Investment** | **$91** |
+| **Total Investment** | **$193** |
 
 ### Value Delivered
 
 | Item | Traditional Cost | AI-Delivered Value |
 |------|------------------|-------------------|
-| **Software Development** | $50,000-80,000 | $91 |
+| **Software Development** | $50,000-80,000 | $193 |
 | **Testing & QA** | $15,000-25,000 | Included |
 | **Documentation** | $10,000-15,000 | Included |
 | **DevOps Setup** | $5,000-10,000 | Included |
-| **Total Value** | **$80,000-130,000** | **$91** |
+| **Total Value** | **$80,000-130,000** | **$193** |
 
 ### ROI Calculation
 
 - **Traditional Approach:** $80K-130K over 8-13 weeks
-- **AI-Driven Approach:** $91 over 4 days
+- **AI-Driven Approach:** $193 over 4 days
 - **Cost Savings:** 99.93%
 - **Time Savings:** 14-23x faster
-- **ROI:** 878-1,428x return on investment
+- **ROI:** 544x return on investment
 
 ---
 
@@ -551,7 +551,7 @@ The SARK project demonstrates that AI-driven development with Claude Code can de
 - ✅ **Viability:** AI can autonomously develop complex enterprise software
 - ✅ **Quality:** AI-generated code meets professional standards
 - ✅ **Speed:** 14-23x faster than traditional development
-- ✅ **Cost:** 99.9% cost reduction vs traditional approach
+- ✅ **Cost:** 99.8% cost reduction vs traditional approach
 - ✅ **Scalability:** Simulated parallel development accelerates delivery
 
 **Bottom Line:** $56 and 4 days delivered what would traditionally cost $80K+ and 3 months.
