@@ -644,12 +644,13 @@ class TestOIDCProvider:
 
         # Create a mock that behaves like JWTClaims
         mock_jwt_claims = MagicMock()
-        mock_jwt_claims.__iter__ = lambda self: iter(mock_claims)
-        mock_jwt_claims.keys = lambda self: mock_claims.keys()
-        mock_jwt_claims.values = lambda self: mock_claims.values()
-        mock_jwt_claims.items = lambda self: mock_claims.items()
-        mock_jwt_claims.get = lambda self, key, default=None: mock_claims.get(key, default)
-        mock_jwt_claims.__getitem__ = lambda self, key: mock_claims[key]
+        mock_jwt_claims.__iter__ = Mock(return_value=iter(mock_claims))
+        mock_jwt_claims.keys = Mock(return_value=mock_claims.keys())
+        mock_jwt_claims.values = Mock(return_value=mock_claims.values())
+        mock_jwt_claims.items = Mock(return_value=mock_claims.items())
+        mock_jwt_claims.get = Mock(side_effect=lambda key, default=None: mock_claims.get(key, default))
+        mock_jwt_claims.__getitem__ = Mock(side_effect=lambda key: mock_claims[key])
+        mock_jwt_claims.__contains__ = Mock(side_effect=lambda key: key in mock_claims)
         mock_jwt_claims.validate = Mock()
 
         with patch.object(oidc_provider, "_get_jwks", return_value={"keys": []}):

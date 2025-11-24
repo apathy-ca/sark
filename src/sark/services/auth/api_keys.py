@@ -419,6 +419,7 @@ class APIKeyService:
         rate_limit_info = {
             "limit": api_key.rate_limit,
             "remaining": max(0, api_key.rate_limit - current_usage),
+            "current_usage": current_usage,
             "reset_in_seconds": 60,  # Per-minute window
         }
 
