@@ -128,6 +128,10 @@ ignore = [
     "S101",   # assert allowed in tests
     "ARG",    # unused arguments allowed in tests (fixtures)
     "FBT",    # boolean trap allowed in tests
+    "SIM117", # nested with statements allowed in tests (clearer for mocking)
+    "SIM113", # enumerate not required in tests
+    "RUF043", # regex patterns don't need to be raw in tests
+    "A002",   # shadowing builtins allowed in tests (common in mocks)
 ]
 "__init__.py" = ["F401"]  # unused imports allowed in __init__.py
 "src/sark/api/routers/saml.py" = ["N803"]  # SAML spec requires specific parameter names
