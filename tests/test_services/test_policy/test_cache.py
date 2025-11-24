@@ -1,6 +1,7 @@
 """Tests for Policy Cache Service."""
 
 import pytest
+import pytest_asyncio
 import hashlib
 import json
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -8,7 +9,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from sark.services.policy.cache import PolicyCache, CacheMetrics, get_policy_cache
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def mock_redis():
     """Create a mock Redis client."""
     redis_mock = AsyncMock()

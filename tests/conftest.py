@@ -37,3 +37,48 @@ def mock_db_engines(monkeypatch: pytest.MonkeyPatch) -> None:
 
     monkeypatch.setattr("sark.db.session.get_postgres_engine", mock_get_postgres_engine)
     monkeypatch.setattr("sark.db.session.get_timescale_engine", mock_get_timescale_engine)
+
+
+# =============================================================================
+# Database Fixtures
+# =============================================================================
+
+
+@pytest.fixture
+def db_session():
+    """Create mock database session for tests.
+
+    Returns:
+        AsyncMock database session with common methods mocked
+    """
+    session = AsyncMock()
+    session.add = MagicMock()
+    session.commit = AsyncMock()
+    session.refresh = AsyncMock()
+    session.execute = AsyncMock()
+    session.rollback = AsyncMock()
+    session.close = AsyncMock()
+    session.flush = AsyncMock()
+    session.query = MagicMock()
+    session.scalars = MagicMock()
+    return session
+
+
+# =============================================================================
+# Tool Registry Fixtures
+# =============================================================================
+
+
+@pytest.fixture
+def tool_registry(db_session):
+    """Create tool registry service for testing.
+
+    Args:
+        db_session: Database session fixture
+
+    Returns:
+        ToolRegistryService instance
+    """
+    from sark.services.discovery.tool_registry import ToolRegistryService
+
+    return ToolRegistryService(db_session)
