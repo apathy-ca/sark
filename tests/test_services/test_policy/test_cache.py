@@ -5,11 +5,12 @@ import json
 from unittest.mock import AsyncMock
 
 import pytest
+import pytest_asyncio
 
 from sark.services.policy.cache import CacheMetrics, PolicyCache, get_policy_cache
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def mock_redis():
     """Create a mock Redis client."""
     redis_mock = AsyncMock()
