@@ -13,6 +13,7 @@ from sark.services.auth.providers.ldap import LDAPProvider, LDAPProviderConfig
 def ldap_config():
     """LDAP configuration for testing."""
     return {
+        "name": "test-ldap-provider",
         "server_url": "ldap://test.example.com:389",
         "bind_dn": "cn=admin,dc=example,dc=com",
         "bind_password": "admin_password",

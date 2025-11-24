@@ -13,6 +13,7 @@ from sark.services.auth.providers.oidc import OIDCProvider, OIDCProviderConfig
 def google_provider():
     """Create a Google OIDC provider for testing."""
     config = OIDCProviderConfig(
+        name="google-oidc-provider",
         issuer_url="https://accounts.google.com",
         client_id="test-client-id",
         client_secret="test-client-secret",
@@ -24,6 +25,7 @@ def google_provider():
 def azure_provider():
     """Create an Azure AD OIDC provider for testing."""
     config = OIDCProviderConfig(
+        name="azure-oidc-provider",
         issuer_url="https://login.microsoftonline.com/test-tenant-id/v2.0",
         client_id="test-client-id",
         client_secret="test-client-secret",
@@ -35,6 +37,7 @@ def azure_provider():
 def okta_provider():
     """Create an Okta OIDC provider for testing."""
     config = OIDCProviderConfig(
+        name="okta-oidc-provider",
         issuer_url="https://test.okta.com",
         client_id="test-client-id",
         client_secret="test-client-secret",
@@ -46,6 +49,7 @@ def okta_provider():
 def custom_provider():
     """Create a custom OIDC provider for testing."""
     config = OIDCProviderConfig(
+        name="custom-oidc-provider",
         issuer_url="https://custom.example.com",
         client_id="test-client-id",
         client_secret="test-client-secret",
@@ -76,6 +80,7 @@ class TestOIDCProviderInitialization:
     def test_provider_initialization(self):
         """Test OIDC provider is initialized correctly."""
         config = OIDCProviderConfig(
+            name="test-oidc-provider",
             issuer_url="https://accounts.google.com",
             client_id="test-client-id",
             client_secret="test-client-secret",
@@ -91,6 +96,7 @@ class TestOIDCProviderInitialization:
     def test_default_scopes(self):
         """Test provider uses default scopes if not provided."""
         config = OIDCProviderConfig(
+            name="test-oidc-provider",
             issuer_url="https://accounts.google.com",
             client_id="test-client-id",
             client_secret="test-client-secret",

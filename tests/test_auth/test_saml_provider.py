@@ -13,9 +13,10 @@ from sark.services.auth.providers.saml import SAMLProvider, SAMLProviderConfig
 def saml_config():
     """SAML configuration for testing."""
     return {
+        "name": "test-saml-provider",
         "sp_entity_id": "https://sark.example.com",
         "sp_acs_url": "https://sark.example.com/api/auth/saml/acs",
-        "sp_sls_url": "https://sark.example.com/api/auth/saml/slo",
+        "sp_slo_url": "https://sark.example.com/api/auth/saml/slo",
         "idp_entity_id": "https://idp.example.com",
         "idp_sso_url": "https://idp.example.com/sso",
         "idp_slo_url": "https://idp.example.com/slo",
@@ -267,7 +268,9 @@ class TestHealthCheck:
     @pytest.mark.asyncio
     async def test_health_check_with_metadata_url(self, saml_config):
         """Test health check with IdP metadata URL."""
-        provider = SAMLProvider(**saml_config, idp_metadata_url="https://idp.example.com/metadata")
+        config_dict = saml_config.copy()
+        config_dict["idp_metadata_url"] = "https://idp.example.com/metadata"
+        provider = SAMLProvider(SAMLProviderConfig(**config_dict))
 
         with patch("httpx.AsyncClient") as mock_client:
             mock_response = MagicMock()
@@ -282,7 +285,9 @@ class TestHealthCheck:
     @pytest.mark.asyncio
     async def test_health_check_metadata_url_failure(self, saml_config):
         """Test health check when metadata URL is unreachable."""
-        provider = SAMLProvider(**saml_config, idp_metadata_url="https://idp.example.com/metadata")
+        config_dict = saml_config.copy()
+        config_dict["idp_metadata_url"] = "https://idp.example.com/metadata"
+        provider = SAMLProvider(SAMLProviderConfig(**config_dict))
 
         with patch("httpx.AsyncClient") as mock_client:
             mock_client.return_value.__aenter__.return_value.get = AsyncMock(
@@ -303,7 +308,7 @@ class TestHealthCheck:
         """Test health check with invalid SSO URL."""
         config = saml_config.copy()
         config["idp_sso_url"] = "invalid-url"
-        provider = SAMLProvider(**config)
+        provider = SAMLProvider(SAMLProviderConfig(**config))
 
         result = await provider.health_check()
         assert result is False
@@ -441,8 +446,9 @@ class TestAttributeMapping:
             "customEmail": "email",
             "displayName": "name",
         }
-
-        provider = SAMLProvider(**saml_config, attribute_mapping=custom_mapping)
+        config_dict = saml_config.copy()
+        config_dict["attribute_mapping"] = custom_mapping
+        provider = SAMLProvider(SAMLProviderConfig(**config_dict))
 
         raw_attributes = {
             "customEmail": ["custom@example.com"],
@@ -539,7 +545,7 @@ class TestRequestPreparation:
         """Test request preparation with HTTP URL."""
         config = saml_config.copy()
         config["sp_acs_url"] = "http://sark.example.com:8000/api/auth/saml/acs"
-        provider = SAMLProvider(**config)
+        provider = SAMLProvider(SAMLProviderConfig(**config))
 
         req = provider._prepare_request({"saml_response": "response"})
 
