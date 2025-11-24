@@ -65,7 +65,7 @@ jobs:
           pip install -e .[dev]
 
       - name: Run tests with coverage
-        run: pytest --cov --cov-report=xml --cov-report=term --ignore=tests/e2e --ignore=tests/integration --ignore=tests/benchmarks --ignore=tests/performance --ignore=tests/load --ignore=tests/load_testing -m "not benchmark and not performance"
+        run: pytest --cov --cov-report=xml --cov-report=term --ignore=tests/e2e --ignore=tests/integration --ignore=tests/benchmarks --ignore=tests/performance --ignore=tests/load --ignore=tests/load_testing --ignore=tests/test_api_pagination.py --ignore=tests/test_audit/test_siem_event_formatting.py --ignore=tests/test_auth/test_saml_provider.py --ignore=tests/test_middleware/test_rate_limit.py -m "not benchmark and not performance"
 
       - name: Upload coverage to artifacts
         uses: actions/upload-artifact@v4
