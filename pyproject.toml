@@ -114,10 +114,13 @@ ignore = [
     "S104",   # possible binding to all interfaces
     "S105",   # possible hardcoded password (false positives in validation)
     "S106",   # possible hardcoded password (false positives in tests)
+    "S314",   # xml parsing (using standard library ET for SAML)
     "B008",   # function call in argument defaults (required for FastAPI Depends)
     "N805",   # first argument should be self (false positive for pydantic validators)
     "C901",   # function is too complex (can be addressed later)
+    "SIM102", # nested if statements (can be more readable)
     "SIM108", # use ternary operator (style preference)
+    "RUF006", # asyncio.create_task without reference (background tasks)
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -127,6 +130,7 @@ ignore = [
     "FBT",    # boolean trap allowed in tests
 ]
 "__init__.py" = ["F401"]  # unused imports allowed in __init__.py
+"src/sark/api/routers/saml.py" = ["N803"]  # SAML spec requires specific parameter names
 
 [tool.ruff.lint.isort]
 known-first-party = ["sark"]
