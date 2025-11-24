@@ -15,12 +15,20 @@ SARK provides enterprise-grade security and governance for Model Context Protoco
 
 ✅ **Cloud Ready** - Production-ready with Kubernetes support, health checks, metrics, and comprehensive monitoring.
 
+✅ **CI/CD Operational** - Test suite fully operational with 948/1,242 tests passing (77.8%), 63.66% code coverage
+
 📋 **[Path to Production](docs/ROADMAP.md)** - Detailed roadmap with timelines, milestones, and resource requirements
 
 **Key Milestones:**
 - **Phase 2 (Weeks 1-6):** Security Hardening - Authentication, Authorization, SIEM Integration
 - **Phase 3 (Weeks 7-12):** Production Polish - Web UI, CLI, Documentation, Pilot Program
 - **Production Launch:** Q1 2026 (Estimated 2-3 months from MVP)
+
+**Test Status** (Updated 2025-11-23):
+- ✅ **948 tests passing** (77.8% pass rate)
+- ✅ **63.66% code coverage** (target: 85%, roadmap in place)
+- ✅ CI/CD pipeline fully operational
+- 📊 [Full Test Report](docs/TEST_EXECUTION_SUMMARY.md) | [Coverage Details](docs/TEST_COVERAGE_REPORT.md)
 
 ## Key Features
 
@@ -376,11 +384,8 @@ All checks run automatically via pre-commit hooks and CI/CD.
 ### Running Tests
 
 ```bash
-# Run all tests
-pytest
-
-# Run with coverage
-pytest --cov
+# Run all tests with coverage
+pytest --cov=src --cov-report=html --cov-report=term
 
 # Run specific test file
 pytest tests/test_example.py
@@ -390,7 +395,23 @@ pytest -k "test_pattern"
 
 # Run only fast tests
 pytest -m "not slow"
+
+# Run specific test categories
+pytest tests/unit/              # Unit tests only
+pytest tests/integration/       # Integration tests only
+pytest tests/test_api/          # API tests
 ```
+
+**Test Status**:
+- **Tests**: 948 passing / 1,242 total (77.8%)
+- **Coverage**: 63.66% (target: 85%)
+- **Execution Time**: ~2.5 minutes
+- **CI Pipeline**: ✅ Fully operational
+
+**Reports**:
+- [Test Execution Summary](docs/TEST_EXECUTION_SUMMARY.md)
+- [Test Coverage Report](docs/TEST_COVERAGE_REPORT.md)
+- [Known Issues](docs/KNOWN_ISSUES.md)
 
 ### Code Quality Checks
 
