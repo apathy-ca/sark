@@ -126,6 +126,7 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = [
     "S101",   # assert allowed in tests
+    "S311",   # pseudo-random generators OK for test data
     "ARG",    # unused arguments allowed in tests (fixtures)
     "FBT",    # boolean trap allowed in tests
     "SIM117", # nested with statements allowed in tests (clearer for mocking)
