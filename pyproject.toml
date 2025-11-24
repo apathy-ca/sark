@@ -4,6 +4,10 @@ version = "0.1.0"
 description = "SARK - Security Audit and Resource Kontroler for MCP Governance"
 readme = "README.md"
 requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "James R. A. Henry"}
+]
 dependencies = [
     "fastapi>=0.100.0",
     "uvicorn[standard]>=0.23.0",

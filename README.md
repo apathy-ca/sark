@@ -546,4 +546,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on:
 
 ## License
 
-TBD
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## Copyright
+
+Copyright 2024 James R. A. Henry. All rights reserved.
