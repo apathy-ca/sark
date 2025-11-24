@@ -304,9 +304,7 @@ async def extend_session(
             )
 
         # Extend session
-        extended_session = await session_service.extend_session(
-            session_id, additional_seconds
-        )
+        extended_session = await session_service.extend_session(session_id, additional_seconds)
 
         if not extended_session:
             raise HTTPException(

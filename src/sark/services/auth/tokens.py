@@ -45,9 +45,7 @@ class TokenService:
                 self.jwt_signing_key = self.settings.secret_key
                 self.settings.jwt_algorithm = "HS256"
         else:  # HS256
-            self.jwt_signing_key = (
-                self.settings.jwt_secret_key or self.settings.secret_key
-            )
+            self.jwt_signing_key = self.settings.jwt_secret_key or self.settings.secret_key
 
     async def create_access_token(self, user_context: dict) -> str:
         """Create a new JWT access token.

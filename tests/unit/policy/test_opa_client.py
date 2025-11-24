@@ -176,9 +176,7 @@ class TestOPAClient:
     # ===== evaluate_policy Tests =====
 
     @pytest.mark.asyncio
-    async def test_evaluate_policy_allow(
-        self, client, sample_auth_input, mock_opa_allow_response
-    ):
+    async def test_evaluate_policy_allow(self, client, sample_auth_input, mock_opa_allow_response):
         """Test successful policy evaluation with allow decision."""
         mock_response = MagicMock()
         mock_response.json.return_value = mock_opa_allow_response
@@ -193,9 +191,7 @@ class TestOPAClient:
             assert decision.audit_id == "audit-abc-123"
 
     @pytest.mark.asyncio
-    async def test_evaluate_policy_deny(
-        self, client, sample_auth_input, mock_opa_deny_response
-    ):
+    async def test_evaluate_policy_deny(self, client, sample_auth_input, mock_opa_deny_response):
         """Test policy evaluation with deny decision."""
         mock_response = MagicMock()
         mock_response.json.return_value = mock_opa_deny_response

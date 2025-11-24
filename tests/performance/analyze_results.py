@@ -81,9 +81,11 @@ class ResultsAnalyzer:
                         min_ms=float(row["Min Response Time"]),
                         max_ms=float(row["Max Response Time"]),
                         rps=float(row["Requests/s"]) if row["Requests/s"] else 0,
-                        failure_rate=float(row["Failure Count"]) / float(row["Request Count"]) * 100
-                        if int(row["Request Count"]) > 0
-                        else 0,
+                        failure_rate=(
+                            float(row["Failure Count"]) / float(row["Request Count"]) * 100
+                            if int(row["Request Count"]) > 0
+                            else 0
+                        ),
                     )
                     self.metrics.append(metric)
                 except (ValueError, KeyError) as e:
@@ -146,7 +148,9 @@ class ResultsAnalyzer:
         total_failures = sum(m.failures for m in self.metrics)
         overall_failure_rate = (total_failures / total_requests * 100) if total_requests > 0 else 0
 
-        print(f"Overall Error Rate: {overall_failure_rate:.2f}% (threshold: {self.thresholds.error_rate_percent}%)")
+        print(
+            f"Overall Error Rate: {overall_failure_rate:.2f}% (threshold: {self.thresholds.error_rate_percent}%)"
+        )
 
         if overall_failure_rate <= self.thresholds.error_rate_percent:
             print("  ✅ PASS: Error rate within threshold")
@@ -206,7 +210,9 @@ class ResultsAnalyzer:
                 "total_requests": sum(m.requests for m in self.metrics),
                 "total_failures": sum(m.failures for m in self.metrics),
                 "overall_failure_rate": (
-                    sum(m.failures for m in self.metrics) / sum(m.requests for m in self.metrics) * 100
+                    sum(m.failures for m in self.metrics)
+                    / sum(m.requests for m in self.metrics)
+                    * 100
                     if sum(m.requests for m in self.metrics) > 0
                     else 0
                 ),

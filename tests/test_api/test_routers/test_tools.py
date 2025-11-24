@@ -167,9 +167,7 @@ async def test_update_tool_sensitivity_invalid_level(
 
 @pytest.mark.asyncio
 @patch("sark.services.policy.OPAClient.authorize", return_value=True)
-async def test_update_tool_sensitivity_not_found(
-    mock_authorize, client: AsyncClient, mock_user
-):
+async def test_update_tool_sensitivity_not_found(mock_authorize, client: AsyncClient, mock_user):
     """Test updating sensitivity for non-existent tool."""
     fake_id = uuid4()
 
@@ -381,9 +379,7 @@ async def test_list_tools_by_sensitivity_invalid_level(client: AsyncClient):
 async def test_bulk_detect_sensitivity(client: AsyncClient, mock_server, mock_user):
     """Test bulk sensitivity detection for a server."""
     with patch("sark.services.auth.get_current_user", return_value=mock_user):
-        response = await client.post(
-            f"/api/v1/tools/servers/{mock_server.id}/tools/detect-all"
-        )
+        response = await client.post(f"/api/v1/tools/servers/{mock_server.id}/tools/detect-all")
 
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
@@ -428,9 +424,7 @@ async def test_detect_sensitivity_missing_name(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_update_sensitivity_with_optional_reason(
-    client: AsyncClient, mock_tool, mock_user
-):
+async def test_update_sensitivity_with_optional_reason(client: AsyncClient, mock_tool, mock_user):
     """Test update with optional reason field."""
     with patch("sark.services.policy.OPAClient.authorize", return_value=True):
         with patch("sark.services.auth.get_current_user", return_value=mock_user):

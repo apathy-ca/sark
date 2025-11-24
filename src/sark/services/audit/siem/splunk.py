@@ -22,9 +22,7 @@ class SplunkConfig(SIEMConfig):
     )
     hec_token: str = Field(default="", description="Splunk HEC authentication token")
     index: str = Field(default="sark_audit", description="Splunk index name")
-    sourcetype: str = Field(
-        default="sark:audit:event", description="Splunk sourcetype for events"
-    )
+    sourcetype: str = Field(default="sark:audit:event", description="Splunk sourcetype for events")
     source: str = Field(default="sark", description="Splunk source field")
     host: str | None = Field(default=None, description="Splunk host field (optional)")
 
@@ -163,10 +161,8 @@ class SplunkSIEM(BaseSIEM):
             # Format events for batch HEC request
             # Splunk HEC batch format: multiple JSON objects separated by newlines
             import json
-            batch_payload = "\n".join(
-                json.dumps(self._format_hec_event(event))
-                for event in events
-            )
+
+            batch_payload = "\n".join(json.dumps(self._format_hec_event(event)) for event in events)
 
             # Send batch to HEC
             response = await self._client.post(
@@ -218,9 +214,7 @@ class SplunkSIEM(BaseSIEM):
             )
             raise
         except Exception as e:
-            await self._update_failure_metrics(
-                event_count=len(events), error_type=type(e).__name__
-            )
+            await self._update_failure_metrics(event_count=len(events), error_type=type(e).__name__)
             self._logger.error(
                 "splunk_batch_send_exception",
                 event_count=len(events),
@@ -239,7 +233,9 @@ class SplunkSIEM(BaseSIEM):
             start_time = datetime.now(UTC)
 
             # Use HEC health endpoint
-            health_url = self.splunk_config.hec_url.replace("/services/collector", "/services/collector/health")
+            health_url = self.splunk_config.hec_url.replace(
+                "/services/collector", "/services/collector/health"
+            )
 
             response = await self._client.get(health_url)
 

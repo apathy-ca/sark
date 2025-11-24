@@ -108,9 +108,7 @@ class TestAuditServiceLogEvent:
         assert event.event_type == AuditEventType.TOOL_INVOKED
 
     @pytest.mark.asyncio
-    async def test_log_event_with_authorization_decision(
-        self, audit_service, mock_db, sample_user
-    ):
+    async def test_log_event_with_authorization_decision(self, audit_service, mock_db, sample_user):
         """Test logging event with authorization decision."""
         policy_id = uuid4()
         event = await audit_service.log_event(
@@ -162,9 +160,7 @@ class TestAuditServiceLogEvent:
         assert event.details["action"] == "create"
 
     @pytest.mark.asyncio
-    async def test_log_event_none_details_defaults_to_empty_dict(
-        self, audit_service, mock_db
-    ):
+    async def test_log_event_none_details_defaults_to_empty_dict(self, audit_service, mock_db):
         """Test that None details defaults to empty dict."""
         event = await audit_service.log_event(
             event_type=AuditEventType.USER_LOGOUT,
@@ -316,9 +312,7 @@ class TestAuditServiceLogAuthorizationDecision:
         assert event.decision == "deny"
 
     @pytest.mark.asyncio
-    async def test_log_authorization_with_policy_id(
-        self, audit_service, mock_db, sample_user
-    ):
+    async def test_log_authorization_with_policy_id(self, audit_service, mock_db, sample_user):
         """Test logging authorization decision with policy ID."""
         policy_id = uuid4()
 
@@ -365,9 +359,7 @@ class TestAuditServiceLogAuthorizationDecision:
         assert event.request_id == "req-auth-123"
 
     @pytest.mark.asyncio
-    async def test_log_authorization_with_details(
-        self, audit_service, mock_db, sample_user
-    ):
+    async def test_log_authorization_with_details(self, audit_service, mock_db, sample_user):
         """Test logging authorization decision with additional details."""
         details = {
             "reason": "user has required permissions",
@@ -507,9 +499,7 @@ class TestAuditServiceLogSecurityViolation:
     """Test log_security_violation method."""
 
     @pytest.mark.asyncio
-    async def test_log_security_violation_with_user(
-        self, audit_service, mock_db, sample_user
-    ):
+    async def test_log_security_violation_with_user(self, audit_service, mock_db, sample_user):
         """Test logging security violation with user information."""
         event = await audit_service.log_security_violation(
             user_id=sample_user["user_id"],
@@ -538,9 +528,7 @@ class TestAuditServiceLogSecurityViolation:
         assert event.details["violation_type"] == "unauthorized_access_attempt"
 
     @pytest.mark.asyncio
-    async def test_log_security_violation_with_details(
-        self, audit_service, mock_db, sample_user
-    ):
+    async def test_log_security_violation_with_details(self, audit_service, mock_db, sample_user):
         """Test logging security violation with additional details."""
         details = {
             "attempted_resource": "/admin/users",
@@ -599,17 +587,13 @@ class TestAuditServiceErrorScenarios:
             )
 
     @pytest.mark.asyncio
-    async def test_siem_forward_failure_does_not_block_logging(
-        self, audit_service, mock_db
-    ):
+    async def test_siem_forward_failure_does_not_block_logging(self, audit_service, mock_db):
         """Test that SIEM forwarding failure doesn't prevent event logging."""
 
         async def failing_siem_forward(event):
             raise Exception("SIEM unavailable")
 
-        with patch.object(
-            audit_service, "_forward_to_siem", new=failing_siem_forward
-        ):
+        with patch.object(audit_service, "_forward_to_siem", new=failing_siem_forward):
             # Should raise because we're not catching the exception
             with pytest.raises(Exception, match="SIEM unavailable"):
                 await audit_service.log_event(
