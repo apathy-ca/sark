@@ -99,8 +99,19 @@ class TestCompleteAuthFlows:
             "family_name": "User",
         }
 
+        # Create a mock JWTClaims object
+        mock_jwt_claims = Mock()
+        mock_jwt_claims.__iter__ = Mock(return_value=iter(mock_claims))
+        mock_jwt_claims.keys = Mock(return_value=mock_claims.keys())
+        mock_jwt_claims.values = Mock(return_value=mock_claims.values())
+        mock_jwt_claims.items = Mock(return_value=mock_claims.items())
+        mock_jwt_claims.get = Mock(side_effect=lambda key, default=None: mock_claims.get(key, default))
+        mock_jwt_claims.__getitem__ = Mock(side_effect=lambda key: mock_claims[key])
+        mock_jwt_claims.__contains__ = Mock(side_effect=lambda key: key in mock_claims)
+        mock_jwt_claims.validate = Mock()
+
         with patch.object(oidc_provider, "_get_jwks", return_value=Mock()):
-            with patch.object(oidc_provider.jwt, "decode", return_value=mock_claims):
+            with patch.object(oidc_provider.jwt, "decode", return_value=mock_jwt_claims):
                 user_info = await oidc_provider.validate_token("mock_access_token")
 
                 assert user_info is not None
@@ -171,7 +182,10 @@ class TestCompleteAuthFlows:
             updated_at=datetime.now(UTC),
         )
 
-        mock_db_session.first = AsyncMock(return_value=mock_api_key)
+        # Mock database query result
+        mock_result = Mock()
+        mock_result.scalar_one_or_none = Mock(return_value=mock_api_key)
+        mock_db_session.execute = AsyncMock(return_value=mock_result)
 
         validated_key, error = await api_key_service.validate_api_key(
             full_key,
@@ -436,8 +450,19 @@ class TestCrossProviderScenarios:
             "name": "Test User",
         }
 
+        # Create a mock JWTClaims object
+        mock_jwt_claims = Mock()
+        mock_jwt_claims.__iter__ = Mock(return_value=iter(mock_claims))
+        mock_jwt_claims.keys = Mock(return_value=mock_claims.keys())
+        mock_jwt_claims.values = Mock(return_value=mock_claims.values())
+        mock_jwt_claims.items = Mock(return_value=mock_claims.items())
+        mock_jwt_claims.get = Mock(side_effect=lambda key, default=None: mock_claims.get(key, default))
+        mock_jwt_claims.__getitem__ = Mock(side_effect=lambda key: mock_claims[key])
+        mock_jwt_claims.__contains__ = Mock(side_effect=lambda key: key in mock_claims)
+        mock_jwt_claims.validate = Mock()
+
         with patch.object(oidc_provider, "_get_jwks", return_value=Mock()):
-            with patch.object(oidc_provider.jwt, "decode", return_value=mock_claims):
+            with patch.object(oidc_provider.jwt, "decode", return_value=mock_jwt_claims):
                 user_info_oidc = await oidc_provider.validate_token("oidc_token")
                 assert user_info_oidc is not None
                 assert user_info_oidc.user_id == "oidc_user123"
@@ -480,7 +505,10 @@ class TestCrossProviderScenarios:
             updated_at=datetime.now(UTC),
         )
 
-        mock_db_session.first = AsyncMock(return_value=api_key)
+        # Mock database query result
+        mock_result = Mock()
+        mock_result.scalar_one_or_none = Mock(return_value=api_key)
+        mock_db_session.execute = AsyncMock(return_value=mock_result)
 
         # Validate with read scope (should succeed)
         validated_key, error = await api_key_service.validate_api_key(
@@ -493,7 +521,8 @@ class TestCrossProviderScenarios:
 
         # Reset mock for second test
         api_key.usage_count = 0  # Reset usage
-        mock_db_session.first = AsyncMock(return_value=api_key)
+        mock_result.scalar_one_or_none = Mock(return_value=api_key)
+        mock_db_session.execute = AsyncMock(return_value=mock_result)
 
         # Validate with write scope (should fail)
         validated_key, error = await api_key_service.validate_api_key(
