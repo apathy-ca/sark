@@ -126,13 +126,17 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = [
     "S101",   # assert allowed in tests
+    "S110",   # try-except-pass allowed in tests
     "S311",   # pseudo-random generators OK for test data
     "ARG",    # unused arguments allowed in tests (fixtures)
     "FBT",    # boolean trap allowed in tests
+    "B017",   # pytest.raises(Exception) is acceptable in tests
+    "SIM105", # contextlib.suppress not always clearer in tests
     "SIM117", # nested with statements allowed in tests (clearer for mocking)
     "SIM113", # enumerate not required in tests
     "RUF043", # regex patterns don't need to be raw in tests
     "A002",   # shadowing builtins allowed in tests (common in mocks)
+    "E402",   # module level imports not at top OK in tests
 ]
 "__init__.py" = ["F401"]  # unused imports allowed in __init__.py
 "src/sark/api/routers/saml.py" = ["N803"]  # SAML spec requires specific parameter names
