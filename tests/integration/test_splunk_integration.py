@@ -42,14 +42,16 @@ from sark.services.audit.siem import (
 )
 
 # Check for credentials
-HAS_CREDENTIALS = all([
-    os.getenv("SPLUNK_HEC_URL"),
-    os.getenv("SPLUNK_HEC_TOKEN"),
-])
+HAS_CREDENTIALS = all(
+    [
+        os.getenv("SPLUNK_HEC_URL"),
+        os.getenv("SPLUNK_HEC_TOKEN"),
+    ]
+)
 
 requires_credentials = pytest.mark.skipif(
     not HAS_CREDENTIALS,
-    reason="Splunk credentials not configured. Set SPLUNK_HEC_URL and SPLUNK_HEC_TOKEN."
+    reason="Splunk credentials not configured. Set SPLUNK_HEC_URL and SPLUNK_HEC_TOKEN.",
 )
 
 
@@ -146,7 +148,9 @@ class TestSplunkEventFormatting:
         print("\n✅ Single event sent successfully")
         print(f"   Event ID: {test_event.id}")
         print(f"   Type: {test_event.event_type.value}")
-        print(f"   Search in Splunk: index={splunk_siem.splunk_config.index} event_id={test_event.id}")
+        print(
+            f"   Search in Splunk: index={splunk_siem.splunk_config.index} event_id={test_event.id}"
+        )
 
     @requires_credentials
     @pytest.mark.asyncio
@@ -256,7 +260,9 @@ class TestSplunkWithOptimizations:
 
     @requires_credentials
     @pytest.mark.asyncio
-    async def test_with_error_handler(self, splunk_siem: SplunkSIEM, test_event: AuditEvent, tmp_path):
+    async def test_with_error_handler(
+        self, splunk_siem: SplunkSIEM, test_event: AuditEvent, tmp_path
+    ):
         """Test Splunk with error handler and fallback."""
         error_handler = SIEMErrorHandler(
             fallback_log_dir=tmp_path,
@@ -269,11 +275,13 @@ class TestSplunkWithOptimizations:
         def on_alert(errors):
             alert_fired.append(len(errors))
 
-        error_handler.add_alert(ErrorAlert(
-            name="test_alert",
-            condition=lambda e: high_error_rate_condition(e, threshold=1),
-            callback=on_alert,
-        ))
+        error_handler.add_alert(
+            ErrorAlert(
+                name="test_alert",
+                condition=lambda e: high_error_rate_condition(e, threshold=1),
+                callback=on_alert,
+            )
+        )
 
         # Send event (should succeed)
         try:
@@ -329,6 +337,7 @@ class TestSplunkLoadPerformance:
         try:
             # Send 1000 events
             import time
+
             start_time = time.time()
 
             for i in range(1000):
@@ -396,7 +405,9 @@ if __name__ == "__main__":
     if not HAS_CREDENTIALS:
         print("❌ Splunk credentials not configured")
         print("\nPlease set environment variables:")
-        print("  export SPLUNK_HEC_URL='https://your-instance.splunkcloud.com:8088/services/collector'")
+        print(
+            "  export SPLUNK_HEC_URL='https://your-instance.splunkcloud.com:8088/services/collector'"
+        )
         print("  export SPLUNK_HEC_TOKEN='your-hec-token'")
         print("  export SPLUNK_INDEX='sark_test'")
         sys.exit(1)

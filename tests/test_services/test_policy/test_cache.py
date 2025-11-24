@@ -297,6 +297,7 @@ async def test_invalidate_by_user(cache, mock_redis):
 @pytest.mark.asyncio
 async def test_invalidate_by_user_and_action(cache, mock_redis):
     """Test invalidating cache for user + action."""
+
     async def async_iter(keys_list):
         for key in keys_list:
             yield key
@@ -332,13 +333,12 @@ async def test_invalidate_pattern(cache, mock_redis):
 @pytest.mark.asyncio
 async def test_clear_all(cache, mock_redis):
     """Test clearing all cache entries."""
+
     async def async_iter(keys_list):
         for key in keys_list:
             yield key
 
-    mock_redis.scan_iter.return_value = async_iter(
-        ["policy:decision:key1", "policy:decision:key2"]
-    )
+    mock_redis.scan_iter.return_value = async_iter(["policy:decision:key1", "policy:decision:key2"])
     mock_redis.delete.return_value = 2
 
     result = await cache.clear_all()
@@ -421,6 +421,7 @@ def test_record_opa_latency(cache):
 @pytest.mark.asyncio
 async def test_get_cache_size(cache, mock_redis):
     """Test getting cache size."""
+
     async def async_iter(keys_list):
         for key in keys_list:
             yield key
@@ -525,6 +526,7 @@ async def test_cache_with_complex_context(cache, mock_redis):
 @pytest.mark.asyncio
 async def test_cache_invalidate_no_keys(cache, mock_redis):
     """Test invalidation when no keys match."""
+
     async def async_iter(keys_list):
         for key in keys_list:
             yield key
@@ -541,12 +543,8 @@ async def test_concurrent_cache_operations(cache, mock_redis):
     """Test cache handles concurrent operations."""
     import asyncio
 
-
     # Simulate concurrent gets
-    tasks = [
-        cache.get("user-1", "tool:invoke", f"tool:{i}")
-        for i in range(10)
-    ]
+    tasks = [cache.get("user-1", "tool:invoke", f"tool:{i}") for i in range(10)]
 
     results = await asyncio.gather(*tasks)
 

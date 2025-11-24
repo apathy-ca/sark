@@ -123,7 +123,9 @@ class TestSplunkSIEM:
         assert "event" in hec_event
         assert isinstance(hec_event["event"], dict)
 
-    def test_format_hec_event_without_host(self, splunk_config: SplunkConfig, audit_event: AuditEvent):
+    def test_format_hec_event_without_host(
+        self, splunk_config: SplunkConfig, audit_event: AuditEvent
+    ):
         """Test HEC event formatting without host field."""
         config = SplunkConfig(
             hec_url=splunk_config.hec_url,
@@ -172,9 +174,7 @@ class TestSplunkSIEM:
     @pytest.mark.asyncio
     async def test_send_event_timeout(self, splunk_siem: SplunkSIEM, audit_event: AuditEvent):
         """Test event send with timeout."""
-        with patch.object(
-            splunk_siem._client, "post", new_callable=AsyncMock
-        ) as mock_post:
+        with patch.object(splunk_siem._client, "post", new_callable=AsyncMock) as mock_post:
             mock_post.side_effect = httpx.TimeoutException("Request timeout")
 
             with pytest.raises(httpx.TimeoutException):
@@ -188,9 +188,7 @@ class TestSplunkSIEM:
         self, splunk_siem: SplunkSIEM, audit_event: AuditEvent
     ):
         """Test event send with connection error."""
-        with patch.object(
-            splunk_siem._client, "post", new_callable=AsyncMock
-        ) as mock_post:
+        with patch.object(splunk_siem._client, "post", new_callable=AsyncMock) as mock_post:
             mock_post.side_effect = httpx.ConnectError("Connection refused")
 
             with pytest.raises(httpx.ConnectError):
@@ -204,9 +202,7 @@ class TestSplunkSIEM:
         self, splunk_siem: SplunkSIEM, audit_event: AuditEvent
     ):
         """Test event send with generic exception."""
-        with patch.object(
-            splunk_siem._client, "post", new_callable=AsyncMock
-        ) as mock_post:
+        with patch.object(splunk_siem._client, "post", new_callable=AsyncMock) as mock_post:
             mock_post.side_effect = ValueError("Invalid data")
 
             with pytest.raises(ValueError):
@@ -263,9 +259,7 @@ class TestSplunkSIEM:
         """Test batch send with timeout."""
         events = [audit_event, audit_event]
 
-        with patch.object(
-            splunk_siem._client, "post", new_callable=AsyncMock
-        ) as mock_post:
+        with patch.object(splunk_siem._client, "post", new_callable=AsyncMock) as mock_post:
             mock_post.side_effect = httpx.TimeoutException("Request timeout")
 
             with pytest.raises(httpx.TimeoutException):
@@ -345,9 +339,7 @@ class TestSplunkSIEM:
     @pytest.mark.asyncio
     async def test_close(self, splunk_siem: SplunkSIEM):
         """Test closing the SIEM connection."""
-        with patch.object(
-            splunk_siem._client, "aclose", new_callable=AsyncMock
-        ) as mock_close:
+        with patch.object(splunk_siem._client, "aclose", new_callable=AsyncMock) as mock_close:
             await splunk_siem.close()
             assert mock_close.call_count == 1
 

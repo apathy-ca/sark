@@ -86,9 +86,7 @@ class ExportRequest(BaseModel):
     start_time: datetime | None = Field(
         None, description="Start of time range (defaults to 24h ago)"
     )
-    end_time: datetime | None = Field(
-        None, description="End of time range (defaults to now)"
-    )
+    end_time: datetime | None = Field(None, description="End of time range (defaults to now)")
     format: str = Field("json", description="Export format: 'json' or 'csv'")
     filters: dict[str, Any] | None = Field(None, description="Additional filters")
 
@@ -100,9 +98,7 @@ class ExportRequest(BaseModel):
 
 @router.get("/decisions", response_model=list[PolicyDecisionLogResponse])
 async def get_decision_logs(
-    start_time: datetime | None = Query(
-        None, description="Start of time range (ISO 8601)"
-    ),
+    start_time: datetime | None = Query(None, description="Start of time range (ISO 8601)"),
     end_time: datetime | None = Query(None, description="End of time range (ISO 8601)"),
     user_id: str | None = Query(None, description="Filter by user ID"),
     action: str | None = Query(None, description="Filter by action"),
@@ -417,7 +413,9 @@ async def export_decisions_json(
         filters=request.filters,
     )
 
-    filename = f"policy_decisions_{start_time.strftime('%Y%m%d')}_{end_time.strftime('%Y%m%d')}.json"
+    filename = (
+        f"policy_decisions_{start_time.strftime('%Y%m%d')}_{end_time.strftime('%Y%m%d')}.json"
+    )
 
     return Response(
         content=json_content,

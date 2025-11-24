@@ -240,10 +240,9 @@ class PolicyCache:
                     if ttl_remaining < stale_threshold:
                         # Serve stale cache, revalidate in background
                         self.metrics.stale_hits += 1
-                        asyncio.create_task(
-                            self._background_revalidate(
-                                user_id, action, resource, context
-                            )
+                        # Background revalidation task (fire and forget)
+                        asyncio.create_task(  # noqa: RUF006
+                            self._background_revalidate(user_id, action, resource, context)
                         )
 
                         logger.debug(
@@ -279,7 +278,10 @@ class PolicyCache:
 
                 self.metrics.total_requests += 1
                 self.metrics.cache_latency_ms = (
-                    (self.metrics.cache_latency_ms * (self.metrics.hits + self.metrics.stale_hits - 1))
+                    (
+                        self.metrics.cache_latency_ms
+                        * (self.metrics.hits + self.metrics.stale_hits - 1)
+                    )
                     + latency_ms
                 ) / (self.metrics.hits + self.metrics.stale_hits)
 
@@ -330,9 +332,7 @@ class PolicyCache:
 
         try:
             # Call revalidation callback (OPA evaluation)
-            new_decision = await self.revalidate_callback(
-                user_id, action, resource, context
-            )
+            new_decision = await self.revalidate_callback(user_id, action, resource, context)
 
             # Update cache with fresh decision
             if new_decision:
@@ -642,9 +642,7 @@ class PolicyCache:
         """
         try:
             count = 0
-            async for _ in self.redis.scan_iter(
-                match=f"{self.KEY_PREFIX}:*", count=100
-            ):
+            async for _ in self.redis.scan_iter(match=f"{self.KEY_PREFIX}:*", count=100):
                 count += 1
             return count
 
@@ -667,8 +665,7 @@ class PolicyCache:
         # Calculate running average
         if self.metrics.misses > 0:
             self.metrics.opa_latency_ms = (
-                (self.metrics.opa_latency_ms * (self.metrics.misses - 1))
-                + latency_ms
+                (self.metrics.opa_latency_ms * (self.metrics.misses - 1)) + latency_ms
             ) / self.metrics.misses
 
     async def health_check(self) -> bool:

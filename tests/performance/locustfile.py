@@ -65,7 +65,7 @@ class ServerManagementTasks(TaskSet):
             json=server_data,
             headers=self.headers,
             catch_response=True,
-            name="/api/v1/servers/ [POST - Register]"
+            name="/api/v1/servers/ [POST - Register]",
         ) as response:
             if response.status_code == 201:
                 data = response.json()
@@ -84,7 +84,7 @@ class ServerManagementTasks(TaskSet):
             "/api/v1/servers/",
             headers=self.headers,
             catch_response=True,
-            name="/api/v1/servers/ [GET - List]"
+            name="/api/v1/servers/ [GET - List]",
         ) as response:
             if response.status_code == 200:
                 response.success()
@@ -104,7 +104,7 @@ class ServerManagementTasks(TaskSet):
             f"/api/v1/servers/{server_id}",
             headers=self.headers,
             catch_response=True,
-            name="/api/v1/servers/{id} [GET]"
+            name="/api/v1/servers/{id} [GET]",
         ) as response:
             if response.status_code in (200, 404):
                 # 404 is acceptable if server doesn't exist
@@ -125,7 +125,7 @@ class ServerManagementTasks(TaskSet):
             params=query_params,
             headers=self.headers,
             catch_response=True,
-            name="/api/v1/servers/ [GET - Search]"
+            name="/api/v1/servers/ [GET - Search]",
         ) as response:
             if response.status_code == 200:
                 response.success()
@@ -151,7 +151,7 @@ class PolicyEvaluationTasks(TaskSet):
             json=policy_request,
             headers=self.headers,
             catch_response=True,
-            name="/api/v1/policy/evaluate [Tool Invoke]"
+            name="/api/v1/policy/evaluate [Tool Invoke]",
         ) as response:
             if response.status_code == 200:
                 data = response.json()
@@ -170,7 +170,7 @@ class PolicyEvaluationTasks(TaskSet):
         policy_request = {
             "action": random.choice(actions),
             "server_id": str(uuid.uuid4()),
-            "parameters": {}
+            "parameters": {},
         }
 
         with self.client.post(
@@ -178,7 +178,7 @@ class PolicyEvaluationTasks(TaskSet):
             json=policy_request,
             headers=self.headers,
             catch_response=True,
-            name="/api/v1/policy/evaluate [Server Action]"
+            name="/api/v1/policy/evaluate [Server Action]",
         ) as response:
             if response.status_code == 200:
                 response.success()
@@ -192,11 +192,7 @@ class HealthCheckTasks(TaskSet):
     @task(1)
     def health_check(self):
         """Basic health check."""
-        with self.client.get(
-            "/health/",
-            catch_response=True,
-            name="/health/ [GET]"
-        ) as response:
+        with self.client.get("/health/", catch_response=True, name="/health/ [GET]") as response:
             if response.status_code == 200:
                 response.success()
             else:
@@ -206,9 +202,7 @@ class HealthCheckTasks(TaskSet):
     def ready_check(self):
         """Readiness check."""
         with self.client.get(
-            "/health/ready",
-            catch_response=True,
-            name="/health/ready [GET]"
+            "/health/ready", catch_response=True, name="/health/ready [GET]"
         ) as response:
             if response.status_code == 200:
                 response.success()
@@ -219,9 +213,7 @@ class HealthCheckTasks(TaskSet):
     def detailed_health(self):
         """Detailed health check with component status."""
         with self.client.get(
-            "/health/detailed",
-            catch_response=True,
-            name="/health/detailed [GET]"
+            "/health/detailed", catch_response=True, name="/health/detailed [GET]"
         ) as response:
             if response.status_code == 200:
                 response.success()
@@ -236,6 +228,7 @@ class MixedWorkloadUser(FastHttpUser):
     This user performs a combination of server management and policy evaluation tasks,
     simulating real-world usage patterns.
     """
+
     wait_time = between(1, 3)  # Wait 1-3 seconds between requests
     tasks: ClassVar = {
         ServerManagementTasks: 3,  # 30% server management
@@ -252,6 +245,7 @@ class ServerRegistrationUser(FastHttpUser):
     Target: 1000 req/s server registration
     Expected p95: < 200ms
     """
+
     wait_time = between(0.5, 2)
     tasks: ClassVar = [ServerManagementTasks]
 
@@ -263,6 +257,7 @@ class PolicyEvaluationUser(FastHttpUser):
     Use this for focused policy evaluation performance tests.
     Expected p95: < 50ms
     """
+
     wait_time = between(0.1, 0.5)  # Fast policy evaluation
     tasks: ClassVar = [PolicyEvaluationTasks]
 
@@ -274,6 +269,7 @@ class BurstTrafficUser(FastHttpUser):
     This user creates bursty traffic with periods of high activity
     followed by idle periods, simulating real-world traffic spikes.
     """
+
     wait_time = between(0, 1)
 
     def on_start(self):
@@ -294,9 +290,7 @@ class BurstTrafficUser(FastHttpUser):
 
             if request_type == "server_list":
                 self.client.get(
-                    "/api/v1/servers/",
-                    headers=self.headers,
-                    name="/api/v1/servers/ [Burst]"
+                    "/api/v1/servers/", headers=self.headers, name="/api/v1/servers/ [Burst]"
                 )
             elif request_type == "policy_eval":
                 policy_request = generator.generate_policy_evaluation()
@@ -304,7 +298,7 @@ class BurstTrafficUser(FastHttpUser):
                     "/api/v1/policy/evaluate",
                     json=policy_request,
                     headers=self.headers,
-                    name="/api/v1/policy/evaluate [Burst]"
+                    name="/api/v1/policy/evaluate [Burst]",
                 )
             else:
                 self.client.get("/health/", name="/health/ [Burst]")
@@ -320,6 +314,7 @@ class ConcurrentOperationsUser(FastHttpUser):
     This user performs rapid concurrent operations to stress test
     database transactions, locks, and concurrent session handling.
     """
+
     wait_time = between(0.1, 0.3)
 
     def on_start(self):
@@ -336,7 +331,7 @@ class ConcurrentOperationsUser(FastHttpUser):
                 "/api/v1/policy/evaluate",
                 json=policy_request,
                 headers=self.headers,
-                name="/api/v1/policy/evaluate [Concurrent]"
+                name="/api/v1/policy/evaluate [Concurrent]",
             )
 
     @task(5)
@@ -347,13 +342,14 @@ class ConcurrentOperationsUser(FastHttpUser):
             self.client.get(
                 f"/api/v1/servers/{server_id}",
                 headers=self.headers,
-                name="/api/v1/servers/{id} [Concurrent]"
+                name="/api/v1/servers/{id} [Concurrent]",
             )
 
 
 # ============================================================================
 # Scenario-specific user classes for targeted load testing
 # ============================================================================
+
 
 class RateLimitTestUser(FastHttpUser):
     """
@@ -362,6 +358,7 @@ class RateLimitTestUser(FastHttpUser):
     This user attempts to exceed rate limits to verify that
     rate limiting is working correctly and returns appropriate 429 responses.
     """
+
     wait_time = between(0, 0.1)  # Very fast to trigger rate limits
 
     def on_start(self):
@@ -376,7 +373,7 @@ class RateLimitTestUser(FastHttpUser):
             "/api/v1/servers/",
             headers=self.headers,
             catch_response=True,
-            name="/api/v1/servers/ [Rate Limit Test]"
+            name="/api/v1/servers/ [Rate Limit Test]",
         ) as response:
             if response.status_code == 200:
                 response.success()
@@ -395,6 +392,7 @@ class DatabaseStressUser(FastHttpUser):
     to test database connection pooling, query performance, and transaction handling.
     Target: Database queries < 20ms
     """
+
     wait_time = between(0.5, 1.5)
 
     def on_start(self):
@@ -414,7 +412,7 @@ class DatabaseStressUser(FastHttpUser):
             "/api/v1/servers/",
             params=params,
             headers=self.headers,
-            name="/api/v1/servers/ [Filtered]"
+            name="/api/v1/servers/ [Filtered]",
         )
 
     @task(3)
@@ -429,7 +427,7 @@ class DatabaseStressUser(FastHttpUser):
             json=server_data,
             headers=self.headers,
             catch_response=True,
-            name="/api/v1/servers/ [Complex Registration]"
+            name="/api/v1/servers/ [Complex Registration]",
         ) as response:
             if response.status_code in (201, 403):
                 response.success()

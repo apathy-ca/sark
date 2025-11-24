@@ -116,10 +116,20 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = [
     "S101",   # assert allowed in tests
+    "S110",   # try-except-pass allowed in tests
+    "S311",   # random usage allowed in test data generation
     "ARG",    # unused arguments allowed in tests (fixtures)
     "FBT",    # boolean trap allowed in tests
+    "SIM105", # suppressible exception allowed in tests
+    "SIM113", # enumerate style preference in tests
+    "SIM117", # multiple with statements allowed in tests
+    "B017",   # assert raises without message allowed in tests
+    "RUF043", # pytest pattern metacharacters
+    "A002",   # builtin shadowing allowed in test fixtures
 ]
+"tests/load/locustfile.py" = ["E402"]  # module imports must be delayed in locust files
 "__init__.py" = ["F401"]  # unused imports allowed in __init__.py
+"src/sark/api/routers/saml.py" = ["N803"]  # SAML spec requires uppercase parameter names
 
 [tool.ruff.lint.isort]
 known-first-party = ["sark"]

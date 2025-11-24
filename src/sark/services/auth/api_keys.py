@@ -58,8 +58,8 @@ class APIKeyService:
             - key_hash: bcrypt hash of the full key for storage
         """
         # Generate cryptographically secure random values
-        prefix = secrets.token_urlsafe(cls.PREFIX_LENGTH)[:cls.PREFIX_LENGTH]
-        secret = secrets.token_urlsafe(cls.SECRET_LENGTH)[:cls.SECRET_LENGTH]
+        prefix = secrets.token_urlsafe(cls.PREFIX_LENGTH)[: cls.PREFIX_LENGTH]
+        secret = secrets.token_urlsafe(cls.SECRET_LENGTH)[: cls.SECRET_LENGTH]
 
         # Construct full key: sark_sk_<env>_<prefix>_<secret>
         full_key = f"{cls.KEY_PREFIX}_sk_{environment}_{prefix}_{secret}"
@@ -280,10 +280,12 @@ class APIKeyService:
             return None, "API key has expired"
 
         # Check scope if required
-        if required_scope and required_scope not in api_key.scopes:
-            # Check for admin scope (has all permissions)
-            if "admin" not in api_key.scopes:
-                return None, f"API key does not have required scope: {required_scope}"
+        if (
+            required_scope
+            and required_scope not in api_key.scopes
+            and "admin" not in api_key.scopes
+        ):
+            return None, f"API key does not have required scope: {required_scope}"
 
         # Record usage
         api_key.record_usage(ip_address)

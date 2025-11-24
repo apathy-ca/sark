@@ -73,9 +73,7 @@ class TestSIEMOptimizer:
         siem = MagicMock()
         siem.send_event = AsyncMock(return_value=True)
         siem.send_batch = AsyncMock(return_value=True)
-        siem.health_check = AsyncMock(
-            return_value=SIEMHealth(healthy=True, latency_ms=10.0)
-        )
+        siem.health_check = AsyncMock(return_value=SIEMHealth(healthy=True, latency_ms=10.0))
         return siem
 
     @pytest.fixture
@@ -242,9 +240,7 @@ class TestSIEMOptimizer:
         assert optimizer.is_healthy() is False
 
         # Recover
-        optimizer.siem.health_check.return_value = SIEMHealth(
-            healthy=True, latency_ms=10.0
-        )
+        optimizer.siem.health_check.return_value = SIEMHealth(healthy=True, latency_ms=10.0)
 
         await asyncio.sleep(1.2)
 

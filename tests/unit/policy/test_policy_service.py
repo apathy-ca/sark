@@ -60,6 +60,7 @@ class TestPolicyService:
         )
 
         mock_db.refresh.side_effect = lambda obj: None
+
         # Mock the policy object to have an id after add
         def add_side_effect(obj):
             if isinstance(obj, Policy):
