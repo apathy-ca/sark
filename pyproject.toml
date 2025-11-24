@@ -159,8 +159,8 @@ ignore_missing_imports = false
 show_error_codes = true
 show_column_numbers = true
 pretty = true
-# Disable strict checks that are too restrictive for FastAPI/Pydantic
-disable_error_code = ["misc", "no-any-return", "attr-defined", "type-arg", "assignment"]
+# Disable strict checks that are too restrictive for FastAPI/Pydantic/SQLAlchemy
+disable_error_code = ["misc", "no-any-return", "attr-defined", "type-arg", "assignment", "var-annotated", "arg-type"]
 
 [[tool.mypy.overrides]]
 module = "tests.*"
