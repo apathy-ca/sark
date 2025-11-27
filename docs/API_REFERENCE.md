@@ -2303,50 +2303,306 @@ async function loadAdminDashboard() {
 }
 ```
 
-### WebSocket Alternative (Server-Sent Events)
+### Real-Time Updates with WebSocket
 
-For real-time updates without WebSocket complexity:
+SARK provides WebSocket endpoints for real-time updates without polling.
+
+#### Available WebSocket Endpoints
+
+1. **Audit Log Stream**: `ws://localhost:8000/api/v1/ws/audit/stream`
+2. **Server Status Updates**: `ws://localhost:8000/api/v1/ws/servers/status`
+3. **Live Metrics**: `ws://localhost:8000/api/v1/ws/metrics/live`
+
+#### WebSocket Authentication
+
+All WebSocket connections require authentication via JWT token passed as a query parameter:
 
 ```javascript
-class ServerHealthMonitor {
-  constructor(serverId) {
-    this.serverId = serverId;
-    this.eventSource = null;
+const token = getAccessToken();
+const wsUrl = `ws://localhost:8000/api/v1/ws/audit/stream?token=${token}`;
+const ws = new WebSocket(wsUrl);
+```
+
+#### Audit Log Stream Example
+
+```javascript
+class AuditLogStream {
+  constructor() {
+    this.ws = null;
+    this.reconnectAttempts = 0;
+    this.maxReconnectAttempts = 5;
+    this.reconnectDelay = 3000;
   }
 
-  start() {
-    // Note: This is conceptual - actual implementation depends on SSE support
-    this.eventSource = new EventSource(
-      `/api/v1/servers/${this.serverId}/health/stream`,
-      {
-        headers: {
-          'Authorization': `Bearer ${window.sarkAuth.accessToken}`
-        }
-      }
-    );
+  connect() {
+    const token = getAccessToken();
+    const wsUrl = `ws://localhost:8000/api/v1/ws/audit/stream?token=${token}`;
 
-    this.eventSource.addEventListener('health-update', (event) => {
+    this.ws = new WebSocket(wsUrl);
+
+    this.ws.onopen = () => {
+      console.log('[Audit Stream] Connected');
+      this.reconnectAttempts = 0;
+    };
+
+    this.ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      this.onHealthUpdate(data);
-    });
 
-    this.eventSource.addEventListener('error', (error) => {
-      console.error('SSE error:', error);
-      this.stop();
-    });
+      switch (data.type) {
+        case 'connected':
+          console.log('[Audit Stream] Welcome:', data.message);
+          break;
+
+        case 'audit_event':
+          this.handleAuditEvent(data.event);
+          break;
+
+        case 'ping':
+          // Server keep-alive ping
+          this.ws.send('pong');
+          break;
+
+        default:
+          console.warn('[Audit Stream] Unknown message type:', data.type);
+      }
+    };
+
+    this.ws.onerror = (error) => {
+      console.error('[Audit Stream] Error:', error);
+    };
+
+    this.ws.onclose = (event) => {
+      console.log('[Audit Stream] Disconnected:', event.code, event.reason);
+
+      // Attempt to reconnect
+      if (this.reconnectAttempts < this.maxReconnectAttempts) {
+        this.reconnectAttempts++;
+        console.log(`[Audit Stream] Reconnecting (attempt ${this.reconnectAttempts})...`);
+        setTimeout(() => this.connect(), this.reconnectDelay);
+      }
+    };
   }
 
-  stop() {
-    if (this.eventSource) {
-      this.eventSource.close();
-      this.eventSource = null;
+  handleAuditEvent(event) {
+    console.log('[Audit Event]', {
+      action: event.action,
+      user: event.user_id,
+      decision: event.decision,
+      reason: event.reason
+    });
+
+    // Add to audit log UI
+    addAuditLogEntry(event);
+
+    // Show notification for denied actions
+    if (event.decision === 'deny') {
+      showNotification(`Action blocked: ${event.reason}`, 'warning');
     }
   }
 
-  onHealthUpdate(data) {
-    // Update UI with new health status
-    document.getElementById('server-status').textContent = data.status;
-    document.getElementById('last-check').textContent = data.last_check;
+  disconnect() {
+    if (this.ws) {
+      this.ws.close();
+      this.ws = null;
+    }
+  }
+
+  // Send ping to keep connection alive
+  ping() {
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send('ping');
+    }
+  }
+}
+
+// Usage
+const auditStream = new AuditLogStream();
+auditStream.connect();
+
+// Keep connection alive
+setInterval(() => auditStream.ping(), 25000); // Ping every 25 seconds
+```
+
+#### Server Status Stream Example
+
+```javascript
+class ServerStatusStream {
+  constructor(onStatusChange) {
+    this.onStatusChange = onStatusChange;
+    this.ws = null;
+  }
+
+  connect() {
+    const token = getAccessToken();
+    const wsUrl = `ws://localhost:8000/api/v1/ws/servers/status?token=${token}`;
+
+    this.ws = new WebSocket(wsUrl);
+
+    this.ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      if (data.type === 'server_status_change') {
+        this.onStatusChange(data.server);
+      }
+    };
+
+    this.ws.onerror = (error) => {
+      console.error('[Server Status] Error:', error);
+    };
+  }
+
+  disconnect() {
+    if (this.ws) {
+      this.ws.close();
+    }
+  }
+}
+
+// Usage
+const statusStream = new ServerStatusStream((server) => {
+  console.log(`Server ${server.name} changed from ${server.previous_status} to ${server.status}`);
+
+  // Update UI
+  updateServerStatus(server.id, server.status);
+
+  // Show notification
+  if (server.status === 'unhealthy') {
+    showNotification(`Server ${server.name} is now unhealthy!`, 'error');
+  }
+});
+
+statusStream.connect();
+```
+
+#### Live Metrics Stream Example
+
+```javascript
+class LiveMetricsStream {
+  constructor(onMetricsUpdate) {
+    this.onMetricsUpdate = onMetricsUpdate;
+    this.ws = null;
+  }
+
+  connect() {
+    const token = getAccessToken();
+    const wsUrl = `ws://localhost:8000/api/v1/ws/metrics/live?token=${token}`;
+
+    this.ws = new WebSocket(wsUrl);
+
+    this.ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      if (data.type === 'metrics_update') {
+        this.onMetricsUpdate(data.metrics);
+      }
+    };
+  }
+
+  disconnect() {
+    if (this.ws) {
+      this.ws.close();
+    }
+  }
+}
+
+// Usage
+const metricsStream = new LiveMetricsStream((metrics) => {
+  document.getElementById('total-servers').textContent = metrics.total_servers;
+  document.getElementById('active-servers').textContent = metrics.active_servers;
+  document.getElementById('unhealthy-servers').textContent = metrics.unhealthy_servers;
+
+  // Update charts
+  updateMetricsChart(metrics);
+});
+
+metricsStream.connect();
+```
+
+#### WebSocket Best Practices
+
+**1. Handle Reconnection:**
+```javascript
+function connectWithRetry(url, maxAttempts = 5) {
+  let attempts = 0;
+
+  function connect() {
+    const ws = new WebSocket(url);
+
+    ws.onclose = () => {
+      if (attempts < maxAttempts) {
+        attempts++;
+        setTimeout(connect, 3000 * attempts); // Exponential backoff
+      }
+    };
+
+    return ws;
+  }
+
+  return connect();
+}
+```
+
+**2. Handle Token Expiration:**
+```javascript
+class AuthenticatedWebSocket {
+  constructor(baseUrl) {
+    this.baseUrl = baseUrl;
+    this.ws = null;
+  }
+
+  connect() {
+    // Get fresh token
+    const token = getAccessToken();
+
+    // Check if token will expire soon (within 5 minutes)
+    if (tokenExpiresWithin(300)) {
+      refreshAccessToken().then(() => {
+        this.establishConnection();
+      });
+    } else {
+      this.establishConnection();
+    }
+  }
+
+  establishConnection() {
+    const token = getAccessToken();
+    const url = `${this.baseUrl}?token=${token}`;
+    this.ws = new WebSocket(url);
+
+    // ... setup handlers
+  }
+}
+```
+
+**3. Graceful Shutdown:**
+```javascript
+// Close WebSocket connections before page unload
+window.addEventListener('beforeunload', () => {
+  if (auditStream) auditStream.disconnect();
+  if (statusStream) statusStream.disconnect();
+  if (metricsStream) metricsStream.disconnect();
+});
+```
+
+**4. Message Rate Limiting:**
+```javascript
+class RateLimitedWebSocket {
+  constructor(ws, maxMessagesPerSecond = 10) {
+    this.ws = ws;
+    this.messageQueue = [];
+    this.maxRate = maxMessagesPerSecond;
+
+    // Process queue at max rate
+    setInterval(() => {
+      if (this.messageQueue.length > 0) {
+        const message = this.messageQueue.shift();
+        this.ws.send(message);
+      }
+    }, 1000 / maxMessagesPerSecond);
+  }
+
+  send(message) {
+    this.messageQueue.push(message);
   }
 }
 ```

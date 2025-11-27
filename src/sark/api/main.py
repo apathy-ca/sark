@@ -7,7 +7,7 @@ import structlog
 
 from sark.api.middleware import AuthMiddleware
 from sark.api.middleware.security_headers import add_security_middleware
-from sark.api.routers import auth, bulk, export, health, metrics, policy, servers, tools
+from sark.api.routers import auth, bulk, export, health, metrics, policy, servers, tools, websocket
 from sark.config import get_settings
 from sark.db import init_db
 
@@ -103,6 +103,10 @@ See the documentation for complete details.
                 "name": "export",
                 "description": "Data export in CSV and JSON formats",
             },
+            {
+                "name": "websocket",
+                "description": "WebSocket endpoints for real-time updates (audit logs, server status, metrics)",
+            },
         ],
     )
 
@@ -137,6 +141,7 @@ See the documentation for complete details.
     app.include_router(bulk.router, prefix="/api/v1/bulk", tags=["bulk"])
     app.include_router(metrics.router, prefix="/api/v1/metrics", tags=["metrics"])
     app.include_router(export.router, prefix="/api/v1/export", tags=["export"])
+    app.include_router(websocket.router, prefix="/api/v1/ws", tags=["websocket"])
 
     # Prometheus metrics endpoint
     if settings.metrics_enabled:
