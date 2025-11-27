@@ -78,6 +78,37 @@ docker-up-full: ## Start Docker services (full profile - complete stack)
 docker-down: ## Stop Docker services
 	docker compose down
 
+# Development environment commands
+dev-up: ## Start development environment (frontend + backend + database)
+	docker compose -f docker-compose.dev.yml up -d
+
+dev-up-build: ## Start development environment with rebuild
+	docker compose -f docker-compose.dev.yml up -d --build
+
+dev-down: ## Stop development environment
+	docker compose -f docker-compose.dev.yml down
+
+dev-logs: ## View development environment logs
+	docker compose -f docker-compose.dev.yml logs -f
+
+dev-logs-frontend: ## View frontend dev logs only
+	docker compose -f docker-compose.dev.yml logs -f frontend-dev
+
+dev-logs-api: ## View API dev logs only
+	docker compose -f docker-compose.dev.yml logs -f app
+
+dev-shell-frontend: ## Open shell in frontend dev container
+	docker compose -f docker-compose.dev.yml exec frontend-dev sh
+
+dev-shell-api: ## Open shell in API dev container
+	docker compose -f docker-compose.dev.yml exec app bash
+
+dev-restart: ## Restart development environment
+	docker compose -f docker-compose.dev.yml restart
+
+dev-clean: ## Clean development environment (remove volumes)
+	docker compose -f docker-compose.dev.yml down -v
+
 docker-test: ## Run tests in Docker
 	docker compose run --rm app pytest
 
