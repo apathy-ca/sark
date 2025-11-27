@@ -1,0 +1,67 @@
+{
+  "name": "local-cli-tool",
+  "description": "Local command-line tool using stdio transport",
+  "transport": "stdio",
+  "command": "/usr/local/bin/my-mcp-tool",
+  "version": "2025-06-18",
+  "capabilities": ["tools"],
+  "sensitivity_level": "low",
+  "tools": [
+    {
+      "name": "file_stats",
+      "description": "Get statistics about a file",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "file_path": {
+            "type": "string",
+            "description": "Path to the file",
+            "maxLength": 500,
+            "pattern": "^/[a-zA-Z0-9/_.-]+$"
+          },
+          "include_hash": {
+            "type": "boolean",
+            "description": "Calculate file hash (slower)",
+            "default": false
+          }
+        },
+        "required": ["file_path"]
+      },
+      "sensitivity_level": "low"
+    },
+    {
+      "name": "list_directory",
+      "description": "List contents of a directory",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "directory_path": {
+            "type": "string",
+            "description": "Path to the directory",
+            "maxLength": 500,
+            "pattern": "^/[a-zA-Z0-9/_.-]+$"
+          },
+          "recursive": {
+            "type": "boolean",
+            "description": "List recursively",
+            "default": false
+          },
+          "max_depth": {
+            "type": "integer",
+            "description": "Maximum recursion depth",
+            "minimum": 1,
+            "maximum": 10,
+            "default": 1
+          }
+        },
+        "required": ["directory_path"]
+      },
+      "sensitivity_level": "low"
+    }
+  ],
+  "metadata": {
+    "owner": "devtools-team@example.com",
+    "installation_docs": "https://docs.example.com/mcp-cli-tool",
+    "binary_checksum": "sha256:abc123..."
+  }
+}

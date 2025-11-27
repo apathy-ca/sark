@@ -381,6 +381,55 @@ Press `Ctrl+/` in the UI to see all available shortcuts:
 
 ---
 
+## API Documentation & Client Generation
+
+SARK provides a comprehensive REST API with auto-generated clients for multiple languages:
+
+**Interactive API Documentation:**
+- Swagger UI: `http://localhost:8000/docs`
+- ReDoc: `http://localhost:8000/redoc`
+- OpenAPI Spec: `http://localhost:8000/openapi.json`
+
+**Auto-Generate API Clients:**
+```bash
+# Generate TypeScript client
+./scripts/codegen/generate-client.sh typescript ./clients/typescript
+
+# Generate Python client
+./scripts/codegen/generate-client.sh python ./clients/python
+
+# Generate Go client
+./scripts/codegen/generate-client.sh go ./clients/go
+```
+
+See [scripts/codegen/README.md](scripts/codegen/README.md) for complete client generation documentation.
+
+**Key API Endpoints:**
+- `/api/v1/servers` - MCP server registration and management
+- `/api/v1/policy` - Policy evaluation and validation
+- `/api/v1/metrics` - Server metrics and statistics
+- `/api/v1/export` - Data export (CSV/JSON)
+- `/api/v1/auth` - Authentication and session management
+- `/api/v1/tools` - Tool sensitivity classification
+- `/ws/events` - WebSocket real-time event stream
+
+**Example Usage:**
+```python
+# Using the generated Python client
+import sark_client
+from sark_client.api import servers_api
+
+config = sark_client.Configuration(host="http://localhost:8000")
+config.api_key['X-API-Key'] = 'your-api-key'
+
+with sark_client.ApiClient(config) as api_client:
+    servers = servers_api.ServersApi(api_client)
+    server_list = servers.list_servers()
+    print(f"Found {len(server_list.items)} servers")
+```
+
+See [examples/](examples/) for more code samples and tutorials.
+
 ## Development Setup
 
 ### Initial Setup

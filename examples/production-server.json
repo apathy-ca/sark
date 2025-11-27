@@ -1,0 +1,150 @@
+{
+  "name": "analytics-server",
+  "description": "Production analytics MCP server with multiple tools",
+  "transport": "http",
+  "endpoint": "https://analytics.example.com/mcp",
+  "version": "2025-06-18",
+  "capabilities": ["tools", "resources"],
+  "sensitivity_level": "high",
+  "tools": [
+    {
+      "name": "query_metrics",
+      "description": "Query system metrics from TimescaleDB",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "metric_name": {
+            "type": "string",
+            "description": "Name of the metric to query",
+            "enum": ["cpu_usage", "memory_usage", "request_count", "error_rate"]
+          },
+          "time_range": {
+            "type": "string",
+            "description": "Time range for the query",
+            "pattern": "^(1h|6h|24h|7d|30d)$",
+            "default": "1h"
+          },
+          "aggregation": {
+            "type": "string",
+            "description": "Aggregation function",
+            "enum": ["avg", "sum", "min", "max", "count"],
+            "default": "avg"
+          },
+          "filters": {
+            "type": "object",
+            "description": "Additional filters",
+            "properties": {
+              "environment": {
+                "type": "string",
+                "enum": ["production", "staging", "development"]
+              },
+              "service": {
+                "type": "string",
+                "maxLength": 100
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": ["metric_name"]
+      },
+      "sensitivity_level": "medium",
+      "requires_approval": false
+    },
+    {
+      "name": "search_logs",
+      "description": "Search application logs with filters",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search query string",
+            "maxLength": 500
+          },
+          "severity": {
+            "type": "array",
+            "description": "Log severity levels to include",
+            "items": {
+              "type": "string",
+              "enum": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+            },
+            "minItems": 1,
+            "maxItems": 5
+          },
+          "start_time": {
+            "type": "string",
+            "description": "Start time (ISO 8601)",
+            "format": "date-time"
+          },
+          "end_time": {
+            "type": "string",
+            "description": "End time (ISO 8601)",
+            "format": "date-time"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of results",
+            "minimum": 1,
+            "maximum": 1000,
+            "default": 100
+          }
+        },
+        "required": ["query"]
+      },
+      "sensitivity_level": "medium",
+      "requires_approval": false
+    },
+    {
+      "name": "export_report",
+      "description": "Export analytics report in various formats",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "report_type": {
+            "type": "string",
+            "description": "Type of report to generate",
+            "enum": ["usage", "performance", "errors", "custom"]
+          },
+          "format": {
+            "type": "string",
+            "description": "Export format",
+            "enum": ["json", "csv", "pdf"],
+            "default": "json"
+          },
+          "date_range": {
+            "type": "object",
+            "properties": {
+              "start": {
+                "type": "string",
+                "format": "date"
+              },
+              "end": {
+                "type": "string",
+                "format": "date"
+              }
+            },
+            "required": ["start", "end"]
+          },
+          "include_pii": {
+            "type": "boolean",
+            "description": "Include personally identifiable information",
+            "default": false
+          }
+        },
+        "required": ["report_type", "date_range"]
+      },
+      "sensitivity_level": "high",
+      "requires_approval": true
+    }
+  ],
+  "metadata": {
+    "owner": "analytics-team@example.com",
+    "cost_center": "engineering",
+    "sla_tier": "platinum",
+    "support_contact": "analytics-oncall@example.com",
+    "documentation_url": "https://docs.example.com/analytics-mcp",
+    "version": "2.1.0",
+    "deployed_at": "2025-11-20T10:00:00Z"
+  }
+}

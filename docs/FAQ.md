@@ -65,6 +65,431 @@ With SARK:
 
 ---
 
+## MCP Protocol Questions
+
+### What MCP protocol version does SARK support?
+
+SARK supports **MCP 2025-06-18** (the latest stable version).
+
+**Backward compatibility:**
+- ✅ MCP 2024-11-05 - Fully supported
+- ✅ MCP 2024-06-15 - Supported with warnings
+- ⚠️ Earlier versions - May work but not tested
+
+**Version detection:** SARK auto-detects the MCP version from server metadata and adapts accordingly.
+
+### What MCP transports are supported?
+
+SARK supports all standard MCP transports:
+
+| Transport | Status | Use Case |
+|-----------|--------|----------|
+| **HTTP/HTTPS** | ✅ Fully supported | Production servers, microservices |
+| **stdio** | ✅ Fully supported | Local tools, CLI integrations |
+| **SSE (Server-Sent Events)** | ✅ Fully supported | Streaming responses, real-time updates |
+| **WebSocket** | 🔄 Coming soon | Bidirectional streaming |
+
+**Configuration examples:**
+
+```json
+// HTTP transport
+{
+  "name": "my-server",
+  "transport": "http",
+  "endpoint": "https://api.example.com/mcp"
+}
+
+// stdio transport
+{
+  "name": "local-tool",
+  "transport": "stdio",
+  "command": "/usr/local/bin/my-tool"
+}
+
+// SSE transport
+{
+  "name": "streaming-server",
+  "transport": "sse",
+  "endpoint": "https://api.example.com/mcp/stream"
+}
+```
+
+### How does SARK validate MCP tool schemas?
+
+**Three-level validation:**
+
+1. **Syntax Validation** - Tool definitions must be valid JSON Schema
+   ```json
+   {
+     "name": "search_database",
+     "parameters": {
+       "type": "object",
+       "properties": {
+         "query": {"type": "string"},
+         "limit": {"type": "integer", "minimum": 1, "maximum": 100}
+       },
+       "required": ["query"]
+     }
+   }
+   ```
+
+2. **Semantic Validation** - Tools checked for dangerous patterns
+   - SQL injection risks
+   - Command injection risks
+   - Excessive permissions
+   - Sensitive data exposure
+
+3. **Policy Validation** - OPA policies can enforce:
+   - Required tool parameters
+   - Allowed tool names
+   - Sensitivity levels
+   - Required signatures
+
+**Validation happens at:**
+- Server registration time
+- Tool invocation time
+- Policy evaluation time
+
+### What happens if an MCP server goes offline?
+
+**SARK's resilience strategy:**
+
+1. **Health Monitoring**
+   - Periodic health checks every 30 seconds
+   - Marks server as "unhealthy" after 3 failed checks
+   - Auto-recovery when server comes back online
+
+2. **Graceful Degradation**
+   - Requests to unhealthy servers return 503 Service Unavailable
+   - Policy engine can route to backup servers
+   - Audit logs record all failures
+
+3. **Alerting**
+   - Prometheus alert: `sark_server_unhealthy`
+   - Notification to ops team
+   - Dashboard shows server status
+
+**Auto-decommission:**
+- Servers unhealthy for >7 days marked as "decommissioned"
+- Configurable via `SERVER_UNHEALTHY_THRESHOLD_DAYS`
+
+### Can SARK work with custom MCP extensions?
+
+**Yes!** SARK is extensible:
+
+**1. Custom Tool Attributes:**
+```json
+{
+  "name": "my_tool",
+  "description": "Custom tool",
+  "parameters": { /* standard */ },
+  "x-company-cost-center": "engineering",
+  "x-company-sla": "tier1",
+  "x-company-pii": true
+}
+```
+
+**2. Custom Transport Metadata:**
+```json
+{
+  "transport": "http",
+  "endpoint": "https://api.example.com",
+  "metadata": {
+    "circuit_breaker_enabled": true,
+    "timeout_ms": 5000,
+    "retry_policy": "exponential"
+  }
+}
+```
+
+**3. Policy Access to Extensions:**
+```rego
+# Access custom attributes in policies
+allow if {
+    input.tool.x-company-cost-center == "approved-center"
+    input.tool.x-company-pii == false
+}
+```
+
+**Note:** Custom extensions must start with `x-` prefix per MCP spec.
+
+### How do I register an MCP server with SARK?
+
+**Three methods:**
+
+**1. REST API** (Recommended for automation):
+```bash
+curl -X POST https://sark.company.com/api/v1/servers \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "analytics-server",
+    "transport": "http",
+    "endpoint": "https://analytics.example.com/mcp",
+    "version": "2025-06-18",
+    "capabilities": ["tools"],
+    "tools": [
+      {
+        "name": "query_metrics",
+        "description": "Query system metrics",
+        "parameters": { /* JSON Schema */ }
+      }
+    ],
+    "sensitivity_level": "medium"
+  }'
+```
+
+**2. CLI Tool**:
+```bash
+sark-cli servers register \
+  --name analytics-server \
+  --endpoint https://analytics.example.com/mcp \
+  --tools-file tools.json
+```
+
+**3. Auto-Discovery** (Kubernetes):
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-mcp-server
+  annotations:
+    sark.io/auto-register: "true"
+    sark.io/sensitivity: "medium"
+    sark.io/tools-endpoint: "/mcp/tools"
+```
+
+SARK's discovery agent automatically finds and registers the server.
+
+### What's the difference between MCP tools and capabilities?
+
+**Capabilities** - Server-level features:
+```json
+{
+  "capabilities": ["tools", "resources", "prompts", "sampling"]
+}
+```
+
+| Capability | Description | Support |
+|------------|-------------|---------|
+| **tools** | Exposes executable tools | ✅ Full |
+| **resources** | Provides data resources | ✅ Full |
+| **prompts** | Provides prompt templates | ✅ Full |
+| **sampling** | Supports model sampling | ⚠️ Limited |
+
+**Tools** - Individual functions the server provides:
+```json
+{
+  "tools": [
+    {
+      "name": "search",
+      "description": "Search the database",
+      "parameters": { /* schema */ }
+    }
+  ]
+}
+```
+
+**SARK governance:**
+- Policies can restrict capabilities: `if "sampling" in server.capabilities { deny }`
+- Policies can restrict individual tools: `if tool.name == "dangerous_tool" { deny }`
+- Sensitivity levels apply to both servers and tools
+
+### How does SARK handle MCP tool parameter validation?
+
+**Validation pipeline:**
+
+```
+1. JSON Schema Validation
+   ↓
+2. Sensitivity Detection
+   ↓
+3. Policy Evaluation
+   ↓
+4. Parameter Filtering
+   ↓
+5. Invocation
+```
+
+**Example - SQL Query Tool:**
+
+```json
+{
+  "name": "execute_query",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "maxLength": 10000,
+        "pattern": "^SELECT.*"  // Only SELECT queries
+      },
+      "database": {
+        "type": "string",
+        "enum": ["analytics", "readonly"]  // Allowed DBs
+      }
+    }
+  }
+}
+```
+
+**Policy can further restrict:**
+```rego
+# Deny queries containing sensitive tables
+deny if {
+    contains(lower(input.parameters.query), "user_passwords")
+}
+
+# Filter out certain parameters
+filter_parameters := {
+    "query": redact_patterns(input.parameters.query),
+    "database": input.parameters.database
+}
+```
+
+### Can MCP servers be dynamically discovered?
+
+**Yes! SARK supports multiple discovery mechanisms:**
+
+**1. Kubernetes Service Discovery** (Recommended):
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    sark.io/auto-register: "true"
+    sark.io/mcp-port: "8080"
+    sark.io/mcp-path: "/mcp"
+```
+
+SARK watches Kubernetes API for annotated services.
+
+**2. Consul Service Discovery**:
+```bash
+# MCP servers register with Consul
+consul services register -name=mcp-analytics \
+  -tag=mcp \
+  -tag=sensitivity:medium
+```
+
+SARK queries Consul for `tag=mcp` services.
+
+**3. DNS Service Discovery**:
+```bash
+# DNS SRV records
+_mcp._tcp.example.com. 86400 IN SRV 10 60 8080 server1.example.com.
+```
+
+**4. Network Scanning** (Development only):
+```bash
+# Scan internal network for MCP servers
+sark-cli discover --network 10.0.0.0/24 --port 8080
+```
+
+**Discovery interval:** Every 5 minutes (configurable)
+
+### How do I debug MCP communication issues?
+
+**Debugging tools:**
+
+**1. MCP Protocol Tracer**:
+```bash
+# Enable verbose MCP logging
+export SARK_MCP_DEBUG=true
+export SARK_LOG_LEVEL=debug
+
+# See full MCP request/response in logs
+tail -f /var/log/sark/mcp-trace.log
+```
+
+**2. Test MCP Endpoint**:
+```bash
+# Health check endpoint
+curl -v https://mcp-server.example.com/health
+
+# List tools endpoint
+curl -v https://mcp-server.example.com/mcp/tools
+
+# Test tool invocation
+curl -X POST https://mcp-server.example.com/mcp/invoke \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tool": "search",
+    "parameters": {"query": "test"}
+  }'
+```
+
+**3. SARK Diagnostic Endpoint**:
+```bash
+# Test connectivity from SARK to MCP server
+curl -X POST https://sark.company.com/api/v1/debug/test-connection \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{
+    "server_id": "uuid",
+    "test_tool": "search",
+    "test_parameters": {}
+  }'
+```
+
+**4. Audit Logs**:
+```bash
+# Check recent MCP invocations
+curl https://sark.company.com/api/v1/audit/events?event_type=tool_invocation&limit=50
+```
+
+**Common issues:**
+- ❌ Network connectivity → Check firewalls, DNS
+- ❌ Certificate errors → Verify TLS certificates
+- ❌ Timeout → Increase `MCP_REQUEST_TIMEOUT_MS`
+- ❌ Invalid response → Check MCP server compliance
+
+### What MCP-specific security features does SARK provide?
+
+**MCP Protocol Security:**
+
+1. **Prompt Injection Detection**
+   - Scans tool parameters for malicious prompts
+   - Blocks common injection patterns
+   - AI-powered anomaly detection
+
+2. **Tool Signature Verification**
+   - Cryptographic signatures on tools
+   - Verify tool hasn't been tampered with
+   - PKI integration
+
+3. **Schema Validation**
+   - Strict JSON Schema enforcement
+   - Type validation
+   - Range checking
+
+4. **Content Filtering**
+   - PII detection in responses
+   - Redaction of sensitive data
+   - Compliance with data policies
+
+5. **Rate Limiting**
+   - Per-tool rate limits
+   - Per-user rate limits
+   - Adaptive throttling
+
+**Example policy:**
+```rego
+# Require tool signatures for high-sensitivity tools
+deny if {
+    input.tool.sensitivity_level == "critical"
+    not input.tool.signature
+}
+
+# Block tools with dangerous parameters
+deny if {
+    some param in input.tool.parameters.properties
+    param.type == "string"
+    not param.maxLength  # Unbounded strings are risky
+}
+```
+
+---
+
 ## Deployment Questions
 
 ### Can I run SARK in my existing Kubernetes cluster?
