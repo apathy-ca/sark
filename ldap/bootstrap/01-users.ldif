@@ -1,0 +1,202 @@
+# SARK Tutorial Sample Users
+# These users are pre-configured for tutorial walkthroughs
+# DO NOT use in production - these are for development/testing only
+
+# Base organizational units
+dn: ou=people,dc=sark,dc=local
+objectClass: organizationalUnit
+ou: people
+
+dn: ou=groups,dc=sark,dc=local
+objectClass: organizationalUnit
+ou: groups
+
+# ============================================================================
+# USERS
+# ============================================================================
+
+# User 1: john.doe - Developer & Team Lead
+# Use case: Tutorial 1 - Standard developer with elevated permissions
+dn: uid=john.doe,ou=people,dc=sark,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: john.doe
+cn: John Doe
+sn: Doe
+givenName: John
+mail: john.doe@sark.local
+userPassword: {SSHA}password
+uidNumber: 1001
+gidNumber: 1001
+homeDirectory: /home/john.doe
+loginShell: /bin/bash
+description: Developer and team lead for engineering team
+
+# User 2: jane.smith - Junior Developer
+# Use case: Limited permissions, demonstrates policy denials
+dn: uid=jane.smith,ou=people,dc=sark,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: jane.smith
+cn: Jane Smith
+sn: Smith
+givenName: Jane
+mail: jane.smith@sark.local
+userPassword: {SSHA}password
+uidNumber: 1002
+gidNumber: 1001
+homeDirectory: /home/jane.smith
+loginShell: /bin/bash
+description: Junior developer with basic permissions
+
+# User 3: admin - System Administrator
+# Use case: Full administrative access
+dn: uid=admin,ou=people,dc=sark,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: admin
+cn: Admin User
+sn: User
+givenName: Admin
+mail: admin@sark.local
+userPassword: {SSHA}admin
+uidNumber: 1000
+gidNumber: 1000
+homeDirectory: /home/admin
+loginShell: /bin/bash
+description: System administrator with full access
+
+# User 4: alice.engineer - Data Engineer
+# Use case: Database and analytics tool access
+dn: uid=alice.engineer,ou=people,dc=sark,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: alice.engineer
+cn: Alice Engineer
+sn: Engineer
+givenName: Alice
+mail: alice.engineer@sark.local
+userPassword: {SSHA}password
+uidNumber: 1003
+gidNumber: 1002
+homeDirectory: /home/alice.engineer
+loginShell: /bin/bash
+description: Data engineer with database query permissions
+
+# User 5: bob.security - Security Engineer
+# Use case: Security tools and critical operations
+dn: uid=bob.security,ou=people,dc=sark,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: bob.security
+cn: Bob Security
+sn: Security
+givenName: Bob
+mail: bob.security@sark.local
+userPassword: {SSHA}password
+uidNumber: 1004
+gidNumber: 1003
+homeDirectory: /home/bob.security
+loginShell: /bin/bash
+description: Security engineer with access to security tools
+
+# User 6: carol.analyst - Data Analyst
+# Use case: Read-only analytics access
+dn: uid=carol.analyst,ou=people,dc=sark,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: carol.analyst
+cn: Carol Analyst
+sn: Analyst
+givenName: Carol
+mail: carol.analyst@sark.local
+userPassword: {SSHA}password
+uidNumber: 1005
+gidNumber: 1002
+homeDirectory: /home/carol.analyst
+loginShell: /bin/bash
+description: Data analyst with read-only database access
+
+# User 7: dave.devops - DevOps Engineer
+# Use case: Infrastructure and deployment tools
+dn: uid=dave.devops,ou=people,dc=sark,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: dave.devops
+cn: Dave DevOps
+sn: DevOps
+givenName: Dave
+mail: dave.devops@sark.local
+userPassword: {SSHA}password
+uidNumber: 1006
+gidNumber: 1004
+homeDirectory: /home/dave.devops
+loginShell: /bin/bash
+description: DevOps engineer with infrastructure permissions
+
+# ============================================================================
+# GROUPS
+# ============================================================================
+
+# Group: developers
+dn: cn=developers,ou=groups,dc=sark,dc=local
+objectClass: posixGroup
+objectClass: groupOfNames
+cn: developers
+gidNumber: 1001
+member: uid=john.doe,ou=people,dc=sark,dc=local
+member: uid=jane.smith,ou=people,dc=sark,dc=local
+description: Software developers
+
+# Group: data-engineering
+dn: cn=data-engineering,ou=groups,dc=sark,dc=local
+objectClass: posixGroup
+objectClass: groupOfNames
+cn: data-engineering
+gidNumber: 1002
+member: uid=alice.engineer,ou=people,dc=sark,dc=local
+member: uid=carol.analyst,ou=people,dc=sark,dc=local
+description: Data engineering and analytics team
+
+# Group: security
+dn: cn=security,ou=groups,dc=sark,dc=local
+objectClass: posixGroup
+objectClass: groupOfNames
+cn: security
+gidNumber: 1003
+member: uid=bob.security,ou=people,dc=sark,dc=local
+description: Security team
+
+# Group: devops
+dn: cn=devops,ou=groups,dc=sark,dc=local
+objectClass: posixGroup
+objectClass: groupOfNames
+cn: devops
+gidNumber: 1004
+member: uid=dave.devops,ou=people,dc=sark,dc=local
+description: DevOps and infrastructure team
+
+# Group: admins
+dn: cn=admins,ou=groups,dc=sark,dc=local
+objectClass: posixGroup
+objectClass: groupOfNames
+cn: admins
+gidNumber: 1000
+member: uid=admin,ou=people,dc=sark,dc=local
+description: System administrators
+
+# Group: team-leads
+dn: cn=team-leads,ou=groups,dc=sark,dc=local
+objectClass: posixGroup
+objectClass: groupOfNames
+cn: team-leads
+gidNumber: 2000
+member: uid=john.doe,ou=people,dc=sark,dc=local
+description: Team leads with elevated permissions

@@ -3,16 +3,22 @@ version: '3.9'
 # ============================================================================
 # SARK Docker Compose Configuration
 # ============================================================================
-# This file supports both:
-# - Managed services (deployed via Docker Compose)
-# - External services (existing enterprise deployments)
+# This file supports multiple deployment profiles for different use cases:
 #
-# Usage:
-# - Managed mode: docker-compose --profile managed up
-# - External mode: Use .env file to configure external service endpoints
-# - Mixed mode: Enable only specific managed services
+# Profiles:
+# - minimal  : Quick start with just PostgreSQL + Redis (5-minute setup)
+# - managed  : Full local stack with Kong Gateway (complete testing)
+# - full     : Same as managed (alias for compatibility)
+# - kong     : Only Kong services (use with external DB/Redis)
 #
-# See docs/deployment/INTEGRATION.md for detailed instructions.
+# Usage Examples:
+# - Quick Start:    docker compose --profile minimal up
+# - Full Local:     docker compose --profile managed up
+# - Production-like: docker compose --profile full up
+# - External mode:   Use .env file to configure external service endpoints
+#
+# See docs/QUICK_START.md for 5-minute quickstart guide.
+# See docs/DEPLOYMENT.md for complete deployment instructions.
 # ============================================================================
 
 services:
@@ -52,21 +58,70 @@ services:
       - KONG_MODE=${KONG_MODE:-managed}
       - KONG_ADMIN_URL=${KONG_ADMIN_URL:-http://kong:8001}
       - KONG_PROXY_URL=${KONG_PROXY_URL:-http://kong:8000}
+      # OPA configuration
+      - OPA_ENABLED=${OPA_ENABLED:-true}
+      - OPA_URL=${OPA_URL:-http://opa:8181}
+      - OPA_POLICY_PATH=${OPA_POLICY_PATH:-/v1/data/mcp/allow}
+      # LDAP configuration
+      - LDAP_ENABLED=${LDAP_ENABLED:-true}
+      - LDAP_SERVER=${LDAP_SERVER:-ldap://openldap:389}
+      - LDAP_BASE_DN=${LDAP_BASE_DN:-dc=sark,dc=local}
+      - LDAP_USER_DN=${LDAP_USER_DN:-ou=people,dc=sark,dc=local}
+      - LDAP_BIND_DN=${LDAP_BIND_DN:-cn=admin,dc=sark,dc=local}
+      - LDAP_BIND_PASSWORD=${LDAP_BIND_PASSWORD:-admin}
     stdin_open: true
     tty: true
     command: python -m pytest --cov
     networks:
       - sark-network
     depends_on:
+      opa:
+        condition: service_healthy
+        required: false
       database:
         condition: service_healthy
         required: false
       cache:
         condition: service_healthy
         required: false
+      openldap:
+        condition: service_healthy
+        required: false
       kong:
         condition: service_healthy
         required: false
+
+  # ============================================================================
+  # Open Policy Agent (OPA) - Policy Engine
+  # ============================================================================
+  # Required for authorization decisions
+  # ============================================================================
+  opa:
+    image: openpolicyagent/opa:0.60.0
+    container_name: sark-opa
+    profiles:
+      - minimal
+      - managed
+      - full
+    command:
+      - "run"
+      - "--server"
+      - "--log-level=info"
+      - "--log-format=json"
+      - "/policies"
+    volumes:
+      - ./opa/policies:/policies:ro
+    ports:
+      - "8181:8181"
+    networks:
+      - sark-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8181/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
 
   # ============================================================================
   # PostgreSQL Database (Managed Service)
@@ -78,6 +133,7 @@ services:
     image: postgres:15-alpine
     container_name: sark-db
     profiles:
+      - minimal
       - managed
       - full
     environment:
@@ -110,6 +166,7 @@ services:
     image: redis:7-alpine
     container_name: sark-cache
     profiles:
+      - minimal
       - managed
       - full
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
@@ -125,6 +182,48 @@ services:
       timeout: 5s
       retries: 5
       start_period: 5s
+    restart: unless-stopped
+
+  # ============================================================================
+  # OpenLDAP (Managed Service)
+  # ============================================================================
+  # Provides LDAP authentication for tutorials and development
+  # Pre-loaded with sample users for tutorial walkthroughs
+  # DO NOT use in production - for development/testing only
+  # ============================================================================
+  openldap:
+    image: osixia/openldap:1.5.0
+    container_name: sark-openldap
+    profiles:
+      - minimal
+      - managed
+      - full
+    environment:
+      - LDAP_ORGANISATION=SARK
+      - LDAP_DOMAIN=sark.local
+      - LDAP_ADMIN_PASSWORD=${LDAP_ADMIN_PASSWORD:-admin}
+      - LDAP_CONFIG_PASSWORD=${LDAP_CONFIG_PASSWORD:-config}
+      - LDAP_READONLY_USER=false
+      - LDAP_RFC2307BIS_SCHEMA=false
+      - LDAP_BACKEND=mdb
+      - LDAP_TLS=false
+      - LDAP_REPLICATION=false
+      - LDAP_REMOVE_CONFIG_AFTER_SETUP=true
+    volumes:
+      - ldap-data:/var/lib/ldap
+      - ldap-config:/etc/ldap/slapd.d
+      - ./ldap/bootstrap:/container/service/slapd/assets/config/bootstrap/ldif/custom:ro
+    ports:
+      - "${LDAP_PORT:-389}:389"
+      - "${LDAP_SSL_PORT:-636}:636"
+    networks:
+      - sark-network
+    healthcheck:
+      test: ["CMD", "ldapsearch", "-x", "-H", "ldap://localhost", "-b", "dc=sark,dc=local", "-D", "cn=admin,dc=sark,dc=local", "-w", "${LDAP_ADMIN_PASSWORD:-admin}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     restart: unless-stopped
 
   # ============================================================================
@@ -231,3 +330,7 @@ volumes:
     name: sark-redis-data
   kong-data:
     name: sark-kong-data
+  ldap-data:
+    name: sark-ldap-data
+  ldap-config:
+    name: sark-ldap-config
