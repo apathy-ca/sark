@@ -20,9 +20,9 @@ Hands-on tutorials to help you master SARK, from basic setup to advanced policy 
                  │
                  ▼
 ┌────────────────────────────────────────────────────────────┐
-│  Tutorial 3: Policy Development (Coming Soon)               │
+│  Tutorial 3: Policy Development                             │
 │  Write Rego policies, test, deploy                         │
-│  Duration: 30 minutes | Difficulty: Intermediate            │
+│  Duration: 45 minutes | Difficulty: Intermediate            │
 └────────────────┬───────────────────────────────────────────┘
                  │
                  ▼
@@ -82,7 +82,7 @@ Hands-on tutorials to help you master SARK, from basic setup to advanced policy 
 
 ## Tutorial 3: Policy Development
 
-**Status:** Coming Soon
+**[Start Tutorial →](03-policies/README.md)**
 
 **What you'll learn:**
 - Rego policy language basics
@@ -91,14 +91,22 @@ Hands-on tutorials to help you master SARK, from basic setup to advanced policy 
 - IP-based restrictions (corporate network only)
 - MFA requirements for critical tools
 - Parameter filtering and data masking
-- Policy testing and validation
+- SQL injection prevention
+- Policy testing with OPA CLI
 - Deploy policies to production
 
 **Prerequisites:**
-- Completion of Tutorials 1-2
+- Completion of Tutorial 1
+- OPA CLI installed
 - Text editor with Rego support (VS Code recommended)
 
-**Duration:** 30 minutes
+**Duration:** 45 minutes
+
+**Perfect for:**
+- Intermediate users learning policy development
+- Security teams implementing access control
+- Compliance requirements (SOC 2, HIPAA)
+- Custom authorization logic
 
 ---
 
@@ -131,9 +139,9 @@ Hands-on tutorials to help you master SARK, from basic setup to advanced policy 
 
 | Tutorial | Duration | Difficulty | Services Used | What You Learn |
 |----------|----------|------------|---------------|----------------|
-| **1. Basic Setup** | 15 min | Beginner | 4 (minimal) | Core SARK workflow |
+| **1. Basic Setup** | 15 min | Beginner | 5 (minimal) | Core SARK workflow |
 | **2. Authentication** | 20 min | Beginner | 6 (w/ LDAP/OIDC) | All auth methods |
-| **3. Policies** | 30 min | Intermediate | 4 (minimal) | Write Rego policies |
+| **3. Policies** | 45 min | Intermediate | 5 (minimal) | Write Rego policies |
 | **4. Production** | 45 min | Advanced | 12+ (full stack) | Deploy to K8s |
 
 ### Prerequisites by Tutorial
@@ -150,7 +158,7 @@ Hands-on tutorials to help you master SARK, from basic setup to advanced policy 
 |----------|--------------------------|
 | 1 | None |
 | 2 | OIDC provider account (optional), SAML IdP (optional) |
-| 3 | VS Code with OPA extension (recommended) |
+| 3 | OPA CLI, VS Code with OPA extension (recommended) |
 | 4 | Kubernetes cluster, Helm 3+, kubectl |
 
 ---
