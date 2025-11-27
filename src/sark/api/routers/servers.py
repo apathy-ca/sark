@@ -47,6 +47,47 @@ class ServerRegistrationRequest(BaseModel):
     signature: str | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
 
+    class Config:
+        schema_extra = {
+            "example": {
+                "name": "analytics-server",
+                "description": "Analytics MCP server for querying metrics",
+                "transport": "http",
+                "endpoint": "https://analytics.example.com/mcp",
+                "version": "2025-06-18",
+                "capabilities": ["tools", "resources"],
+                "tools": [
+                    {
+                        "name": "query_metrics",
+                        "description": "Query system metrics",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {
+                                "metric_name": {
+                                    "type": "string",
+                                    "enum": ["cpu_usage", "memory_usage", "request_count"]
+                                },
+                                "time_range": {
+                                    "type": "string",
+                                    "pattern": "^(1h|6h|24h|7d)$",
+                                    "default": "1h"
+                                }
+                            },
+                            "required": ["metric_name"]
+                        },
+                        "sensitivity_level": "medium",
+                        "requires_approval": False
+                    }
+                ],
+                "sensitivity_level": "medium",
+                "metadata": {
+                    "owner": "analytics-team@example.com",
+                    "cost_center": "engineering",
+                    "version": "2.1.0"
+                }
+            }
+        }
+
 
 class ServerResponse(BaseModel):
     """Server response schema."""
@@ -64,6 +105,30 @@ class ServerListItem(BaseModel):
     transport: str
     status: str
     sensitivity_level: str
+    created_at: str
+
+
+class ToolDetailResponse(BaseModel):
+    """Tool detail response schema."""
+
+    id: str
+    name: str
+    description: str | None
+    sensitivity_level: str
+
+
+class ServerDetailResponse(BaseModel):
+    """Server detail response schema."""
+
+    id: str
+    name: str
+    description: str | None
+    transport: str
+    endpoint: str | None
+    status: str
+    sensitivity_level: str
+    tools: list[ToolDetailResponse]
+    metadata: dict[str, Any]
     created_at: str
 
 
@@ -157,12 +222,23 @@ async def register_server(
         ) from e
 
 
-@router.get("/{server_id}")
+@router.get("/{server_id}", response_model=ServerDetailResponse)
 async def get_server(
     server_id: UUID,
     db: AsyncSession = Depends(get_db),
-) -> dict[str, Any]:
-    """Get server details by ID."""
+) -> ServerDetailResponse:
+    """
+    Get detailed information about a specific MCP server.
+
+    Returns complete server configuration including:
+    - Server metadata and status
+    - Transport configuration
+    - All registered tools
+    - Custom metadata
+    - Sensitivity classification
+
+    Requires authentication.
+    """
     discovery_service = DiscoveryService(db)
     server = await discovery_service.get_server(server_id)
 
@@ -175,26 +251,26 @@ async def get_server(
     # Get server tools
     tools = await discovery_service.get_server_tools(server_id)
 
-    return {
-        "id": str(server.id),
-        "name": server.name,
-        "description": server.description,
-        "transport": server.transport.value,
-        "endpoint": server.endpoint,
-        "status": server.status.value,
-        "sensitivity_level": server.sensitivity_level.value,
-        "tools": [
-            {
-                "id": str(tool.id),
-                "name": tool.name,
-                "description": tool.description,
-                "sensitivity_level": tool.sensitivity_level.value,
-            }
+    return ServerDetailResponse(
+        id=str(server.id),
+        name=server.name,
+        description=server.description,
+        transport=server.transport.value,
+        endpoint=server.endpoint,
+        status=server.status.value,
+        sensitivity_level=server.sensitivity_level.value,
+        tools=[
+            ToolDetailResponse(
+                id=str(tool.id),
+                name=tool.name,
+                description=tool.description,
+                sensitivity_level=tool.sensitivity_level.value,
+            )
             for tool in tools
         ],
-        "metadata": server.extra_metadata,
-        "created_at": server.created_at.isoformat(),
-    }
+        metadata=server.extra_metadata or {},
+        created_at=server.created_at.isoformat(),
+    )
 
 
 @router.get("/", response_model=PaginatedResponse[ServerListItem])
