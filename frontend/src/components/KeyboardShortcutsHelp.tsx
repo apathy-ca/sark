@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { KEYBOARD_SHORTCUTS, type KeyboardShortcut } from '@/hooks/useKeyboardShortcuts';
 

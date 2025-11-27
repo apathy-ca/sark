@@ -14,12 +14,16 @@ export default function ApiKeysPage() {
 
   const { data: apiKeys, isLoading, error } = useQuery({
     queryKey: ['api-keys'],
-    queryFn: apiKeysApi.list,
+    queryFn: () => apiKeysApi.list(false),
   });
 
   const createMutation = useMutation({
     mutationFn: ({ name, expires_in_days }: { name: string; expires_in_days?: number }) =>
-      apiKeysApi.create(name, expires_in_days),
+      apiKeysApi.create({
+        name,
+        scopes: ['read', 'write'],
+        expires_in_days
+      }),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['api-keys'] });
       setCreatedKey(data.key);
@@ -131,7 +135,7 @@ export default function ApiKeysPage() {
       {/* API Keys List */}
       {!isLoading && !error && apiKeys && (
         <div className="bg-card rounded-lg border overflow-hidden">
-          {apiKeys.keys.length === 0 ? (
+          {apiKeys.length === 0 ? (
             <div className="p-12 text-center">
               <div className="text-muted-foreground">
                 <p className="text-lg mb-2">No API keys yet</p>
@@ -140,7 +144,7 @@ export default function ApiKeysPage() {
             </div>
           ) : (
             <div className="divide-y">
-              {apiKeys.keys.map((key: ApiKey) => (
+              {apiKeys.map((key: ApiKey) => (
                 <div key={key.id} className="p-4 hover:bg-muted/50 transition-colors">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">

@@ -10,13 +10,11 @@ import { useState } from 'react';
 const serverSchema = z.object({
   name: z.string().min(1, 'Name is required').max(255, 'Name too long'),
   description: z.string().optional(),
-  transport: z.enum(['http', 'stdio', 'sse'], {
-    required_error: 'Transport type is required',
-  }),
+  transport: z.enum(['http', 'stdio', 'sse']),
   endpoint: z.string().url('Must be a valid URL').optional().or(z.literal('')),
   command: z.string().optional(),
   args: z.array(z.string()).optional(),
-  env: z.record(z.string()).optional(),
+  env: z.record(z.string(), z.string()).optional(),
   sensitivity_level: z.enum(['low', 'medium', 'high', 'critical']),
   tools: z.array(
     z.object({
@@ -26,7 +24,7 @@ const serverSchema = z.object({
       input_schema: z.string().optional(),
     })
   ).optional(),
-  metadata: z.record(z.string()).optional(),
+  metadata: z.record(z.string(), z.string()).optional(),
 });
 
 type ServerFormData = z.infer<typeof serverSchema>;

@@ -3,7 +3,8 @@
  * Centralized HTTP client for all API interactions
  */
 
-import axios, { AxiosInstance, AxiosError, AxiosRequestConfig } from "axios";
+import axios from "axios";
+import type { AxiosInstance, AxiosError, AxiosRequestConfig } from "axios";
 import type {
   LoginRequest,
   LoginResponse,
@@ -25,7 +26,6 @@ import type {
   PolicyEvaluationResponse,
   Policy,
   PoliciesResponse,
-  AuditEvent,
   AuditEventsParams,
   AuditEventsResponse,
   AuditMetrics,

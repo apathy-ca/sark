@@ -85,10 +85,13 @@ export interface Server {
 export interface ServerListItem {
   id: string;
   name: string;
+  description: string;
   transport: TransportType;
   status: ServerStatus;
   sensitivity_level: SensitivityLevel;
+  tool_count: number;
   created_at: string;
+  updated_at: string;
 }
 
 export interface ToolDefinition {
@@ -115,7 +118,9 @@ export interface ServerRegistrationRequest {
 }
 
 export interface ServerResponse {
+  id: string;
   server_id: string;
+  name: string;
   status: string;
   consul_id: string | null;
 }
@@ -140,6 +145,8 @@ export interface PaginationParams {
 export interface ServerListParams extends PaginationParams {
   status?: string;
   sensitivity?: string;
+  sensitivity_level?: string;
+  transport?: string;
   team_id?: string;
   owner_id?: string;
   tags?: string;
@@ -194,8 +201,11 @@ export interface PolicyEvaluationResponse {
 export interface Policy {
   id: string;
   name: string;
-  package: string;
-  rules: string[];
+  content: string;
+  package_name: string;
+  created_at: string;
+  updated_at: string;
+  version: number;
 }
 
 export interface PoliciesResponse {
@@ -235,7 +245,9 @@ export interface AuditEventsParams {
   limit?: number;
   offset?: number;
   user_id?: string;
+  user_email?: string;
   server_id?: string;
+  server_name?: string;
   event_type?: string;
   start_time?: string;
   end_time?: string;
@@ -289,6 +301,8 @@ export interface ApiKey {
   created_at: string; // ISO 8601
   expires_at: string; // ISO 8601
   last_used: string | null; // ISO 8601
+  last_used_at: string | null; // ISO 8601 (alias)
+  is_active: boolean;
   revoked: boolean;
 }
 
