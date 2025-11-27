@@ -1,11 +1,69 @@
-node_modules
-npm-debug.log
-dist
-.git
-.gitignore
-.env*
-!.env.production
-README.md
-.vscode
-.idea
+# ============================================================================
+# Frontend .dockerignore
+# ============================================================================
+# Exclude files from Docker build context to reduce build time and image size
+# ============================================================================
+
+# Dependencies (will be installed during build)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build output (will be created during build)
+dist/
+build/
+.vite/
+
+# Testing
+coverage/
+.nyc_output/
+
+# Development files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 *.log
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+DEVELOPMENT.md
+docs/
+
+# Testing
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+__tests__/
+__mocks__/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Docker
+Dockerfile.dev
+docker-compose*.yml
+.dockerignore
+
+# Temporary files
+tmp/
+temp/
+*.tmp

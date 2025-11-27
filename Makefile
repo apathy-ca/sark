@@ -203,3 +203,40 @@ docs-clean: ## Clean documentation build artifacts
 docs-check: ## Check documentation for broken links
 	mkdocs build --strict
 	@echo "Documentation build successful - no broken links found"
+
+# Frontend commands
+frontend-build: ## Build production frontend Docker image
+	cd frontend && docker build \
+		--target production \
+		--build-arg VITE_API_URL=${VITE_API_URL:-http://localhost:8000} \
+		--build-arg VITE_APP_VERSION=$$(git describe --tags --always) \
+		--build-arg VITE_APP_NAME=SARK \
+		-t sark-frontend:latest \
+		-t sark-frontend:$$(git describe --tags --always) \
+		.
+
+frontend-build-dev: ## Build development frontend Docker image
+	cd frontend && docker build \
+		-f Dockerfile.dev \
+		-t sark-frontend:dev \
+		.
+
+frontend-up: ## Start frontend service (production)
+	docker compose --profile standard up -d frontend
+
+frontend-down: ## Stop frontend service
+	docker compose stop frontend
+	docker compose rm -f frontend
+
+frontend-logs: ## View frontend logs
+	docker compose logs -f frontend
+
+frontend-shell: ## Open shell in frontend container
+	docker compose exec frontend sh
+
+frontend-restart: ## Restart frontend service
+	docker compose restart frontend
+
+frontend-clean: ## Clean frontend containers and images
+	docker compose down frontend
+	docker rmi sark-frontend:latest sark-frontend:dev 2>/dev/null || true

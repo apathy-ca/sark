@@ -74,6 +74,45 @@ services:
         required: false
 
   # ============================================================================
+  # Frontend Service (Production)
+  # ============================================================================
+  # React + Vite frontend served by Nginx
+  # Included in 'standard' and 'full' profiles
+  # ============================================================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production
+      args:
+        - VITE_API_URL=${VITE_API_URL:-http://localhost:8000}
+        - VITE_APP_VERSION=${VITE_APP_VERSION:-dev}
+        - VITE_APP_NAME=${VITE_APP_NAME:-SARK}
+    container_name: sark-frontend
+    profiles:
+      - standard  # Include in standard profile
+      - full      # Include in full stack
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+      - "${FRONTEND_HTTPS_PORT:-3443}:443"
+    environment:
+      - NGINX_HOST=${NGINX_HOST:-localhost}
+      - NGINX_PORT=${NGINX_PORT:-80}
+    networks:
+      - sark-network
+    depends_on:
+      app:
+        condition: service_started
+        required: false
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+  # ============================================================================
   # PostgreSQL Database (Managed Service)
   # ============================================================================
   # Included in 'standard' and 'full' profiles
