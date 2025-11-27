@@ -1,0 +1,615 @@
+{
+  "use_case": "Data Analysis Workflow",
+  "description": "MCP server providing comprehensive data analysis capabilities for AI assistants. Enables data scientists and analysts to perform complex analytics workflows including data loading, transformation, statistical analysis, visualization, and reporting.",
+  "scenario": "Data analysts need to perform routine analyses (sales reports, user metrics, A/B test results) that follow similar patterns. This MCP server automates common workflows, enables AI-assisted analysis, and generates professional reports.",
+
+  "mcp_server": {
+    "name": "analytics-mcp",
+    "description": "Comprehensive data analysis platform with pandas, numpy, scikit-learn, and visualization tools",
+    "transport": "sse",
+    "endpoint": "https://analytics-mcp.internal.company.com/mcp/v1/sse",
+    "mcp_version": "2025-06-18",
+    "capabilities": ["tools", "resources"],
+    "sensitivity_level": "high",
+    "health_endpoint": "https://analytics-mcp.internal.company.com/health",
+    "owner_email": "data-science@company.com",
+    "team": "data-science",
+    "tags": ["analytics", "data-science", "pandas", "ml", "visualization"],
+    "extra_metadata": {
+      "runtime": "Python 3.11 with Jupyter kernel",
+      "libraries": ["pandas", "numpy", "scipy", "scikit-learn", "matplotlib", "seaborn", "plotly"],
+      "compute_resources": "4 CPU, 16GB RAM per session",
+      "max_dataset_size": "500MB",
+      "session_timeout": "2 hours",
+      "department": "Data Science",
+      "transport_note": "Uses SSE for streaming progress updates during long-running analyses"
+    }
+  },
+
+  "tools": [
+    {
+      "name": "load_dataset",
+      "description": "Load dataset from various sources (database, S3, CSV, Excel, Parquet) into pandas DataFrame. Returns dataset metadata and first few rows.",
+      "sensitivity_level": "high",
+      "requires_approval": false,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "source_type": {
+            "type": "string",
+            "enum": ["postgres", "mysql", "snowflake", "s3", "csv", "excel", "parquet", "bigquery"],
+            "description": "Data source type"
+          },
+          "source_config": {
+            "type": "object",
+            "description": "Source-specific configuration",
+            "properties": {
+              "database": {"type": "string"},
+              "table": {"type": "string"},
+              "query": {"type": "string"},
+              "s3_path": {"type": "string"},
+              "file_path": {"type": "string"}
+            }
+          },
+          "sample_rows": {
+            "type": "integer",
+            "description": "Number of sample rows to return (for preview)",
+            "minimum": 5,
+            "maximum": 100,
+            "default": 10
+          },
+          "cache": {
+            "type": "boolean",
+            "description": "Cache dataset for reuse in this session",
+            "default": true
+          }
+        },
+        "required": ["source_type", "source_config"]
+      },
+      "examples": [
+        {
+          "name": "Load sales data from Snowflake",
+          "arguments": {
+            "source_type": "snowflake",
+            "source_config": {
+              "database": "ANALYTICS",
+              "table": "SALES_FACT",
+              "query": "SELECT * FROM SALES_FACT WHERE sale_date >= '2024-01-01'"
+            },
+            "sample_rows": 10,
+            "cache": true
+          },
+          "expected_result": {
+            "dataset_id": "ds_abc123",
+            "rows_total": 1523456,
+            "columns": ["order_id", "sale_date", "customer_id", "product_id", "quantity", "revenue", "region"],
+            "dtypes": {
+              "order_id": "int64",
+              "sale_date": "datetime64[ns]",
+              "customer_id": "int64",
+              "product_id": "int64",
+              "quantity": "int64",
+              "revenue": "float64",
+              "region": "object"
+            },
+            "memory_usage_mb": 125.3,
+            "sample_data": [
+              {"order_id": 1, "sale_date": "2024-01-01", "customer_id": 123, "product_id": 456, "quantity": 2, "revenue": 99.98, "region": "West"},
+              {"order_id": 2, "sale_date": "2024-01-01", "customer_id": 124, "product_id": 457, "quantity": 1, "revenue": 149.99, "region": "East"}
+            ],
+            "load_time_ms": 3450,
+            "cached": true
+          }
+        }
+      ],
+      "sse_events": [
+        "event: progress | data: {\"status\": \"connecting_to_database\", \"percent\": 10}",
+        "event: progress | data: {\"status\": \"executing_query\", \"percent\": 40}",
+        "event: progress | data: {\"status\": \"loading_data\", \"percent\": 70, \"rows_loaded\": 500000}",
+        "event: progress | data: {\"status\": \"complete\", \"percent\": 100}",
+        "event: result | data: {\"dataset_id\": \"ds_abc123\", \"rows_total\": 1523456, ...}"
+      ]
+    },
+    {
+      "name": "analyze_dataset",
+      "description": "Perform comprehensive statistical analysis on dataset. Generates descriptive statistics, distributions, correlations, and identifies outliers.",
+      "sensitivity_level": "medium",
+      "requires_approval": false,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "dataset_id": {
+            "type": "string",
+            "description": "Dataset ID from load_dataset"
+          },
+          "analysis_types": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["descriptive_stats", "distribution", "correlation", "outliers", "missing_values", "trends"]
+            },
+            "default": ["descriptive_stats", "distribution", "correlation"]
+          },
+          "columns": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Specific columns to analyze (if not specified, analyzes all numeric columns)"
+          },
+          "group_by": {
+            "type": "string",
+            "description": "Column to group by for aggregated analysis (e.g., 'region')"
+          }
+        },
+        "required": ["dataset_id"]
+      },
+      "examples": [
+        {
+          "name": "Analyze sales data",
+          "arguments": {
+            "dataset_id": "ds_abc123",
+            "analysis_types": ["descriptive_stats", "distribution", "correlation"],
+            "columns": ["quantity", "revenue"],
+            "group_by": "region"
+          },
+          "expected_result": {
+            "dataset_id": "ds_abc123",
+            "descriptive_stats": {
+              "quantity": {
+                "count": 1523456,
+                "mean": 2.34,
+                "std": 1.45,
+                "min": 1,
+                "25%": 1,
+                "50%": 2,
+                "75%": 3,
+                "max": 15
+              },
+              "revenue": {
+                "count": 1523456,
+                "mean": 127.43,
+                "std": 85.21,
+                "min": 9.99,
+                "25%": 49.99,
+                "50%": 99.99,
+                "75%": 199.99,
+                "max": 2999.99
+              }
+            },
+            "distribution": {
+              "quantity": {
+                "distribution_type": "poisson",
+                "parameters": {"lambda": 2.34},
+                "fit_quality": "good",
+                "histogram": {
+                  "bins": [1, 2, 3, 4, 5],
+                  "counts": [450000, 523000, 380000, 150000, 20456]
+                }
+              },
+              "revenue": {
+                "distribution_type": "log-normal",
+                "skewness": 1.23,
+                "kurtosis": 3.45
+              }
+            },
+            "correlation": {
+              "quantity_vs_revenue": {
+                "pearson_r": 0.85,
+                "p_value": 0.0001,
+                "interpretation": "strong positive correlation"
+              }
+            },
+            "grouped_analysis": {
+              "by_region": {
+                "West": {"mean_revenue": 135.67, "total_orders": 523456},
+                "East": {"mean_revenue": 142.31, "total_orders": 498732},
+                "Central": {"mean_revenue": 118.54, "total_orders": 501268}
+              }
+            },
+            "outliers": {
+              "method": "IQR",
+              "outliers_found": 1234,
+              "outlier_percentage": 0.08,
+              "outlier_examples": [
+                {"order_id": 12345, "quantity": 15, "revenue": 2999.99, "reason": "quantity > 3 * IQR"}
+              ]
+            },
+            "analysis_time_ms": 5678
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_visualization",
+      "description": "Generate visualization (chart/graph) from dataset. Supports line charts, bar charts, scatter plots, heatmaps, and more. Returns image URL and interactive HTML.",
+      "sensitivity_level": "low",
+      "requires_approval": false,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "dataset_id": {
+            "type": "string",
+            "description": "Dataset ID to visualize"
+          },
+          "chart_type": {
+            "type": "string",
+            "enum": ["line", "bar", "scatter", "histogram", "box", "heatmap", "pie", "area"],
+            "description": "Type of chart to create"
+          },
+          "x_column": {
+            "type": "string",
+            "description": "Column for X-axis"
+          },
+          "y_column": {
+            "type": "string",
+            "description": "Column for Y-axis (or value for pie chart)"
+          },
+          "group_by": {
+            "type": "string",
+            "description": "Column to group/color by"
+          },
+          "title": {
+            "type": "string",
+            "description": "Chart title"
+          },
+          "format": {
+            "type": "string",
+            "enum": ["png", "svg", "interactive_html", "plotly_json"],
+            "default": "png"
+          },
+          "style": {
+            "type": "object",
+            "properties": {
+              "theme": {
+                "type": "string",
+                "enum": ["default", "dark", "colorblind", "presentation"],
+                "default": "default"
+              },
+              "width": {"type": "integer", "default": 1200},
+              "height": {"type": "integer", "default": 800}
+            }
+          }
+        },
+        "required": ["dataset_id", "chart_type", "x_column", "y_column"]
+      },
+      "examples": [
+        {
+          "name": "Create revenue trend chart",
+          "arguments": {
+            "dataset_id": "ds_abc123",
+            "chart_type": "line",
+            "x_column": "sale_date",
+            "y_column": "revenue",
+            "group_by": "region",
+            "title": "Revenue Trend by Region (2024)",
+            "format": "interactive_html",
+            "style": {
+              "theme": "presentation",
+              "width": 1400,
+              "height": 800
+            }
+          },
+          "expected_result": {
+            "chart_id": "chart_xyz789",
+            "chart_type": "line",
+            "format": "interactive_html",
+            "url": "https://analytics-mcp.internal.company.com/charts/chart_xyz789.html",
+            "thumbnail_url": "https://analytics-mcp.internal.company.com/charts/chart_xyz789_thumb.png",
+            "embed_code": "<iframe src='https://analytics-mcp.internal.company.com/charts/chart_xyz789.html' width='1400' height='800'></iframe>",
+            "download_links": {
+              "png": "https://analytics-mcp.internal.company.com/charts/chart_xyz789.png",
+              "svg": "https://analytics-mcp.internal.company.com/charts/chart_xyz789.svg",
+              "pdf": "https://analytics-mcp.internal.company.com/charts/chart_xyz789.pdf"
+            },
+            "generation_time_ms": 234
+          }
+        }
+      ]
+    },
+    {
+      "name": "run_ab_test_analysis",
+      "description": "Perform statistical A/B test analysis to determine if there's a significant difference between control and treatment groups. Calculates p-value, confidence intervals, and provides recommendations.",
+      "sensitivity_level": "medium",
+      "requires_approval": false,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "dataset_id": {
+            "type": "string",
+            "description": "Dataset containing A/B test results"
+          },
+          "group_column": {
+            "type": "string",
+            "description": "Column indicating group (control vs treatment)",
+            "examples": ["variant", "group", "experiment_group"]
+          },
+          "metric_column": {
+            "type": "string",
+            "description": "Column containing metric to compare (e.g., conversion_rate, revenue)",
+            "examples": ["conversion_rate", "revenue_per_user", "click_through_rate"]
+          },
+          "test_type": {
+            "type": "string",
+            "enum": ["proportions", "means", "chi_square"],
+            "description": "Type of statistical test to perform",
+            "default": "means"
+          },
+          "confidence_level": {
+            "type": "number",
+            "minimum": 0.8,
+            "maximum": 0.99,
+            "default": 0.95,
+            "description": "Confidence level for statistical test (0.95 = 95%)"
+          },
+          "control_group_value": {
+            "type": "string",
+            "description": "Value in group_column representing control group",
+            "default": "control"
+          },
+          "treatment_group_value": {
+            "type": "string",
+            "description": "Value in group_column representing treatment group",
+            "default": "treatment"
+          }
+        },
+        "required": ["dataset_id", "group_column", "metric_column"]
+      },
+      "examples": [
+        {
+          "name": "Analyze button color A/B test",
+          "arguments": {
+            "dataset_id": "ds_abtest_001",
+            "group_column": "button_color",
+            "metric_column": "conversion_rate",
+            "test_type": "proportions",
+            "confidence_level": 0.95,
+            "control_group_value": "blue",
+            "treatment_group_value": "green"
+          },
+          "expected_result": {
+            "test_id": "ab_test_001",
+            "test_type": "two_sample_proportions",
+            "control_group": {
+              "name": "blue",
+              "sample_size": 10523,
+              "conversions": 842,
+              "conversion_rate": 0.08,
+              "std_error": 0.0026
+            },
+            "treatment_group": {
+              "name": "green",
+              "sample_size": 10487,
+              "conversions": 987,
+              "conversion_rate": 0.094,
+              "std_error": 0.0028
+            },
+            "statistical_results": {
+              "p_value": 0.0001,
+              "confidence_level": 0.95,
+              "confidence_interval": [0.008, 0.020],
+              "statistically_significant": true,
+              "effect_size": {
+                "absolute_lift": 0.014,
+                "relative_lift": 0.175,
+                "relative_lift_percentage": "17.5%"
+              },
+              "power": 0.95,
+              "minimum_detectable_effect": 0.01
+            },
+            "recommendation": {
+              "decision": "DEPLOY_TREATMENT",
+              "confidence": "high",
+              "reasoning": "Treatment group (green button) shows statistically significant improvement of 17.5% over control (blue button). p-value of 0.0001 is well below significance threshold of 0.05. Recommend deploying green button to all users.",
+              "expected_impact": "Deploying to 100% of users (1M/month) would result in approximately 175,000 additional conversions per month.",
+              "risks": "None identified. Test had adequate sample size and statistical power."
+            },
+            "visualizations": {
+              "funnel_comparison": "https://analytics-mcp.internal.company.com/charts/ab_test_001_funnel.png",
+              "distribution_plot": "https://analytics-mcp.internal.company.com/charts/ab_test_001_dist.png"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "generate_report",
+      "description": "Generate comprehensive analysis report combining multiple analyses, visualizations, and narrative insights. Exports to PDF, PowerPoint, or HTML.",
+      "sensitivity_level": "medium",
+      "requires_approval": false,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "report_title": {
+            "type": "string",
+            "description": "Report title",
+            "examples": ["Q4 2024 Sales Analysis", "Marketing Campaign Performance Report"]
+          },
+          "sections": {
+            "type": "array",
+            "description": "Report sections to include",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {"type": "string"},
+                "type": {
+                  "type": "string",
+                  "enum": ["dataset_summary", "analysis", "visualization", "narrative", "recommendations"]
+                },
+                "content_id": {
+                  "type": "string",
+                  "description": "ID of dataset/analysis/chart to include"
+                }
+              }
+            }
+          },
+          "format": {
+            "type": "string",
+            "enum": ["pdf", "pptx", "html", "markdown"],
+            "default": "pdf"
+          },
+          "template": {
+            "type": "string",
+            "enum": ["executive_summary", "detailed_analysis", "technical_report", "dashboard"],
+            "default": "executive_summary"
+          },
+          "auto_insights": {
+            "type": "boolean",
+            "description": "Use AI to generate narrative insights and recommendations",
+            "default": true
+          }
+        },
+        "required": ["report_title", "sections"]
+      },
+      "examples": [
+        {
+          "name": "Generate Q4 sales report",
+          "arguments": {
+            "report_title": "Q4 2024 Sales Performance Analysis",
+            "sections": [
+              {
+                "title": "Executive Summary",
+                "type": "narrative",
+                "content_id": "auto_generate"
+              },
+              {
+                "title": "Sales Overview",
+                "type": "dataset_summary",
+                "content_id": "ds_abc123"
+              },
+              {
+                "title": "Revenue Trends",
+                "type": "visualization",
+                "content_id": "chart_xyz789"
+              },
+              {
+                "title": "Regional Performance",
+                "type": "analysis",
+                "content_id": "analysis_regional"
+              },
+              {
+                "title": "Recommendations",
+                "type": "recommendations",
+                "content_id": "auto_generate"
+              }
+            ],
+            "format": "pdf",
+            "template": "executive_summary",
+            "auto_insights": true
+          },
+          "expected_result": {
+            "report_id": "rpt_q4_2024",
+            "title": "Q4 2024 Sales Performance Analysis",
+            "generated_at": "2025-01-15T14:30:00Z",
+            "format": "pdf",
+            "pages": 15,
+            "file_url": "https://analytics-mcp.internal.company.com/reports/rpt_q4_2024.pdf",
+            "preview_url": "https://analytics-mcp.internal.company.com/reports/rpt_q4_2024_preview.html",
+            "download_links": {
+              "pdf": "https://analytics-mcp.internal.company.com/reports/rpt_q4_2024.pdf",
+              "pptx": "https://analytics-mcp.internal.company.com/reports/rpt_q4_2024.pptx"
+            },
+            "key_insights": [
+              "Q4 revenue increased 23% YoY to $5.2M",
+              "West region outperformed with 31% growth",
+              "Average order value increased 15% to $127.43",
+              "Mobile conversion rate doubled to 4.2%"
+            ],
+            "generation_time_ms": 8945
+          }
+        }
+      ]
+    }
+  ],
+
+  "workflow_example": {
+    "name": "Monthly Sales Analysis Workflow",
+    "description": "Complete workflow for generating monthly sales report",
+    "steps": [
+      {
+        "step": 1,
+        "tool": "load_dataset",
+        "description": "Load sales data from Snowflake",
+        "arguments": {
+          "source_type": "snowflake",
+          "source_config": {
+            "database": "ANALYTICS",
+            "query": "SELECT * FROM SALES_FACT WHERE sale_date >= DATEADD(month, -1, CURRENT_DATE())"
+          }
+        },
+        "output": "dataset_id"
+      },
+      {
+        "step": 2,
+        "tool": "analyze_dataset",
+        "description": "Perform statistical analysis",
+        "arguments": {
+          "dataset_id": "{step1.dataset_id}",
+          "analysis_types": ["descriptive_stats", "trends"],
+          "group_by": "region"
+        },
+        "output": "analysis_id"
+      },
+      {
+        "step": 3,
+        "tool": "create_visualization",
+        "description": "Create revenue trend chart",
+        "arguments": {
+          "dataset_id": "{step1.dataset_id}",
+          "chart_type": "line",
+          "x_column": "sale_date",
+          "y_column": "revenue",
+          "group_by": "region"
+        },
+        "output": "chart_id"
+      },
+      {
+        "step": 4,
+        "tool": "generate_report",
+        "description": "Generate comprehensive report",
+        "arguments": {
+          "report_title": "Monthly Sales Analysis",
+          "sections": [
+            {"type": "dataset_summary", "content_id": "{step1.dataset_id}"},
+            {"type": "analysis", "content_id": "{step2.analysis_id}"},
+            {"type": "visualization", "content_id": "{step3.chart_id}"}
+          ],
+          "format": "pdf"
+        },
+        "output": "report_url"
+      }
+    ],
+    "estimated_duration": "3-5 minutes",
+    "automation_potential": "100% - can be fully automated with AI assistant"
+  },
+
+  "opa_policy_example": {
+    "policy": "package mcp.analytics\n\ndefault allow := false\n\n# Data analysts can use all analysis tools\nallow if {\n    \"data_analyst\" in input.user.roles\n    input.tool.name in [\"load_dataset\", \"analyze_dataset\", \"create_visualization\"]\n}\n\n# Sensitive datasets require approval\nrequires_approval if {\n    input.tool.name == \"load_dataset\"\n    input.arguments.source_config.database in [\"FINANCE\", \"HR\"]\n}\n\n# Report generation limited to senior analysts\nallow if {\n    input.tool.name == \"generate_report\"\n    \"senior_analyst\" in input.user.roles\n}"
+  },
+
+  "benefits": [
+    "Automates repetitive data analysis tasks",
+    "Reduces analysis time from hours to minutes",
+    "Enables AI assistants to perform complex analytics",
+    "Generates publication-ready reports automatically",
+    "Streaming progress updates for long-running analyses (via SSE transport)",
+    "Comprehensive statistical testing (A/B tests, hypothesis testing)",
+    "Professional visualizations with multiple export formats",
+    "Complete audit trail of all analyses for reproducibility",
+    "Policy-based access to sensitive datasets"
+  ],
+
+  "typical_users": [
+    "Data Analysts: Automate routine reporting",
+    "Data Scientists: Quick exploratory data analysis",
+    "Product Managers: Analyze A/B test results",
+    "Marketing: Campaign performance analysis",
+    "Executives: AI-generated business insights",
+    "AI Assistants: Answer data questions with actual analysis"
+  ],
+
+  "limitations": [
+    "Max dataset size: 500MB (for larger data, use distributed computing)",
+    "Session timeout: 2 hours",
+    "Compute resources: 4 CPU, 16GB RAM per session",
+    "Long-running analyses (>10 min) require SSE transport"
+  ]
+}
