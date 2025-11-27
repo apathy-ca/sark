@@ -1,0 +1,263 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1200" style="background: #f5f5f5;">
+  <defs>
+    <style>
+      .wireframe-title { font: bold 24px sans-serif; fill: #333; }
+      .section-title { font: bold 16px sans-serif; fill: #333; }
+      .label { font: 12px sans-serif; fill: #666; }
+      .box { fill: white; stroke: #ccc; stroke-width: 2; }
+      .box-gray { fill: #e8e8e8; stroke: #ccc; stroke-width: 2; }
+      .box-dark { fill: #d0d0d0; stroke: #999; stroke-width: 2; }
+      .text { font: 11px sans-serif; fill: #666; }
+      .icon-placeholder { fill: #b0b0b0; stroke: #999; stroke-width: 1; }
+      .table-header { fill: #f0f0f0; stroke: #ccc; stroke-width: 1; }
+      .table-row { fill: white; stroke: #e0e0e0; stroke-width: 1; }
+    </style>
+  </defs>
+
+  <!-- Page Title -->
+  <text x="50" y="40" class="wireframe-title">MCP Servers - List View Wireframe</text>
+  <text x="50" y="65" class="label">Desktop View (1440x900) | Status: Draft v1.0</text>
+
+  <!-- Header -->
+  <rect x="30" y="90" width="1540" height="70" class="box"/>
+  <text x="50" y="115" class="section-title">Header</text>
+  <rect x="50" y="120" width="120" height="30" class="box-dark" rx="4"/>
+  <text x="110" y="140" class="text" text-anchor="middle">SARK Logo</text>
+  <rect x="200" y="120" width="400" height="30" class="box-gray" rx="4"/>
+  <text x="220" y="140" class="text">🔍 Search servers, policies, users...</text>
+  <rect x="1400" y="120" width="150" height="30" class="box-gray" rx="4"/>
+  <circle cx="1420" cy="135" r="10" class="icon-placeholder"/>
+  <text x="1440" y="140" class="text">Admin User ▾</text>
+
+  <!-- Sidebar -->
+  <rect x="30" y="180" width="240" height="990" class="box"/>
+  <text x="50" y="210" class="section-title">Navigation</text>
+  <rect x="50" y="230" width="200" height="40" class="box-gray" rx="4"/>
+  <text x="70" y="255" class="text">📊 Dashboard</text>
+  <rect x="50" y="280" width="200" height="40" class="box-dark" rx="4"/>
+  <text x="70" y="305" class="section-title">🖥️ Servers</text>
+  <rect x="50" y="330" width="200" height="40" class="box-gray" rx="4"/>
+  <text x="70" y="355" class="text">🔧 Tools</text>
+  <rect x="50" y="380" width="200" height="40" class="box-gray" rx="4"/>
+  <text x="70" y="405" class="text">📋 Policies</text>
+  <rect x="50" y="430" width="200" height="40" class="box-gray" rx="4"/>
+  <text x="70" y="455" class="text">👥 Users</text>
+  <rect x="50" y="480" width="200" height="40" class="box-gray" rx="4"/>
+  <text x="70" y="505" class="text">👥 Teams</text>
+  <rect x="50" y="530" width="200" height="40" class="box-gray" rx="4"/>
+  <text x="70" y="555" class="text">📜 Audit Logs</text>
+  <rect x="50" y="580" width="200" height="40" class="box-gray" rx="4"/>
+  <text x="70" y="605" class="text">⚙️ Settings</text>
+
+  <!-- Main Content Area -->
+  <rect x="290" y="180" width="1280" height="990" class="box"/>
+
+  <!-- Breadcrumb -->
+  <text x="310" y="210" class="label">Home > Servers</text>
+
+  <!-- Page Header -->
+  <text x="310" y="245" class="wireframe-title">MCP Servers</text>
+  <text x="310" y="270" class="label">Manage and monitor your MCP server fleet</text>
+
+  <!-- Action Buttons -->
+  <rect x="1250" y="220" width="150" height="35" class="box-dark" rx="4"/>
+  <text x="1325" y="242" class="section-title" text-anchor="middle">+ Register Server</text>
+
+  <rect x="1420" y="220" width="130" height="35" class="box-gray" rx="4"/>
+  <text x="1485" y="242" class="text" text-anchor="middle">⋮ Bulk Actions</text>
+
+  <!-- Stats Summary -->
+  <rect x="310" y="290" width="230" height="80" class="box" rx="4"/>
+  <text x="330" y="315" class="label">TOTAL SERVERS</text>
+  <text x="330" y="350" class="wireframe-title">1,247</text>
+
+  <rect x="560" y="290" width="230" height="80" class="box" rx="4"/>
+  <text x="580" y="315" class="label">ACTIVE</text>
+  <text x="580" y="350" class="section-title" fill="#22c55e">1,060</text>
+
+  <rect x="810" y="290" width="230" height="80" class="box" rx="4"/>
+  <text x="830" y="315" class="label">INACTIVE</text>
+  <text x="830" y="350" class="section-title" fill="#f59e0b">125</text>
+
+  <rect x="1060" y="290" width="230" height="80" class="box" rx="4"/>
+  <text x="1080" y="315" class="label">UNHEALTHY</text>
+  <text x="1080" y="350" class="section-title" fill="#ef4444">62</text>
+
+  <rect x="1310" y="290" width="240" height="80" class="box" rx="4"/>
+  <text x="1330" y="315" class="label">AVG RESPONSE TIME</text>
+  <text x="1330" y="350" class="section-title">127ms</text>
+
+  <!-- Filters and Search -->
+  <text x="310" y="410" class="section-title">Filters</text>
+
+  <rect x="310" y="420" width="250" height="35" class="box-gray" rx="4"/>
+  <text x="330" y="443" class="text">🔍 Search by name or ID...</text>
+
+  <rect x="580" y="420" width="180" height="35" class="box-gray" rx="4"/>
+  <text x="600" y="443" class="text">Status: All ▾</text>
+
+  <rect x="780" y="420" width="180" height="35" class="box-gray" rx="4"/>
+  <text x="800" y="443" class="text">Transport: All ▾</text>
+
+  <rect x="980" y="420" width="180" height="35" class="box-gray" rx="4"/>
+  <text x="1000" y="443" class="text">Team: All ▾</text>
+
+  <rect x="1180" y="420" width="180" height="35" class="box-gray" rx="4"/>
+  <text x="1200" y="443" class="text">Sensitivity: All ▾</text>
+
+  <rect x="1380" y="420" width="170" height="35" class="box-gray" rx="4"/>
+  <text x="1465" y="443" class="text" text-anchor="middle">Clear Filters</text>
+
+  <!-- Table -->
+  <text x="310" y="490" class="label">Showing 50 of 1,247 servers</text>
+
+  <!-- Table Header -->
+  <rect x="310" y="500" width="1240" height="40" class="table-header"/>
+  <rect x="310" y="500" width="40" height="40" class="table-header"/>
+  <text x="330" y="525" class="label" text-anchor="middle">☐</text>
+
+  <text x="370" y="525" class="section-title">Name</text>
+  <text x="690" y="525" class="section-title">Status</text>
+  <text x="820" y="525" class="section-title">Transport</text>
+  <text x="970" y="525" class="section-title">Team</text>
+  <text x="1120" y="525" class="section-title">Sensitivity</text>
+  <text x="1280" y="525" class="section-title">Last Check</text>
+  <text x="1480" y="525" class="section-title">Actions</text>
+
+  <!-- Table Row 1 -->
+  <rect x="310" y="540" width="1240" height="60" class="table-row"/>
+  <rect x="310" y="540" width="40" height="60" class="table-row"/>
+  <text x="330" y="575" class="text" text-anchor="middle">☐</text>
+
+  <text x="370" y="565" class="section-title">prod-mcp-server-01</text>
+  <text x="370" y="585" class="label">srv_abc123xyz</text>
+
+  <rect x="690" y="557" width="80" height="25" fill="#22c55e" opacity="0.2" rx="12"/>
+  <text x="730" y="573" class="text" text-anchor="middle" fill="#22c55e">● Active</text>
+
+  <text x="820" y="575" class="text">HTTP</text>
+
+  <text x="970" y="575" class="text">Platform Team</text>
+
+  <rect x="1120" y="557" width="80" height="25" fill="#ef4444" opacity="0.2" rx="12"/>
+  <text x="1160" y="573" class="text" text-anchor="middle" fill="#ef4444">Critical</text>
+
+  <text x="1280" y="575" class="text">2 min ago</text>
+
+  <rect x="1480" y="555" width="60" height="30" class="box-gray" rx="4"/>
+  <text x="1510" y="575" class="text" text-anchor="middle">⋮ More</text>
+
+  <!-- Table Row 2 -->
+  <rect x="310" y="600" width="1240" height="60" class="table-row"/>
+  <rect x="310" y="600" width="40" height="60" class="table-row"/>
+  <text x="330" y="635" class="text" text-anchor="middle">☐</text>
+
+  <text x="370" y="625" class="section-title">staging-api-gateway</text>
+  <text x="370" y="645" class="label">srv_def456uvw</text>
+
+  <rect x="690" y="617" width="80" height="25" fill="#22c55e" opacity="0.2" rx="12"/>
+  <text x="730" y="633" class="text" text-anchor="middle" fill="#22c55e">● Active</text>
+
+  <text x="820" y="635" class="text">SSE</text>
+
+  <text x="970" y="635" class="text">Backend Team</text>
+
+  <rect x="1120" y="617" width="80" height="25" fill="#3b82f6" opacity="0.2" rx="12"/>
+  <text x="1160" y="633" class="text" text-anchor="middle" fill="#3b82f6">High</text>
+
+  <text x="1280" y="635" class="text">5 min ago</text>
+
+  <rect x="1480" y="615" width="60" height="30" class="box-gray" rx="4"/>
+  <text x="1510" y="635" class="text" text-anchor="middle">⋮ More</text>
+
+  <!-- Table Row 3 -->
+  <rect x="310" y="660" width="1240" height="60" class="table-row"/>
+  <rect x="310" y="660" width="40" height="60" class="table-row"/>
+  <text x="330" y="695" class="text" text-anchor="middle">☐</text>
+
+  <text x="370" y="685" class="section-title">dev-test-server-03</text>
+  <text x="370" y="705" class="label">srv_ghi789rst</text>
+
+  <rect x="690" y="677" width="90" height="25" fill="#ef4444" opacity="0.2" rx="12"/>
+  <text x="735" y="693" class="text" text-anchor="middle" fill="#ef4444">● Unhealthy</text>
+
+  <text x="820" y="695" class="text">STDIO</text>
+
+  <text x="970" y="695" class="text">Dev Team</text>
+
+  <rect x="1120" y="677" width="80" height="25" fill="#22c55e" opacity="0.2" rx="12"/>
+  <text x="1160" y="693" class="text" text-anchor="middle" fill="#22c55e">Low</text>
+
+  <text x="1280" y="695" class="text">1 hour ago</text>
+
+  <rect x="1480" y="675" width="60" height="30" class="box-gray" rx="4"/>
+  <text x="1510" y="695" class="text" text-anchor="middle">⋮ More</text>
+
+  <!-- Table Row 4 -->
+  <rect x="310" y="720" width="1240" height="60" class="table-row"/>
+  <rect x="310" y="720" width="40" height="60" class="table-row"/>
+  <text x="330" y="755" class="text" text-anchor="middle">☐</text>
+
+  <text x="370" y="745" class="section-title">analytics-mcp-server</text>
+  <text x="370" y="765" class="label">srv_jkl012mno</text>
+
+  <rect x="690" y="737" width="80" height="25" fill="#f59e0b" opacity="0.2" rx="12"/>
+  <text x="730" y="753" class="text" text-anchor="middle" fill="#f59e0b">● Inactive</text>
+
+  <text x="820" y="755" class="text">HTTP</text>
+
+  <text x="970" y="755" class="text">Data Team</text>
+
+  <rect x="1120" y="737" width="80" height="25" fill="#f59e0b" opacity="0.2" rx="12"/>
+  <text x="1160" y="753" class="text" text-anchor="middle" fill="#f59e0b">Medium</text>
+
+  <text x="1280" y="755" class="text">10 min ago</text>
+
+  <rect x="1480" y="735" width="60" height="30" class="box-gray" rx="4"/>
+  <text x="1510" y="755" class="text" text-anchor="middle">⋮ More</text>
+
+  <!-- Table Row 5 -->
+  <rect x="310" y="780" width="1240" height="60" class="table-row"/>
+  <rect x="310" y="780" width="40" height="60" class="table-row"/>
+  <text x="330" y="815" class="text" text-anchor="middle">☐</text>
+
+  <text x="370" y="805" class="section-title">ml-inference-server</text>
+  <text x="370" y="825" class="label">srv_pqr345stu</text>
+
+  <rect x="690" y="797" width="80" height="25" fill="#22c55e" opacity="0.2" rx="12"/>
+  <text x="730" y="813" class="text" text-anchor="middle" fill="#22c55e">● Active</text>
+
+  <text x="820" y="815" class="text">HTTP</text>
+
+  <text x="970" y="815" class="text">ML Team</text>
+
+  <rect x="1120" y="797" width="80" height="25" fill="#ef4444" opacity="0.2" rx="12"/>
+  <text x="1160" y="813" class="text" text-anchor="middle" fill="#ef4444">Critical</text>
+
+  <text x="1280" y="815" class="text">1 min ago</text>
+
+  <rect x="1480" y="795" width="60" height="30" class="box-gray" rx="4"/>
+  <text x="1510" y="815" class="text" text-anchor="middle">⋮ More</text>
+
+  <!-- More rows indicated -->
+  <text x="880" y="875" class="label" text-anchor="middle">... 45 more rows ...</text>
+
+  <!-- Pagination -->
+  <rect x="310" y="1100" width="1240" height="50" class="box"/>
+
+  <text x="330" y="1130" class="text">Rows per page: 50 ▾</text>
+
+  <text x="900" y="1130" class="text">1-50 of 1,247</text>
+
+  <rect x="1350" y="1110" width="40" height="30" class="box-gray" rx="4"/>
+  <text x="1370" y="1130" class="text" text-anchor="middle">←</text>
+
+  <rect x="1400" y="1110" width="40" height="30" class="box-dark" rx="4"/>
+  <text x="1420" y="1130" class="text" text-anchor="middle">1</text>
+
+  <rect x="1450" y="1110" width="40" height="30" class="box-gray" rx="4"/>
+  <text x="1470" y="1130" class="text" text-anchor="middle">2</text>
+
+  <rect x="1500" y="1110" width="40" height="30" class="box-gray" rx="4"/>
+  <text x="1520" y="1130" class="text" text-anchor="middle">→</text>
+</svg>

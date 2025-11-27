@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1200" style="background: #f5f5f5;">
+  <defs>
+    <style>
+      .wireframe-title { font: bold 24px sans-serif; fill: #333; }
+      .section-title { font: bold 16px sans-serif; fill: #333; }
+      .label { font: 12px sans-serif; fill: #666; }
+      .box { fill: white; stroke: #ccc; stroke-width: 2; }
+      .box-gray { fill: #e8e8e8; stroke: #ccc; stroke-width: 2; }
+      .box-dark { fill: #d0d0d0; stroke: #999; stroke-width: 2; }
+      .code-bg { fill: #1e1e1e; stroke: #333; stroke-width: 2; }
+      .text { font: 11px sans-serif; fill: #666; }
+      .code-text { font: 11px monospace; fill: #d4d4d4; }
+    </style>
+  </defs>
+
+  <!-- Page Title -->
+  <text x="50" y="40" class="wireframe-title">Policy Editor - Wireframe</text>
+  <text x="50" y="65" class="label">Desktop View (1440x900) | Status: Draft v1.0</text>
+
+  <!-- Header -->
+  <rect x="30" y="90" width="1540" height="70" class="box"/>
+  <rect x="50" y="120" width="120" height="30" class="box-dark" rx="4"/>
+  <text x="110" y="140" class="text" text-anchor="middle">SARK Logo</text>
+  <rect x="1400" y="120" width="150" height="30" class="box-gray" rx="4"/>
+  <text x="1475" y="140" class="text" text-anchor="middle">Admin User ▾</text>
+
+  <!-- Sidebar -->
+  <rect x="30" y="180" width="240" height="990" class="box"/>
+  <text x="50" y="210" class="section-title">Navigation</text>
+  <rect x="50" y="280" width="200" height="40" class="box-dark" rx="4"/>
+  <text x="70" y="305" class="section-title">📋 Policies</text>
+
+  <!-- Main Content -->
+  <rect x="290" y="180" width="1280" height="990" class="box"/>
+
+  <!-- Breadcrumb -->
+  <text x="310" y="210" class="label">Home > Policies > team-based-access.rego</text>
+
+  <!-- Header -->
+  <text x="310" y="250" class="wireframe-title">team-based-access.rego</text>
+  <rect x="1100" y="225" width="100" height="35" class="box-gray" rx="4"/>
+  <text x="1150" y="247" class="text" text-anchor="middle">Test</text>
+
+  <rect x="1210" y="225" width="100" height="35" class="box-gray" rx="4"/>
+  <text x="1260" y="247" class="text" text-anchor="middle">Format</text>
+
+  <rect x="1320" y="225" width="120" height="35" class="box-dark" rx="4"/>
+  <text x="1380" y="247" class="section-title" text-anchor="middle">Save</text>
+
+  <rect x="1450" y="225" width="100" height="35" class="box-gray" rx="4"/>
+  <text x="1500" y="247" class="text" text-anchor="middle">⋮ More</text>
+
+  <!-- Policy Info -->
+  <rect x="310" y="280" width="1240" height="80" class="box" rx="8"/>
+  <text x="330" y="305" class="label">POLICY INFORMATION</text>
+  <text x="330" y="330" class="text">Status: Active | Version: 1.2.0 | Last Modified: 2025-11-25 14:30:00 by admin@example.com</text>
+  <text x="330" y="350" class="text">Environment: Production | Applies to: All users | Decision Cache: Enabled (TTL: 300s)</text>
+
+  <!-- Split view -->
+  <!-- Left: Editor -->
+  <rect x="310" y="380" width="760" height="770" class="box" rx="8"/>
+  <text x="330" y="405" class="section-title">Code Editor</text>
+
+  <!-- Toolbar -->
+  <rect x="330" y="415" width="720" height="35" class="box-gray" rx="4"/>
+  <text x="350" y="437" class="text">File: team-based-access.rego</text>
+  <rect x="650" y="420" width="80" height="25" class="box-dark" rx="4"/>
+  <text x="690" y="437" class="text" text-anchor="middle">Rego ▾</text>
+
+  <!-- Monaco Editor -->
+  <rect x="330" y="455" width="720" height="675" class="code-bg" rx="4"/>
+
+  <!-- Line numbers -->
+  <text x="345" y="480" class="code-text" fill="#858585">1</text>
+  <text x="345" y="500" class="code-text" fill="#858585">2</text>
+  <text x="345" y="520" class="code-text" fill="#858585">3</text>
+  <text x="345" y="540" class="code-text" fill="#858585">4</text>
+  <text x="345" y="560" class="code-text" fill="#858585">5</text>
+  <text x="345" y="580" class="code-text" fill="#858585">6</text>
+  <text x="345" y="600" class="code-text" fill="#858585">7</text>
+  <text x="345" y="620" class="code-text" fill="#858585">8</text>
+  <text x="345" y="640" class="code-text" fill="#858585">9</text>
+  <text x="345" y="660" class="code-text" fill="#858585">10</text>
+
+  <!-- Code -->
+  <text x="375" y="480" class="code-text" fill="#c586c0">package</text>
+  <text x="435" y="480" class="code-text">authz.team_based</text>
+
+  <text x="375" y="520" class="code-text" fill="#6a9955"># Default deny</text>
+  <text x="375" y="540" class="code-text" fill="#c586c0">default</text>
+  <text x="435" y="540" class="code-text">allow </text>
+  <text x="480" y="540" class="code-text" fill="#d16969">=</text>
+  <text x="495" y="540" class="code-text" fill="#569cd6">false</text>
+
+  <text x="375" y="580" class="code-text" fill="#6a9955"># Allow if same team</text>
+  <text x="375" y="600" class="code-text">allow </text>
+  <text x="420" y="600" class="code-text" fill="#d16969">{</text>
+  <text x="390" y="620" class="code-text">  input.user.team_id </text>
+  <text x="550" y="620" class="code-text" fill="#d16969">==</text>
+  <text x="575" y="620" class="code-text"> input.resource.team_id</text>
+  <text x="375" y="640" class="code-text" fill="#d16969">}</text>
+
+  <!-- Right: Testing Panel -->
+  <rect x="1090" y="380" width="460" height="770" class="box" rx="8"/>
+  <text x="1110" y="405" class="section-title">Policy Testing</text>
+
+  <!-- Test input -->
+  <text x="1110" y="435" class="label">INPUT DATA</text>
+  <rect x="1110" y="445" width="420" height="280" class="box-gray" rx="4"/>
+  <text x="1130" y="470" class="code-text" fill="#333">{</text>
+  <text x="1145" y="495" class="code-text" fill="#333">  "user": {</text>
+  <text x="1160" y="520" class="code-text" fill="#333">    "id": "user-001",</text>
+  <text x="1160" y="545" class="code-text" fill="#333">    "role": "user",</text>
+  <text x="1160" y="570" class="code-text" fill="#333">    "team_id": "team-a"</text>
+  <text x="1145" y="595" class="code-text" fill="#333">  },</text>
+  <text x="1145" y="620" class="code-text" fill="#333">  "resource": {</text>
+  <text x="1160" y="645" class="code-text" fill="#333">    "type": "tool",</text>
+  <text x="1160" y="670" class="code-text" fill="#333">    "team_id": "team-a"</text>
+  <text x="1145" y="695" class="code-text" fill="#333">  }</text>
+  <text x="1130" y="720" class="code-text" fill="#333">}</text>
+
+  <!-- Run button -->
+  <rect x="1110" y="740" width="420" height="40" class="box-dark" rx="4"/>
+  <text x="1320" y="765" class="section-title" text-anchor="middle">▶ Run Test</text>
+
+  <!-- Test output -->
+  <text x="1110" y="805" class="label">OUTPUT</text>
+  <rect x="1110" y="815" width="420" height="100" class="box" rx="4"/>
+  <rect x="1130" y="830" width="380" height="35" fill="#22c55e" opacity="0.2" rx="4"/>
+  <text x="1320" y="852" class="section-title" text-anchor="middle" fill="#22c55e">✓ ALLOW</text>
+  <text x="1130" y="885" class="text">Evaluation time: 0.42ms</text>
+  <text x="1130" y="905" class="text">Cache: HIT</text>
+
+  <!-- Test cases -->
+  <text x="1110" y="940" class="label">SAVED TEST CASES</text>
+
+  <rect x="1110" y="950" width="420" height="40" class="box-gray" rx="4"/>
+  <text x="1130" y="975" class="text">✓ Same team access - PASS</text>
+
+  <rect x="1110" y="1000" width="420" height="40" class="box-gray" rx="4"/>
+  <text x="1130" y="1025" class="text">✓ Cross team denied - PASS</text>
+
+  <rect x="1110" y="1050" width="420" height="40" class="box-gray" rx="4"/>
+  <text x="1130" y="1075" class="text">✓ Admin override - PASS</text>
+
+  <rect x="1110" y="1100" width="420" height="40" class="box-dark" rx="4"/>
+  <text x="1320" y="1125" class="text" text-anchor="middle">+ Add Test Case</text>
+</svg>

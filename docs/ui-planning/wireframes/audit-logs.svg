@@ -1,0 +1,180 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1200" style="background: #f5f5f5;">
+  <defs>
+    <style>
+      .wireframe-title { font: bold 24px sans-serif; fill: #333; }
+      .section-title { font: bold 16px sans-serif; fill: #333; }
+      .label { font: 12px sans-serif; fill: #666; }
+      .box { fill: white; stroke: #ccc; stroke-width: 2; }
+      .box-gray { fill: #e8e8e8; stroke: #ccc; stroke-width: 2; }
+      .box-dark { fill: #d0d0d0; stroke: #999; stroke-width: 2; }
+      .text { font: 11px sans-serif; fill: #666; }
+      .code-text { font: 10px monospace; fill: #333; }
+    </style>
+  </defs>
+
+  <!-- Page Title -->
+  <text x="50" y="40" class="wireframe-title">Audit Logs - Wireframe</text>
+  <text x="50" y="65" class="label">Desktop View (1440x900) | Status: Draft v1.0</text>
+
+  <!-- Header -->
+  <rect x="30" y="90" width="1540" height="70" class="box"/>
+  <rect x="50" y="120" width="120" height="30" class="box-dark" rx="4"/>
+  <text x="110" y="140" class="text" text-anchor="middle">SARK Logo</text>
+
+  <!-- Sidebar -->
+  <rect x="30" y="180" width="240" height="990" class="box"/>
+  <rect x="50" y="530" width="200" height="40" class="box-dark" rx="4"/>
+  <text x="70" y="555" class="section-title">📜 Audit Logs</text>
+
+  <!-- Main Content -->
+  <rect x="290" y="180" width="1280" height="990" class="box"/>
+
+  <!-- Breadcrumb -->
+  <text x="310" y="210" class="label">Home > Audit Logs</text>
+
+  <!-- Page Header -->
+  <text x="310" y="245" class="wireframe-title">Audit Logs</text>
+  <text x="310" y="270" class="label">Monitor and track all system activity</text>
+
+  <!-- Export Button -->
+  <rect x="1380" y="220" width="170" height="35" class="box-dark" rx="4"/>
+  <text x="1465" y="242" class="section-title" text-anchor="middle">⬇ Export Logs</text>
+
+  <!-- Stats Cards -->
+  <rect x="310" y="290" width="380" height="80" class="box" rx="4"/>
+  <text x="330" y="315" class="label">EVENTS (LAST 24H)</text>
+  <text x="330" y="350" class="wireframe-title">89,247</text>
+
+  <rect x="710" y="290" width="380" height="80" class="box" rx="4"/>
+  <text x="730" y="315" class="label">FAILED OPERATIONS</text>
+  <text x="730" y="350" class="section-title" fill="#ef4444">142</text>
+
+  <rect x="1110" y="290" width="440" height="80" class="box" rx="4"/>
+  <text x="1130" y="315" class="label">POLICY DENIALS (24H)</text>
+  <text x="1130" y="350" class="section-title" fill="#f59e0b">1,023</text>
+
+  <!-- Advanced Filters Section -->
+  <text x="310" y="410" class="section-title">Filters & Search</text>
+
+  <!-- Search -->
+  <rect x="310" y="420" width="400" height="35" class="box-gray" rx="4"/>
+  <text x="330" y="443" class="text">🔍 Search by event, user, resource, or IP...</text>
+
+  <!-- Date Range -->
+  <rect x="730" y="420" width="200" height="35" class="box-gray" rx="4"/>
+  <text x="750" y="443" class="text">📅 Last 24 hours ▾</text>
+
+  <!-- Real-time toggle -->
+  <rect x="950" y="420" width="180" height="35" class="box-dark" rx="4"/>
+  <text x="1040" y="443" class="section-title" text-anchor="middle">● Live Updates</text>
+
+  <!-- Clear filters -->
+  <rect x="1150" y="420" width="140" height="35" class="box-gray" rx="4"/>
+  <text x="1220" y="443" class="text" text-anchor="middle">Clear Filters</text>
+
+  <!-- Advanced filters row 2 -->
+  <rect x="310" y="470" width="180" height="35" class="box-gray" rx="4"/>
+  <text x="330" y="493" class="text">Event Type: All ▾</text>
+
+  <rect x="510" y="470" width="180" height="35" class="box-gray" rx="4"/>
+  <text x="530" y="493" class="text">User: All ▾</text>
+
+  <rect x="710" y="470" width="180" height="35" class="box-gray" rx="4"/>
+  <text x="730" y="493" class="text">Resource: All ▾</text>
+
+  <rect x="910" y="470" width="180" height="35" class="box-gray" rx="4"/>
+  <text x="930" y="493" class="text">Status: All ▾</text>
+
+  <rect x="1110" y="470" width="180" height="35" class="box-gray" rx="4"/>
+  <text x="1130" y="493" class="text">Severity: All ▾</text>
+
+  <!-- Results Summary -->
+  <text x="310" y="540" class="label">Showing 50 of 89,247 events | Real-time updates: ON</text>
+
+  <!-- Event Timeline / List -->
+  <!-- Event 1 - Success -->
+  <rect x="310" y="555" width="1240" height="95" class="box" rx="8"/>
+  <circle cx="335" cy="585" r="8" fill="#22c55e"/>
+  <line x1="335" y1="593" x2="335" y2="645" stroke="#22c55e" stroke-width="2" stroke-dasharray="2,2"/>
+
+  <text x="360" y="575" class="section-title">server.registered</text>
+  <rect x="530" y="565" width="80" height="20" fill="#22c55e" opacity="0.2" rx="10"/>
+  <text x="570" y="578" class="text" text-anchor="middle" fill="#22c55e">Success</text>
+
+  <text x="360" y="595" class="text">User: john.doe@example.com | IP: 192.168.1.42</text>
+  <text x="360" y="613" class="code-text">Server "prod-mcp-server-47" registered with endpoint https://mcp-prod-47.example.com</text>
+  <text x="360" y="630" class="label">Resource: srv_abc123 | Team: Platform Team | Sensitivity: Critical</text>
+
+  <text x="1470" y="575" class="label" text-anchor="end">2 min ago</text>
+  <text x="1470" y="595" class="text" text-anchor="end">2025-11-27</text>
+  <text x="1470" y="610" class="text" text-anchor="end">14:32:15 UTC</text>
+
+  <rect x="1400" y="620" width="140" height="25" class="box-gray" rx="4"/>
+  <text x="1470" y="637" class="text" text-anchor="middle">View Details →</text>
+
+  <!-- Event 2 - Policy Denial -->
+  <rect x="310" y="660" width="1240" height="95" class="box" rx="8"/>
+  <circle cx="335" cy="690" r="8" fill="#f59e0b"/>
+  <line x1="335" y1="698" x2="335" y2="750" stroke="#f59e0b" stroke-width="2" stroke-dasharray="2,2"/>
+
+  <text x="360" y="680" class="section-title">policy.denied</text>
+  <rect x="500" y="670" width="80" height="20" fill="#f59e0b" opacity="0.2" rx="10"/>
+  <text x="540" y="683" class="text" text-anchor="middle" fill="#f59e0b">Denied</text>
+
+  <text x="360" y="700" class="text">User: alice.smith@example.com | IP: 10.0.2.134</text>
+  <text x="360" y="718" class="code-text">Tool invocation denied by policy "team-based-access" (cross-team access)</text>
+  <text x="360" y="735" class="label">Resource: tool_xyz789 | Requested Team: Backend | User Team: Data</text>
+
+  <text x="1470" y="680" class="label" text-anchor="end">15 min ago</text>
+  <text x="1470" y="700" class="text" text-anchor="end">2025-11-27</text>
+  <text x="1470" y="715" class="text" text-anchor="end">14:19:43 UTC</text>
+
+  <rect x="1400" y="725" width="140" height="25" class="box-gray" rx="4"/>
+  <text x="1470" y="742" class="text" text-anchor="middle">View Details →</text>
+
+  <!-- Event 3 - Failed Operation -->
+  <rect x="310" y="765" width="1240" height="95" class="box" rx="8"/>
+  <circle cx="335" cy="795" r="8" fill="#ef4444"/>
+  <line x1="335" y1="803" x2="335" y2="855" stroke="#ef4444" stroke-width="2" stroke-dasharray="2,2"/>
+
+  <text x="360" y="785" class="section-title">authentication.failed</text>
+  <rect x="550" y="775" width="80" height="20" fill="#ef4444" opacity="0.2" rx="10"/>
+  <text x="590" y="788" class="text" text-anchor="middle" fill="#ef4444">Failed</text>
+
+  <text x="360" y="805" class="text">User: unknown | IP: 203.0.113.45</text>
+  <text x="360" y="823" class="code-text">LDAP authentication failed: Invalid credentials (3 attempts in 5 minutes)</text>
+  <text x="360" y="840" class="label">Attempted username: admin@example.com | Suspicious: Yes | Blocked: Yes</text>
+
+  <text x="1470" y="785" class="label" text-anchor="end">1 hour ago</text>
+  <text x="1470" y="805" class="text" text-anchor="end">2025-11-27</text>
+  <text x="1470" y="820" class="text" text-anchor="end">13:34:22 UTC</text>
+
+  <rect x="1400" y="830" width="140" height="25" class="box-gray" rx="4"/>
+  <text x="1470" y="847" class="text" text-anchor="middle">View Details →</text>
+
+  <!-- Event 4 - Info -->
+  <rect x="310" y="870" width="1240" height="95" class="box" rx="8"/>
+  <circle cx="335" cy="900" r="8" fill="#3b82f6"/>
+
+  <text x="360" y="890" class="section-title">policy.updated</text>
+  <rect x="510" y="880" width="80" height="20" fill="#3b82f6" opacity="0.2" rx="10"/>
+  <text x="550" y="893" class="text" text-anchor="middle" fill="#3b82f6">Info</text>
+
+  <text x="360" y="910" class="text">User: admin@example.com | IP: 192.168.1.10</text>
+  <text x="360" y="928" class="code-text">Policy "team-based-access.rego" updated to version 1.2.1</text>
+  <text x="360" y="945" class="label">Changes: Added sensitivity level check | Tests: All passing (12/12)</text>
+
+  <text x="1470" y="890" class="label" text-anchor="end">3 hours ago</text>
+  <text x="1470" y="910" class="text" text-anchor="end">2025-11-27</text>
+  <text x="1470" y="925" class="text" text-anchor="end">11:15:08 UTC</text>
+
+  <rect x="1400" y="935" width="140" height="25" class="box-gray" rx="4"/>
+  <text x="1470" y="952" class="text" text-anchor="middle">View Details →</text>
+
+  <!-- More events indicated -->
+  <text x="880" y="1000" class="label" text-anchor="middle">... 46 more events ...</text>
+
+  <!-- Load more button -->
+  <rect x="310" y="1110" width="1240" height="50" class="box-dark" rx="4"/>
+  <text x="880" y="1140" class="section-title" text-anchor="middle">Load More Events (50)</text>
+</svg>
