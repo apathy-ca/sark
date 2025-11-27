@@ -152,21 +152,53 @@ opa-check: ## Check OPA policy syntax
 	docker compose exec opa opa check /policies
 
 # Kubernetes commands
-k8s-deploy: ## Deploy to Kubernetes
-	kubectl apply -f k8s/base/namespace.yaml
-	kubectl apply -f k8s/base/opa-deployment.yaml
-	kubectl apply -f k8s/base/deployment.yaml
+k8s-deploy: ## Deploy to Kubernetes using Kustomize
+	kubectl apply -k k8s/base
+
+k8s-deploy-prod: ## Deploy to production using Kustomize overlay
+	kubectl apply -k k8s/overlays/production
 
 k8s-status: ## Check Kubernetes deployment status
-	kubectl get all -n sark-system
+	kubectl get all -n sark
 
-k8s-logs: ## View Kubernetes logs
-	kubectl logs -f deployment/sark-api -n sark-system
+k8s-logs: ## View backend API logs
+	kubectl logs -f deployment/sark-api -n sark
+
+k8s-logs-frontend: ## View frontend logs
+	kubectl logs -f -n sark -l app.kubernetes.io/component=frontend
 
 k8s-delete: ## Delete Kubernetes resources
-	kubectl delete -f k8s/base/deployment.yaml
-	kubectl delete -f k8s/base/opa-deployment.yaml
-	kubectl delete -f k8s/base/namespace.yaml
+	kubectl delete -k k8s/base
+
+k8s-shell-frontend: ## Open shell in frontend pod
+	kubectl exec -it -n sark deployment/sark-frontend -- sh
+
+k8s-shell-api: ## Open shell in API pod
+	kubectl exec -it -n sark deployment/sark-api -- bash
+
+# Helm commands
+helm-install: ## Install SARK using Helm
+	helm install sark ./helm/sark --namespace sark --create-namespace
+
+helm-install-prod: ## Install SARK using Helm with production values
+	helm install sark ./helm/sark \
+		--namespace sark \
+		--create-namespace \
+		--set frontend.enabled=true \
+		--set ingress.enabled=true
+
+helm-upgrade: ## Upgrade SARK Helm release
+	helm upgrade sark ./helm/sark --namespace sark
+
+helm-uninstall: ## Uninstall SARK Helm release
+	helm uninstall sark --namespace sark
+
+helm-status: ## Check Helm release status
+	helm status sark --namespace sark
+
+helm-test: ## Test Helm chart
+	helm lint ./helm/sark
+	helm template sark ./helm/sark
 
 ci-local: quality test ## Run basic CI checks locally (quality + tests)
 
