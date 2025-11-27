@@ -9,6 +9,56 @@ SARK provides enterprise-grade security and governance for Model Context Protoco
 
 **Target Scale:** 50,000+ employees, 10,000+ MCP servers
 
+## What is MCP?
+
+**Model Context Protocol (MCP)** is an open protocol that enables AI assistants and language models to securely interact with external tools, data sources, and services. Think of it as a standardized "plugin system" for AI—allowing AI assistants to query databases, create tickets, search documentation, analyze data, and perform countless other tasks.
+
+### Why MCP Matters
+
+Without governance, MCP deployments in enterprise environments face significant risks:
+
+❌ **No Visibility** - Shadow IT proliferation of ungoverned MCP servers
+❌ **No Control** - AI accessing sensitive data without proper authorization
+❌ **No Audit** - Privileged operations executed without compliance trails
+❌ **Security Gaps** - Vulnerabilities through prompt injection and tool misuse
+❌ **Chaos** - Thousands of servers with no central management
+
+**SARK provides the solution** - enterprise-grade governance for MCP at massive scale.
+
+### MCP in Action
+
+```mermaid
+graph LR
+    AI[AI Assistant] -->|MCP Protocol| SARK[SARK Gateway]
+    SARK -->|Authorized| DB[(Database)]
+    SARK -->|Authorized| JIRA[Jira API]
+    SARK -->|Authorized| SLACK[Slack API]
+
+    SARK -->|Log All Actions| AUDIT[(Audit Trail)]
+    SARK -->|Check Permissions| OPA[Policy Engine]
+
+    style SARK fill:#4a90e2
+    style OPA fill:#50c878
+    style AUDIT fill:#f5a623
+```
+
+**Example Use Case:**
+
+1. Developer asks AI: *"Show me all P0 bugs assigned to my team"*
+2. AI uses MCP to invoke `jira.query` tool via SARK
+3. SARK validates: Is user authorized? Is request safe? Is sensitivity level appropriate?
+4. If allowed: Query executes → Results returned to AI → AI presents to developer
+5. All actions logged in immutable audit trail for compliance
+
+**What SARK Governs:**
+- **Discovery**: Automatically find all MCP servers across the organization
+- **Authorization**: Fine-grained policies controlling who can use which tools
+- **Audit**: Complete trail of every AI action for compliance and security
+- **Security**: Protection against prompt injection, privilege escalation, and data exfiltration
+- **Scale**: Manage 10,000+ MCP servers serving 50,000+ employees
+
+📖 **[Learn more about MCP](docs/MCP_INTRODUCTION.md)** - Comprehensive introduction to Model Context Protocol
+
 ## Project Status
 
 ✅ **Phase 2 - Operational Excellence** - COMPLETE (November 2025)
