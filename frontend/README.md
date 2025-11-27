@@ -1,73 +1,47 @@
-# React + TypeScript + Vite
+# SARK Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Modern React + TypeScript frontend for SARK (Security Audit and Resource Kontroler).
 
-Currently, two official plugins are available:
+## Quick Start
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install && npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Features
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- **Full UI Suite**: Servers, Policies, Audit Logs, API Keys
+- **Real-time Updates**: WebSocket integration
+- **Dark Mode**: System/Light/Dark themes
+- **Keyboard Shortcuts**: Press `Ctrl+/` to see all
+- **Data Export**: CSV/JSON export for all tables
+- **Code Editor**: Syntax-highlighted Rego policy editor
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Tech Stack
+
+React 18 • TypeScript • Vite • Tailwind CSS • TanStack Query • Zustand • React Router
+
+## Documentation
+
+- [API Reference](../docs/ui/API_REFERENCE.md)
+- [Implementation Roadmap](../docs/ui/IMPLEMENTATION_ROADMAP.md)
+- [Keyboard Shortcuts](#keyboard-shortcuts)
+
+## Keyboard Shortcuts
+
+- `g+d/s/p/a/k` - Navigate to Dashboard/Servers/Policies/Audit/Keys
+- `Ctrl+/` - Show all shortcuts
+- `t` - Toggle theme
+- `Esc` - Close modals
+
+## Environment
+
+```env
+VITE_API_BASE_URL=http://localhost:8000
+```
+
+## Build
+
+```bash
+npm run build  # Output: dist/
 ```
