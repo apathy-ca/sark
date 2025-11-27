@@ -1,0 +1,27 @@
+{
+  "name": "my-first-server",
+  "description": "A minimal MCP server example",
+  "transport": "http",
+  "endpoint": "http://localhost:3000/mcp",
+  "version": "2025-06-18",
+  "capabilities": ["tools"],
+  "sensitivity_level": "medium",
+  "tools": [
+    {
+      "name": "echo",
+      "description": "Echoes back the input message",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "The message to echo",
+            "maxLength": 1000
+          }
+        },
+        "required": ["message"]
+      },
+      "sensitivity_level": "low"
+    }
+  ]
+}
