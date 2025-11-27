@@ -1,15 +1,19 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { auditApi } from '@/services/api';
 import { useState } from 'react';
 import type { AuditEvent } from '@/types/api';
+import { ExportButton } from '@/components/ExportButton';
+import { useAuditLogStream } from '@/hooks/useWebSocket';
 
 type TimePeriod = '1h' | '24h' | '7d' | '30d';
 
 export default function AuditLogsPage() {
+  const queryClient = useQueryClient();
   const [period, setPeriod] = useState<TimePeriod>('24h');
   const [eventTypeFilter, setEventTypeFilter] = useState<string>('');
   const [userFilter, setUserFilter] = useState<string>('');
   const [serverFilter, setServerFilter] = useState<string>('');
+  const [realtimeEnabled, setRealtimeEnabled] = useState(false);
 
   const getStartTime = (period: TimePeriod): string => {
     const now = new Date();
@@ -32,8 +36,37 @@ export default function AuditLogsPage() {
         user_email: userFilter || undefined,
         server_name: serverFilter || undefined,
       }),
-    refetchInterval: 30000, // Refetch every 30 seconds
+    refetchInterval: realtimeEnabled ? false : 30000, // Disable polling when real-time is enabled
   });
+
+  // WebSocket real-time updates
+  const { isConnected: wsConnected, error: wsError } = useAuditLogStream(
+    (newEvent: AuditEvent) => {
+      // Add new event to the cache
+      queryClient.setQueryData(
+        ['audit-events', period, eventTypeFilter, userFilter, serverFilter],
+        (oldData: any) => {
+          if (!oldData) return oldData;
+
+          // Check if event matches current filters
+          const matchesFilters =
+            (!eventTypeFilter || newEvent.event_type === eventTypeFilter) &&
+            (!userFilter || newEvent.user_email?.includes(userFilter)) &&
+            (!serverFilter || newEvent.server_name?.includes(serverFilter));
+
+          if (!matchesFilters) return oldData;
+
+          // Prepend new event to the list
+          return {
+            ...oldData,
+            events: [newEvent, ...oldData.events],
+            total: oldData.total + 1,
+          };
+        }
+      );
+    },
+    realtimeEnabled
+  );
 
   const getDecisionColor = (decision: string) => {
     switch (decision) {
@@ -72,52 +105,47 @@ export default function AuditLogsPage() {
     }).format(date);
   };
 
-  const exportToCSV = () => {
-    if (!data?.events || data.events.length === 0) return;
-
-    const headers = ['Timestamp', 'Event Type', 'User', 'Server', 'Tool', 'Decision', 'Reason'];
-    const rows = data.events.map((event: AuditEvent) => [
-      event.timestamp,
-      event.event_type,
-      event.user_email || '',
-      event.server_name || '',
-      event.tool_name || '',
-      event.decision || '',
-      event.reason || '',
-    ]);
-
-    const csvContent = [
-      headers.join(','),
-      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(',')),
-    ].join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `audit-logs-${period}-${Date.now()}.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
-  };
-
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Audit Logs</h1>
+        <div>
+          <h1 className="text-3xl font-bold">Audit Logs</h1>
+          {realtimeEnabled && (
+            <div className="flex items-center gap-2 mt-2">
+              <div
+                className={`w-2 h-2 rounded-full ${
+                  wsConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'
+                }`}
+              />
+              <span className="text-sm text-muted-foreground">
+                {wsConnected ? 'Live' : wsError ? 'Connection error' : 'Connecting...'}
+              </span>
+            </div>
+          )}
+        </div>
         <div className="flex gap-3">
           <button
+            onClick={() => setRealtimeEnabled(!realtimeEnabled)}
+            className={`px-4 py-2 border rounded-md hover:bg-muted transition-colors text-sm ${
+              realtimeEnabled ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' : ''
+            }`}
+            title={realtimeEnabled ? 'Disable real-time updates' : 'Enable real-time updates'}
+          >
+            {realtimeEnabled ? '🟢 Live' : '⚫ Real-time'}
+          </button>
+          <button
             onClick={() => refetch()}
-            className="px-4 py-2 border rounded-md hover:bg-muted transition-colors text-sm"
+            disabled={realtimeEnabled}
+            className="px-4 py-2 border rounded-md hover:bg-muted transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             🔄 Refresh
           </button>
-          <button
-            onClick={exportToCSV}
-            disabled={!data?.events || data.events.length === 0}
-            className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            📥 Export CSV
-          </button>
+          <ExportButton
+            data={data?.events || []}
+            baseFilename={`audit-logs-${period}`}
+            headers={['timestamp', 'event_type', 'user_email', 'server_name', 'tool_name', 'decision', 'reason']}
+            className="text-sm"
+          />
         </div>
       </div>
 

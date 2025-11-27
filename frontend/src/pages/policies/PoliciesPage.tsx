@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { policyApi } from '@/services/api';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { RegoEditor, RegoViewer } from '@/components/RegoEditor';
 
 export default function PoliciesPage() {
   const queryClient = useQueryClient();
@@ -9,6 +10,8 @@ export default function PoliciesPage() {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadContent, setUploadContent] = useState('');
   const [uploadName, setUploadName] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState('');
 
   const { data: policies, isLoading, error } = useQuery({
     queryKey: ['policies'],
@@ -48,6 +51,32 @@ export default function PoliciesPage() {
     },
   });
 
+  const updateMutation = useMutation({
+    mutationFn: ({ id, content }: { id: string; content: string }) =>
+      policyApi.update(id, content),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['policies'] });
+      queryClient.invalidateQueries({ queryKey: ['policy', selectedPolicyId] });
+      toast.success('Policy updated successfully');
+      setIsEditing(false);
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.detail || 'Failed to update policy');
+    },
+  });
+
+  // Sync editContent with selectedPolicy
+  useEffect(() => {
+    if (selectedPolicy?.content) {
+      setEditContent(selectedPolicy.content);
+    }
+  }, [selectedPolicy]);
+
+  // Reset edit mode when changing policies
+  useEffect(() => {
+    setIsEditing(false);
+  }, [selectedPolicyId]);
+
   const handleUpload = () => {
     if (!uploadName || !uploadContent) {
       toast.error('Please provide both name and policy content');
@@ -60,6 +89,16 @@ export default function PoliciesPage() {
     if (confirm('Are you sure you want to delete this policy?')) {
       deleteMutation.mutate(policyId);
     }
+  };
+
+  const handleSave = () => {
+    if (!selectedPolicyId) return;
+    updateMutation.mutate({ id: selectedPolicyId, content: editContent });
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditContent(selectedPolicy?.content || '');
   };
 
   return (
@@ -148,13 +187,42 @@ export default function PoliciesPage() {
                       </p>
                     )}
                   </div>
-                  <button
-                    onClick={() => handleDelete(selectedPolicyId)}
-                    disabled={deleteMutation.isPending}
-                    className="text-sm text-red-600 hover:text-red-700 dark:text-red-400 disabled:opacity-50"
-                  >
-                    {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
-                  </button>
+                  <div className="flex gap-2">
+                    {isEditing ? (
+                      <>
+                        <button
+                          onClick={handleCancelEdit}
+                          disabled={updateMutation.isPending}
+                          className="text-sm px-3 py-1 border rounded hover:bg-muted transition-colors disabled:opacity-50"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={handleSave}
+                          disabled={updateMutation.isPending}
+                          className="text-sm px-3 py-1 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors disabled:opacity-50"
+                        >
+                          {updateMutation.isPending ? 'Saving...' : 'Save'}
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => setIsEditing(true)}
+                          className="text-sm px-3 py-1 border rounded hover:bg-muted transition-colors"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(selectedPolicyId)}
+                          disabled={deleteMutation.isPending}
+                          className="text-sm px-3 py-1 text-red-600 hover:text-red-700 dark:text-red-400 disabled:opacity-50"
+                        >
+                          {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
 
                 {/* Policy Metadata */}
@@ -176,9 +244,18 @@ export default function PoliciesPage() {
 
                 {/* Policy Content with Syntax Highlighting */}
                 <div className="p-4">
-                  <pre className="bg-muted/50 p-4 rounded-lg overflow-x-auto text-sm font-mono">
-                    <code className="text-foreground">{selectedPolicy?.content || 'Loading...'}</code>
-                  </pre>
+                  {isEditing ? (
+                    <RegoEditor
+                      value={editContent}
+                      onChange={(value) => setEditContent(value)}
+                      height="600px"
+                    />
+                  ) : (
+                    <RegoViewer
+                      value={selectedPolicy?.content || ''}
+                      height="600px"
+                    />
+                  )}
                 </div>
 
                 {/* Policy Stats */}
@@ -230,11 +307,10 @@ export default function PoliciesPage() {
                 <label className="block text-sm font-medium mb-2">
                   Policy Content (Rego) <span className="text-red-500">*</span>
                 </label>
-                <textarea
+                <RegoEditor
                   value={uploadContent}
-                  onChange={(e) => setUploadContent(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary font-mono text-sm"
-                  rows={15}
+                  onChange={(value) => setUploadContent(value)}
+                  height="400px"
                   placeholder={`package sark.example
 
 default allow = false
