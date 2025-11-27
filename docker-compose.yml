@@ -1,24 +1,22 @@
-version: '3.9'
 
 # ============================================================================
 # SARK Docker Compose Configuration
 # ============================================================================
-# This file supports multiple deployment profiles for different use cases:
+# This file supports flexible deployment with three main profiles:
 #
 # Profiles:
-# - minimal  : Quick start with just PostgreSQL + Redis (5-minute setup)
-# - managed  : Full local stack with Kong Gateway (complete testing)
-# - full     : Same as managed (alias for compatibility)
-# - kong     : Only Kong services (use with external DB/Redis)
+# - minimal:  App only (connect to external services via .env)
+# - standard: App + PostgreSQL + Redis (good for development)
+# - full:     Complete stack with Kong, OPA, monitoring (staging/demo)
 #
-# Usage Examples:
-# - Quick Start:    docker compose --profile minimal up
-# - Full Local:     docker compose --profile managed up
-# - Production-like: docker compose --profile full up
-# - External mode:   Use .env file to configure external service endpoints
+# Usage:
+# - docker compose up -d                    # Minimal (app only)
+# - docker compose --profile standard up -d # Standard (app + DB + cache)
+# - docker compose --profile full up -d     # Full stack
 #
-# See docs/QUICK_START.md for 5-minute quickstart guide.
-# See docs/DEPLOYMENT.md for complete deployment instructions.
+# Note: 'managed' is an alias for 'standard' for backward compatibility
+#
+# See docs/deployment/INTEGRATION.md for detailed instructions.
 # ============================================================================
 
 services:
@@ -58,33 +56,16 @@ services:
       - KONG_MODE=${KONG_MODE:-managed}
       - KONG_ADMIN_URL=${KONG_ADMIN_URL:-http://kong:8001}
       - KONG_PROXY_URL=${KONG_PROXY_URL:-http://kong:8000}
-      # OPA configuration
-      - OPA_ENABLED=${OPA_ENABLED:-true}
-      - OPA_URL=${OPA_URL:-http://opa:8181}
-      - OPA_POLICY_PATH=${OPA_POLICY_PATH:-/v1/data/mcp/allow}
-      # LDAP configuration
-      - LDAP_ENABLED=${LDAP_ENABLED:-true}
-      - LDAP_SERVER=${LDAP_SERVER:-ldap://openldap:389}
-      - LDAP_BASE_DN=${LDAP_BASE_DN:-dc=sark,dc=local}
-      - LDAP_USER_DN=${LDAP_USER_DN:-ou=people,dc=sark,dc=local}
-      - LDAP_BIND_DN=${LDAP_BIND_DN:-cn=admin,dc=sark,dc=local}
-      - LDAP_BIND_PASSWORD=${LDAP_BIND_PASSWORD:-admin}
     stdin_open: true
     tty: true
     command: python -m pytest --cov
     networks:
       - sark-network
     depends_on:
-      opa:
-        condition: service_healthy
-        required: false
       database:
         condition: service_healthy
         required: false
       cache:
-        condition: service_healthy
-        required: false
-      openldap:
         condition: service_healthy
         required: false
       kong:
@@ -92,50 +73,57 @@ services:
         required: false
 
   # ============================================================================
-  # Open Policy Agent (OPA) - Policy Engine
+  # Frontend Service (Production)
   # ============================================================================
-  # Required for authorization decisions
+  # React + Vite frontend served by Nginx
+  # Included in 'standard' and 'full' profiles
   # ============================================================================
-  opa:
-    image: openpolicyagent/opa:0.60.0
-    container_name: sark-opa
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production
+      args:
+        - VITE_API_URL=${VITE_API_URL:-http://localhost:8000}
+        - VITE_APP_VERSION=${VITE_APP_VERSION:-dev}
+        - VITE_APP_NAME=${VITE_APP_NAME:-SARK}
+    container_name: sark-frontend
     profiles:
-      - minimal
-      - managed
-      - full
-    command:
-      - "run"
-      - "--server"
-      - "--log-level=info"
-      - "--log-format=json"
-      - "/policies"
-    volumes:
-      - ./opa/policies:/policies:ro
+      - standard  # Include in standard profile
+      - full      # Include in full stack
     ports:
-      - "8181:8181"
+      - "${FRONTEND_PORT:-3000}:80"
+      - "${FRONTEND_HTTPS_PORT:-3443}:443"
+    environment:
+      - NGINX_HOST=${NGINX_HOST:-localhost}
+      - NGINX_PORT=${NGINX_PORT:-80}
     networks:
       - sark-network
+    depends_on:
+      app:
+        condition: service_started
+        required: false
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8181/health"]
-      interval: 10s
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
       timeout: 5s
-      retries: 5
-      start_period: 5s
+      retries: 3
+      start_period: 10s
     restart: unless-stopped
 
   # ============================================================================
   # PostgreSQL Database (Managed Service)
   # ============================================================================
-  # Use profile 'managed' to deploy this service locally
+  # Included in 'standard' and 'full' profiles
   # For external PostgreSQL, configure via .env file
   # ============================================================================
   database:
     image: postgres:15-alpine
     container_name: sark-db
     profiles:
-      - minimal
-      - managed
-      - full
+      - standard  # Primary profile
+      - managed   # Alias for backward compatibility
+      - full      # Included in full stack
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-sark}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-sark}
@@ -159,16 +147,16 @@ services:
   # ============================================================================
   # Redis Cache (Managed Service)
   # ============================================================================
-  # Use profile 'managed' to deploy this service locally
+  # Included in 'standard' and 'full' profiles
   # For external Redis, configure via .env file
   # ============================================================================
   cache:
     image: redis:7-alpine
     container_name: sark-cache
     profiles:
-      - minimal
-      - managed
-      - full
+      - standard  # Primary profile
+      - managed   # Alias for backward compatibility
+      - full      # Included in full stack
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
     volumes:
       - redis-data:/data
@@ -185,61 +173,18 @@ services:
     restart: unless-stopped
 
   # ============================================================================
-  # OpenLDAP (Managed Service)
-  # ============================================================================
-  # Provides LDAP authentication for tutorials and development
-  # Pre-loaded with sample users for tutorial walkthroughs
-  # DO NOT use in production - for development/testing only
-  # ============================================================================
-  openldap:
-    image: osixia/openldap:1.5.0
-    container_name: sark-openldap
-    profiles:
-      - minimal
-      - managed
-      - full
-    environment:
-      - LDAP_ORGANISATION=SARK
-      - LDAP_DOMAIN=sark.local
-      - LDAP_ADMIN_PASSWORD=${LDAP_ADMIN_PASSWORD:-admin}
-      - LDAP_CONFIG_PASSWORD=${LDAP_CONFIG_PASSWORD:-config}
-      - LDAP_READONLY_USER=false
-      - LDAP_RFC2307BIS_SCHEMA=false
-      - LDAP_BACKEND=mdb
-      - LDAP_TLS=false
-      - LDAP_REPLICATION=false
-      - LDAP_REMOVE_CONFIG_AFTER_SETUP=true
-    volumes:
-      - ldap-data:/var/lib/ldap
-      - ldap-config:/etc/ldap/slapd.d
-      - ./ldap/bootstrap:/container/service/slapd/assets/config/bootstrap/ldif/custom:ro
-    ports:
-      - "${LDAP_PORT:-389}:389"
-      - "${LDAP_SSL_PORT:-636}:636"
-    networks:
-      - sark-network
-    healthcheck:
-      test: ["CMD", "ldapsearch", "-x", "-H", "ldap://localhost", "-b", "dc=sark,dc=local", "-D", "cn=admin,dc=sark,dc=local", "-w", "${LDAP_ADMIN_PASSWORD:-admin}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-    restart: unless-stopped
-
-  # ============================================================================
   # Kong API Gateway (Managed Service)
   # ============================================================================
   # Kong requires a database (PostgreSQL) to store configuration
-  # Use profile 'managed' or 'kong' to deploy this service locally
+  # Only included in 'full' profile (not needed for basic development)
   # For external Kong, configure via .env file
   # ============================================================================
   kong-database:
     image: postgres:15-alpine
     container_name: sark-kong-db
     profiles:
-      - managed
-      - kong
-      - full
+      - full  # Only in full stack
+      - kong  # Explicit Kong profile
     environment:
       - POSTGRES_USER=kong
       - POSTGRES_PASSWORD=${KONG_DB_PASSWORD:-kong}
@@ -260,9 +205,8 @@ services:
     image: kong:3.5-alpine
     container_name: sark-kong-migrations
     profiles:
-      - managed
-      - kong
-      - full
+      - full  # Only in full stack
+      - kong  # Explicit Kong profile
     environment:
       - KONG_DATABASE=postgres
       - KONG_PG_HOST=kong-database
@@ -281,9 +225,8 @@ services:
     image: kong:3.5-alpine
     container_name: sark-kong
     profiles:
-      - managed
-      - kong
-      - full
+      - full  # Only in full stack
+      - kong  # Explicit Kong profile
     environment:
       - KONG_DATABASE=postgres
       - KONG_PG_HOST=kong-database
@@ -330,7 +273,3 @@ volumes:
     name: sark-redis-data
   kong-data:
     name: sark-kong-data
-  ldap-data:
-    name: sark-ldap-data
-  ldap-config:
-    name: sark-ldap-config

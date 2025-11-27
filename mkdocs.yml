@@ -1,0 +1,173 @@
+site_name: SARK - Security Audit and Resource Kontroler
+site_description: Enterprise-Grade MCP Governance System
+site_author: James R. A. Henry
+site_url: https://sark.example.com
+
+repo_url: https://github.com/apathy-ca/sark
+repo_name: apathy-ca/sark
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    # Palette toggle for light mode
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.top
+    - navigation.indexes
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - toc.follow
+
+plugins:
+  - search:
+      lang: en
+  - awesome-pages
+  - mermaid2
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - admonition
+  - pymdownx.details
+  - tables
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - def_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+extra:
+  version:
+    provider: mike
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/apathy-ca/sark
+  analytics:
+    provider: google
+    property: !ENV GOOGLE_ANALYTICS_KEY
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Quick Start: QUICK_START.md
+    - Quick Reference: QUICK_REFERENCE_SESSIONS.md
+    - Installation: installation.md
+  - Architecture:
+    - Overview: ARCHITECTURE.md
+    - Security: SECURITY.md
+    - Performance: PERFORMANCE.md
+  - Deployment:
+    - Deployment Guide: DEPLOYMENT.md
+    - Docker Deployment: DOCKER_DEPLOYMENT.md
+    - Production Deployment: PRODUCTION_DEPLOYMENT.md
+    - Production Config: PRODUCTION_CONFIG.md
+    - Production Readiness: PRODUCTION_READINESS.md
+    - Deployment Checklist: DEPLOYMENT_CHECKLIST.md
+    - Disaster Recovery: DISASTER_RECOVERY.md
+    - Rollback Procedures: ROLLBACK_PROCEDURES.md
+  - Authentication & Authorization:
+    - Authentication: AUTHENTICATION.md
+    - Authorization: AUTHORIZATION.md
+    - OIDC Setup: OIDC_SETUP.md
+    - LDAP Setup: LDAP_SETUP.md
+    - SAML Setup: SAML_SETUP.md
+    - API Keys: API_KEYS.md
+  - Policies:
+    - OPA Policy Guide: OPA_POLICY_GUIDE.md
+    - Advanced OPA Policies: ADVANCED_OPA_POLICIES.md
+    - Policy Optimization: POLICY_OPTIMIZATION.md
+    - Policy Caching: POLICY_CACHING.md
+    - Policy Audit Guide: POLICY_AUDIT_GUIDE.md
+    - Policy Audit Trail: POLICY_AUDIT_TRAIL.md
+  - Operations:
+    - Monitoring: MONITORING.md
+    - Monitoring Setup: MONITORING_SETUP.md
+    - Operational Runbook: OPERATIONAL_RUNBOOK.md
+    - Operations Runbook: OPERATIONS_RUNBOOK.md
+    - Incident Response: INCIDENT_RESPONSE.md
+    - Troubleshooting: TROUBLESHOOTING.md
+  - Database:
+    - Database Migrations: DATABASE_MIGRATIONS.md
+    - Database Optimization: DATABASE_OPTIMIZATION.md
+    - Redis Optimization: REDIS_OPTIMIZATION.md
+  - Performance:
+    - Performance Testing: PERFORMANCE_TESTING.md
+    - Performance Tuning: PERFORMANCE_TUNING.md
+    - Performance Optimization: PERFORMANCE_OPTIMIZATION.md
+    - Performance Report: PERFORMANCE_REPORT.md
+    - Policy Performance: POLICY_PERFORMANCE_REPORT.md
+  - API Reference:
+    - API Reference: API_REFERENCE.md
+    - API Integration: API_INTEGRATION.md
+  - Development:
+    - Development Guide: DEVELOPMENT.md
+    - Migration Guide: MIGRATION_GUIDE.md
+    - Development Log: DEVELOPMENT_LOG.md
+    - Testing Strategy: TESTING_STRATEGY.md
+    - Integration Testing: INTEGRATION_TESTING.md
+  - Reports:
+    - Executive Summary: EXECUTIVE_SUMMARY.md
+    - Roadmap: ROADMAP.md
+    - Implementation Plan: IMPLEMENTATION_PLAN.md
+    - Gap Analysis: GAP_ANALYSIS.md
+    - Phase 2 Completion: PHASE2_COMPLETION_REPORT.md
+    - Release Notes v0.2.0: RELEASE_NOTES_v0.2.0.md
+    - Final Test Report: FINAL_TEST_REPORT.md
+    - Test Coverage Report: TEST_COVERAGE_REPORT.md
+    - Known Issues: KNOWN_ISSUES.md
+    - Lessons Learned: LESSONS_LEARNED.md
+  - Planning:
+    - Repository Improvement Plan: REPOSITORY_IMPROVEMENT_PLAN.md
+    - Work Breakdown Sessions: WORK_BREAKDOWN_SESSIONS.md
+    - Work Tasks: WORK_TASKS.md
+    - Phase 2 3-Week Plan: PHASE2_3WEEK_PLAN.md
+    - Week 2 Summary: WEEK_2_SUMMARY.md
+    - Week 3 Summary: WEEK_3_SUMMARY.md
+  - Reference:
+    - Glossary: GLOSSARY.md
+    - FAQ: FAQ.md
+    - Security Best Practices: SECURITY_BEST_PRACTICES.md
+    - Security Hardening: SECURITY_HARDENING.md
+    - Security Audit: SECURITY_AUDIT.md
+    - Production Handoff: PRODUCTION_HANDOFF.md
+
+copyright: Copyright &copy; 2024 James R. A. Henry. All rights reserved.

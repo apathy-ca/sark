@@ -1,0 +1,181 @@
+# ============================================================================
+# SARK Development Docker Compose
+# ============================================================================
+# This compose file is specifically for frontend development with:
+# - Hot module replacement (HMR)
+# - Volume-mounted source code
+# - Vite dev server
+# - Backend API connectivity
+#
+# Usage:
+#   docker compose -f docker-compose.dev.yml up
+#
+# Access:
+#   Frontend: http://localhost:5173
+#   API:      http://localhost:8000
+# ============================================================================
+
+
+services:
+  # ==========================================================================
+  # Frontend Development Service
+  # ==========================================================================
+  frontend-dev:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: sark-frontend-dev
+    ports:
+      - "5173:5173"  # Vite dev server
+    volumes:
+      # Mount source code for hot-reload
+      - ./frontend/src:/app/src:ro
+      - ./frontend/public:/app/public:ro
+      - ./frontend/index.html:/app/index.html:ro
+      - ./frontend/vite.config.ts:/app/vite.config.ts:ro
+      - ./frontend/tsconfig.json:/app/tsconfig.json:ro
+      - ./frontend/tsconfig.app.json:/app/tsconfig.app.json:ro
+      - ./frontend/tsconfig.node.json:/app/tsconfig.node.json:ro
+      - ./frontend/tailwind.config.js:/app/tailwind.config.js:ro
+      - ./frontend/postcss.config.js:/app/postcss.config.js:ro
+      # Prevent node_modules from being overwritten
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:8000
+      - CHOKIDAR_USEPOLLING=true
+    networks:
+      - sark-network
+    depends_on:
+      - app
+    restart: unless-stopped
+
+  # ==========================================================================
+  # Backend API Service (from main docker-compose)
+  # ==========================================================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: sark-api-dev
+    volumes:
+      - .:/app
+      - pip-cache:/root/.cache/pip
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/app/src
+      - ENVIRONMENT=development
+      - LOG_LEVEL=DEBUG
+      # Database configuration
+      - POSTGRES_ENABLED=true
+      - POSTGRES_MODE=managed
+      - POSTGRES_HOST=database
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=sark
+      - POSTGRES_USER=sark
+      - POSTGRES_PASSWORD=sark
+      # Redis configuration
+      - REDIS_ENABLED=true
+      - REDIS_MODE=managed
+      - REDIS_HOST=cache
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=
+      # CORS for dev frontend
+      - ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+    ports:
+      - "8000:8000"
+    networks:
+      - sark-network
+    depends_on:
+      database:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+    command: uvicorn sark.api.main:app --reload --host 0.0.0.0 --port 8000
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
+  # ==========================================================================
+  # PostgreSQL Database
+  # ==========================================================================
+  database:
+    image: postgres:15-alpine
+    container_name: sark-db-dev
+    environment:
+      - POSTGRES_USER=sark
+      - POSTGRES_PASSWORD=sark
+      - POSTGRES_DB=sark
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8
+    volumes:
+      - postgres-dev-data:/var/lib/postgresql/data
+      - ./scripts/db/init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - sark-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sark"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  # ==========================================================================
+  # Redis Cache
+  # ==========================================================================
+  cache:
+    image: redis:7-alpine
+    container_name: sark-cache-dev
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-dev-data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - sark-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
+
+  # ==========================================================================
+  # OPA (Optional - for policy testing)
+  # ==========================================================================
+  opa-dev:
+    image: openpolicyagent/opa:latest
+    container_name: sark-opa-dev
+    profiles:
+      - with-opa
+    command:
+      - "run"
+      - "--server"
+      - "--addr=0.0.0.0:8181"
+      - "--log-level=debug"
+      - "/policies"
+    volumes:
+      - ./opa/policies:/policies:ro
+    ports:
+      - "8181:8181"
+    networks:
+      - sark-network
+    restart: unless-stopped
+
+networks:
+  sark-network:
+    driver: bridge
+    name: sark-dev-network
+
+volumes:
+  pip-cache:
+    name: sark-dev-pip-cache
+  postgres-dev-data:
+    name: sark-dev-postgres-data
+  redis-dev-data:
+    name: sark-dev-redis-data
