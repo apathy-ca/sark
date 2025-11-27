@@ -66,8 +66,14 @@ run: ## Run SARK API server locally
 docker-build: ## Build Docker images
 	docker compose build
 
-docker-up: ## Start Docker services
+docker-up: ## Start Docker services (minimal profile - app only)
 	docker compose up -d
+
+docker-up-standard: ## Start Docker services (standard profile - app + PostgreSQL + Redis)
+	docker compose --profile standard up -d
+
+docker-up-full: ## Start Docker services (full profile - complete stack)
+	docker compose --profile full up -d
 
 docker-down: ## Stop Docker services
 	docker compose down
@@ -149,3 +155,20 @@ setup-dev: install-dev ## Complete development setup
 	@echo "Run 'make test' to verify everything works"
 
 dev: docker-up run ## Start dependencies and run API locally
+
+# Documentation commands
+docs-build: ## Build documentation site
+	mkdocs build --strict
+
+docs-serve: ## Serve documentation locally
+	mkdocs serve
+
+docs-deploy: ## Deploy documentation to GitHub Pages
+	mkdocs gh-deploy --force
+
+docs-clean: ## Clean documentation build artifacts
+	rm -rf site/
+
+docs-check: ## Check documentation for broken links
+	mkdocs build --strict
+	@echo "Documentation build successful - no broken links found"

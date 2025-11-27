@@ -3,14 +3,19 @@ version: '3.9'
 # ============================================================================
 # SARK Docker Compose Configuration
 # ============================================================================
-# This file supports both:
-# - Managed services (deployed via Docker Compose)
-# - External services (existing enterprise deployments)
+# This file supports flexible deployment with three main profiles:
+#
+# Profiles:
+# - minimal:  App only (connect to external services via .env)
+# - standard: App + PostgreSQL + Redis (good for development)
+# - full:     Complete stack with Kong, OPA, monitoring (staging/demo)
 #
 # Usage:
-# - Managed mode: docker-compose --profile managed up
-# - External mode: Use .env file to configure external service endpoints
-# - Mixed mode: Enable only specific managed services
+# - docker compose up -d                    # Minimal (app only)
+# - docker compose --profile standard up -d # Standard (app + DB + cache)
+# - docker compose --profile full up -d     # Full stack
+#
+# Note: 'managed' is an alias for 'standard' for backward compatibility
 #
 # See docs/deployment/INTEGRATION.md for detailed instructions.
 # ============================================================================
@@ -71,15 +76,16 @@ services:
   # ============================================================================
   # PostgreSQL Database (Managed Service)
   # ============================================================================
-  # Use profile 'managed' to deploy this service locally
+  # Included in 'standard' and 'full' profiles
   # For external PostgreSQL, configure via .env file
   # ============================================================================
   database:
     image: postgres:15-alpine
     container_name: sark-db
     profiles:
-      - managed
-      - full
+      - standard  # Primary profile
+      - managed   # Alias for backward compatibility
+      - full      # Included in full stack
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-sark}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-sark}
@@ -103,15 +109,16 @@ services:
   # ============================================================================
   # Redis Cache (Managed Service)
   # ============================================================================
-  # Use profile 'managed' to deploy this service locally
+  # Included in 'standard' and 'full' profiles
   # For external Redis, configure via .env file
   # ============================================================================
   cache:
     image: redis:7-alpine
     container_name: sark-cache
     profiles:
-      - managed
-      - full
+      - standard  # Primary profile
+      - managed   # Alias for backward compatibility
+      - full      # Included in full stack
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
     volumes:
       - redis-data:/data
@@ -131,16 +138,15 @@ services:
   # Kong API Gateway (Managed Service)
   # ============================================================================
   # Kong requires a database (PostgreSQL) to store configuration
-  # Use profile 'managed' or 'kong' to deploy this service locally
+  # Only included in 'full' profile (not needed for basic development)
   # For external Kong, configure via .env file
   # ============================================================================
   kong-database:
     image: postgres:15-alpine
     container_name: sark-kong-db
     profiles:
-      - managed
-      - kong
-      - full
+      - full  # Only in full stack
+      - kong  # Explicit Kong profile
     environment:
       - POSTGRES_USER=kong
       - POSTGRES_PASSWORD=${KONG_DB_PASSWORD:-kong}
@@ -161,9 +167,8 @@ services:
     image: kong:3.5-alpine
     container_name: sark-kong-migrations
     profiles:
-      - managed
-      - kong
-      - full
+      - full  # Only in full stack
+      - kong  # Explicit Kong profile
     environment:
       - KONG_DATABASE=postgres
       - KONG_PG_HOST=kong-database
@@ -182,9 +187,8 @@ services:
     image: kong:3.5-alpine
     container_name: sark-kong
     profiles:
-      - managed
-      - kong
-      - full
+      - full  # Only in full stack
+      - kong  # Explicit Kong profile
     environment:
       - KONG_DATABASE=postgres
       - KONG_PG_HOST=kong-database
