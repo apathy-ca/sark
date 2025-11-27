@@ -1,0 +1,513 @@
+{
+  "use_case": "Document Search and Retrieval",
+  "description": "MCP server providing intelligent document search across multiple repositories (Confluence, SharePoint, Google Docs, internal wikis). Enables AI assistants to find relevant documentation, policies, and knowledge base articles.",
+  "scenario": "Employees spend hours searching for documentation across multiple systems. AI assistants can use this MCP server to quickly find relevant documents, extract key information, and provide answers based on company knowledge.",
+
+  "mcp_server": {
+    "name": "document-search-mcp",
+    "description": "Unified document search across Confluence, SharePoint, Google Docs, and internal wikis with semantic search capabilities",
+    "transport": "http",
+    "endpoint": "https://docs-search-mcp.internal.company.com:8443",
+    "mcp_version": "2025-06-18",
+    "capabilities": ["tools", "resources"],
+    "sensitivity_level": "medium",
+    "health_endpoint": "https://docs-search-mcp.internal.company.com:8443/health",
+    "owner_email": "knowledge-mgmt@company.com",
+    "team": "knowledge-management",
+    "tags": ["documentation", "search", "confluence", "sharepoint", "knowledge-base"],
+    "extra_metadata": {
+      "search_engine": "elasticsearch",
+      "embedding_model": "all-MiniLM-L6-v2",
+      "semantic_search": true,
+      "supported_sources": ["confluence", "sharepoint", "google_docs", "internal_wiki", "notion"],
+      "indexed_documents": 45000,
+      "department": "Knowledge Management"
+    }
+  },
+
+  "tools": [
+    {
+      "name": "search_documents",
+      "description": "Search for documents across all configured document repositories. Supports both keyword and semantic search. Returns ranked results with relevance scores and snippets.",
+      "sensitivity_level": "medium",
+      "requires_approval": false,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search query (keywords or natural language question)",
+            "examples": [
+              "employee onboarding checklist",
+              "How do I request PTO?",
+              "security incident response procedures",
+              "API authentication best practices"
+            ]
+          },
+          "sources": {
+            "type": "array",
+            "description": "Limit search to specific document sources",
+            "items": {
+              "type": "string",
+              "enum": ["confluence", "sharepoint", "google_docs", "wiki", "notion", "all"]
+            },
+            "default": ["all"]
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Maximum number of results to return",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 10
+          },
+          "date_range": {
+            "type": "object",
+            "description": "Filter by document creation/modification date",
+            "properties": {
+              "start": {
+                "type": "string",
+                "format": "date",
+                "description": "Start date (ISO 8601)",
+                "examples": ["2024-01-01"]
+              },
+              "end": {
+                "type": "string",
+                "format": "date",
+                "description": "End date (ISO 8601)"
+              }
+            }
+          },
+          "filters": {
+            "type": "object",
+            "description": "Additional filters",
+            "properties": {
+              "author": {
+                "type": "string",
+                "description": "Filter by document author"
+              },
+              "tags": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "Filter by tags/labels"
+              },
+              "department": {
+                "type": "string",
+                "description": "Filter by department",
+                "enum": ["engineering", "hr", "finance", "legal", "operations", "sales", "marketing"]
+              },
+              "confidentiality": {
+                "type": "string",
+                "enum": ["public", "internal", "confidential", "restricted"],
+                "description": "Filter by confidentiality level"
+              }
+            }
+          },
+          "search_type": {
+            "type": "string",
+            "description": "Type of search to perform",
+            "enum": ["keyword", "semantic", "hybrid"],
+            "default": "hybrid"
+          },
+          "include_snippets": {
+            "type": "boolean",
+            "description": "Include text snippets with highlighted matches",
+            "default": true
+          }
+        },
+        "required": ["query"]
+      },
+      "examples": [
+        {
+          "name": "Find onboarding checklist",
+          "arguments": {
+            "query": "employee onboarding checklist for engineers",
+            "sources": ["confluence", "sharepoint"],
+            "max_results": 5,
+            "filters": {
+              "department": "hr",
+              "tags": ["onboarding", "engineering"]
+            },
+            "search_type": "hybrid"
+          },
+          "expected_result": {
+            "total_results": 23,
+            "results": [
+              {
+                "id": "conf-12345",
+                "title": "Engineering Onboarding Checklist (2025)",
+                "source": "confluence",
+                "url": "https://company.atlassian.net/wiki/spaces/HR/pages/12345",
+                "relevance_score": 0.95,
+                "snippet": "Complete the following steps during your first week: 1. Set up development environment 2. Complete security training 3. Review architecture docs...",
+                "author": "hr@company.com",
+                "last_modified": "2025-01-15T10:30:00Z",
+                "tags": ["onboarding", "engineering", "checklist"],
+                "department": "hr",
+                "confidentiality": "internal",
+                "access_control": {
+                  "allowed_groups": ["employees", "contractors"],
+                  "required_roles": []
+                }
+              },
+              {
+                "id": "sp-67890",
+                "title": "New Hire Welcome - Engineering",
+                "source": "sharepoint",
+                "url": "https://company.sharepoint.com/sites/HR/Documents/new-hire-engineering.pdf",
+                "relevance_score": 0.87,
+                "snippet": "Welcome to the Engineering team! This guide covers everything you need to know...",
+                "author": "engineering@company.com",
+                "last_modified": "2025-02-01T14:20:00Z",
+                "tags": ["onboarding", "engineering"],
+                "file_type": "pdf"
+              }
+            ],
+            "search_time_ms": 45,
+            "search_method": "hybrid (70% semantic, 30% keyword)"
+          }
+        },
+        {
+          "name": "Find security policies",
+          "arguments": {
+            "query": "What is our password policy?",
+            "sources": ["confluence"],
+            "filters": {
+              "department": "legal",
+              "confidentiality": "internal"
+            },
+            "search_type": "semantic",
+            "max_results": 3
+          },
+          "expected_result": {
+            "total_results": 8,
+            "results": [
+              {
+                "id": "conf-policy-001",
+                "title": "Information Security Policy - Password Requirements",
+                "relevance_score": 0.98,
+                "snippet": "All passwords must meet the following criteria: minimum 12 characters, at least one uppercase, one lowercase, one number, one special character. Passwords expire every 90 days...",
+                "url": "https://company.atlassian.net/wiki/spaces/SEC/pages/policy-001"
+              }
+            ]
+          }
+        }
+      ],
+      "search_algorithm": {
+        "description": "Hybrid search combining keyword and semantic search",
+        "steps": [
+          "1. Parse query and extract keywords",
+          "2. Generate query embedding using sentence-transformers",
+          "3. Perform ElasticSearch keyword search (BM25)",
+          "4. Perform vector similarity search on document embeddings",
+          "5. Combine scores using reciprocal rank fusion (RRF)",
+          "6. Apply filters (date, department, confidentiality)",
+          "7. Check user permissions for each result",
+          "8. Return ranked results with snippets"
+        ],
+        "ranking_weights": {
+          "keyword_match": 0.3,
+          "semantic_similarity": 0.7,
+          "recency": 0.1,
+          "popularity": 0.05
+        }
+      }
+    },
+    {
+      "name": "get_document",
+      "description": "Retrieve full content of a specific document by ID. Respects access controls and returns formatted text.",
+      "sensitivity_level": "medium",
+      "requires_approval": false,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "document_id": {
+            "type": "string",
+            "description": "Unique document identifier from search results"
+          },
+          "format": {
+            "type": "string",
+            "enum": ["text", "markdown", "html", "json"],
+            "default": "markdown",
+            "description": "Output format for document content"
+          },
+          "include_metadata": {
+            "type": "boolean",
+            "default": true,
+            "description": "Include document metadata (author, dates, tags)"
+          }
+        },
+        "required": ["document_id"]
+      },
+      "examples": [
+        {
+          "name": "Get onboarding checklist",
+          "arguments": {
+            "document_id": "conf-12345",
+            "format": "markdown",
+            "include_metadata": true
+          },
+          "expected_result": {
+            "document_id": "conf-12345",
+            "title": "Engineering Onboarding Checklist (2025)",
+            "source": "confluence",
+            "url": "https://company.atlassian.net/wiki/spaces/HR/pages/12345",
+            "metadata": {
+              "author": "hr@company.com",
+              "created": "2024-12-01T10:00:00Z",
+              "last_modified": "2025-01-15T10:30:00Z",
+              "version": 5,
+              "tags": ["onboarding", "engineering"],
+              "department": "hr"
+            },
+            "content": "# Engineering Onboarding Checklist\\n\\n## Week 1\\n\\n### Day 1\\n- [ ] Pick up laptop from IT\\n- [ ] Set up email and Slack\\n- [ ] Complete security training\\n\\n### Day 2\\n- [ ] Meet with your manager\\n- [ ] Review team architecture docs\\n...",
+            "content_length": 4532,
+            "content_type": "markdown"
+          }
+        }
+      ]
+    },
+    {
+      "name": "summarize_document",
+      "description": "Generate AI summary of a document. Useful for long documents - provides key points and TL;DR.",
+      "sensitivity_level": "medium",
+      "requires_approval": false,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "document_id": {
+            "type": "string",
+            "description": "Document ID to summarize"
+          },
+          "summary_length": {
+            "type": "string",
+            "enum": ["brief", "medium", "detailed"],
+            "default": "medium",
+            "description": "Length of summary to generate"
+          },
+          "focus": {
+            "type": "string",
+            "description": "Optional focus area for summary (e.g., 'action items', 'key decisions')"
+          }
+        },
+        "required": ["document_id"]
+      },
+      "examples": [
+        {
+          "name": "Summarize security policy",
+          "arguments": {
+            "document_id": "conf-policy-001",
+            "summary_length": "brief"
+          },
+          "expected_result": {
+            "document_id": "conf-policy-001",
+            "title": "Information Security Policy",
+            "summary": "**TL;DR:** Passwords must be 12+ characters with complexity requirements. MFA required for all accounts. Data classification: Public, Internal, Confidential, Restricted. All security incidents must be reported within 1 hour.",
+            "key_points": [
+              "Password requirements: 12+ chars, upper/lower/number/special, 90-day expiry",
+              "Multi-factor authentication (MFA) required for all accounts",
+              "Data classified into 4 levels: Public, Internal, Confidential, Restricted",
+              "Security incidents must be reported within 1 hour of discovery",
+              "Annual security training required for all employees"
+            ],
+            "action_items": [
+              "Enable MFA on your account if not already done",
+              "Review and classify data you have access to",
+              "Complete annual security training by Dec 31"
+            ],
+            "summary_generated_by": "GPT-4",
+            "confidence_score": 0.93
+          }
+        }
+      ]
+    },
+    {
+      "name": "find_similar_documents",
+      "description": "Find documents similar to a given document. Useful for discovering related content.",
+      "sensitivity_level": "low",
+      "requires_approval": false,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "document_id": {
+            "type": "string",
+            "description": "Reference document ID"
+          },
+          "max_results": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50,
+            "default": 10
+          }
+        },
+        "required": ["document_id"]
+      }
+    },
+    {
+      "name": "ask_question",
+      "description": "Ask a question and get an answer extracted from relevant documents. Uses RAG (Retrieval-Augmented Generation) to provide accurate, source-cited answers.",
+      "sensitivity_level": "medium",
+      "requires_approval": false,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string",
+            "description": "Question to answer",
+            "examples": [
+              "How do I request PTO?",
+              "What is our remote work policy?",
+              "How do I deploy to production?"
+            ]
+          },
+          "sources": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Limit answer to specific document sources",
+            "default": ["all"]
+          },
+          "include_citations": {
+            "type": "boolean",
+            "default": true,
+            "description": "Include source document citations in answer"
+          }
+        },
+        "required": ["question"]
+      },
+      "examples": [
+        {
+          "name": "Ask about PTO policy",
+          "arguments": {
+            "question": "How do I request PTO?",
+            "sources": ["confluence"],
+            "include_citations": true
+          },
+          "expected_result": {
+            "question": "How do I request PTO?",
+            "answer": "To request PTO (Paid Time Off), follow these steps:\\n\\n1. Log into BambooHR (https://company.bamboohr.com)\\n2. Navigate to Time Off > Request Time Off\\n3. Select the dates you want off\\n4. Choose the PTO category (Vacation, Sick, Personal)\\n5. Add a note if needed\\n6. Submit for manager approval\\n\\nYour manager will review and approve/deny within 2 business days. You'll receive an email notification once decided. For last-minute sick days, you can also notify your manager via Slack or email.\\n\\n**Important:** Request vacation time at least 2 weeks in advance when possible.",
+            "confidence_score": 0.95,
+            "sources_used": [
+              {
+                "document_id": "conf-hr-001",
+                "title": "PTO Policy and Procedures",
+                "url": "https://company.atlassian.net/wiki/spaces/HR/pages/hr-001",
+                "relevance": "primary source"
+              },
+              {
+                "document_id": "bamboohr-guide",
+                "title": "BambooHR User Guide",
+                "url": "https://company.atlassian.net/wiki/spaces/HR/pages/bamboohr",
+                "relevance": "supporting detail"
+              }
+            ],
+            "retrieval_time_ms": 120,
+            "generation_model": "GPT-4-Turbo"
+          }
+        }
+      ],
+      "rag_pipeline": {
+        "description": "Retrieval-Augmented Generation pipeline",
+        "steps": [
+          "1. Query understanding: Extract intent and key entities",
+          "2. Document retrieval: Search for relevant documents (hybrid search)",
+          "3. Relevance filtering: Keep only high-relevance documents (score > 0.7)",
+          "4. Context assembly: Combine top 3-5 documents into context",
+          "5. Answer generation: Use LLM to generate answer from context",
+          "6. Citation addition: Add source references to answer",
+          "7. Fact verification: Cross-check answer against sources"
+        ]
+      }
+    }
+  ],
+
+  "resources": [
+    {
+      "uri": "docs://categories",
+      "name": "Document Categories",
+      "description": "List of all document categories/spaces",
+      "mimeType": "application/json"
+    },
+    {
+      "uri": "docs://trending",
+      "name": "Trending Documents",
+      "description": "Most viewed/searched documents this week",
+      "mimeType": "application/json"
+    }
+  ],
+
+  "data_sources": {
+    "confluence": {
+      "url": "https://company.atlassian.net",
+      "spaces_indexed": 45,
+      "documents_indexed": 12500,
+      "update_frequency": "every 5 minutes",
+      "indexing_method": "API + webhooks"
+    },
+    "sharepoint": {
+      "url": "https://company.sharepoint.com",
+      "sites_indexed": 23,
+      "documents_indexed": 18000,
+      "update_frequency": "every 15 minutes",
+      "indexing_method": "Microsoft Graph API"
+    },
+    "google_docs": {
+      "organization": "company.com",
+      "drives_indexed": 15,
+      "documents_indexed": 8500,
+      "update_frequency": "every 10 minutes",
+      "indexing_method": "Google Drive API + webhooks"
+    },
+    "internal_wiki": {
+      "documents_indexed": 6000,
+      "update_frequency": "real-time",
+      "indexing_method": "database CDC (change data capture)"
+    }
+  },
+
+  "access_control": {
+    "description": "Document access is controlled by source system permissions",
+    "enforcement": [
+      "User's SARK JWT contains groups and roles",
+      "MCP server queries source system (Confluence/SharePoint) for user's document permissions",
+      "Only documents user has access to are returned in search results",
+      "Unauthorized access attempts are logged and audited"
+    ],
+    "caching": "Document permissions cached for 5 minutes to reduce API calls"
+  },
+
+  "opa_policy_example": {
+    "policy": "package mcp.document_search\n\ndefault allow := false\n\n# All employees can search documents\nallow if {\n    \"employee\" in input.user.roles\n    input.tool.name in [\"search_documents\", \"ask_question\"]\n}\n\n# Check document-level permissions\nallow if {\n    input.tool.name == \"get_document\"\n    document := data.documents[input.arguments.document_id]\n    user_has_access(input.user, document)\n}\n\nuser_has_access(user, document) if {\n    some group in user.groups\n    group in document.access_control.allowed_groups\n}\n\n# Confidential documents require specific role\ndeny if {\n    input.tool.name == \"get_document\"\n    document := data.documents[input.arguments.document_id]\n    document.confidentiality == \"confidential\"\n    not \"confidential_access\" in input.user.roles\n}"
+  },
+
+  "performance_metrics": {
+    "avg_search_latency": "45ms",
+    "avg_retrieval_latency": "120ms",
+    "cache_hit_rate": "78%",
+    "searches_per_day": 8500,
+    "most_searched_topics": [
+      "onboarding procedures",
+      "PTO policy",
+      "expense reporting",
+      "deployment procedures",
+      "security policies"
+    ]
+  },
+
+  "benefits": [
+    "Unified search across all document systems (single interface)",
+    "Semantic search understands natural language questions",
+    "AI-powered answers with source citations (RAG)",
+    "Automatic permission enforcement from source systems",
+    "Document summaries for long content",
+    "Related document discovery",
+    "Real-time indexing (documents searchable within minutes)",
+    "Reduces time spent searching from hours to seconds"
+  ],
+
+  "use_case_scenarios": [
+    "New employee asking 'How do I request PTO?' - gets instant answer with citations",
+    "Engineer asking 'How do I deploy to production?' - finds deployment runbooks",
+    "Manager looking for 'Q4 2024 revenue report' - finds exact document in SharePoint",
+    "Security team searching for 'incident response procedures' - finds SOPs",
+    "AI assistant answering employee questions based on company knowledge base"
+  ]
+}

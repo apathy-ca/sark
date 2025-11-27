@@ -1,0 +1,288 @@
+{
+  "use_case": "Database Query Tool",
+  "description": "MCP server providing secure database query capabilities for AI assistants. Enables data analysts and AI agents to query production databases with policy-based access control and audit logging.",
+  "scenario": "Data analysts need to query production databases for reporting and analysis, but direct database access is risky. This MCP server provides a governed interface with query validation, result limiting, and comprehensive auditing.",
+
+  "mcp_server": {
+    "name": "database-query-mcp",
+    "description": "Secure database query interface for PostgreSQL, MySQL, and Snowflake",
+    "transport": "http",
+    "endpoint": "https://db-query-mcp.internal.company.com:8443",
+    "mcp_version": "2025-06-18",
+    "capabilities": ["tools"],
+    "sensitivity_level": "high",
+    "health_endpoint": "https://db-query-mcp.internal.company.com:8443/health",
+    "owner_email": "data-team@company.com",
+    "team": "data-engineering",
+    "tags": ["database", "analytics", "postgres", "mysql", "snowflake"],
+    "extra_metadata": {
+      "supported_databases": ["postgres", "mysql", "snowflake"],
+      "max_result_rows": 10000,
+      "query_timeout_seconds": 30,
+      "department": "Data Engineering",
+      "compliance": ["SOC2", "GDPR", "HIPAA"]
+    }
+  },
+
+  "tools": [
+    {
+      "name": "query_postgres",
+      "description": "Execute a read-only SELECT query against PostgreSQL database. Results are limited to 1000 rows by default. Only SELECT statements allowed - no DDL or DML.",
+      "sensitivity_level": "high",
+      "requires_approval": false,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "SQL SELECT query to execute. Must be read-only.",
+            "examples": [
+              "SELECT * FROM users WHERE status = 'active' LIMIT 100",
+              "SELECT COUNT(*) FROM orders WHERE created_at > NOW() - INTERVAL '7 days'"
+            ]
+          },
+          "database": {
+            "type": "string",
+            "description": "Database name to query",
+            "enum": ["analytics", "reporting", "staging"],
+            "default": "analytics"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of rows to return (1-10000)",
+            "minimum": 1,
+            "maximum": 10000,
+            "default": 1000
+          },
+          "format": {
+            "type": "string",
+            "description": "Output format for results",
+            "enum": ["json", "csv", "table"],
+            "default": "json"
+          }
+        },
+        "required": ["query"]
+      },
+      "examples": [
+        {
+          "name": "Query active users",
+          "arguments": {
+            "query": "SELECT id, email, created_at FROM users WHERE status = 'active' ORDER BY created_at DESC",
+            "database": "analytics",
+            "limit": 100,
+            "format": "json"
+          },
+          "expected_result": {
+            "rows_returned": 100,
+            "columns": ["id", "email", "created_at"],
+            "execution_time_ms": 45,
+            "data": [
+              {"id": 1, "email": "user1@example.com", "created_at": "2025-01-15T10:30:00Z"},
+              {"id": 2, "email": "user2@example.com", "created_at": "2025-01-14T09:15:00Z"}
+            ]
+          }
+        },
+        {
+          "name": "Count recent orders",
+          "arguments": {
+            "query": "SELECT COUNT(*) as order_count FROM orders WHERE created_at > NOW() - INTERVAL '7 days'",
+            "database": "analytics",
+            "format": "table"
+          },
+          "expected_result": {
+            "rows_returned": 1,
+            "columns": ["order_count"],
+            "data": [
+              {"order_count": 1523}
+            ]
+          }
+        }
+      ],
+      "security_notes": [
+        "Queries are validated to ensure only SELECT statements",
+        "PII columns (SSN, credit cards) are automatically redacted",
+        "Query execution time limited to 30 seconds",
+        "Results cached for 5 minutes to reduce database load",
+        "All queries logged with user attribution to TimescaleDB"
+      ],
+      "error_handling": {
+        "syntax_error": "Returns detailed SQL syntax error message",
+        "timeout": "Returns error after 30 seconds with partial results if available",
+        "permission_denied": "Returns 403 with specific table/column that was denied",
+        "connection_error": "Retries 3 times with exponential backoff"
+      }
+    },
+    {
+      "name": "explain_query",
+      "description": "Get the query execution plan for a SQL query without actually executing it. Useful for optimizing slow queries.",
+      "sensitivity_level": "medium",
+      "requires_approval": false,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "SQL query to explain"
+          },
+          "database": {
+            "type": "string",
+            "enum": ["analytics", "reporting", "staging"],
+            "default": "analytics"
+          },
+          "analyze": {
+            "type": "boolean",
+            "description": "Run EXPLAIN ANALYZE (actually executes query to get real metrics)",
+            "default": false
+          }
+        },
+        "required": ["query"]
+      }
+    },
+    {
+      "name": "query_snowflake",
+      "description": "Execute query against Snowflake data warehouse. Designed for large analytical queries. Higher cost per query.",
+      "sensitivity_level": "high",
+      "requires_approval": true,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "SQL query to execute in Snowflake"
+          },
+          "warehouse": {
+            "type": "string",
+            "description": "Snowflake warehouse to use",
+            "enum": ["COMPUTE_WH", "ANALYTICS_WH", "REPORTING_WH"],
+            "default": "ANALYTICS_WH"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100000,
+            "default": 10000
+          }
+        },
+        "required": ["query"]
+      },
+      "cost_note": "Snowflake queries consume credits. Estimated cost: $0.01-$1.00 per query depending on warehouse and complexity."
+    }
+  ],
+
+  "opa_policy_example": {
+    "description": "Example OPA policy for database query tools",
+    "policy": "package mcp.database_query\n\nimport future.keywords.if\nimport future.keywords.in\n\n# Default deny\ndefault allow := false\n\n# Data analysts can query analytics database\nallow if {\n    \"data_analyst\" in input.user.roles\n    input.tool.name == \"query_postgres\"\n    input.arguments.database == \"analytics\"\n}\n\n# Admins can query any database\nallow if {\n    \"admin\" in input.user.roles\n    input.tool.name in [\"query_postgres\", \"query_snowflake\"]\n}\n\n# Snowflake requires VP approval\nallow if {\n    input.tool.name == \"query_snowflake\"\n    input.approval.approved_by_role == \"vp_data\"\n    not is_expired(input.approval.expires_at)\n}\n\n# Helper function\nis_expired(expiry_time) := time.now_ns() > time.parse_rfc3339_ns(expiry_time)\n\n# Deny queries with DELETE/UPDATE/DROP\ndeny if {\n    regex.match(\"(?i)(DELETE|UPDATE|DROP|INSERT|ALTER|CREATE)\", input.arguments.query)\n}\n\n# Deny production database access\ndeny if {\n    input.arguments.database == \"production\"\n    not \"dba\" in input.user.roles\n}"
+  },
+
+  "deployment": {
+    "docker_image": "company/mcp-database-query:1.0.0",
+    "kubernetes_manifest": {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "database-query-mcp",
+        "namespace": "mcp-servers",
+        "labels": {
+          "mcp.server": "true",
+          "app": "database-query-mcp"
+        }
+      },
+      "spec": {
+        "replicas": 3,
+        "selector": {
+          "matchLabels": {
+            "app": "database-query-mcp"
+          }
+        },
+        "template": {
+          "spec": {
+            "containers": [
+              {
+                "name": "mcp-server",
+                "image": "company/mcp-database-query:1.0.0",
+                "ports": [
+                  {
+                    "containerPort": 8443,
+                    "name": "https"
+                  }
+                ],
+                "env": [
+                  {
+                    "name": "POSTGRES_HOST",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "db-credentials",
+                        "key": "host"
+                      }
+                    }
+                  }
+                ],
+                "resources": {
+                  "requests": {
+                    "memory": "256Mi",
+                    "cpu": "250m"
+                  },
+                  "limits": {
+                    "memory": "512Mi",
+                    "cpu": "500m"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+
+  "audit_events": [
+    {
+      "event_type": "tool_invocation",
+      "tool_name": "query_postgres",
+      "user": "analyst@company.com",
+      "query": "SELECT *** (redacted 245 chars) ***",
+      "database": "analytics",
+      "rows_returned": 1523,
+      "execution_time_ms": 342,
+      "decision": "allow",
+      "policy_reason": "User role 'data_analyst' allowed for 'analytics' database",
+      "timestamp": "2025-11-27T14:30:45.123Z"
+    }
+  ],
+
+  "benefits": [
+    "Centralized database access governance",
+    "Automatic query validation (read-only enforcement)",
+    "PII redaction and data masking",
+    "Query performance optimization via caching",
+    "Complete audit trail for compliance (SOC 2, HIPAA)",
+    "AI agents can query data without direct DB credentials",
+    "Cost tracking for Snowflake queries"
+  ],
+
+  "limitations": [
+    "Read-only queries only (no DDL/DML)",
+    "Result size limited to 10,000 rows",
+    "Query timeout of 30 seconds",
+    "No support for stored procedures or functions"
+  ],
+
+  "siem_integration": {
+    "splunk_query": "index=sark_audit tool_name=\"query_postgres\" | stats count by user, database | sort -count",
+    "datadog_metric": "sark.tools.database_query.invocations",
+    "alerts": [
+      {
+        "name": "Suspicious Database Queries",
+        "condition": "More than 100 queries per minute from single user",
+        "severity": "high",
+        "action": "Alert SOC team, rate limit user"
+      },
+      {
+        "name": "Failed Authorization Attempts",
+        "condition": "More than 5 denied queries from user in 5 minutes",
+        "severity": "medium",
+        "action": "Alert security team"
+      }
+    ]
+  }
+}
