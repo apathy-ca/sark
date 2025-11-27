@@ -20,6 +20,7 @@
 10. [Pagination & Filtering](#pagination--filtering)
 11. [Error Codes](#error-codes)
 12. [Code Examples](#code-examples)
+13. [Web UI Integration](#web-ui-integration)
 
 ---
 
@@ -1506,6 +1507,880 @@ API keys have configurable rate limits (requests per minute). When exceeded:
 - `X-RateLimit-Limit: 1000` - Maximum requests per minute
 - `X-RateLimit-Remaining: 0` - Remaining requests
 - `X-RateLimit-Reset: 1645534800` - Unix timestamp when limit resets
+
+---
+
+## Web UI Integration
+
+This section provides comprehensive guidance for integrating SARK's API into web applications, including common UI workflows, best practices, and complete implementation examples.
+
+### UI Authentication Flow
+
+Web applications should implement the following authentication pattern:
+
+#### 1. Login Flow
+
+**Step 1: User Login**
+```javascript
+// Login with LDAP
+const loginResponse = await fetch('/api/v1/auth/login/ldap', {
+  method: 'POST',
+  headers: {'Content-Type': 'application/json'},
+  credentials: 'include',
+  body: JSON.stringify({
+    username: formData.username,
+    password: formData.password
+  })
+});
+
+const authData = await loginResponse.json();
+
+// Store access token in memory (NOT localStorage)
+window.sarkAuth = {
+  accessToken: authData.access_token,
+  expiresAt: Date.now() + (authData.expires_in * 1000),
+  user: authData.user
+};
+
+// Store refresh token in httpOnly cookie (handled by server)
+// or secure storage for mobile apps
+```
+
+**Step 2: Authenticated API Requests**
+```javascript
+async function authenticatedFetch(url, options = {}) {
+  // Add authorization header
+  const headers = {
+    ...options.headers,
+    'Authorization': `Bearer ${window.sarkAuth.accessToken}`
+  };
+
+  // Check if token needs refresh (before expiration)
+  if (Date.now() > window.sarkAuth.expiresAt - 60000) {
+    await refreshAccessToken();
+  }
+
+  return fetch(url, {...options, headers});
+}
+```
+
+**Step 3: Token Refresh**
+```javascript
+async function refreshAccessToken() {
+  const response = await fetch('/api/v1/auth/refresh', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    credentials: 'include',
+    body: JSON.stringify({
+      refresh_token: getCookie('refresh_token')
+    })
+  });
+
+  if (response.ok) {
+    const data = await response.json();
+    window.sarkAuth.accessToken = data.access_token;
+    window.sarkAuth.expiresAt = Date.now() + (data.expires_in * 1000);
+  } else {
+    // Refresh failed - redirect to login
+    window.location.href = '/login';
+  }
+}
+```
+
+**Step 4: Logout**
+```javascript
+async function logout() {
+  await fetch('/api/v1/auth/revoke', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${window.sarkAuth.accessToken}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      refresh_token: getCookie('refresh_token')
+    })
+  });
+
+  // Clear client-side state
+  delete window.sarkAuth;
+  window.location.href = '/login';
+}
+```
+
+### Dashboard Data Loading
+
+A typical dashboard needs multiple data sources. Use parallel requests for optimal performance:
+
+```javascript
+async function loadDashboardData() {
+  const [metrics, servers, recentActivity] = await Promise.all([
+    // Get server metrics summary
+    authenticatedFetch('/api/v1/metrics/summary').then(r => r.json()),
+
+    // Get active servers (first page)
+    authenticatedFetch('/api/v1/servers?status=active&limit=10').then(r => r.json()),
+
+    // Get time series data for last 24h
+    authenticatedFetch('/api/v1/metrics/timeseries/servers?metric=server_count&time_range=24h').then(r => r.json())
+  ]);
+
+  return {
+    summary: {
+      totalServers: metrics.total_servers,
+      activeServers: metrics.active_servers,
+      unhealthyServers: metrics.unhealthy_servers,
+      totalTools: metrics.total_tools
+    },
+    activeServers: servers.items,
+    chartData: recentActivity.data_points
+  };
+}
+```
+
+### Server Management UI Endpoints
+
+#### Server List View
+
+**Endpoint:** `GET /api/v1/servers`
+
+**UI Features:**
+- Pagination (load more)
+- Filtering by status, sensitivity
+- Search by name/description
+- Sorting
+
+**Example Implementation:**
+```javascript
+class ServerListController {
+  constructor() {
+    this.servers = [];
+    this.cursor = null;
+    this.hasMore = true;
+    this.filters = {
+      status: null,
+      sensitivity: null,
+      search: null
+    };
+  }
+
+  async loadServers(append = false) {
+    const params = new URLSearchParams({
+      limit: 20,
+      ...(this.cursor && {cursor: this.cursor}),
+      ...(this.filters.status && {status: this.filters.status}),
+      ...(this.filters.sensitivity && {sensitivity: this.filters.sensitivity}),
+      ...(this.filters.search && {search: this.filters.search})
+    });
+
+    const response = await authenticatedFetch(`/api/v1/servers?${params}`);
+    const data = await response.json();
+
+    if (append) {
+      this.servers.push(...data.items);
+    } else {
+      this.servers = data.items;
+    }
+
+    this.cursor = data.next_cursor;
+    this.hasMore = data.has_more;
+
+    return this.servers;
+  }
+
+  async applyFilters(newFilters) {
+    this.filters = {...this.filters, ...newFilters};
+    this.cursor = null;
+    return await this.loadServers(false);
+  }
+
+  async loadMore() {
+    if (!this.hasMore) return;
+    return await this.loadServers(true);
+  }
+}
+```
+
+#### Server Detail View
+
+**Endpoint:** `GET /api/v1/servers/{server_id}`
+
+**Additional Data:**
+- Server metrics: `GET /api/v1/metrics/{server_id}`
+- Server health: `GET /health/detailed`
+
+**Example Implementation:**
+```javascript
+async function loadServerDetail(serverId) {
+  const [server, metrics] = await Promise.all([
+    authenticatedFetch(`/api/v1/servers/${serverId}`).then(r => r.json()),
+    authenticatedFetch(`/api/v1/metrics/${serverId}`).then(r => r.json())
+  ]);
+
+  return {
+    ...server,
+    metrics: {
+      totalTools: metrics.total_tools,
+      toolsBySensitivity: metrics.tools_by_sensitivity,
+      uptimePercentage: metrics.uptime_percentage,
+      lastHealthCheck: metrics.last_health_check
+    }
+  };
+}
+```
+
+#### Server Registration Form
+
+**Endpoint:** `POST /api/v1/servers`
+
+**Form Validation:**
+```javascript
+async function registerServer(formData) {
+  // Client-side validation
+  const errors = {};
+
+  if (!formData.name || formData.name.length < 3) {
+    errors.name = 'Server name must be at least 3 characters';
+  }
+
+  if (!formData.transport || !['http', 'stdio', 'sse'].includes(formData.transport)) {
+    errors.transport = 'Invalid transport type';
+  }
+
+  if (formData.transport === 'http' && !formData.endpoint) {
+    errors.endpoint = 'Endpoint required for HTTP transport';
+  }
+
+  if (Object.keys(errors).length > 0) {
+    return {success: false, errors};
+  }
+
+  // Submit to API
+  try {
+    const response = await authenticatedFetch('/api/v1/servers', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(formData)
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      return {success: true, serverId: result.server_id};
+    } else {
+      const error = await response.json();
+      return {success: false, errors: {_global: error.detail}};
+    }
+  } catch (error) {
+    return {success: false, errors: {_global: 'Network error'}};
+  }
+}
+```
+
+### Policy Evaluation UI
+
+**Use Case:** Show user if they can perform an action before they attempt it
+
+**Endpoint:** `POST /api/v1/policy/evaluate`
+
+**Example: Enable/Disable Action Buttons**
+```javascript
+async function checkUserPermissions(action, resourceId = null) {
+  const response = await authenticatedFetch('/api/v1/policy/evaluate', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      action: action,  // e.g., 'server:delete'
+      server_id: resourceId
+    })
+  });
+
+  const decision = await response.json();
+  return decision.decision === 'allow';
+}
+
+// Usage in UI
+async function renderServerActions(server) {
+  const canEdit = await checkUserPermissions('server:write', server.id);
+  const canDelete = await checkUserPermissions('server:delete', server.id);
+
+  return `
+    <button ${!canEdit ? 'disabled' : ''}>Edit</button>
+    <button ${!canDelete ? 'disabled' : ''}>Delete</button>
+  `;
+}
+```
+
+### Metrics and Monitoring UI
+
+#### Real-Time Dashboard Updates
+
+**Endpoint:** `GET /api/v1/metrics/summary`
+
+**Polling Strategy:**
+```javascript
+class MetricsDashboard {
+  constructor() {
+    this.updateInterval = 30000; // 30 seconds
+    this.intervalId = null;
+  }
+
+  async start() {
+    await this.updateMetrics();
+    this.intervalId = setInterval(() => this.updateMetrics(), this.updateInterval);
+  }
+
+  stop() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
+  }
+
+  async updateMetrics() {
+    try {
+      const metrics = await authenticatedFetch('/api/v1/metrics/summary')
+        .then(r => r.json());
+
+      this.renderMetrics(metrics);
+    } catch (error) {
+      console.error('Failed to update metrics:', error);
+    }
+  }
+
+  renderMetrics(metrics) {
+    document.getElementById('total-servers').textContent = metrics.total_servers;
+    document.getElementById('active-servers').textContent = metrics.active_servers;
+    document.getElementById('unhealthy-servers').textContent = metrics.unhealthy_servers;
+    document.getElementById('total-tools').textContent = metrics.total_tools;
+  }
+}
+```
+
+#### Time Series Charts
+
+**Endpoint:** `GET /api/v1/metrics/timeseries/servers`
+
+**Chart.js Integration Example:**
+```javascript
+async function renderServerCountChart() {
+  const response = await authenticatedFetch(
+    '/api/v1/metrics/timeseries/servers?metric=server_count&time_range=7d&interval=1d'
+  );
+  const data = await response.json();
+
+  const chartData = {
+    labels: data.data_points.map(p => new Date(p.timestamp).toLocaleDateString()),
+    datasets: [{
+      label: 'Total Servers',
+      data: data.data_points.map(p => p.value),
+      borderColor: 'rgb(75, 192, 192)',
+      tension: 0.1
+    }]
+  };
+
+  new Chart(document.getElementById('serverChart'), {
+    type: 'line',
+    data: chartData,
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Server Count (Last 7 Days)'
+        }
+      }
+    }
+  });
+}
+```
+
+### Data Export UI
+
+**Endpoints:**
+- `GET /api/v1/export/servers.csv`
+- `GET /api/v1/export/servers.json`
+- `GET /api/v1/export/tools.csv`
+- `GET /api/v1/export/tools.json`
+
+**Download Implementation:**
+```javascript
+async function exportServers(format = 'csv') {
+  const url = `/api/v1/export/servers.${format}`;
+
+  try {
+    const response = await authenticatedFetch(url);
+
+    if (!response.ok) throw new Error('Export failed');
+
+    // Get blob and trigger download
+    const blob = await response.blob();
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = downloadUrl;
+
+    // Extract filename from Content-Disposition header
+    const contentDisposition = response.headers.get('Content-Disposition');
+    const filename = contentDisposition
+      ? contentDisposition.split('filename=')[1].replace(/"/g, '')
+      : `servers_export.${format}`;
+
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(downloadUrl);
+    a.remove();
+
+    return {success: true};
+  } catch (error) {
+    return {success: false, error: error.message};
+  }
+}
+
+// Usage
+document.getElementById('export-csv').addEventListener('click', () => {
+  exportServers('csv');
+});
+
+document.getElementById('export-json').addEventListener('click', () => {
+  exportServers('json');
+});
+```
+
+### Policy Management UI
+
+#### List Active Policies
+
+**Endpoint:** `GET /api/v1/policy/list`
+
+```javascript
+async function loadPolicies() {
+  const response = await authenticatedFetch('/api/v1/policy/list');
+  const data = await response.json();
+
+  return data.policies.map(policy => ({
+    name: policy.name,
+    description: policy.description,
+    version: policy.version,
+    active: policy.active
+  }));
+}
+```
+
+#### Policy Validation (Before Deployment)
+
+**Endpoint:** `POST /api/v1/policy/validate`
+
+```javascript
+async function validatePolicy(policyContent, testCases = null) {
+  const response = await authenticatedFetch('/api/v1/policy/validate', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      policy_content: policyContent,
+      test_cases: testCases
+    })
+  });
+
+  const result = await response.json();
+
+  return {
+    valid: result.valid,
+    errors: result.errors,
+    warnings: result.warnings,
+    testResults: result.test_results
+  };
+}
+
+// Usage in policy editor
+async function onPolicyValidate() {
+  const policyCode = editor.getValue();
+  const validation = await validatePolicy(policyCode);
+
+  if (!validation.valid) {
+    showErrors(validation.errors);
+  } else {
+    showSuccess('Policy is valid');
+    if (validation.warnings.length > 0) {
+      showWarnings(validation.warnings);
+    }
+  }
+}
+```
+
+### Error Handling for UI
+
+**Comprehensive Error Handler:**
+```javascript
+async function apiRequest(url, options = {}) {
+  try {
+    const response = await authenticatedFetch(url, options);
+
+    // Success responses
+    if (response.ok) {
+      return {success: true, data: await response.json()};
+    }
+
+    // Handle specific error codes
+    const errorData = await response.json();
+
+    switch (response.status) {
+      case 400:
+        return {
+          success: false,
+          error: 'Invalid request',
+          details: errorData.detail
+        };
+
+      case 401:
+        // Token expired or invalid
+        await refreshAccessToken();
+        // Retry request once
+        return apiRequest(url, options);
+
+      case 403:
+        return {
+          success: false,
+          error: 'Access denied',
+          details: 'You do not have permission to perform this action'
+        };
+
+      case 404:
+        return {
+          success: false,
+          error: 'Not found',
+          details: errorData.detail
+        };
+
+      case 422:
+        return {
+          success: false,
+          error: 'Validation error',
+          validationErrors: errorData.detail
+        };
+
+      case 429:
+        return {
+          success: false,
+          error: 'Rate limit exceeded',
+          retryAfter: response.headers.get('Retry-After')
+        };
+
+      case 500:
+      case 503:
+        return {
+          success: false,
+          error: 'Server error',
+          details: 'Please try again later'
+        };
+
+      default:
+        return {
+          success: false,
+          error: `Unexpected error (${response.status})`,
+          details: errorData.detail
+        };
+    }
+  } catch (error) {
+    // Network error
+    return {
+      success: false,
+      error: 'Network error',
+      details: 'Unable to connect to server'
+    };
+  }
+}
+```
+
+### Performance Best Practices
+
+#### 1. Request Caching
+
+```javascript
+class APICache {
+  constructor(ttl = 60000) { // 60 second default TTL
+    this.cache = new Map();
+    this.ttl = ttl;
+  }
+
+  get(key) {
+    const cached = this.cache.get(key);
+    if (!cached) return null;
+
+    if (Date.now() > cached.expiresAt) {
+      this.cache.delete(key);
+      return null;
+    }
+
+    return cached.data;
+  }
+
+  set(key, data) {
+    this.cache.set(key, {
+      data,
+      expiresAt: Date.now() + this.ttl
+    });
+  }
+
+  clear() {
+    this.cache.clear();
+  }
+}
+
+// Usage
+const metricsCache = new APICache(30000); // 30 seconds
+
+async function getMetricsSummary() {
+  const cacheKey = 'metrics:summary';
+  const cached = metricsCache.get(cacheKey);
+
+  if (cached) return cached;
+
+  const data = await authenticatedFetch('/api/v1/metrics/summary')
+    .then(r => r.json());
+
+  metricsCache.set(cacheKey, data);
+  return data;
+}
+```
+
+#### 2. Debounced Search
+
+```javascript
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+// Usage for search input
+const searchServers = debounce(async (searchTerm) => {
+  const response = await authenticatedFetch(
+    `/api/v1/servers?search=${encodeURIComponent(searchTerm)}&limit=20`
+  );
+  const results = await response.json();
+  renderSearchResults(results.items);
+}, 300); // Wait 300ms after user stops typing
+
+document.getElementById('search').addEventListener('input', (e) => {
+  searchServers(e.target.value);
+});
+```
+
+#### 3. Infinite Scroll
+
+```javascript
+class InfiniteScrollList {
+  constructor(containerElement, loadFunction) {
+    this.container = containerElement;
+    this.loadFunction = loadFunction;
+    this.loading = false;
+    this.hasMore = true;
+    this.cursor = null;
+
+    this.setupScrollListener();
+  }
+
+  setupScrollListener() {
+    this.container.addEventListener('scroll', () => {
+      if (this.loading || !this.hasMore) return;
+
+      const scrollPosition = this.container.scrollTop + this.container.clientHeight;
+      const scrollHeight = this.container.scrollHeight;
+
+      // Load more when 90% scrolled
+      if (scrollPosition >= scrollHeight * 0.9) {
+        this.loadMore();
+      }
+    });
+  }
+
+  async loadMore() {
+    this.loading = true;
+    this.showLoadingIndicator();
+
+    const response = await this.loadFunction(this.cursor);
+
+    this.appendItems(response.items);
+    this.cursor = response.next_cursor;
+    this.hasMore = response.has_more;
+
+    this.loading = false;
+    this.hideLoadingIndicator();
+  }
+
+  appendItems(items) {
+    const fragment = document.createDocumentFragment();
+    items.forEach(item => {
+      const element = this.createItemElement(item);
+      fragment.appendChild(element);
+    });
+    this.container.appendChild(fragment);
+  }
+
+  createItemElement(item) {
+    // Override in implementation
+  }
+
+  showLoadingIndicator() {
+    document.getElementById('loading').style.display = 'block';
+  }
+
+  hideLoadingIndicator() {
+    document.getElementById('loading').style.display = 'none';
+  }
+}
+
+// Usage
+const serverList = new InfiniteScrollList(
+  document.getElementById('server-list'),
+  async (cursor) => {
+    const params = new URLSearchParams({limit: 20});
+    if (cursor) params.append('cursor', cursor);
+
+    return await authenticatedFetch(`/api/v1/servers?${params}`)
+      .then(r => r.json());
+  }
+);
+```
+
+### Common UI Workflows
+
+#### Workflow 1: User Registration to Server Access
+
+```javascript
+// Step 1: New user logs in
+const loginResult = await login('new.user', 'password');
+
+// Step 2: Load user profile and permissions
+const user = await authenticatedFetch('/api/v1/auth/me').then(r => r.json());
+
+// Step 3: Check what servers user can access
+const servers = await authenticatedFetch(
+  `/api/v1/servers?team_id=${user.teams[0]}&limit=50`
+).then(r => r.json());
+
+// Step 4: For each server, check tool permissions
+const serverPermissions = await Promise.all(
+  servers.items.map(async (server) => {
+    const canInvoke = await checkUserPermissions('tool:invoke', server.id);
+    return {serverId: server.id, canInvoke};
+  })
+);
+```
+
+#### Workflow 2: Admin Dashboard
+
+```javascript
+async function loadAdminDashboard() {
+  // Load all critical data in parallel
+  const [
+    metrics,
+    unhealthyServers,
+    recentPolicyDenials,
+    topUsers
+  ] = await Promise.all([
+    authenticatedFetch('/api/v1/metrics/summary').then(r => r.json()),
+    authenticatedFetch('/api/v1/servers?status=unhealthy&limit=10').then(r => r.json()),
+    authenticatedFetch('/api/v1/audit/policy-denials?limit=20').then(r => r.json()),
+    authenticatedFetch('/api/v1/audit/top-users?limit=10').then(r => r.json())
+  ]);
+
+  return {
+    overview: {
+      totalServers: metrics.total_servers,
+      activeServers: metrics.active_servers,
+      unhealthyCount: metrics.unhealthy_servers,
+      totalTools: metrics.total_tools
+    },
+    alerts: unhealthyServers.items,
+    securityEvents: recentPolicyDenials,
+    topUsers
+  };
+}
+```
+
+### WebSocket Alternative (Server-Sent Events)
+
+For real-time updates without WebSocket complexity:
+
+```javascript
+class ServerHealthMonitor {
+  constructor(serverId) {
+    this.serverId = serverId;
+    this.eventSource = null;
+  }
+
+  start() {
+    // Note: This is conceptual - actual implementation depends on SSE support
+    this.eventSource = new EventSource(
+      `/api/v1/servers/${this.serverId}/health/stream`,
+      {
+        headers: {
+          'Authorization': `Bearer ${window.sarkAuth.accessToken}`
+        }
+      }
+    );
+
+    this.eventSource.addEventListener('health-update', (event) => {
+      const data = JSON.parse(event.data);
+      this.onHealthUpdate(data);
+    });
+
+    this.eventSource.addEventListener('error', (error) => {
+      console.error('SSE error:', error);
+      this.stop();
+    });
+  }
+
+  stop() {
+    if (this.eventSource) {
+      this.eventSource.close();
+      this.eventSource = null;
+    }
+  }
+
+  onHealthUpdate(data) {
+    // Update UI with new health status
+    document.getElementById('server-status').textContent = data.status;
+    document.getElementById('last-check').textContent = data.last_check;
+  }
+}
+```
+
+### Accessibility Considerations
+
+**Loading States:**
+```javascript
+function setLoadingState(loading, elementId = 'main-content') {
+  const element = document.getElementById(elementId);
+
+  if (loading) {
+    element.setAttribute('aria-busy', 'true');
+    element.setAttribute('aria-live', 'polite');
+  } else {
+    element.setAttribute('aria-busy', 'false');
+    element.removeAttribute('aria-live');
+  }
+}
+```
+
+**Error Announcements:**
+```javascript
+function announceError(message) {
+  const announcement = document.getElementById('sr-announcements');
+  announcement.textContent = message;
+  announcement.setAttribute('role', 'alert');
+
+  // Clear after announcement
+  setTimeout(() => {
+    announcement.textContent = '';
+  }, 3000);
+}
+```
 
 ---
 
