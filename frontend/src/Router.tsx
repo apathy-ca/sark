@@ -9,8 +9,8 @@ import ServerRegisterPage from "./pages/servers/ServerRegisterPage";
 import PoliciesPage from "./pages/policies/PoliciesPage";
 import AuditLogsPage from "./pages/audit/AuditLogsPage";
 import ApiKeysPage from "./pages/apikeys/ApiKeysPage";
-import SessionsPage from "./pages/sessions/SessionsPage";
-import ProfilePage from "./pages/ProfilePage";
+// import SessionsPage from "./pages/sessions/SessionsPage";
+// import ProfilePage from "./pages/ProfilePage";
 
 const router = createBrowserRouter([
   {
@@ -60,14 +60,14 @@ const router = createBrowserRouter([
         path: "api-keys",
         element: <ApiKeysPage />,
       },
-      {
-        path: "sessions",
-        element: <SessionsPage />,
-      },
-      {
-        path: "profile",
-        element: <ProfilePage />,
-      },
+      // {
+      //   path: "sessions",
+      //   element: <SessionsPage />,
+      // },
+      // {
+      //   path: "profile",
+      //   element: <ProfilePage />,
+      // },
     ],
   },
 ]);

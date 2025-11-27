@@ -26,7 +26,7 @@ export default function PoliciesPage() {
 
   const uploadMutation = useMutation({
     mutationFn: ({ name, content }: { name: string; content: string }) =>
-      policyApi.upload(name, content),
+      policyApi.create({ id: name, content }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['policies'] });
       toast.success('Policy uploaded successfully');
@@ -53,7 +53,7 @@ export default function PoliciesPage() {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, content }: { id: string; content: string }) =>
-      policyApi.update(id, content),
+      policyApi.update(id, { content }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['policies'] });
       queryClient.invalidateQueries({ queryKey: ['policy', selectedPolicyId] });
@@ -137,15 +137,15 @@ export default function PoliciesPage() {
           <div className="lg:col-span-1">
             <div className="bg-card rounded-lg border overflow-hidden">
               <div className="bg-muted/50 px-4 py-3 border-b">
-                <h2 className="font-semibold">Policies ({policies?.policies?.length || 0})</h2>
+                <h2 className="font-semibold">Policies ({policies?.length || 0})</h2>
               </div>
               <div className="divide-y max-h-[600px] overflow-y-auto">
-                {(!policies?.policies || policies.policies.length === 0) ? (
+                {(!policies || policies.length === 0) ? (
                   <div className="px-4 py-8 text-center text-muted-foreground text-sm">
                     No policies found. Upload your first policy to get started.
                   </div>
                 ) : (
-                  policies.policies.map((policy: any) => (
+                  policies.map((policy: any) => (
                     <button
                       key={policy.id}
                       onClick={() => setSelectedPolicyId(policy.id)}
@@ -226,18 +226,15 @@ export default function PoliciesPage() {
                 </div>
 
                 {/* Policy Metadata */}
-                {selectedPolicy?.rules && selectedPolicy.rules.length > 0 && (
+                {selectedPolicy?.package_name && (
                   <div className="px-4 py-3 border-b bg-muted/20">
-                    <p className="text-xs font-medium text-muted-foreground mb-2">Rules:</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-2">Package:</p>
                     <div className="flex flex-wrap gap-2">
-                      {selectedPolicy.rules.map((rule: string, idx: number) => (
-                        <span
-                          key={idx}
-                          className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-primary/10 text-primary"
-                        >
-                          {rule}
-                        </span>
-                      ))}
+                      <span
+                        className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-primary/10 text-primary"
+                      >
+                        {selectedPolicy.package_name}
+                      </span>
                     </div>
                   </div>
                 )}
