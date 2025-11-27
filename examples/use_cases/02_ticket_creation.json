@@ -1,0 +1,400 @@
+{
+  "use_case": "IT Ticket Creation",
+  "description": "MCP server enabling AI assistants to create and manage IT service tickets in Jira and ServiceNow. Automates incident reporting, service requests, and change management.",
+  "scenario": "Employees and AI agents need to create IT tickets for issues, requests, and incidents. This MCP server provides a governed interface to multiple ticketing systems with automatic routing, SLA enforcement, and workflow automation.",
+
+  "mcp_server": {
+    "name": "ticketing-mcp",
+    "description": "Unified ticketing interface for Jira and ServiceNow",
+    "transport": "http",
+    "endpoint": "https://ticketing-mcp.internal.company.com:8443",
+    "mcp_version": "2025-06-18",
+    "capabilities": ["tools", "resources"],
+    "sensitivity_level": "medium",
+    "health_endpoint": "https://ticketing-mcp.internal.company.com:8443/health",
+    "owner_email": "it-ops@company.com",
+    "team": "it-operations",
+    "tags": ["ticketing", "jira", "servicenow", "itsm", "helpdesk"],
+    "extra_metadata": {
+      "supported_systems": ["jira", "servicenow"],
+      "max_tickets_per_hour": 100,
+      "auto_assignment": true,
+      "sla_tracking": true,
+      "department": "IT Operations"
+    }
+  },
+
+  "tools": [
+    {
+      "name": "create_jira_ticket",
+      "description": "Create a new ticket in Jira for bugs, features, or tasks. Automatically assigns to appropriate team based on labels and components.",
+      "sensitivity_level": "medium",
+      "requires_approval": false,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "project": {
+            "type": "string",
+            "description": "Jira project key",
+            "enum": ["ENG", "OPS", "SEC", "DATA"],
+            "examples": ["ENG", "OPS"]
+          },
+          "issue_type": {
+            "type": "string",
+            "description": "Type of ticket to create",
+            "enum": ["Bug", "Task", "Story", "Incident", "Service Request"],
+            "default": "Task"
+          },
+          "summary": {
+            "type": "string",
+            "description": "Brief ticket title (max 255 chars)",
+            "maxLength": 255,
+            "examples": [
+              "Production API returning 500 errors",
+              "Request VPN access for new employee"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "description": "Detailed description with steps to reproduce, expected behavior, etc.",
+            "examples": [
+              "**Steps to Reproduce:**\\n1. Navigate to /api/users\\n2. Observe 500 error\\n\\n**Expected:** 200 OK with user list\\n**Actual:** 500 Internal Server Error"
+            ]
+          },
+          "priority": {
+            "type": "string",
+            "description": "Ticket priority level",
+            "enum": ["Blocker", "Critical", "High", "Medium", "Low"],
+            "default": "Medium"
+          },
+          "assignee": {
+            "type": "string",
+            "description": "Jira username to assign ticket to (optional - auto-assigns if not specified)"
+          },
+          "labels": {
+            "type": "array",
+            "description": "Labels for categorization and routing",
+            "items": {
+              "type": "string"
+            },
+            "examples": [
+              ["production", "api", "urgent"],
+              ["access-request", "vpn"]
+            ]
+          },
+          "components": {
+            "type": "array",
+            "description": "Jira components (features/systems affected)",
+            "items": {
+              "type": "string"
+            },
+            "examples": [
+              ["User API", "Authentication"],
+              ["VPN", "Network"]
+            ]
+          },
+          "attachments": {
+            "type": "array",
+            "description": "URLs or base64-encoded files to attach",
+            "items": {
+              "type": "object",
+              "properties": {
+                "filename": {"type": "string"},
+                "content_url": {"type": "string"},
+                "content_base64": {"type": "string"}
+              }
+            }
+          }
+        },
+        "required": ["project", "summary", "description"]
+      },
+      "examples": [
+        {
+          "name": "Report production bug",
+          "arguments": {
+            "project": "ENG",
+            "issue_type": "Bug",
+            "summary": "API returning 500 errors on /users endpoint",
+            "description": "**Environment:** Production\\n**Steps:**\\n1. curl https://api.company.com/users\\n2. Observe 500 error\\n\\n**Expected:** 200 OK with users list\\n**Actual:** 500 Internal Server Error\\n\\n**Error logs:**\\nTypeError: Cannot read property 'id' of undefined",
+            "priority": "Critical",
+            "labels": ["production", "api", "p0"],
+            "components": ["User API"]
+          },
+          "expected_result": {
+            "ticket_id": "ENG-12345",
+            "url": "https://company.atlassian.net/browse/ENG-12345",
+            "assigned_to": "api-oncall@company.com",
+            "status": "Open",
+            "sla_breach_time": "2025-11-27T16:30:00Z"
+          }
+        },
+        {
+          "name": "Request laptop for new employee",
+          "arguments": {
+            "project": "OPS",
+            "issue_type": "Service Request",
+            "summary": "Laptop setup for new engineer starting 12/1",
+            "description": "**Employee:** Jane Doe\\n**Start Date:** December 1, 2025\\n**Role:** Senior Software Engineer\\n**Team:** Backend API\\n\\n**Requirements:**\\n- MacBook Pro 16\" M3\\n- 32GB RAM\\n- 1TB SSD\\n- Pre-install: VSCode, Docker, Slack\\n- VPN access\\n- GitHub access",
+            "priority": "High",
+            "labels": ["onboarding", "hardware"],
+            "components": ["IT Equipment"]
+          },
+          "expected_result": {
+            "ticket_id": "OPS-5678",
+            "url": "https://company.atlassian.net/browse/OPS-5678",
+            "assigned_to": "it-provisioning@company.com",
+            "status": "In Progress",
+            "due_date": "2025-11-29T17:00:00Z"
+          }
+        }
+      ],
+      "auto_assignment_rules": {
+        "description": "Tickets are automatically assigned based on labels and components",
+        "rules": [
+          {
+            "condition": "labels contains 'production' AND priority in ['Blocker', 'Critical']",
+            "assign_to": "oncall-engineer-group",
+            "send_page": true
+          },
+          {
+            "condition": "components contains 'Security'",
+            "assign_to": "security-team",
+            "cc": ["ciso@company.com"]
+          },
+          {
+            "condition": "labels contains 'onboarding'",
+            "assign_to": "it-provisioning",
+            "workflow": "new_employee_setup"
+          }
+        ]
+      }
+    },
+    {
+      "name": "create_servicenow_incident",
+      "description": "Create incident in ServiceNow ITSM system. Used for production outages and urgent issues requiring immediate response.",
+      "sensitivity_level": "high",
+      "requires_approval": false,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "short_description": {
+            "type": "string",
+            "description": "Brief incident summary",
+            "maxLength": 160
+          },
+          "description": {
+            "type": "string",
+            "description": "Detailed incident description"
+          },
+          "urgency": {
+            "type": "string",
+            "enum": ["1 - Critical", "2 - High", "3 - Medium", "4 - Low"],
+            "default": "3 - Medium"
+          },
+          "impact": {
+            "type": "string",
+            "enum": ["1 - Enterprise", "2 - Site/Dept", "3 - Multiple Users", "4 - Individual"],
+            "default": "3 - Multiple Users"
+          },
+          "category": {
+            "type": "string",
+            "enum": ["Software", "Hardware", "Network", "Database", "Security"],
+            "examples": ["Software", "Network"]
+          },
+          "affected_service": {
+            "type": "string",
+            "description": "CI (Configuration Item) affected",
+            "examples": ["Production API", "Customer Portal", "Email System"]
+          },
+          "contact": {
+            "type": "object",
+            "properties": {
+              "name": {"type": "string"},
+              "email": {"type": "string"},
+              "phone": {"type": "string"}
+            },
+            "required": ["email"]
+          }
+        },
+        "required": ["short_description", "description", "urgency", "impact", "category"]
+      },
+      "sla_calculation": {
+        "description": "ServiceNow automatically calculates SLA based on urgency and impact",
+        "matrix": [
+          {"urgency": "1 - Critical", "impact": "1 - Enterprise", "response_time": "15 minutes", "resolution_time": "4 hours"},
+          {"urgency": "1 - Critical", "impact": "2 - Site/Dept", "response_time": "30 minutes", "resolution_time": "8 hours"},
+          {"urgency": "2 - High", "impact": "2 - Site/Dept", "response_time": "1 hour", "resolution_time": "24 hours"}
+        ]
+      },
+      "examples": [
+        {
+          "name": "Production outage",
+          "arguments": {
+            "short_description": "Customer portal returning 503 - service unavailable",
+            "description": "**Outage started:** 14:30 UTC\\n**Affected:** All customer portal users\\n**Error:** 503 Service Unavailable\\n**Impact:** Customers cannot log in or view orders\\n**Business impact:** Revenue impact ~$10k/hour",
+            "urgency": "1 - Critical",
+            "impact": "1 - Enterprise",
+            "category": "Software",
+            "affected_service": "Customer Portal",
+            "contact": {
+              "name": "On-Call Engineer",
+              "email": "oncall@company.com",
+              "phone": "+1-555-0100"
+            }
+          },
+          "expected_result": {
+            "incident_number": "INC0012345",
+            "url": "https://company.service-now.com/incident.do?sys_id=abc123",
+            "priority": "P1 - Critical",
+            "assigned_group": "Application Support - L2",
+            "sla_breach_time": "2025-11-27T14:45:00Z",
+            "response_required_by": "2025-11-27T14:45:00Z",
+            "resolution_required_by": "2025-11-27T18:30:00Z",
+            "notifications_sent_to": [
+              "incident-bridge@company.com",
+              "vp-engineering@company.com",
+              "cto@company.com"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_ticket",
+      "description": "Add comment or update fields on existing ticket in Jira or ServiceNow",
+      "sensitivity_level": "low",
+      "requires_approval": false,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "ticket_id": {
+            "type": "string",
+            "description": "Ticket ID (e.g., ENG-12345 or INC0012345)",
+            "examples": ["ENG-12345", "INC0012345"]
+          },
+          "comment": {
+            "type": "string",
+            "description": "Comment to add to ticket"
+          },
+          "status": {
+            "type": "string",
+            "description": "Update ticket status",
+            "enum": ["Open", "In Progress", "Resolved", "Closed"]
+          },
+          "assignee": {
+            "type": "string",
+            "description": "Reassign ticket to different user"
+          }
+        },
+        "required": ["ticket_id"]
+      }
+    },
+    {
+      "name": "search_tickets",
+      "description": "Search for existing tickets using JQL (Jira Query Language) or ServiceNow filters",
+      "sensitivity_level": "low",
+      "requires_approval": false,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "system": {
+            "type": "string",
+            "enum": ["jira", "servicenow"],
+            "default": "jira"
+          },
+          "query": {
+            "type": "string",
+            "description": "JQL query or ServiceNow filter",
+            "examples": [
+              "project = ENG AND status = Open AND priority = Critical",
+              "assignee = currentUser() AND status != Closed"
+            ]
+          },
+          "max_results": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 50
+          }
+        },
+        "required": ["query"]
+      }
+    }
+  ],
+
+  "resources": [
+    {
+      "uri": "ticket://template/bug-report",
+      "name": "Bug Report Template",
+      "description": "Standard template for bug reports",
+      "mimeType": "text/markdown",
+      "content": "## Bug Report\\n\\n**Summary:** [Brief description]\\n\\n**Environment:**\\n- [ ] Production\\n- [ ] Staging\\n- [ ] Development\\n\\n**Steps to Reproduce:**\\n1. Step 1\\n2. Step 2\\n3. Step 3\\n\\n**Expected Behavior:**\\n[What should happen]\\n\\n**Actual Behavior:**\\n[What actually happens]\\n\\n**Screenshots/Logs:**\\n[Attach if applicable]\\n\\n**Impact:**\\n- [ ] Blocker - cannot proceed\\n- [ ] Critical - major functionality broken\\n- [ ] High - important feature affected\\n- [ ] Medium - minor issue\\n- [ ] Low - cosmetic or nice-to-have"
+    },
+    {
+      "uri": "ticket://template/service-request",
+      "name": "Service Request Template",
+      "description": "Template for IT service requests",
+      "mimeType": "text/markdown",
+      "content": "## Service Request\\n\\n**Request Type:**\\n- [ ] Hardware (laptop, monitor, etc.)\\n- [ ] Software (license, installation)\\n- [ ] Access (VPN, system, application)\\n- [ ] Other\\n\\n**Requester Information:**\\n- Name:\\n- Email:\\n- Department:\\n- Manager:\\n\\n**Request Details:**\\n[Detailed description of what you need]\\n\\n**Business Justification:**\\n[Why is this needed?]\\n\\n**Urgency:**\\n- [ ] Immediate (new employee starts soon)\\n- [ ] Within 1 week\\n- [ ] Within 1 month\\n- [ ] No specific deadline"
+    }
+  ],
+
+  "opa_policy_example": {
+    "description": "Example OPA policy for ticketing system",
+    "policy": "package mcp.ticketing\n\nimport future.keywords.if\nimport future.keywords.in\n\ndefault allow := false\n\n# All employees can create tickets\nallow if {\n    input.tool.name in [\"create_jira_ticket\", \"create_servicenow_incident\"]\n    \"employee\" in input.user.roles\n}\n\n# Only assigned user or managers can update tickets\nallow if {\n    input.tool.name == \"update_ticket\"\n    ticket := data.tickets[input.arguments.ticket_id]\n    ticket.assigned_to == input.user.email\n}\n\nallow if {\n    input.tool.name == \"update_ticket\"\n    \"manager\" in input.user.roles\n}\n\n# Critical incidents require manager approval\nrequires_approval if {\n    input.tool.name == \"create_servicenow_incident\"\n    input.arguments.urgency == \"1 - Critical\"\n    input.arguments.impact == \"1 - Enterprise\"\n}"
+  },
+
+  "integration_architecture": {
+    "description": "How the ticketing MCP integrates with existing systems",
+    "components": {
+      "jira_api": {
+        "endpoint": "https://company.atlassian.net/rest/api/3",
+        "auth": "OAuth 2.0",
+        "rate_limit": "3000 requests/hour"
+      },
+      "servicenow_api": {
+        "endpoint": "https://company.service-now.com/api/now/v2",
+        "auth": "Basic Auth with service account",
+        "rate_limit": "5000 requests/hour"
+      },
+      "notification_service": {
+        "slack_webhook": "Send ticket notifications to Slack channels",
+        "email": "SMTP for email notifications",
+        "pagerduty": "Trigger pages for P0/P1 incidents"
+      }
+    }
+  },
+
+  "audit_events": [
+    {
+      "event_type": "tool_invocation",
+      "tool_name": "create_servicenow_incident",
+      "user": "oncall@company.com",
+      "incident_number": "INC0012345",
+      "urgency": "1 - Critical",
+      "impact": "1 - Enterprise",
+      "affected_service": "Customer Portal",
+      "decision": "allow",
+      "notifications_sent": 3,
+      "timestamp": "2025-11-27T14:30:45.123Z"
+    }
+  ],
+
+  "benefits": [
+    "Unified interface for multiple ticketing systems (Jira + ServiceNow)",
+    "Automated ticket routing based on labels/categories",
+    "SLA tracking and breach alerts",
+    "AI agents can create tickets from natural language",
+    "Complete audit trail of all ticket operations",
+    "Automatic notifications (Slack, email, PagerDuty)",
+    "Template-based ticket creation for consistency",
+    "Integration with existing ITSM workflows"
+  ],
+
+  "metrics": {
+    "tickets_created_per_day": 150,
+    "average_response_time": "45 minutes",
+    "sla_compliance_rate": "98.5%",
+    "automation_rate": "65% (tickets created by AI vs humans)"
+  }
+}
