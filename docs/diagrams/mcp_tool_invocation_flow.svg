@@ -1,0 +1,158 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1000" style="background: white;">
+  <defs>
+    <style>
+      .title { font: bold 24px sans-serif; fill: #2c3e50; }
+      .subtitle { font: 16px sans-serif; fill: #7f8c8d; }
+      .actor { font: bold 14px sans-serif; fill: #2c3e50; }
+      .label { font: 12px sans-serif; fill: #34495e; }
+      .box { fill: #ecf0f1; stroke: #95a5a6; stroke-width: 2; }
+      .arrow { fill: none; stroke: #3498db; stroke-width: 2; marker-end: url(#arrowhead); }
+      .return { fill: none; stroke: #2ecc71; stroke-width: 2; stroke-dasharray: 5,5; marker-end: url(#arrowhead-return); }
+      .process { fill: #3498db; stroke: #2980b9; stroke-width: 2; }
+      .decision { fill: #e74c3c; stroke: #c0392b; stroke-width: 2; }
+      .success { fill: #2ecc71; stroke: #27ae60; stroke-width: 2; }
+      .warning { fill: #f39c12; stroke: #e67e22; stroke-width: 2; }
+      .text { font: 11px sans-serif; fill: white; text-anchor: middle; }
+      .note { font: 10px sans-serif; fill: #7f8c8d; font-style: italic; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#3498db" />
+    </marker>
+    <marker id="arrowhead-return" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#2ecc71" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="600" y="35" class="title" text-anchor="middle">MCP Tool Discovery &amp; Invocation Flow</text>
+  <text x="600" y="60" class="subtitle" text-anchor="middle">How users discover and invoke tools from MCP servers</text>
+
+  <!-- Actors -->
+  <rect x="30" y="90" width="100" height="60" class="box" rx="5"/>
+  <text x="80" y="125" class="actor" text-anchor="middle">AI Client</text>
+
+  <rect x="200" y="90" width="100" height="60" class="box" rx="5"/>
+  <text x="250" y="125" class="actor" text-anchor="middle">SARK API</text>
+
+  <rect x="370" y="90" width="100" height="60" class="box" rx="5"/>
+  <text x="420" y="125" class="actor" text-anchor="middle">OPA</text>
+
+  <rect x="540" y="90" width="100" height="60" class="box" rx="5"/>
+  <text x="590" y="125" class="actor" text-anchor="middle">Redis Cache</text>
+
+  <rect x="710" y="90" width="100" height="60" class="box" rx="5"/>
+  <text x="760" y="125" class="actor" text-anchor="middle">PostgreSQL</text>
+
+  <rect x="880" y="90" width="100" height="60" class="box" rx="5"/>
+  <text x="930" y="125" class="actor" text-anchor="middle">MCP Server</text>
+
+  <rect x="1050" y="90" width="100" height="60" class="box" rx="5"/>
+  <text x="1100" y="125" class="actor" text-anchor="middle">Audit</text>
+
+  <!-- Lifelines -->
+  <line x1="80" y1="150" x2="80" y2="970" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="250" y1="150" x2="250" y2="970" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="420" y1="150" x2="420" y2="970" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="590" y1="150" x2="590" y2="970" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="760" y1="150" x2="760" y2="970" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="930" y1="150" x2="930" y2="970" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="1100" y1="150" x2="1100" y2="970" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="5,5"/>
+
+  <!-- PHASE 1: DISCOVERY -->
+  <text x="600" y="185" class="actor" text-anchor="middle">═══ PHASE 1: TOOL DISCOVERY ═══</text>
+
+  <!-- Step 1: Request tools -->
+  <line x1="80" y1="210" x2="250" y2="210" class="arrow"/>
+  <text x="165" y="205" class="label" text-anchor="middle">GET /api/v1/tools/search</text>
+  <text x="165" y="225" class="note" text-anchor="middle">?sensitivity_level=medium</text>
+
+  <!-- Step 2: Check cache -->
+  <line x1="250" y1="250" x2="590" y2="250" class="arrow"/>
+  <text x="420" y="245" class="label" text-anchor="middle">Check cache: tools:user:{id}:medium</text>
+
+  <!-- Step 3: Cache miss -->
+  <line x1="590" y1="280" x2="250" y2="280" class="return"/>
+  <text x="420" y="275" class="label" text-anchor="middle">Cache MISS</text>
+
+  <!-- Step 4: Query database -->
+  <line x1="250" y1="310" x2="760" y2="310" class="arrow"/>
+  <text x="505" y="305" class="label" text-anchor="middle">SELECT * FROM mcp_tools</text>
+  <text x="505" y="325" class="note" text-anchor="middle">WHERE sensitivity_level &lt;= 'medium'</text>
+
+  <!-- Step 5: DB returns tools -->
+  <line x1="760" y1="350" x2="250" y2="350" class="return"/>
+  <text x="505" y="345" class="label" text-anchor="middle">147 tools found</text>
+
+  <!-- Step 6: Filter by policy -->
+  <line x1="250" y1="380" x2="420" y2="380" class="arrow"/>
+  <text x="335" y="375" class="label" text-anchor="middle">Batch authorize tools</text>
+  <text x="335" y="395" class="note" text-anchor="middle">{user, action: "invoke", resources: [tools]}</text>
+
+  <!-- Step 7: OPA returns allowed tools -->
+  <line x1="420" y1="425" x2="250" y2="425" class="return"/>
+  <text x="335" y="420" class="label" text-anchor="middle">92 tools allowed</text>
+
+  <!-- Step 8: Cache results -->
+  <line x1="250" y1="455" x2="590" y2="455" class="arrow"/>
+  <text x="420" y="450" class="label" text-anchor="middle">SET tools:user:{id}:medium [92 tools]</text>
+  <text x="420" y="470" class="note" text-anchor="middle">TTL: 300s</text>
+
+  <!-- Step 9: Return to client -->
+  <line x1="250" y1="500" x2="80" y2="500" class="return"/>
+  <text x="165" y="495" class="label" text-anchor="middle">200 OK: 92 tools</text>
+
+  <!-- PHASE 2: INVOCATION -->
+  <text x="600" y="545" class="actor" text-anchor="middle">═══ PHASE 2: TOOL INVOCATION ═══</text>
+
+  <!-- Step 10: Invoke tool -->
+  <line x1="80" y1="570" x2="250" y2="570" class="arrow"/>
+  <text x="165" y="565" class="label" text-anchor="middle">POST /api/v1/tools/{tool_id}/invoke</text>
+  <text x="165" y="585" class="note" text-anchor="middle">{params: {query: "example"}}</text>
+
+  <!-- Step 11: Check authorization -->
+  <line x1="250" y1="610" x2="420" y2="610" class="arrow"/>
+  <text x="335" y="605" class="label" text-anchor="middle">Check policy: can_invoke_tool</text>
+  <text x="335" y="625" class="note" text-anchor="middle">{user, tool, sensitivity_level}</text>
+
+  <!-- Step 12: Authorization result -->
+  <polygon points="370,650 470,650 445,690 395,690" class="decision"/>
+  <text x="420" y="675" class="text">Allowed?</text>
+
+  <!-- Step 13a: If denied -->
+  <line x1="395" y1="670" x2="250" y2="670" class="return"/>
+  <text x="322" y="665" class="label" text-anchor="middle">403 Forbidden</text>
+
+  <!-- Step 13b: If allowed, check if requires approval -->
+  <polygon points="370,720 470,720 445,760 395,760" class="warning"/>
+  <text x="420" y="742" class="text" font-size="10">Requires</text>
+  <text x="420" y="755" class="text" font-size="10">Approval?</text>
+
+  <!-- Step 14a: If requires approval -->
+  <rect x="200" y="780" width="100" height="40" class="warning" rx="5"/>
+  <text x="250" y="795" class="text">Create</text>
+  <text x="250" y="810" class="text">Approval Request</text>
+
+  <!-- Step 14b: If no approval needed, invoke -->
+  <line x1="420" y1="790" x2="930" y2="790" class="arrow"/>
+  <text x="675" y="785" class="label" text-anchor="middle">Invoke tool via MCP protocol</text>
+  <text x="675" y="805" class="note" text-anchor="middle">POST https://mcp-server/tools/invoke</text>
+
+  <!-- Step 15: MCP server executes -->
+  <rect x="880" y="820" width="100" height="40" class="process" rx="5"/>
+  <text x="930" y="835" class="text">Execute</text>
+  <text x="930" y="850" class="text">Tool Logic</text>
+
+  <!-- Step 16: Return result -->
+  <line x1="930" y1="880" x2="250" y2="880" class="return"/>
+  <text x="590" y="875" class="label" text-anchor="middle">Tool result: {data, status}</text>
+
+  <!-- Step 17: Log invocation -->
+  <line x1="250" y1="910" x2="1100" y2="910" class="arrow"/>
+  <text x="675" y="905" class="label" text-anchor="middle">Log audit event: tool_invoked</text>
+  <text x="675" y="925" class="note" text-anchor="middle">{tool_id, user_id, duration_ms, status}</text>
+
+  <!-- Step 18: Return to client -->
+  <rect x="200" y="940" width="100" height="40" class="success" rx="5"/>
+  <text x="250" y="955" class="text">200 OK</text>
+  <text x="250" y="970" class="text">Return result</text>
+</svg>

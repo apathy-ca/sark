@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 500" style="background: white;">
+  <defs>
+    <style>
+      .title { font: bold 28px sans-serif; fill: #2c3e50; }
+      .subtitle { font: 16px sans-serif; fill: #7f8c8d; }
+      .milestone { font: bold 18px sans-serif; fill: white; text-anchor: middle; }
+      .milestone-desc { font: 12px sans-serif; fill: white; text-anchor: middle; }
+      .time { font: 11px sans-serif; fill: white; text-anchor: middle; font-style: italic; }
+      .step-text { font: 11px sans-serif; fill: #2c3e50; }
+      .connector { fill: none; stroke: #bdc3c7; stroke-width: 4; }
+      .progress-bar { fill: #ecf0f1; stroke: #95a5a6; stroke-width: 2; }
+    </style>
+  </defs>
+
+  <!-- Title -->
+  <text x="800" y="40" class="title" text-anchor="middle">SARK Learning Journey</text>
+  <text x="800" y="70" class="subtitle" text-anchor="middle">A simple path from getting started to becoming an expert</text>
+
+  <!-- Progress bar background -->
+  <rect x="100" y="110" width="1400" height="40" class="progress-bar" rx="20"/>
+
+  <!-- Progress segments -->
+  <rect x="100" y="110" width="350" height="40" fill="#27ae60" rx="20"/>
+  <rect x="450" y="110" width="350" height="40" fill="#2980b9"/>
+  <rect x="800" y="110" width="350" height="40" fill="#8e44ad"/>
+  <rect x="1150" y="110" width="350" height="40" fill="#c0392b" rx="20"/>
+
+  <!-- Milestone markers -->
+  <!-- Milestone 1 -->
+  <circle cx="275" cy="130" r="50" fill="#27ae60" stroke="#1e8449" stroke-width="4"/>
+  <text x="275" y="130" class="milestone" font-size="36">1</text>
+  <text x="275" y="200" class="milestone" fill="#27ae60">Beginner</text>
+  <text x="275" y="225" class="milestone-desc" fill="#27ae60">Get Started</text>
+  <text x="275" y="245" class="time" fill="#27ae60">2-3 hours</text>
+
+  <text x="135" y="280" class="step-text">✓ Deploy locally</text>
+  <text x="135" y="300" class="step-text">✓ Register server</text>
+  <text x="135" y="320" class="step-text">✓ Test tools</text>
+
+  <!-- Milestone 2 -->
+  <circle cx="625" cy="130" r="50" fill="#2980b9" stroke="#1f618d" stroke-width="4"/>
+  <text x="625" y="130" class="milestone" font-size="36">2</text>
+  <text x="625" y="200" class="milestone" fill="#2980b9">Intermediate</text>
+  <text x="625" y="225" class="milestone-desc" fill="#2980b9">Build Skills</text>
+  <text x="625" y="245" class="time" fill="#2980b9">5-7 hours</text>
+
+  <text x="485" y="280" class="step-text">✓ Configure auth (OIDC/LDAP)</text>
+  <text x="485" y="300" class="step-text">✓ Manage users & teams</text>
+  <text x="485" y="320" class="step-text">✓ Apply RBAC policies</text>
+  <text x="485" y="340" class="step-text">✓ Monitor & audit</text>
+
+  <!-- Milestone 3 -->
+  <circle cx="975" cy="130" r="50" fill="#8e44ad" stroke="#6c3483" stroke-width="4"/>
+  <text x="975" y="130" class="milestone" font-size="36">3</text>
+  <text x="975" y="200" class="milestone" fill="#8e44ad">Advanced</text>
+  <text x="975" y="225" class="milestone-desc" fill="#8e44ad">Master Features</text>
+  <text x="975" y="245" class="time" fill="#8e44ad">10-15 hours</text>
+
+  <text x="835" y="280" class="step-text">✓ Write custom policies (Rego)</text>
+  <text x="835" y="300" class="step-text">✓ Integrate SIEM (Splunk/Datadog)</text>
+  <text x="835" y="320" class="step-text">✓ Configure API gateway (Kong)</text>
+  <text x="835" y="340" class="step-text">✓ Optimize performance</text>
+  <text x="835" y="360" class="step-text">✓ Set up high availability</text>
+
+  <!-- Milestone 4 -->
+  <circle cx="1325" cy="130" r="50" fill="#c0392b" stroke="#922b21" stroke-width="4"/>
+  <text x="1325" y="130" class="milestone" font-size="36">4</text>
+  <text x="1325" y="200" class="milestone" fill="#c0392b">Expert</text>
+  <text x="1325" y="225" class="milestone-desc" fill="#c0392b">Production Ready</text>
+  <text x="1325" y="245" class="time" fill="#c0392b">15-20 hours</text>
+
+  <text x="1185" y="280" class="step-text">✓ Production deployment (K8s)</text>
+  <text x="1185" y="300" class="step-text">✓ Security hardening (75+ items)</text>
+  <text x="1185" y="320" class="step-text">✓ Disaster recovery plan</text>
+  <text x="1185" y="340" class="step-text">✓ Scale testing (10k+ servers)</text>
+
+  <!-- Connecting arrows -->
+  <polygon points="325,130 375,120 375,140" fill="#7f8c8d"/>
+  <polygon points="675,130 725,120 725,140" fill="#7f8c8d"/>
+  <polygon points="1025,130 1075,120 1075,140" fill="#7f8c8d"/>
+
+  <!-- Bottom summary -->
+  <rect x="100" y="390" width="1400" height="90" rx="10" fill="#34495e"/>
+  <text x="800" y="420" class="milestone">🚀 Total Learning Time: 32-45 hours</text>
+  <text x="800" y="450" class="milestone-desc">Self-paced learning with hands-on tutorials and documentation</text>
+  <text x="800" y="470" class="step-text" fill="white" text-anchor="middle">Gain expertise in MCP governance, security, and enterprise deployment</text>
+
+  <!-- Icons and indicators -->
+  <rect x="130" y="410" width="200" height="50" rx="5" fill="#2c3e50"/>
+  <text x="230" y="430" class="step-text" fill="white" text-anchor="middle">📖 Documentation</text>
+  <text x="230" y="448" class="step-text" fill="#95a5a6" text-anchor="middle" font-size="10">17+ comprehensive guides</text>
+
+  <rect x="700" y="410" width="200" height="50" rx="5" fill="#2c3e50"/>
+  <text x="800" y="430" class="step-text" fill="white" text-anchor="middle">💻 Hands-on Labs</text>
+  <text x="800" y="448" class="step-text" fill="#95a5a6" text-anchor="middle" font-size="10">Interactive tutorials included</text>
+
+  <rect x="1270" y="410" width="200" height="50" rx="5" fill="#2c3e50"/>
+  <text x="1370" y="430" class="step-text" fill="white" text-anchor="middle">🏆 Certification</text>
+  <text x="1370" y="448" class="step-text" fill="#95a5a6" text-anchor="middle" font-size="10">Track your progress</text>
+</svg>

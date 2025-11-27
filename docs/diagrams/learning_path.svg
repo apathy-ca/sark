@@ -1,0 +1,275 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1100" style="background: white;">
+  <defs>
+    <style>
+      .title { font: bold 28px sans-serif; fill: #2c3e50; }
+      .subtitle { font: 18px sans-serif; fill: #7f8c8d; }
+      .level-title { font: bold 20px sans-serif; fill: white; text-anchor: middle; }
+      .step-number { font: bold 24px sans-serif; fill: white; text-anchor: middle; }
+      .step-title { font: bold 14px sans-serif; fill: #2c3e50; }
+      .step-desc { font: 11px sans-serif; fill: #34495e; }
+      .duration { font: 10px sans-serif; fill: #7f8c8d; font-style: italic; }
+      .doc-link { font: 10px sans-serif; fill: #3498db; text-decoration: underline; }
+
+      .beginner-bg { fill: #27ae60; }
+      .intermediate-bg { fill: #2980b9; }
+      .advanced-bg { fill: #8e44ad; }
+      .expert-bg { fill: #c0392b; }
+
+      .step-box { fill: white; stroke: #bdc3c7; stroke-width: 2; }
+      .step-circle { fill: #3498db; stroke: #2980b9; stroke-width: 2; }
+      .arrow { fill: none; stroke: #7f8c8d; stroke-width: 3; marker-end: url(#arrowhead); }
+      .path-line { fill: none; stroke: #bdc3c7; stroke-width: 3; stroke-dasharray: 10,5; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#7f8c8d" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="700" y="40" class="title" text-anchor="middle">SARK Learning Path</text>
+  <text x="700" y="70" class="subtitle" text-anchor="middle">Your journey from beginner to expert in MCP governance</text>
+
+  <!-- Path line connecting all levels -->
+  <path d="M 200,150 L 200,1000" class="path-line"/>
+
+  <!-- ===== LEVEL 1: BEGINNER ===== -->
+  <rect x="30" y="120" width="340" height="280" rx="10" class="beginner-bg"/>
+  <text x="200" y="150" class="level-title">🌱 LEVEL 1: BEGINNER</text>
+  <text x="200" y="175" class="duration" fill="white">Estimated time: 2-3 hours</text>
+
+  <!-- Step 1.1 -->
+  <circle cx="200" cy="210" r="25" class="step-circle"/>
+  <text x="200" y="220" class="step-number">1</text>
+  <rect x="240" y="185" width="120" height="50" class="step-box" rx="5"/>
+  <text x="250" y="202" class="step-title">Quick Start</text>
+  <text x="250" y="217" class="step-desc">Deploy SARK locally</text>
+  <text x="250" y="230" class="duration">15 minutes</text>
+
+  <!-- Step 1.2 -->
+  <line x1="200" y1="235" x2="200" y2="265" class="arrow"/>
+  <circle cx="200" cy="275" r="25" class="step-circle"/>
+  <text x="200" y="285" class="step-number">2</text>
+  <rect x="240" y="250" width="120" height="50" class="step-box" rx="5"/>
+  <text x="250" y="267" class="step-title">Register a Server</text>
+  <text x="250" y="282" class="step-desc">Add your first MCP server</text>
+  <text x="250" y="295" class="duration">30 minutes</text>
+
+  <!-- Step 1.3 -->
+  <line x1="200" y1="300" x2="200" y2="330" class="arrow"/>
+  <circle cx="200" cy="340" r="25" class="step-circle"/>
+  <text x="200" y="350" class="step-number">3</text>
+  <rect x="240" y="315" width="120" height="50" class="step-box" rx="5"/>
+  <text x="250" y="332" class="step-title">Explore Tools</text>
+  <text x="250" y="347" class="step-desc">Discover and test tools</text>
+  <text x="250" y="360" class="duration">45 minutes</text>
+
+  <!-- Beginner Resources -->
+  <rect x="45" y="375" width="310" height="15" fill="#1e8449" rx="3"/>
+  <text x="200" y="387" class="doc-link" fill="white" text-anchor="middle">📚 GETTING_STARTED_5MIN.md | QUICKSTART.md</text>
+
+  <!-- ===== LEVEL 2: INTERMEDIATE ===== -->
+  <rect x="400" y="120" width="340" height="340" rx="10" class="intermediate-bg"/>
+  <text x="570" y="150" class="level-title">📚 LEVEL 2: INTERMEDIATE</text>
+  <text x="570" y="175" class="duration" fill="white">Estimated time: 5-7 hours</text>
+
+  <!-- Step 2.1 -->
+  <circle cx="570" cy="210" r="25" class="step-circle"/>
+  <text x="570" y="220" class="step-number">4</text>
+  <rect x="610" y="185" width="120" height="50" class="step-box" rx="5"/>
+  <text x="620" y="202" class="step-title">Authentication</text>
+  <text x="620" y="217" class="step-desc">Configure OIDC/LDAP</text>
+  <text x="620" y="230" class="duration">1-2 hours</text>
+
+  <!-- Step 2.2 -->
+  <line x1="570" y1="235" x2="570" y2="265" class="arrow"/>
+  <circle cx="570" cy="275" r="25" class="step-circle"/>
+  <text x="570" y="285" class="step-number">5</text>
+  <rect x="610" y="250" width="120" height="50" class="step-box" rx="5"/>
+  <text x="620" y="267" class="step-title">Manage Users</text>
+  <text x="620" y="282" class="step-desc">Create users & teams</text>
+  <text x="620" y="295" class="duration">1 hour</text>
+
+  <!-- Step 2.3 -->
+  <line x1="570" y1="300" x2="570" y2="330" class="arrow"/>
+  <circle cx="570" cy="340" r="25" class="step-circle"/>
+  <text x="570" y="350" class="step-number">6</text>
+  <rect x="610" y="315" width="120" height="50" class="step-box" rx="5"/>
+  <text x="620" y="332" class="step-title">Basic Policies</text>
+  <text x="620" y="347" class="step-desc">Apply RBAC policies</text>
+  <text x="620" y="360" class="duration">2 hours</text>
+
+  <!-- Step 2.4 -->
+  <line x1="570" y1="365" x2="570" y2="395" class="arrow"/>
+  <circle cx="570" cy="405" r="25" class="step-circle"/>
+  <text x="570" y="415" class="step-number">7</text>
+  <rect x="610" y="380" width="120" height="50" class="step-box" rx="5"/>
+  <text x="620" y="397" class="step-title">Monitor & Audit</text>
+  <text x="620" y="412" class="step-desc">View audit logs</text>
+  <text x="620" y="425" class="duration">1 hour</text>
+
+  <!-- Intermediate Resources -->
+  <rect x="415" y="445" width="310" height="15" fill="#1a5490" rx="3"/>
+  <text x="570" y="457" class="doc-link" fill="white" text-anchor="middle">📚 AUTHENTICATION.md | AUTHORIZATION.md</text>
+
+  <!-- ===== LEVEL 3: ADVANCED ===== -->
+  <rect x="770" y="120" width="340" height="400" rx="10" class="advanced-bg"/>
+  <text x="940" y="150" class="level-title">🎯 LEVEL 3: ADVANCED</text>
+  <text x="940" y="175" class="duration" fill="white">Estimated time: 10-15 hours</text>
+
+  <!-- Step 3.1 -->
+  <circle cx="940" cy="210" r="25" class="step-circle"/>
+  <text x="940" y="220" class="step-number">8</text>
+  <rect x="980" y="185" width="120" height="50" class="step-box" rx="5"/>
+  <text x="990" y="202" class="step-title">Custom Policies</text>
+  <text x="990" y="217" class="step-desc">Write Rego policies</text>
+  <text x="990" y="230" class="duration">3-4 hours</text>
+
+  <!-- Step 3.2 -->
+  <line x1="940" y1="235" x2="940" y2="265" class="arrow"/>
+  <circle cx="940" cy="275" r="25" class="step-circle"/>
+  <text x="940" y="285" class="step-number">9</text>
+  <rect x="980" y="250" width="120" height="50" class="step-box" rx="5"/>
+  <text x="990" y="267" class="step-title">SIEM Integration</text>
+  <text x="990" y="282" class="step-desc">Connect Splunk/Datadog</text>
+  <text x="990" y="295" class="duration">2-3 hours</text>
+
+  <!-- Step 3.3 -->
+  <line x1="940" y1="300" x2="940" y2="330" class="arrow"/>
+  <circle cx="940" cy="340" r="25" class="step-circle"/>
+  <text x="940" y="350" class="step-number">10</text>
+  <rect x="980" y="315" width="120" height="50" class="step-box" rx="5"/>
+  <text x="990" y="332" class="step-title">API Integration</text>
+  <text x="990" y="347" class="step-desc">Kong gateway setup</text>
+  <text x="990" y="360" class="duration">2-3 hours</text>
+
+  <!-- Step 3.4 -->
+  <line x1="940" y1="365" x2="940" y2="395" class="arrow"/>
+  <circle cx="940" cy="405" r="25" class="step-circle"/>
+  <text x="940" y="415" class="step-number">11</text>
+  <rect x="980" y="380" width="120" height="50" class="step-box" rx="5"/>
+  <text x="990" y="397" class="step-title">Performance</text>
+  <text x="990" y="412" class="step-desc">Tune caching & queries</text>
+  <text x="990" y="425" class="duration">2-3 hours</text>
+
+  <!-- Step 3.5 -->
+  <line x1="940" y1="430" x2="940" y2="460" class="arrow"/>
+  <circle cx="940" cy="470" r="25" class="step-circle"/>
+  <text x="940" y="480" class="step-number">12</text>
+  <rect x="980" y="445" width="120" height="50" class="step-box" rx="5"/>
+  <text x="990" y="462" class="step-title">High Availability</text>
+  <text x="990" y="477" class="step-desc">Redis Sentinel, PG HA</text>
+  <text x="990" y="490" class="duration">2-3 hours</text>
+
+  <!-- Advanced Resources -->
+  <rect x="785" y="510" width="310" height="15" fill="#6c3483" rx="3"/>
+  <text x="940" y="522" class="doc-link" fill="white" text-anchor="middle">📚 OPA_POLICY_GUIDE.md | SIEM_INTEGRATION.md</text>
+
+  <!-- ===== LEVEL 4: EXPERT ===== -->
+  <rect x="30" y="540" width="340" height="360" rx="10" class="expert-bg"/>
+  <text x="200" y="570" class="level-title">🏆 LEVEL 4: EXPERT</text>
+  <text x="200" y="595" class="duration" fill="white">Estimated time: 15-20 hours</text>
+
+  <!-- Step 4.1 -->
+  <circle cx="200" cy="630" r="25" class="step-circle"/>
+  <text x="200" y="640" class="step-number">13</text>
+  <rect x="240" y="605" width="120" height="50" class="step-box" rx="5"/>
+  <text x="250" y="622" class="step-title">Production Deploy</text>
+  <text x="250" y="637" class="step-desc">Kubernetes deployment</text>
+  <text x="250" y="650" class="duration">4-5 hours</text>
+
+  <!-- Step 4.2 -->
+  <line x1="200" y1="655" x2="200" y2="685" class="arrow"/>
+  <circle cx="200" cy="695" r="25" class="step-circle"/>
+  <text x="200" y="705" class="step-number">14</text>
+  <rect x="240" y="670" width="120" height="50" class="step-box" rx="5"/>
+  <text x="250" y="687" class="step-title">Security Hardening</text>
+  <text x="250" y="702" class="step-desc">Complete 75+ checklist</text>
+  <text x="250" y="715" class="duration">3-4 hours</text>
+
+  <!-- Step 4.3 -->
+  <line x1="200" y1="720" x2="200" y2="750" class="arrow"/>
+  <circle cx="200" cy="760" r="25" class="step-circle"/>
+  <text x="200" y="770" class="step-number">15</text>
+  <rect x="240" y="735" width="120" height="50" class="step-box" rx="5"/>
+  <text x="250" y="752" class="step-title">Disaster Recovery</text>
+  <text x="250" y="767" class="step-desc">Implement DR plan</text>
+  <text x="250" y="780" class="duration">4-5 hours</text>
+
+  <!-- Step 4.4 -->
+  <line x1="200" y1="785" x2="200" y2="815" class="arrow"/>
+  <circle cx="200" cy="825" r="25" class="step-circle"/>
+  <text x="200" y="835" class="step-number">16</text>
+  <rect x="240" y="800" width="120" height="50" class="step-box" rx="5"/>
+  <text x="250" y="817" class="step-title">Scale Testing</text>
+  <text x="250" y="832" class="step-desc">10k+ servers, load tests</text>
+  <text x="250" y="845" class="duration">4-6 hours</text>
+
+  <!-- Expert Resources -->
+  <rect x="45" y="865" width="310" height="15" fill="#922b21" rx="3"/>
+  <text x="200" y="877" class="doc-link" fill="white" text-anchor="middle">📚 PRODUCTION_DEPLOYMENT.md | SECURITY.md</text>
+
+  <!-- ===== SPECIALIZATION TRACKS ===== -->
+  <rect x="400" y="540" width="710" height="360" rx="10" fill="#ecf0f1" stroke="#95a5a6" stroke-width="2"/>
+  <text x="755" y="570" class="level-title" fill="#2c3e50">🎓 SPECIALIZATION TRACKS</text>
+  <text x="755" y="595" class="duration">Choose your focus area</text>
+
+  <!-- Track 1: Policy Expert -->
+  <rect x="420" y="620" width="210" height="120" rx="8" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="525" y="645" class="level-title" font-size="16">📋 Policy Expert</text>
+  <text x="430" y="670" class="step-desc" fill="white">• Advanced Rego development</text>
+  <text x="430" y="690" class="step-desc" fill="white">• Policy testing & validation</text>
+  <text x="430" y="710" class="step-desc" fill="white">• Custom authorization logic</text>
+  <text x="525" y="730" class="duration" fill="white">Time: 8-10 hours</text>
+
+  <!-- Track 2: DevOps Specialist -->
+  <rect x="650" y="620" width="210" height="120" rx="8" fill="#e67e22" stroke="#d35400" stroke-width="2"/>
+  <text x="755" y="645" class="level-title" font-size="16">⚙️ DevOps Specialist</text>
+  <text x="660" y="670" class="step-desc" fill="white">• Infrastructure as Code</text>
+  <text x="660" y="690" class="step-desc" fill="white">• CI/CD pipelines</text>
+  <text x="660" y="710" class="step-desc" fill="white">• Multi-region deployment</text>
+  <text x="755" y="730" class="duration" fill="white">Time: 10-12 hours</text>
+
+  <!-- Track 3: Security Architect -->
+  <rect x="880" y="620" width="210" height="120" rx="8" fill="#c0392b" stroke="#a93226" stroke-width="2"/>
+  <text x="985" y="645" class="level-title" font-size="16">🔒 Security Architect</text>
+  <text x="890" y="670" class="step-desc" fill="white">• Threat modeling</text>
+  <text x="890" y="690" class="step-desc" fill="white">• Security audits</text>
+  <text x="890" y="710" class="step-desc" fill="white">• Compliance (SOC2, ISO)</text>
+  <text x="985" y="730" class="duration" fill="white">Time: 12-15 hours</text>
+
+  <!-- Track 4: Integration Engineer -->
+  <rect x="420" y="760" width="210" height="120" rx="8" fill="#16a085" stroke="#138d75" stroke-width="2"/>
+  <text x="525" y="785" class="level-title" font-size="16">🔌 Integration Engineer</text>
+  <text x="430" y="810" class="step-desc" fill="white">• API gateway integration</text>
+  <text x="430" y="830" class="step-desc" fill="white">• Custom MCP servers</text>
+  <text x="430" y="850" class="step-desc" fill="white">• Webhook automation</text>
+  <text x="525" y="870" class="duration" fill="white">Time: 8-10 hours</text>
+
+  <!-- Track 5: Performance Engineer -->
+  <rect x="650" y="760" width="210" height="120" rx="8" fill="#2874a6" stroke="#1f618d" stroke-width="2"/>
+  <text x="755" y="785" class="level-title" font-size="16">⚡ Performance Engineer</text>
+  <text x="660" y="810" class="step-desc" fill="white">• Database optimization</text>
+  <text x="660" y="830" class="step-desc" fill="white">• Caching strategies</text>
+  <text x="660" y="850" class="step-desc" fill="white">• Benchmark testing</text>
+  <text x="755" y="870" class="duration" fill="white">Time: 10-12 hours</text>
+
+  <!-- Track 6: Data Analyst -->
+  <rect x="880" y="760" width="210" height="120" rx="8" fill="#7d3c98" stroke="#6c3483" stroke-width="2"/>
+  <text x="985" y="785" class="level-title" font-size="16">📊 Data Analyst</text>
+  <text x="890" y="810" class="step-desc" fill="white">• Audit log analysis</text>
+  <text x="890" y="830" class="step-desc" fill="white">• Metrics dashboards</text>
+  <text x="890" y="850" class="step-desc" fill="white">• Usage reporting</text>
+  <text x="985" y="870" class="duration" fill="white">Time: 8-10 hours</text>
+
+  <!-- Connection arrows between levels -->
+  <path d="M 370,260 L 400,260" class="arrow"/>
+  <path d="M 740,280 L 770,280" class="arrow"/>
+  <path d="M 360,700 L 400,700" class="arrow"/>
+
+  <!-- Total time estimate -->
+  <rect x="30" y="930" width="1340" height="140" rx="10" fill="#34495e"/>
+  <text x="700" y="965" class="level-title">🎯 Your Learning Journey</text>
+  <text x="700" y="1000" class="step-desc" fill="white" text-anchor="middle" font-size="14">Total Base Path: ~30-45 hours (Beginner → Expert)</text>
+  <text x="700" y="1025" class="step-desc" fill="white" text-anchor="middle" font-size="14">With Specialization: +8-15 hours per track</text>
+  <text x="700" y="1055" class="step-desc" fill="white" text-anchor="middle" font-size="14">🏆 Complete all 16 core steps + 1 specialization to become a SARK Expert!</text>
+</svg>

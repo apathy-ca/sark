@@ -1,0 +1,188 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 950" style="background: white;">
+  <defs>
+    <style>
+      .title { font: bold 24px sans-serif; fill: #2c3e50; }
+      .subtitle { font: 16px sans-serif; fill: #7f8c8d; }
+      .heading { font: bold 16px sans-serif; fill: #2c3e50; }
+      .actor { font: bold 14px sans-serif; fill: #2c3e50; }
+      .label { font: 12px sans-serif; fill: #34495e; }
+      .code { font: 11px monospace; fill: #2c3e50; }
+      .box { fill: #ecf0f1; stroke: #95a5a6; stroke-width: 2; }
+      .arrow { fill: none; stroke: #3498db; stroke-width: 2; marker-end: url(#arrowhead); }
+      .return { fill: none; stroke: #2ecc71; stroke-width: 2; stroke-dasharray: 5,5; marker-end: url(#arrowhead-return); }
+      .process { fill: #3498db; stroke: #2980b9; stroke-width: 2; }
+      .opa-box { fill: #9b59b6; stroke: #8e44ad; stroke-width: 2; }
+      .policy-box { fill: #f8f9fa; stroke: #6c757d; stroke-width: 1; }
+      .text { font: 11px sans-serif; fill: white; text-anchor: middle; }
+      .note { font: 10px sans-serif; fill: #7f8c8d; font-style: italic; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#3498db" />
+    </marker>
+    <marker id="arrowhead-return" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#2ecc71" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="600" y="35" class="title" text-anchor="middle">MCP Authorization Flow with Open Policy Agent</text>
+  <text x="600" y="60" class="subtitle" text-anchor="middle">Policy-based access control for MCP resources using OPA</text>
+
+  <!-- Left side: Flow Diagram -->
+  <rect x="30" y="90" width="620" height="550" class="box" rx="5"/>
+  <text x="340" y="115" class="heading" text-anchor="middle">Authorization Flow</text>
+
+  <!-- Actors -->
+  <rect x="60" y="140" width="100" height="50" class="box" rx="5"/>
+  <text x="110" y="170" class="actor" text-anchor="middle">SARK API</text>
+
+  <rect x="240" y="140" width="100" height="50" class="box" rx="5"/>
+  <text x="290" y="165" class="actor" text-anchor="middle">OPA Client</text>
+  <text x="290" y="180" class="note" text-anchor="middle">(opa_client.py)</text>
+
+  <rect x="420" y="140" width="100" height="50" class="box" rx="5"/>
+  <text x="470" y="165" class="actor" text-anchor="middle">OPA Server</text>
+  <text x="470" y="180" class="note" text-anchor="middle">:8181</text>
+
+  <rect x="540" y="140" width="90" height="50" class="box" rx="5"/>
+  <text x="585" y="165" class="actor" text-anchor="middle">Redis</text>
+  <text x="585" y="180" class="note" text-anchor="middle">(cache)</text>
+
+  <!-- Lifelines -->
+  <line x1="110" y1="190" x2="110" y2="610" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="290" y1="190" x2="290" y2="610" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="470" y1="190" x2="470" y2="610" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="585" y1="190" x2="585" y2="610" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="5,5"/>
+
+  <!-- Step 1 -->
+  <line x1="110" y1="220" x2="290" y2="220" class="arrow"/>
+  <text x="200" y="215" class="label" text-anchor="middle">authorize(input)</text>
+  <text x="200" y="235" class="note" text-anchor="middle">user, action, resource</text>
+
+  <!-- Step 2 -->
+  <rect x="240" y="250" width="100" height="40" class="process" rx="5"/>
+  <text x="290" y="265" class="text">Generate</text>
+  <text x="290" y="280" class="text">cache key</text>
+
+  <!-- Step 3 -->
+  <line x1="290" y1="310" x2="585" y2="310" class="arrow"/>
+  <text x="437" y="305" class="label" text-anchor="middle">GET policy:cache:{hash}</text>
+
+  <!-- Step 4 -->
+  <line x1="585" y1="340" x2="290" y2="340" class="return"/>
+  <text x="437" y="335" class="label" text-anchor="middle">MISS (or HIT → return)</text>
+
+  <!-- Step 5 -->
+  <line x1="290" y1="370" x2="470" y2="370" class="arrow"/>
+  <text x="380" y="365" class="label" text-anchor="middle">POST /v1/data/authz/allow</text>
+  <text x="380" y="385" class="note" text-anchor="middle">{input: {user, action, resource}}</text>
+
+  <!-- Step 6 -->
+  <rect x="420" y="400" width="100" height="50" class="opa-box" rx="5"/>
+  <text x="470" y="415" class="text">Evaluate</text>
+  <text x="470" y="430" class="text">Rego Policies</text>
+  <text x="470" y="445" class="text">(see right →)</text>
+
+  <!-- Step 7 -->
+  <line x1="470" y1="470" x2="290" y2="470" class="return"/>
+  <text x="380" y="465" class="label" text-anchor="middle">{result: {allow: true}}</text>
+
+  <!-- Step 8 -->
+  <line x1="290" y1="500" x2="585" y2="500" class="arrow"/>
+  <text x="437" y="495" class="label" text-anchor="middle">SET policy:cache:{hash}</text>
+  <text x="437" y="515" class="note" text-anchor="middle">TTL: 300s, value: allow=true</text>
+
+  <!-- Step 9 -->
+  <rect x="240" y="540" width="100" height="40" class="process" rx="5"/>
+  <text x="290" y="555" class="text">Return</text>
+  <text x="290" y="570" class="text">decision</text>
+
+  <!-- Step 10 -->
+  <line x1="290" y1="590" x2="110" y2="590" class="return"/>
+  <text x="200" y="585" class="label" text-anchor="middle">allow = true</text>
+
+  <!-- Right side: OPA Policy Example -->
+  <rect x="680" y="90" width="490" height="550" class="policy-box" rx="5"/>
+  <text x="925" y="115" class="heading" text-anchor="middle">OPA Policy (Rego)</text>
+  <text x="925" y="135" class="note" text-anchor="middle">File: opa/policies/mcp_authorization.rego</text>
+
+  <!-- Policy code -->
+  <text x="700" y="165" class="code">package authz</text>
+  <text x="700" y="185" class="code"></text>
+  <text x="700" y="200" class="code"># Import data</text>
+  <text x="700" y="215" class="code">import data.users</text>
+  <text x="700" y="230" class="code">import data.teams</text>
+  <text x="700" y="245" class="code">import data.policies</text>
+  <text x="700" y="260" class="code"></text>
+  <text x="700" y="275" class="code"># Default deny</text>
+  <text x="700" y="290" class="code">default allow = false</text>
+  <text x="700" y="305" class="code"></text>
+  <text x="700" y="320" class="code"># Rule 1: Admin access</text>
+  <text x="700" y="335" class="code">allow {</text>
+  <text x="715" y="350" class="code">input.user.role == "admin"</text>
+  <text x="700" y="365" class="code">}</text>
+  <text x="700" y="380" class="code"></text>
+  <text x="700" y="395" class="code"># Rule 2: Team-based access</text>
+  <text x="700" y="410" class="code">allow {</text>
+  <text x="715" y="425" class="code">input.action == "invoke"</text>
+  <text x="715" y="440" class="code">input.resource.type == "tool"</text>
+  <text x="715" y="455" class="code">user_team := input.user.team_id</text>
+  <text x="715" y="470" class="code">resource_team := input.resource.team_id</text>
+  <text x="715" y="485" class="code">user_team == resource_team</text>
+  <text x="700" y="500" class="code">}</text>
+  <text x="700" y="515" class="code"></text>
+  <text x="700" y="530" class="code"># Rule 3: Sensitivity level check</text>
+  <text x="700" y="545" class="code">allow {</text>
+  <text x="715" y="560" class="code">user_clearance := input.user.clearance</text>
+  <text x="715" y="575" class="code">resource_sensitivity := input.resource.sensitivity</text>
+  <text x="715" y="590" class="code">clearance_sufficient(</text>
+  <text x="730" y="605" class="code">user_clearance, resource_sensitivity</text>
+  <text x="715" y="620" class="code">)</text>
+  <text x="700" y="635" class="code">}</text>
+
+  <!-- Decision Factors -->
+  <rect x="30" y="670" width="370" height="250" class="box" rx="5"/>
+  <text x="215" y="695" class="heading" text-anchor="middle">Authorization Decision Factors</text>
+
+  <circle cx="60" cy="720" r="5" fill="#3498db"/>
+  <text x="75" y="725" class="label">User attributes: role, team_id, clearance_level</text>
+
+  <circle cx="60" cy="745" r="5" fill="#3498db"/>
+  <text x="75" y="750" class="label">Resource attributes: type, sensitivity_level, team_id</text>
+
+  <circle cx="60" cy="770" r="5" fill="#3498db"/>
+  <text x="75" y="775" class="label">Action type: register, invoke, update, delete</text>
+
+  <circle cx="60" cy="795" r="5" fill="#3498db"/>
+  <text x="75" y="800" class="label">Context: time_of_day, ip_address, request_origin</text>
+
+  <circle cx="60" cy="820" r="5" fill="#3498db"/>
+  <text x="75" y="825" class="label">Policy rules: RBAC, ABAC, team-based, time-based</text>
+
+  <text x="215" y="855" class="heading" text-anchor="middle">Performance Optimization</text>
+
+  <text x="60" y="880" class="label">• Redis caching: 95%+ hit rate, &lt;5ms cache latency</text>
+  <text x="60" y="900" class="label">• Policy compilation: OPA compiles Rego to native code</text>
+
+  <!-- Policy Types -->
+  <rect x="430" y="670" width="370" height="250" class="box" rx="5"/>
+  <text x="615" y="695" class="heading" text-anchor="middle">Built-in Policy Types</text>
+
+  <rect x="450" y="710" width="330" height="35" class="policy-box" rx="3"/>
+  <text x="460" y="725" class="label">1. RBAC (Role-Based Access Control)</text>
+  <text x="465" y="740" class="note">Admin, power user, standard user, read-only</text>
+
+  <rect x="450" y="755" width="330" height="35" class="policy-box" rx="3"/>
+  <text x="460" y="770" class="label">2. Team-Based Access</text>
+  <text x="465" y="785" class="note">Users can only access their team's resources</text>
+
+  <rect x="450" y="800" width="330" height="35" class="policy-box" rx="3"/>
+  <text x="460" y="815" class="label">3. Sensitivity-Level Enforcement</text>
+  <text x="465" y="830" class="note">Clearance required: LOW, MEDIUM, HIGH, CRITICAL</text>
+
+  <rect x="450" y="845" width="330" height="35" class="policy-box" rx="3"/>
+  <text x="460" y="860" class="label">4. Time-Based Restrictions</text>
+  <text x="465" y="875" class="note">Business hours only, maintenance windows</text>
+
+  <text x="615" y="905" class="note" text-anchor="middle">Policies are composable and environment-specific (dev/staging/prod)</text>
+</svg>

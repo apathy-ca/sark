@@ -1,0 +1,246 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1000" style="background: white;">
+  <defs>
+    <style>
+      .title { font: bold 24px sans-serif; fill: #2c3e50; }
+      .subtitle { font: 16px sans-serif; fill: #7f8c8d; }
+      .state-label { font: bold 14px sans-serif; fill: white; text-anchor: middle; }
+      .transition-label { font: 12px sans-serif; fill: #34495e; }
+      .note { font: 10px sans-serif; fill: #7f8c8d; font-style: italic; }
+      .section-title { font: bold 16px sans-serif; fill: #2c3e50; }
+      .list-item { font: 12px sans-serif; fill: #2c3e50; }
+      .registered { fill: #95a5a6; stroke: #7f8c8d; stroke-width: 3; }
+      .active { fill: #2ecc71; stroke: #27ae60; stroke-width: 3; }
+      .inactive { fill: #f39c12; stroke: #e67e22; stroke-width: 3; }
+      .unhealthy { fill: #e74c3c; stroke: #c0392b; stroke-width: 3; }
+      .decommissioned { fill: #34495e; stroke: #2c3e50; stroke-width: 3; }
+      .arrow { fill: none; stroke: #3498db; stroke-width: 2; marker-end: url(#arrowhead); }
+      .health-arrow { fill: none; stroke: #2ecc71; stroke-width: 2; marker-end: url(#arrowhead-health); }
+      .fail-arrow { fill: none; stroke: #e74c3c; stroke-width: 2; marker-end: url(#arrowhead-fail); stroke-dasharray: 5,5; }
+      .box { fill: #ecf0f1; stroke: #95a5a6; stroke-width: 2; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#3498db" />
+    </marker>
+    <marker id="arrowhead-health" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#2ecc71" />
+    </marker>
+    <marker id="arrowhead-fail" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#e74c3c" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="700" y="35" class="title" text-anchor="middle">MCP Server Lifecycle Management</text>
+  <text x="700" y="60" class="subtitle" text-anchor="middle">State transitions and health monitoring for MCP servers</text>
+
+  <!-- State Machine Diagram -->
+  <rect x="30" y="90" width="900" height="550" class="box" rx="5"/>
+  <text x="480" y="115" class="section-title" text-anchor="middle">Server State Machine</text>
+
+  <!-- State 1: REGISTERED -->
+  <ellipse cx="180" cy="200" rx="90" ry="45" class="registered"/>
+  <text x="180" y="200" class="state-label">REGISTERED</text>
+  <text x="180" y="215" class="state-label" font-size="10">Initial State</text>
+  <text x="180" y="260" class="note" text-anchor="middle">Server created via API</text>
+  <text x="180" y="275" class="note" text-anchor="middle">Not yet validated</text>
+
+  <!-- State 2: ACTIVE -->
+  <ellipse cx="480" cy="200" rx="90" ry="45" class="active"/>
+  <text x="480" y="200" class="state-label">ACTIVE</text>
+  <text x="480" y="215" class="state-label" font-size="10">Healthy</text>
+  <text x="480" y="260" class="note" text-anchor="middle">Health checks passing</text>
+  <text x="480" y="275" class="note" text-anchor="middle">Available for use</text>
+
+  <!-- State 3: INACTIVE -->
+  <ellipse cx="780" cy="200" rx="90" ry="45" class="inactive"/>
+  <text x="780" y="200" class="state-label">INACTIVE</text>
+  <text x="780" y="215" class="state-label" font-size="10">Paused</text>
+  <text x="780" y="260" class="note" text-anchor="middle">Manually disabled</text>
+  <text x="780" y="275" class="note" text-anchor="middle">Not available</text>
+
+  <!-- State 4: UNHEALTHY -->
+  <ellipse cx="480" cy="420" rx="90" ry="45" class="unhealthy"/>
+  <text x="480" y="420" class="state-label">UNHEALTHY</text>
+  <text x="480" y="435" class="state-label" font-size="10">Failed Checks</text>
+  <text x="480" y="480" class="note" text-anchor="middle">Health checks failing</text>
+  <text x="480" y="495" class="note" text-anchor="middle">Alert triggered</text>
+
+  <!-- State 5: DECOMMISSIONED -->
+  <ellipse cx="780" cy="420" rx="110" ry="45" class="decommissioned"/>
+  <text x="780" y="420" class="state-label">DECOMMISSIONED</text>
+  <text x="780" y="435" class="state-label" font-size="10">End of Life</text>
+  <text x="780" y="480" class="note" text-anchor="middle">Server retired</text>
+  <text x="780" y="495" class="note" text-anchor="middle">Historical data retained</text>
+
+  <!-- Transition 1: REGISTERED → ACTIVE -->
+  <path d="M 270 200 L 390 200" class="health-arrow"/>
+  <text x="330" y="195" class="transition-label" text-anchor="middle">Health check</text>
+  <text x="330" y="210" class="transition-label" text-anchor="middle">succeeds</text>
+
+  <!-- Transition 2: ACTIVE → UNHEALTHY -->
+  <path d="M 480 245 L 480 375" class="fail-arrow"/>
+  <text x="520" y="310" class="transition-label" text-anchor="middle">Health check</text>
+  <text x="520" y="325" class="transition-label" text-anchor="middle">fails (3x)</text>
+
+  <!-- Transition 3: UNHEALTHY → ACTIVE -->
+  <path d="M 440 385 L 440 235" class="health-arrow"/>
+  <text x="400" y="310" class="transition-label" text-anchor="middle">Health</text>
+  <text x="400" y="325" class="transition-label" text-anchor="middle">recovered</text>
+
+  <!-- Transition 4: ACTIVE → INACTIVE -->
+  <path d="M 565 185 L 695 185" class="arrow"/>
+  <text x="630" y="180" class="transition-label" text-anchor="middle">Admin disables</text>
+
+  <!-- Transition 5: INACTIVE → ACTIVE -->
+  <path d="M 695 215 L 565 215" class="arrow"/>
+  <text x="630" y="230" class="transition-label" text-anchor="middle">Admin enables</text>
+
+  <!-- Transition 6: INACTIVE → DECOMMISSIONED -->
+  <path d="M 780 245 L 780 375" class="arrow"/>
+  <text x="820" y="310" class="transition-label" text-anchor="middle">Admin</text>
+  <text x="820" y="325" class="transition-label" text-anchor="middle">decommissions</text>
+
+  <!-- Transition 7: UNHEALTHY → DECOMMISSIONED -->
+  <path d="M 565 435 L 670 435" class="arrow"/>
+  <text x="617" y="430" class="transition-label" text-anchor="middle">Failed for 24h</text>
+  <text x="617" y="445" class="transition-label" text-anchor="middle">or admin action</text>
+
+  <!-- Transition 8: ACTIVE → DECOMMISSIONED -->
+  <path d="M 550 230 L 710 390" class="arrow"/>
+  <text x="650" y="295" class="transition-label" text-anchor="middle">Immediate</text>
+  <text x="650" y="310" class="transition-label" text-anchor="middle">decommission</text>
+
+  <!-- Legend -->
+  <rect x="50" y="560" width="860" height="60" class="box" rx="5"/>
+  <text x="480" y="580" class="section-title" text-anchor="middle">State Transition Legend</text>
+
+  <line x1="80" y1="600" x2="130" y2="600" class="arrow"/>
+  <text x="145" y="605" class="list-item">Manual action (API call)</text>
+
+  <line x1="340" y1="600" x2="390" y2="600" class="health-arrow"/>
+  <text x="405" y="605" class="list-item">Automated health recovery</text>
+
+  <line x1="630" y1="600" x2="680" y2="600" class="fail-arrow"/>
+  <text x="695" y="605" class="list-item">Automated failure detection</text>
+
+  <!-- Health Check Flow -->
+  <rect x="960" y="90" width="410" height="350" class="box" rx="5"/>
+  <text x="1165" y="115" class="section-title" text-anchor="middle">Health Check Process</text>
+
+  <rect x="980" y="140" width="370" height="40" class="active" rx="5"/>
+  <text x="1165" y="165" class="state-label">1. Schedule Health Check</text>
+  <text x="985" y="195" class="note">Every 60 seconds for ACTIVE servers</text>
+
+  <rect x="980" y="210" width="370" height="40" class="active" rx="5"/>
+  <text x="1165" y="235" class="state-label">2. HTTP GET {health_endpoint}</text>
+  <text x="985" y="265" class="note">Timeout: 5 seconds</text>
+
+  <rect x="980" y="280" width="180" height="40" class="active" rx="5"/>
+  <text x="1070" y="305" class="state-label">3a. Success (200)</text>
+
+  <rect x="1170" y="280" width="180" height="40" class="unhealthy" rx="5"/>
+  <text x="1260" y="305" class="state-label">3b. Failure</text>
+
+  <rect x="980" y="335" width="180" height="40" class="active" rx="5"/>
+  <text x="1070" y="360" class="state-label">Update last_check</text>
+
+  <rect x="1170" y="335" width="180" height="40" class="unhealthy" rx="5"/>
+  <text x="1260" y="360" class="state-label">Increment failures</text>
+
+  <text x="985" y="395" class="note">After 3 consecutive failures → UNHEALTHY</text>
+  <text x="985" y="410" class="note">After 24h unhealthy → DECOMMISSIONED</text>
+  <text x="985" y="425" class="note">Recovery: 1 success → ACTIVE</text>
+
+  <!-- Server Operations -->
+  <rect x="960" y="460" width="410" height="160" class="box" rx="5"/>
+  <text x="1165" y="485" class="section-title" text-anchor="middle">Server Operations</text>
+
+  <circle cx="990" cy="510" r="5" fill="#3498db"/>
+  <text x="1005" y="515" class="list-item">POST /api/v1/servers - Register new server</text>
+
+  <circle cx="990" cy="535" r="5" fill="#3498db"/>
+  <text x="1005" y="540" class="list-item">GET /api/v1/servers/{id} - Get server details</text>
+
+  <circle cx="990" cy="560" r="5" fill="#3498db"/>
+  <text x="1005" y="565" class="list-item">PATCH /api/v1/servers/{id} - Update config</text>
+
+  <circle cx="990" cy="585" r="5" fill="#3498db"/>
+  <text x="1005" y="590" class="list-item">DELETE /api/v1/servers/{id} - Decommission</text>
+
+  <text x="985" y="610" class="note">All operations require authorization via OPA</text>
+
+  <!-- Metrics and Monitoring -->
+  <rect x="30" y="660" width="440" height="310" class="box" rx="5"/>
+  <text x="250" y="685" class="section-title" text-anchor="middle">Metrics &amp; Monitoring</text>
+
+  <text x="50" y="710" class="section-title">Server Metrics:</text>
+  <circle cx="60" cy="730" r="4" fill="#2ecc71"/>
+  <text x="75" y="735" class="list-item">Total servers by status (ACTIVE, INACTIVE, etc.)</text>
+  <circle cx="60" cy="750" r="4" fill="#2ecc71"/>
+  <text x="75" y="755" class="list-item">Health check success rate (%)</text>
+  <circle cx="60" cy="770" r="4" fill="#2ecc71"/>
+  <text x="75" y="775" class="list-item">Average health check latency (ms)</text>
+  <circle cx="60" cy="790" r="4" fill="#2ecc71"/>
+  <text x="75" y="795" class="list-item">Servers registered in last 24h</text>
+  <circle cx="60" cy="810" r="4" fill="#2ecc71"/>
+  <text x="75" y="815" class="list-item">Unhealthy server count (alert threshold: 5)</text>
+
+  <text x="50" y="840" class="section-title">Audit Events:</text>
+  <circle cx="60" cy="860" r="4" fill="#9b59b6"/>
+  <text x="75" y="865" class="list-item">server_registered - New server added</text>
+  <circle cx="60" cy="880" r="4" fill="#9b59b6"/>
+  <text x="75" y="885" class="list-item">server_health_changed - Status transition</text>
+  <circle cx="60" cy="900" r="4" fill="#9b59b6"/>
+  <text x="75" y="905" class="list-item">server_updated - Configuration changed</text>
+  <circle cx="60" cy="920" r="4" fill="#9b59b6"/>
+  <text x="75" y="925" class="list-item">server_decommissioned - Server retired</text>
+
+  <text x="55" y="950" class="note">All events stored in TimescaleDB with 90-day retention</text>
+
+  <!-- Alerting Rules -->
+  <rect x="500" y="660" width="870" height="310" class="box" rx="5"/>
+  <text x="935" y="685" class="section-title" text-anchor="middle">Alerting &amp; Auto-Remediation</text>
+
+  <rect x="520" y="705" width="400" height="250" class="box" rx="3"/>
+  <text x="720" y="725" class="section-title" text-anchor="middle">Alert Conditions</text>
+
+  <rect x="530" y="740" width="380" height="35" class="unhealthy" rx="3"/>
+  <text x="540" y="755" class="list-item" fill="white">P1: &gt;10% of servers UNHEALTHY</text>
+  <text x="545" y="770" class="note" fill="white">Action: Page on-call, create incident</text>
+
+  <rect x="530" y="785" width="380" height="35" class="inactive" rx="3"/>
+  <text x="540" y="800" class="list-item">P2: Server unhealthy for &gt;1 hour</text>
+  <text x="545" y="815" class="note">Action: Slack alert, log investigation ticket</text>
+
+  <rect x="530" y="830" width="380" height="35" class="inactive" rx="3"/>
+  <text x="540" y="845" class="list-item">P3: Health check latency &gt;500ms</text>
+  <text x="545" y="860" class="note">Action: Log warning, investigate network</text>
+
+  <rect x="530" y="875" width="380" height="35" class="registered" rx="3"/>
+  <text x="540" y="890" class="list-item">P4: Server stuck in REGISTERED &gt;10 min</text>
+  <text x="545" y="905" class="note">Action: Auto-retry health check, notify owner</text>
+
+  <rect x="940" y="705" width="410" height="250" class="box" rx="3"/>
+  <text x="1145" y="725" class="section-title" text-anchor="middle">Auto-Remediation</text>
+
+  <circle cx="960" cy="750" r="5" fill="#2ecc71"/>
+  <text x="975" y="755" class="list-item">Retry health checks with exponential backoff</text>
+
+  <circle cx="960" cy="775" r="5" fill="#2ecc71"/>
+  <text x="975" y="780" class="list-item">Auto-restart unhealthy servers (if configured)</text>
+
+  <circle cx="960" cy="800" r="5" fill="#2ecc71"/>
+  <text x="975" y="805" class="list-item">Failover to backup server in same team</text>
+
+  <circle cx="960" cy="825" r="5" fill="#2ecc71"/>
+  <text x="975" y="830" class="list-item">Notify server owner via email/Slack</text>
+
+  <circle cx="960" cy="850" r="5" fill="#2ecc71"/>
+  <text x="975" y="855" class="list-item">Create JIRA ticket for persistent failures</text>
+
+  <circle cx="960" cy="875" r="5" fill="#2ecc71"/>
+  <text x="975" y="880" class="list-item">Auto-decommission after 7 days unhealthy</text>
+
+  <text x="960" y="910" class="note">Remediation actions configurable per server</text>
+  <text x="960" y="930" class="note">All actions logged to audit trail</text>
+</svg>

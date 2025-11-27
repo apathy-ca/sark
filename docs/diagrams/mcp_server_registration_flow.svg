@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" style="background: white;">
+  <defs>
+    <style>
+      .title { font: bold 24px sans-serif; fill: #2c3e50; }
+      .subtitle { font: 16px sans-serif; fill: #7f8c8d; }
+      .actor { font: bold 14px sans-serif; fill: #2c3e50; }
+      .label { font: 12px sans-serif; fill: #34495e; }
+      .box { fill: #ecf0f1; stroke: #95a5a6; stroke-width: 2; }
+      .arrow { fill: none; stroke: #3498db; stroke-width: 2; marker-end: url(#arrowhead); }
+      .return { fill: none; stroke: #2ecc71; stroke-width: 2; stroke-dasharray: 5,5; marker-end: url(#arrowhead-return); }
+      .process { fill: #3498db; stroke: #2980b9; stroke-width: 2; }
+      .decision { fill: #e74c3c; stroke: #c0392b; stroke-width: 2; }
+      .success { fill: #2ecc71; stroke: #27ae60; stroke-width: 2; }
+      .text { font: 11px sans-serif; fill: white; text-anchor: middle; }
+      .note { font: 10px sans-serif; fill: #7f8c8d; font-style: italic; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#3498db" />
+    </marker>
+    <marker id="arrowhead-return" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#2ecc71" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="600" y="35" class="title" text-anchor="middle">MCP Server Registration Flow</text>
+  <text x="600" y="60" class="subtitle" text-anchor="middle">How MCP servers are registered and validated in SARK</text>
+
+  <!-- Actors -->
+  <rect x="50" y="90" width="120" height="60" class="box" rx="5"/>
+  <text x="110" y="125" class="actor" text-anchor="middle">Developer</text>
+
+  <rect x="250" y="90" width="120" height="60" class="box" rx="5"/>
+  <text x="310" y="125" class="actor" text-anchor="middle">SARK API</text>
+
+  <rect x="450" y="90" width="120" height="60" class="box" rx="5"/>
+  <text x="510" y="125" class="actor" text-anchor="middle">Auth Service</text>
+
+  <rect x="650" y="90" width="120" height="60" class="box" rx="5"/>
+  <text x="710" y="125" class="actor" text-anchor="middle">OPA</text>
+
+  <rect x="850" y="90" width="120" height="60" class="box" rx="5"/>
+  <text x="910" y="125" class="actor" text-anchor="middle">PostgreSQL</text>
+
+  <rect x="1050" y="90" width="120" height="60" class="box" rx="5"/>
+  <text x="1110" y="125" class="actor" text-anchor="middle">Audit Service</text>
+
+  <!-- Lifelines -->
+  <line x1="110" y1="150" x2="110" y2="850" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="310" y1="150" x2="310" y2="850" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="510" y1="150" x2="510" y2="850" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="710" y1="150" x2="710" y2="850" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="910" y1="150" x2="910" y2="850" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="1110" y1="150" x2="1110" y2="850" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="5,5"/>
+
+  <!-- Step 1: POST request -->
+  <line x1="110" y1="180" x2="310" y2="180" class="arrow"/>
+  <text x="210" y="175" class="label" text-anchor="middle">POST /api/v1/servers</text>
+  <text x="210" y="195" class="note" text-anchor="middle">{name, transport, endpoint, capabilities}</text>
+
+  <!-- Step 2: Validate token -->
+  <line x1="310" y1="220" x2="510" y2="220" class="arrow"/>
+  <text x="410" y="215" class="label" text-anchor="middle">Validate JWT token</text>
+
+  <!-- Step 3: Token response -->
+  <line x1="510" y1="250" x2="310" y2="250" class="return"/>
+  <text x="410" y="245" class="label" text-anchor="middle">user_id, roles, teams</text>
+
+  <!-- Step 4: Check authorization -->
+  <line x1="310" y1="280" x2="710" y2="280" class="arrow"/>
+  <text x="510" y="275" class="label" text-anchor="middle">Check policy: can_register_server</text>
+  <text x="510" y="295" class="note" text-anchor="middle">{user, action: "register", resource: "mcp_server"}</text>
+
+  <!-- Step 5: Authorization response -->
+  <line x1="710" y1="330" x2="310" y2="330" class="return"/>
+  <text x="510" y="325" class="label" text-anchor="middle">allow = true</text>
+
+  <!-- Step 6: Decision box -->
+  <polygon points="260,360 360,360 335,400 285,400" class="decision"/>
+  <text x="310" y="385" class="text">Authorized?</text>
+
+  <!-- Step 7a: If not authorized -->
+  <line x1="285" y1="380" x2="110" y2="380" class="return"/>
+  <text x="195" y="375" class="label" text-anchor="middle">403 Forbidden</text>
+
+  <!-- Step 7b: If authorized, validate payload -->
+  <rect x="260" y="430" width="100" height="40" class="process" rx="5"/>
+  <text x="310" y="455" class="text">Validate</text>
+  <text x="310" y="470" class="text">Payload</text>
+
+  <!-- Step 8: Generate server ID -->
+  <rect x="260" y="490" width="100" height="40" class="process" rx="5"/>
+  <text x="310" y="510" class="text">Generate</text>
+  <text x="310" y="525" class="text">Server UUID</text>
+
+  <!-- Step 9: Save to database -->
+  <line x1="310" y1="550" x2="910" y2="550" class="arrow"/>
+  <text x="610" y="545" class="label" text-anchor="middle">INSERT INTO mcp_servers</text>
+  <text x="610" y="565" class="note" text-anchor="middle">(id, name, transport, endpoint, owner_id, status="registered")</text>
+
+  <!-- Step 10: DB response -->
+  <line x1="910" y1="590" x2="310" y2="590" class="return"/>
+  <text x="610" y="585" class="label" text-anchor="middle">Server created</text>
+
+  <!-- Step 11: Create audit event -->
+  <line x1="310" y1="620" x2="1110" y2="620" class="arrow"/>
+  <text x="710" y="615" class="label" text-anchor="middle">Log audit event</text>
+  <text x="710" y="635" class="note" text-anchor="middle">event_type: "mcp_server_registered"</text>
+
+  <!-- Step 12: Audit response -->
+  <line x1="1110" y1="660" x2="310" y2="660" class="return"/>
+  <text x="710" y="655" class="label" text-anchor="middle">Event logged</text>
+
+  <!-- Step 13: Return success -->
+  <rect x="260" y="680" width="100" height="40" class="success" rx="5"/>
+  <text x="310" y="700" class="text">201 Created</text>
+  <text x="310" y="715" class="text">Return server</text>
+
+  <!-- Step 14: Response to developer -->
+  <line x1="310" y1="740" x2="110" y2="740" class="return"/>
+  <text x="210" y="735" class="label" text-anchor="middle">201 Created</text>
+  <text x="210" y="755" class="note" text-anchor="middle">{id, name, status, created_at, endpoint}</text>
+
+  <!-- Step 15: Background health check -->
+  <rect x="260" y="780" width="100" height="40" class="process" rx="5"/>
+  <text x="310" y="795" class="text">Schedule</text>
+  <text x="310" y="810" class="text">Health Check</text>
+
+  <text x="600" y="870" class="note" text-anchor="middle">Note: Server status changes from "registered" to "active" after first successful health check</text>
+</svg>
