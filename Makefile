@@ -66,11 +66,48 @@ run: ## Run SARK API server locally
 docker-build: ## Build Docker images
 	docker compose build
 
-docker-up: ## Start Docker services
+docker-up: ## Start Docker services (minimal profile - app only)
 	docker compose up -d
+
+docker-up-standard: ## Start Docker services (standard profile - app + PostgreSQL + Redis)
+	docker compose --profile standard up -d
+
+docker-up-full: ## Start Docker services (full profile - complete stack)
+	docker compose --profile full up -d
 
 docker-down: ## Stop Docker services
 	docker compose down
+
+# Development environment commands
+dev-up: ## Start development environment (frontend + backend + database)
+	docker compose -f docker-compose.dev.yml up -d
+
+dev-up-build: ## Start development environment with rebuild
+	docker compose -f docker-compose.dev.yml up -d --build
+
+dev-down: ## Stop development environment
+	docker compose -f docker-compose.dev.yml down
+
+dev-logs: ## View development environment logs
+	docker compose -f docker-compose.dev.yml logs -f
+
+dev-logs-frontend: ## View frontend dev logs only
+	docker compose -f docker-compose.dev.yml logs -f frontend-dev
+
+dev-logs-api: ## View API dev logs only
+	docker compose -f docker-compose.dev.yml logs -f app
+
+dev-shell-frontend: ## Open shell in frontend dev container
+	docker compose -f docker-compose.dev.yml exec frontend-dev sh
+
+dev-shell-api: ## Open shell in API dev container
+	docker compose -f docker-compose.dev.yml exec app bash
+
+dev-restart: ## Restart development environment
+	docker compose -f docker-compose.dev.yml restart
+
+dev-clean: ## Clean development environment (remove volumes)
+	docker compose -f docker-compose.dev.yml down -v
 
 docker-test: ## Run tests in Docker
 	docker compose run --rm app pytest
@@ -115,21 +152,53 @@ opa-check: ## Check OPA policy syntax
 	docker compose exec opa opa check /policies
 
 # Kubernetes commands
-k8s-deploy: ## Deploy to Kubernetes
-	kubectl apply -f k8s/base/namespace.yaml
-	kubectl apply -f k8s/base/opa-deployment.yaml
-	kubectl apply -f k8s/base/deployment.yaml
+k8s-deploy: ## Deploy to Kubernetes using Kustomize
+	kubectl apply -k k8s/base
+
+k8s-deploy-prod: ## Deploy to production using Kustomize overlay
+	kubectl apply -k k8s/overlays/production
 
 k8s-status: ## Check Kubernetes deployment status
-	kubectl get all -n sark-system
+	kubectl get all -n sark
 
-k8s-logs: ## View Kubernetes logs
-	kubectl logs -f deployment/sark-api -n sark-system
+k8s-logs: ## View backend API logs
+	kubectl logs -f deployment/sark-api -n sark
+
+k8s-logs-frontend: ## View frontend logs
+	kubectl logs -f -n sark -l app.kubernetes.io/component=frontend
 
 k8s-delete: ## Delete Kubernetes resources
-	kubectl delete -f k8s/base/deployment.yaml
-	kubectl delete -f k8s/base/opa-deployment.yaml
-	kubectl delete -f k8s/base/namespace.yaml
+	kubectl delete -k k8s/base
+
+k8s-shell-frontend: ## Open shell in frontend pod
+	kubectl exec -it -n sark deployment/sark-frontend -- sh
+
+k8s-shell-api: ## Open shell in API pod
+	kubectl exec -it -n sark deployment/sark-api -- bash
+
+# Helm commands
+helm-install: ## Install SARK using Helm
+	helm install sark ./helm/sark --namespace sark --create-namespace
+
+helm-install-prod: ## Install SARK using Helm with production values
+	helm install sark ./helm/sark \
+		--namespace sark \
+		--create-namespace \
+		--set frontend.enabled=true \
+		--set ingress.enabled=true
+
+helm-upgrade: ## Upgrade SARK Helm release
+	helm upgrade sark ./helm/sark --namespace sark
+
+helm-uninstall: ## Uninstall SARK Helm release
+	helm uninstall sark --namespace sark
+
+helm-status: ## Check Helm release status
+	helm status sark --namespace sark
+
+helm-test: ## Test Helm chart
+	helm lint ./helm/sark
+	helm template sark ./helm/sark
 
 ci-local: quality test ## Run basic CI checks locally (quality + tests)
 
@@ -149,3 +218,57 @@ setup-dev: install-dev ## Complete development setup
 	@echo "Run 'make test' to verify everything works"
 
 dev: docker-up run ## Start dependencies and run API locally
+
+# Documentation commands
+docs-build: ## Build documentation site
+	mkdocs build --strict
+
+docs-serve: ## Serve documentation locally
+	mkdocs serve
+
+docs-deploy: ## Deploy documentation to GitHub Pages
+	mkdocs gh-deploy --force
+
+docs-clean: ## Clean documentation build artifacts
+	rm -rf site/
+
+docs-check: ## Check documentation for broken links
+	mkdocs build --strict
+	@echo "Documentation build successful - no broken links found"
+
+# Frontend commands
+frontend-build: ## Build production frontend Docker image
+	cd frontend && docker build \
+		--target production \
+		--build-arg VITE_API_URL=${VITE_API_URL:-http://localhost:8000} \
+		--build-arg VITE_APP_VERSION=$$(git describe --tags --always) \
+		--build-arg VITE_APP_NAME=SARK \
+		-t sark-frontend:latest \
+		-t sark-frontend:$$(git describe --tags --always) \
+		.
+
+frontend-build-dev: ## Build development frontend Docker image
+	cd frontend && docker build \
+		-f Dockerfile.dev \
+		-t sark-frontend:dev \
+		.
+
+frontend-up: ## Start frontend service (production)
+	docker compose --profile standard up -d frontend
+
+frontend-down: ## Stop frontend service
+	docker compose stop frontend
+	docker compose rm -f frontend
+
+frontend-logs: ## View frontend logs
+	docker compose logs -f frontend
+
+frontend-shell: ## Open shell in frontend container
+	docker compose exec frontend sh
+
+frontend-restart: ## Restart frontend service
+	docker compose restart frontend
+
+frontend-clean: ## Clean frontend containers and images
+	docker compose down frontend
+	docker rmi sark-frontend:latest sark-frontend:dev 2>/dev/null || true

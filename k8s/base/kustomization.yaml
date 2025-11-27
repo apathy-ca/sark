@@ -12,10 +12,18 @@ resources:
   - service.yaml
   - hpa.yaml
   - ingress.yaml
+  # Frontend resources
+  - frontend-serviceaccount.yaml
+  - frontend-deployment.yaml
+  - frontend-service.yaml
+  - frontend-hpa.yaml
+  - frontend-ingress.yaml
 
 commonLabels:
   app.kubernetes.io/managed-by: kustomize
 
 images:
   - name: sark
+    newTag: latest
+  - name: sark-frontend
     newTag: latest

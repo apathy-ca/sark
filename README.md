@@ -78,6 +78,95 @@ graph LR
 **Next Steps:**
 - **Phase 3 (Q1 2026):** Production deployment, monitoring, user feedback, enhancements
 
+## What is MCP?
+
+**Model Context Protocol (MCP)** is an open protocol that standardizes how applications provide context to Large Language Models (LLMs). MCP enables AI applications to securely connect to various data sources, tools, and services through a unified interface.
+
+### Why MCP Matters for Enterprises
+
+As organizations adopt AI assistants and LLM-powered applications, they face critical challenges:
+
+- **🔓 Unrestricted Access**: MCP servers can potentially access any data or system they're connected to
+- **👁️ Limited Visibility**: IT teams lack insight into which MCP servers are deployed and what they're accessing
+- **🚫 No Enforcement**: Without governance, MCP servers operate outside standard security controls
+- **📋 Compliance Gaps**: Audit trails and policy enforcement are typically missing
+
+### The SARK Solution
+
+SARK provides enterprise-grade governance for MCP deployments at scale:
+
+```mermaid
+graph TB
+    subgraph "Without SARK"
+        A1[AI App] -->|Direct Access| B1[MCP Server 1]
+        A1 -->|Direct Access| B2[MCP Server 2]
+        A1 -->|Direct Access| B3[MCP Server 3]
+        B1 -.->|Uncontrolled| D1[(Database)]
+        B2 -.->|Uncontrolled| D2[(APIs)]
+        B3 -.->|Uncontrolled| D3[(Files)]
+    end
+
+    subgraph "With SARK"
+        A2[AI App] -->|Authenticated| S[SARK Gateway]
+        S -->|Authorized| M1[MCP Server 1]
+        S -->|Authorized| M2[MCP Server 2]
+        S -->|Authorized| M3[MCP Server 3]
+        S -->|Audit Trail| L[TimescaleDB]
+        S -->|Policy Check| P[OPA]
+        M1 -->|Controlled| D4[(Database)]
+        M2 -->|Controlled| D5[(APIs)]
+        M3 -->|Controlled| D6[(Files)]
+    end
+```
+
+### MCP Governance Features
+
+SARK provides comprehensive MCP governance through:
+
+#### 🔍 **Discovery**
+- Automated scanning for MCP servers across your infrastructure
+- Registry of all MCP servers with capabilities, versions, and metadata
+- Network topology mapping and dependency tracking
+
+#### 🔐 **Authentication**
+- Multi-protocol support (OIDC, LDAP, SAML, API Keys)
+- Integration with enterprise identity providers
+- Service-to-service authentication for MCP servers
+
+#### 🛡️ **Authorization**
+- Fine-grained access control using Open Policy Agent (OPA)
+- Hybrid ReBAC + ABAC authorization model
+- Tool-level and resource-level permissions
+- Context-aware policies (time, location, sensitivity)
+
+#### 📊 **Audit Trail**
+- Immutable audit logs for all MCP interactions
+- Compliance reporting (SOC 2, ISO 27001, GDPR)
+- Real-time SIEM integration (Splunk, Datadog)
+- Long-term retention in TimescaleDB
+
+#### ⚡ **Runtime Enforcement**
+- API Gateway integration (Kong) for edge security
+- Rate limiting and quota management
+- Circuit breakers for failing services
+- Policy caching for sub-5ms decisions
+
+### MCP Use Cases
+
+SARK enables secure MCP deployments for:
+
+- **Code Assistants**: Control access to repositories, build systems, and deployment tools
+- **Data Analytics**: Govern connections to databases, data warehouses, and BI tools
+- **DevOps Automation**: Secure access to cloud providers, Kubernetes, and infrastructure
+- **Document Processing**: Protect access to file systems, SharePoint, and document management
+- **Enterprise Search**: Control querying across internal knowledge bases and wikis
+
+### Learn More About MCP
+
+- **[MCP Official Specification](https://spec.modelcontextprotocol.io/)** - Protocol documentation
+- **[MCP GitHub Repository](https://github.com/modelcontextprotocol)** - Official implementations
+- **[SARK MCP Introduction](docs/MCP_INTRODUCTION.md)** - Detailed MCP concepts (coming soon)
+
 ## Key Features
 
 - **Zero-Trust MCP Architecture** with multi-layer enforcement

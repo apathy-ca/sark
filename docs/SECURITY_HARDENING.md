@@ -567,7 +567,7 @@ CMD ["uvicorn", "sark.main:app", "--host", "0.0.0.0", "--port", "8000"]
 #### Docker Compose Security
 
 ```yaml
-version: '3.9'
+# Docker Compose file (no version needed for Compose v2+)
 
 services:
   api:

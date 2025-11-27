@@ -4,6 +4,74 @@
 
 ---
 
+## 🔑 Core Concept
+
+### MCP (Model Context Protocol)
+
+**Model Context Protocol** is an open protocol that standardizes how applications provide context to Large Language Models (LLMs).
+
+**What it does:**
+- Enables AI applications to securely connect to data sources, tools, and services
+- Provides a unified interface for LLMs to access external context
+- Supports discovery of capabilities, invocation of tools, and retrieval of resources
+
+**Why governance is needed:**
+- **Unrestricted Access**: MCP servers can potentially access any connected system
+- **Visibility Gap**: Organizations lack insight into deployed MCP servers
+- **Missing Controls**: No standard authorization or audit mechanisms
+- **Compliance Risk**: Audit trails and policy enforcement typically absent
+
+**MCP Components:**
+- **MCP Client**: AI application that connects to MCP servers (e.g., Claude Desktop, IDEs)
+- **MCP Server**: Service that exposes tools, resources, and prompts to clients
+- **MCP Protocol**: JSON-RPC 2.0 based communication protocol
+- **MCP Gateway**: Proxy layer for authentication, authorization, and audit (SARK's role)
+
+**Key Capabilities:**
+- **Tools**: Executable functions (e.g., search database, run script, send email)
+- **Resources**: Data access (e.g., read file, query API, fetch document)
+- **Prompts**: Template interactions with context
+- **Sampling**: Request LLM completions through the server
+
+**SARK's MCP Governance:**
+1. **Discovery**: Automated scanning and registration of MCP servers
+2. **Authentication**: Multi-protocol identity verification (OIDC, LDAP, SAML)
+3. **Authorization**: Policy-based access control via Open Policy Agent
+4. **Audit**: Immutable logging of all MCP interactions
+5. **Enforcement**: Runtime policy enforcement at the gateway layer
+
+**Example MCP Server:**
+```json
+{
+  "name": "database-server",
+  "version": "1.0.0",
+  "capabilities": ["tools", "resources"],
+  "tools": ["query_customer_data", "update_records"],
+  "resources": ["customer_database", "analytics_views"],
+  "endpoint": "https://mcp-db.internal:8080",
+  "sensitivity": "high"
+}
+```
+
+**Security Considerations:**
+- MCP servers inherit the permissions of their host environment
+- Tools can execute arbitrary code if not properly sandboxed
+- Resources may expose sensitive data without access controls
+- Rate limiting needed to prevent abuse
+
+**Standards & Specifications:**
+- **Official Spec**: https://spec.modelcontextprotocol.io/
+- **GitHub Repo**: https://github.com/modelcontextprotocol
+- **Transport**: JSON-RPC 2.0 over HTTP/HTTPS, WebSockets, or stdio
+
+**See also:**
+- [MCP Server](#mcp-server)
+- [MCP Client](#mcp-client)
+- [Capabilities (MCP)](#capabilities-mcp)
+- [Zero-Trust MCP](#zero-trust-mcp)
+
+---
+
 ## A
 
 ### ABAC (Attribute-Based Access Control)
@@ -294,15 +362,56 @@ Open protocol for AI assistants to access tools and data.
 
 **Version:** 2025-06-18 (latest)
 
+**See also:** [MCP (detailed)](#mcp-model-context-protocol) in Core Concepts section
+
+### MCP Client
+AI application or agent that connects to MCP servers to access tools, resources, and prompts.
+
+**Examples:**
+- Claude Desktop (Anthropic's desktop app)
+- IDEs with AI integrations (VS Code, Cursor, Zed)
+- Custom AI agents and chatbots
+- Enterprise AI platforms
+
+**Client responsibilities:**
+- Discover available MCP servers
+- Authenticate with servers or gateway
+- Request tool execution and resource access
+- Handle responses and present to users
+
+**SARK integration:** Clients connect through SARK Gateway for authentication and authorization
+
+### MCP Gateway
+Proxy layer that sits between MCP clients and servers to enforce security policies.
+
+**What SARK provides:**
+- Authentication: Verify client identities (OIDC, LDAP, SAML, API keys)
+- Authorization: Policy-based access control via OPA
+- Audit: Log all tool invocations and resource accesses
+- Rate limiting: Prevent abuse and DoS
+- Discovery: Central registry of available MCP servers
+
+**Architecture:** Clients → SARK Gateway → MCP Servers → Resources
+
 ### MCP Server
 Service that implements MCP protocol to provide tools/resources to AI assistants.
 
 **Transports:** HTTP, stdio, SSE (Server-Sent Events)
 
+**Security concerns:**
+- Servers run with host system permissions
+- Tools can execute arbitrary code
+- Resources may expose sensitive data
+- No built-in authentication or authorization
+
+**SARK solution:** All access goes through gateway with policy enforcement
+
 ### MCP Tool
 Function exposed by MCP server that AI can invoke.
 
 **Examples:** `database_query`, `send_email`, `create_ticket`
+
+**Security:** SARK can restrict which users/roles can invoke which tools
 
 ### mTLS (Mutual TLS)
 TLS where both client and server authenticate each other with certificates.
@@ -592,6 +701,59 @@ Security model where no user or service is trusted by default.
 **Principles:** Verify explicitly, least privilege, assume breach
 
 **SARK:** Every request authenticated and authorized, regardless of source
+
+### Zero-Trust MCP
+Application of zero-trust security principles to Model Context Protocol deployments.
+
+**Key tenets:**
+1. **Never trust, always verify**: Every MCP request requires authentication
+2. **Least privilege**: Grant minimum permissions needed for each tool/resource
+3. **Assume breach**: Log everything, detect anomalies, limit blast radius
+4. **Explicit authorization**: Every tool invocation checked against policies
+5. **Continuous validation**: Re-authenticate and re-authorize for sensitive operations
+
+**SARK implementation:**
+- **Identity verification**: Multi-factor authentication via OIDC/LDAP/SAML
+- **Context-aware policies**: Consider user, time, location, sensitivity, risk score
+- **Microsegmentation**: Isolate MCP servers in network segments
+- **Least privilege access**: Default deny, explicitly grant tool permissions
+- **Continuous monitoring**: Real-time anomaly detection, SIEM integration
+- **Immutable audit**: All MCP interactions logged to TimescaleDB
+
+**Architecture layers:**
+```
+┌─────────────────────────────────────────┐
+│ User/Application (Authenticated)        │
+└──────────────┬──────────────────────────┘
+               │ 1. Authenticate
+               ▼
+┌─────────────────────────────────────────┐
+│ SARK Gateway (AuthN + AuthZ)            │
+│ - Verify identity (OIDC/LDAP)           │
+│ - Check OPA policies                    │
+│ - Log to audit trail                    │
+└──────────────┬──────────────────────────┘
+               │ 2. Authorized request
+               ▼
+┌─────────────────────────────────────────┐
+│ MCP Server (Sandboxed)                  │
+│ - Execute tool/access resource          │
+│ - Limited permissions                   │
+└──────────────┬──────────────────────────┘
+               │ 3. Access data
+               ▼
+┌─────────────────────────────────────────┐
+│ Protected Resource (Database/API/File)  │
+└─────────────────────────────────────────┘
+```
+
+**Benefits:**
+- Prevent lateral movement after compromise
+- Detect and respond to suspicious tool usage
+- Meet compliance requirements (SOC 2, ISO 27001)
+- Reduce blast radius of compromised MCP servers
+
+**See also:** [Zero-Trust](#zero-trust), [MCP Gateway](#mcp-gateway), [Defense in Depth](#defense-in-depth)
 
 ---
 
