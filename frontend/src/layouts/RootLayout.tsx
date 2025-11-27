@@ -1,9 +1,15 @@
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { getAccessToken } from "../services/api";
+import { ThemeToggleIcon } from "@/components/ThemeToggle";
+import { KeyboardShortcutsHelp } from "@/components/KeyboardShortcutsHelp";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 
 export default function RootLayout() {
   const navigate = useNavigate();
+
+  // Enable global keyboard shortcuts
+  useKeyboardShortcuts();
 
   useEffect(() => {
     // Check if user is authenticated
@@ -57,6 +63,7 @@ export default function RootLayout() {
               </nav>
             </div>
             <div className="flex items-center space-x-4">
+              <ThemeToggleIcon />
               <Link
                 to="/profile"
                 className="text-foreground/80 hover:text-foreground transition-colors"
@@ -72,6 +79,9 @@ export default function RootLayout() {
       <main className="container mx-auto px-4 py-8">
         <Outlet />
       </main>
+
+      {/* Keyboard Shortcuts Help Modal */}
+      <KeyboardShortcutsHelp />
     </div>
   );
 }
