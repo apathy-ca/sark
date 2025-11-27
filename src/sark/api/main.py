@@ -7,7 +7,7 @@ import structlog
 
 from sark.api.middleware import AuthMiddleware
 from sark.api.middleware.security_headers import add_security_middleware
-from sark.api.routers import auth, bulk, health, metrics, policy, servers, tools
+from sark.api.routers import auth, bulk, export, health, metrics, policy, servers, tools
 from sark.config import get_settings
 from sark.db import init_db
 
@@ -99,6 +99,10 @@ See the documentation for complete details.
                 "name": "metrics",
                 "description": "Server metrics, statistics, and time-series data",
             },
+            {
+                "name": "export",
+                "description": "Data export in CSV and JSON formats",
+            },
         ],
     )
 
@@ -132,6 +136,7 @@ See the documentation for complete details.
     app.include_router(tools.router, prefix="/api/v1/tools", tags=["tools"])
     app.include_router(bulk.router, prefix="/api/v1/bulk", tags=["bulk"])
     app.include_router(metrics.router, prefix="/api/v1/metrics", tags=["metrics"])
+    app.include_router(export.router, prefix="/api/v1/export", tags=["export"])
 
     # Prometheus metrics endpoint
     if settings.metrics_enabled:
