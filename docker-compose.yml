@@ -3,16 +3,22 @@ version: '3.9'
 # ============================================================================
 # SARK Docker Compose Configuration
 # ============================================================================
-# This file supports both:
-# - Managed services (deployed via Docker Compose)
-# - External services (existing enterprise deployments)
+# This file supports multiple deployment profiles for different use cases:
 #
-# Usage:
-# - Managed mode: docker-compose --profile managed up
-# - External mode: Use .env file to configure external service endpoints
-# - Mixed mode: Enable only specific managed services
+# Profiles:
+# - minimal  : Quick start with just PostgreSQL + Redis (5-minute setup)
+# - managed  : Full local stack with Kong Gateway (complete testing)
+# - full     : Same as managed (alias for compatibility)
+# - kong     : Only Kong services (use with external DB/Redis)
 #
-# See docs/deployment/INTEGRATION.md for detailed instructions.
+# Usage Examples:
+# - Quick Start:    docker compose --profile minimal up
+# - Full Local:     docker compose --profile managed up
+# - Production-like: docker compose --profile full up
+# - External mode:   Use .env file to configure external service endpoints
+#
+# See docs/QUICK_START.md for 5-minute quickstart guide.
+# See docs/DEPLOYMENT.md for complete deployment instructions.
 # ============================================================================
 
 services:
@@ -52,12 +58,19 @@ services:
       - KONG_MODE=${KONG_MODE:-managed}
       - KONG_ADMIN_URL=${KONG_ADMIN_URL:-http://kong:8001}
       - KONG_PROXY_URL=${KONG_PROXY_URL:-http://kong:8000}
+      # OPA configuration
+      - OPA_ENABLED=${OPA_ENABLED:-true}
+      - OPA_URL=${OPA_URL:-http://opa:8181}
+      - OPA_POLICY_PATH=${OPA_POLICY_PATH:-/v1/data/mcp/allow}
     stdin_open: true
     tty: true
     command: python -m pytest --cov
     networks:
       - sark-network
     depends_on:
+      opa:
+        condition: service_healthy
+        required: false
       database:
         condition: service_healthy
         required: false
@@ -69,6 +82,38 @@ services:
         required: false
 
   # ============================================================================
+  # Open Policy Agent (OPA) - Policy Engine
+  # ============================================================================
+  # Required for authorization decisions
+  # ============================================================================
+  opa:
+    image: openpolicyagent/opa:0.60.0
+    container_name: sark-opa
+    profiles:
+      - minimal
+      - managed
+      - full
+    command:
+      - "run"
+      - "--server"
+      - "--log-level=info"
+      - "--log-format=json"
+      - "/policies"
+    volumes:
+      - ./opa/policies:/policies:ro
+    ports:
+      - "8181:8181"
+    networks:
+      - sark-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8181/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
+
+  # ============================================================================
   # PostgreSQL Database (Managed Service)
   # ============================================================================
   # Use profile 'managed' to deploy this service locally
@@ -78,6 +123,7 @@ services:
     image: postgres:15-alpine
     container_name: sark-db
     profiles:
+      - minimal
       - managed
       - full
     environment:
@@ -110,6 +156,7 @@ services:
     image: redis:7-alpine
     container_name: sark-cache
     profiles:
+      - minimal
       - managed
       - full
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
