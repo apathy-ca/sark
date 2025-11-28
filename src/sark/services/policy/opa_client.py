@@ -655,3 +655,190 @@ class OPAClient:
 
         decision = await self.evaluate_policy(auth_input)
         return decision.allow
+
+    async def evaluate_gateway_policy(
+        self,
+        user_context: dict[str, Any],
+        action: str,
+        server: dict[str, Any] | None = None,
+        tool: dict[str, Any] | None = None,
+        context: dict[str, Any] | None = None,
+    ) -> AuthorizationDecision:
+        """
+        Evaluate Gateway-specific policy.
+
+        This method is designed for MCP Gateway integration, supporting
+        Gateway-managed server and tool authorization decisions.
+
+        Args:
+            user_context: User information (id, role, teams, etc.)
+            action: Gateway action (e.g., "gateway:tool:invoke", "gateway:server:register")
+            server: Server metadata (id, owner_id, managed_by_team, etc.)
+            tool: Tool metadata (name, sensitivity_level, parameters, etc.)
+            context: Additional context (timestamp, environment, etc.)
+
+        Returns:
+            Authorization decision with allow/deny, reason, and filtered parameters
+
+        Example:
+            >>> decision = await opa_client.evaluate_gateway_policy(
+            ...     user_context={"id": "user1", "role": "developer", "teams": ["team-alpha"]},
+            ...     action="gateway:tool:invoke",
+            ...     server={"id": "server1", "owner_id": "user1"},
+            ...     tool={"name": "db-query", "sensitivity_level": "medium"},
+            ...     context={"timestamp": 0}
+            ... )
+        """
+        auth_input = AuthorizationInput(
+            user=user_context,
+            action=action,
+            server=server,
+            tool=tool,
+            context=context or {},
+        )
+        return await self.evaluate_policy(auth_input)
+
+    async def batch_evaluate_gateway(
+        self,
+        requests: list[tuple[dict[str, Any], str, dict[str, Any] | None, dict[str, Any] | None]],
+    ) -> list[AuthorizationDecision]:
+        """
+        Batch evaluate Gateway authorizations.
+
+        This is optimized for checking multiple Gateway operations in a single
+        call, reducing latency through Redis pipelining and parallel OPA queries.
+
+        Args:
+            requests: List of tuples (user_context, action, server, tool)
+                Each tuple contains:
+                - user_context: User information dict
+                - action: Gateway action string
+                - server: Server metadata dict or None
+                - tool: Tool metadata dict or None
+
+        Returns:
+            List of authorization decisions in the same order as inputs
+
+        Example:
+            >>> requests = [
+            ...     ({"id": "user1", "role": "admin"}, "gateway:tool:invoke",
+            ...      {"id": "s1"}, {"name": "tool1", "sensitivity_level": "low"}),
+            ...     ({"id": "user1", "role": "admin"}, "gateway:server:register",
+            ...      {"name": "new-server"}, None),
+            ... ]
+            >>> decisions = await opa_client.batch_evaluate_gateway(requests)
+        """
+        auth_inputs = [
+            AuthorizationInput(
+                user=u,
+                action=a,
+                server=s,
+                tool=t,
+                context={},
+            )
+            for u, a, s, t in requests
+        ]
+        return await self.evaluate_policy_batch(auth_inputs)
+
+    async def evaluate_a2a_policy(
+        self,
+        source_agent: dict[str, Any],
+        target_agent: dict[str, Any],
+        action: str,
+        context: dict[str, Any] | None = None,
+    ) -> AuthorizationDecision:
+        """
+        Evaluate Agent-to-Agent (A2A) authorization policy.
+
+        This method is designed for A2A communication authorization within
+        the MCP Gateway ecosystem, supporting trust levels and capabilities.
+
+        Args:
+            source_agent: Source agent information (id, type, trust_level, capabilities, etc.)
+            target_agent: Target agent information (id, type, trust_level, etc.)
+            action: A2A action (e.g., "a2a:communicate", "a2a:execute", "a2a:delegate")
+            context: Additional context (rate_limit, environment, etc.)
+
+        Returns:
+            Authorization decision with allow/deny, reason, and restrictions
+
+        Example:
+            >>> decision = await opa_client.evaluate_a2a_policy(
+            ...     source_agent={
+            ...         "id": "agent1",
+            ...         "type": "service",
+            ...         "trust_level": "trusted",
+            ...         "environment": "production"
+            ...     },
+            ...     target_agent={
+            ...         "id": "agent2",
+            ...         "type": "worker",
+            ...         "trust_level": "trusted",
+            ...         "environment": "production"
+            ...     },
+            ...     action="a2a:execute",
+            ...     context={"rate_limit": {"current_count": 100}}
+            ... )
+        """
+        # For A2A policies, we use a different input structure
+        # that matches the a2a_authorization.rego policy expectations
+        policy_input = {
+            "source_agent": source_agent,
+            "target_agent": target_agent,
+            "action": action,
+            "context": context or {},
+        }
+
+        start_time = time.time()
+
+        try:
+            # Use the a2a policy path
+            a2a_policy_path = "/v1/data/mcp/gateway/a2a/result"
+
+            response = await self.client.post(
+                f"{self.opa_url}{a2a_policy_path}",
+                json={"input": policy_input},
+            )
+            response.raise_for_status()
+
+            opa_latency_ms = (time.time() - start_time) * 1000
+
+            result = response.json()
+            policy_result = result.get("result", {})
+
+            decision = AuthorizationDecision(
+                allow=policy_result.get("allow", False),
+                reason=policy_result.get("audit_reason", "A2A policy evaluation completed"),
+                filtered_parameters=policy_result.get("restrictions"),
+                audit_id=policy_result.get("audit_id"),
+            )
+
+            # Record OPA latency for metrics
+            self.cache.record_opa_latency(opa_latency_ms)
+
+            logger.info(
+                "a2a_policy_evaluated",
+                decision=decision.allow,
+                source_agent_id=source_agent.get("id"),
+                target_agent_id=target_agent.get("id"),
+                action=action,
+                opa_latency_ms=round(opa_latency_ms, 2),
+            )
+
+            return decision
+
+        except httpx.HTTPError as e:
+            logger.error("opa_a2a_request_failed", error=str(e), opa_url=self.opa_url)
+            # Fail closed - deny on error
+            return AuthorizationDecision(
+                allow=False,
+                reason=f"A2A policy evaluation failed: {e!s}",
+            )
+
+        except Exception as e:
+            logger.error("unexpected_error_a2a", error=str(e))
+            # Fail closed
+            return AuthorizationDecision(
+                allow=False,
+                reason="Internal error during A2A policy evaluation",
+            )
