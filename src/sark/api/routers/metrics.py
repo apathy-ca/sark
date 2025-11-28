@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import structlog
 
 from sark.db import get_db
-from sark.models.mcp_server import MCPServer, MCPTool, ServerStatus, SensitivityLevel
+from sark.models.mcp_server import MCPServer, MCPTool, ServerStatus
 from sark.services.auth import UserContext, get_current_user
 
 logger = structlog.get_logger()

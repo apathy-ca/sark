@@ -3,12 +3,9 @@
 import asyncio
 from typing import Any
 
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query, status
-from fastapi.responses import JSONResponse
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect, status
 import structlog
 
-from sark.db import get_db, get_timescale_db
 from sark.services.auth import JWTHandler, UserContext
 
 logger = structlog.get_logger()
@@ -209,7 +206,7 @@ async def audit_stream_websocket(
                 if data == "ping":
                     await websocket.send_text("pong")
 
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 # Send a keep-alive ping
                 try:
                     await websocket.send_json({"type": "ping"})
@@ -297,7 +294,7 @@ async def server_status_websocket(
                 data = await asyncio.wait_for(websocket.receive_text(), timeout=30.0)
                 if data == "ping":
                     await websocket.send_text("pong")
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 try:
                     await websocket.send_json({"type": "ping"})
                 except Exception:
@@ -388,7 +385,7 @@ async def metrics_live_websocket(
                 data = await asyncio.wait_for(websocket.receive_text(), timeout=30.0)
                 if data == "ping":
                     await websocket.send_text("pong")
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 try:
                     await websocket.send_json({"type": "ping"})
                 except Exception:
@@ -427,4 +424,4 @@ async def get_websocket_connections():
 
 
 # Export the manager for use in other modules to broadcast events
-__all__ = ["router", "manager"]
+__all__ = ["manager", "router"]
