@@ -279,9 +279,7 @@ class SessionStore:
             List of user's sessions
         """
         session_ids = self._user_sessions.get(user_id, set())
-        return [
-            self._sessions[sid] for sid in session_ids if sid in self._sessions
-        ]
+        return [self._sessions[sid] for sid in session_ids if sid in self._sessions]
 
     def delete_user_sessions(self, user_id: UUID) -> int:
         """
@@ -311,9 +309,7 @@ class SessionStore:
         """
         now = datetime.now(UTC)
         expired = [
-            session_id
-            for session_id, session in self._sessions.items()
-            if now > session.expires_at
+            session_id for session_id, session in self._sessions.items() if now > session.expires_at
         ]
 
         for session_id in expired:

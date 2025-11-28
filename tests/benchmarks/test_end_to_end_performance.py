@@ -52,9 +52,7 @@ def opa_client(mock_redis):
 @pytest.mark.benchmark
 @pytest.mark.asyncio
 @patch("httpx.AsyncClient.post")
-async def test_end_to_end_tool_invocation_latency(
-    mock_post, opa_client, tool_registry, mock_redis
-):
+async def test_end_to_end_tool_invocation_latency(mock_post, opa_client, tool_registry, mock_redis):
     """Benchmark: Complete tool invocation flow should be <50ms p95.
 
     Flow:
@@ -74,9 +72,7 @@ async def test_end_to_end_tool_invocation_latency(
         await asyncio.sleep(0.030)  # 30ms OPA call
         response = MagicMock()
         response.status_code = 200
-        response.json.return_value = {
-            "result": {"allow": True, "audit_reason": "Test"}
-        }
+        response.json.return_value = {"result": {"allow": True, "audit_reason": "Test"}}
         response.raise_for_status = MagicMock()
         return response
 
@@ -200,9 +196,7 @@ async def test_end_to_end_tool_invocation_latency(
 @pytest.mark.benchmark
 @pytest.mark.asyncio
 @patch("httpx.AsyncClient.post")
-async def test_end_to_end_mixed_workload(
-    mock_post, opa_client, tool_registry, mock_redis
-):
+async def test_end_to_end_mixed_workload(mock_post, opa_client, tool_registry, mock_redis):
     """Benchmark: Mixed workload (80% cache hit) should have good overall latency.
 
     Simulates realistic production scenario with 80% cache hit rate.
@@ -215,9 +209,7 @@ async def test_end_to_end_mixed_workload(
         await asyncio.sleep(0.030)  # 30ms
         response = MagicMock()
         response.status_code = 200
-        response.json.return_value = {
-            "result": {"allow": True, "audit_reason": "Test"}
-        }
+        response.json.return_value = {"result": {"allow": True, "audit_reason": "Test"}}
         response.raise_for_status = MagicMock()
         return response
 
@@ -314,9 +306,7 @@ async def test_end_to_end_throughput(mock_post, opa_client, tool_registry, mock_
     # Setup fast OPA mock
     opa_response = MagicMock()
     opa_response.status_code = 200
-    opa_response.json.return_value = {
-        "result": {"allow": True, "audit_reason": "Test"}
-    }
+    opa_response.json.return_value = {"result": {"allow": True, "audit_reason": "Test"}}
     opa_response.raise_for_status = MagicMock()
     mock_post.return_value = opa_response
 
@@ -373,9 +363,7 @@ async def test_end_to_end_throughput(mock_post, opa_client, tool_registry, mock_
 @pytest.mark.benchmark
 @pytest.mark.asyncio
 @patch("httpx.AsyncClient.post")
-async def test_concurrent_users_performance(
-    mock_post, opa_client, tool_registry, mock_redis
-):
+async def test_concurrent_users_performance(mock_post, opa_client, tool_registry, mock_redis):
     """Benchmark: Performance under concurrent user load.
 
     Simulates 100 concurrent users making authorization requests.
@@ -385,9 +373,7 @@ async def test_concurrent_users_performance(
 
     opa_response = MagicMock()
     opa_response.status_code = 200
-    opa_response.json.return_value = {
-        "result": {"allow": True, "audit_reason": "Test"}
-    }
+    opa_response.json.return_value = {"result": {"allow": True, "audit_reason": "Test"}}
     opa_response.raise_for_status = MagicMock()
     mock_post.return_value = opa_response
 
@@ -495,16 +481,13 @@ async def test_sensitivity_detection_scalability(tool_registry):
 
     for count in tool_counts:
         tools = [
-            (f"tool-{i}", f"Tool {i} description with various operations")
-            for i in range(count)
+            (f"tool-{i}", f"Tool {i} description with various operations") for i in range(count)
         ]
 
         start = time.perf_counter()
 
         # Detect all concurrently
-        tasks = [
-            tool_registry.detect_sensitivity(name, desc) for name, desc in tools
-        ]
+        tasks = [tool_registry.detect_sensitivity(name, desc) for name, desc in tools]
         await asyncio.gather(*tasks)
 
         end = time.perf_counter()
@@ -549,9 +532,7 @@ async def test_sustained_load(mock_post, opa_client, tool_registry, mock_redis):
 
     opa_response = MagicMock()
     opa_response.status_code = 200
-    opa_response.json.return_value = {
-        "result": {"allow": True, "audit_reason": "Test"}
-    }
+    opa_response.json.return_value = {"result": {"allow": True, "audit_reason": "Test"}}
     opa_response.raise_for_status = MagicMock()
     mock_post.return_value = opa_response
 

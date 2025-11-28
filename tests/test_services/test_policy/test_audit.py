@@ -244,9 +244,7 @@ async def test_get_decision_logs_with_filters(
     assert all(log.user_id == "user-123" for log in user_logs)
 
     # Query by result
-    denied_logs = await audit_service.get_decision_logs(
-        result=PolicyDecisionResult.DENY, limit=100
-    )
+    denied_logs = await audit_service.get_decision_logs(result=PolicyDecisionResult.DENY, limit=100)
     assert len(denied_logs) >= 1
     assert all(log.result == PolicyDecisionResult.DENY for log in denied_logs)
 
@@ -307,9 +305,7 @@ async def test_get_policy_changes(audit_service):
 
 
 @pytest.mark.asyncio
-async def test_export_decisions_csv(
-    audit_service, sample_auth_input, sample_policy_decision
-):
+async def test_export_decisions_csv(audit_service, sample_auth_input, sample_policy_decision):
     """Test exporting decisions to CSV format."""
     # Create log entries
     await audit_service.log_decision(sample_auth_input, sample_policy_decision)
@@ -328,9 +324,7 @@ async def test_export_decisions_csv(
 
 
 @pytest.mark.asyncio
-async def test_export_decisions_json(
-    audit_service, sample_auth_input, sample_policy_decision
-):
+async def test_export_decisions_json(audit_service, sample_auth_input, sample_policy_decision):
     """Test exporting decisions to JSON format."""
     import json
 
@@ -360,14 +354,14 @@ async def test_export_decisions_json(
 
 
 @pytest.mark.asyncio
-async def test_get_decision_analytics(
-    audit_service, sample_auth_input, sample_policy_decision
-):
+async def test_get_decision_analytics(audit_service, sample_auth_input, sample_policy_decision):
     """Test getting decision analytics."""
     # Create multiple log entries
     for i in range(10):
         decision = (
-            sample_policy_decision if i % 2 == 0 else AuthorizationDecision(allow=False, reason="Denied")
+            sample_policy_decision
+            if i % 2 == 0
+            else AuthorizationDecision(allow=False, reason="Denied")
         )
         cache_hit = i % 3 == 0
 
@@ -418,9 +412,7 @@ async def test_get_decision_analytics_grouped(
 
 
 @pytest.mark.asyncio
-async def test_get_top_denial_reasons(
-    audit_service, sample_auth_input
-):
+async def test_get_top_denial_reasons(audit_service, sample_auth_input):
     """Test getting top denial reasons."""
     # Create denials with different reasons
     reasons = [

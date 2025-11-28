@@ -24,11 +24,12 @@ fake = Faker()
 # User Generators
 # ============================================================================
 
+
 def generate_user(
     role: str = "developer",
     is_admin: bool = False,
     is_active: bool = True,
-    team_id: UUID | None = None
+    team_id: UUID | None = None,
 ) -> User:
     """
     Generate a single user with realistic data.
@@ -60,7 +61,7 @@ def generate_user(
         is_admin=is_admin,
         extra_metadata=extra_metadata,
         created_at=datetime.now(UTC) - timedelta(days=random.randint(1, 365)),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
 
@@ -94,8 +95,14 @@ def generate_team(member_count: int = 0) -> Team:
         Team object
     """
     team_names = [
-        "Engineering", "Data Science", "DevOps", "Security",
-        "Product", "Design", "QA", "Research"
+        "Engineering",
+        "Data Science",
+        "DevOps",
+        "Security",
+        "Product",
+        "Design",
+        "QA",
+        "Research",
     ]
 
     return Team(
@@ -104,10 +111,10 @@ def generate_team(member_count: int = 0) -> Team:
         description=fake.catch_phrase(),
         extra_metadata={
             "department": random.choice(["Tech", "Business", "Operations"]),
-            "member_count": member_count
+            "member_count": member_count,
         },
         created_at=datetime.now(UTC) - timedelta(days=random.randint(1, 730)),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
 
@@ -115,12 +122,13 @@ def generate_team(member_count: int = 0) -> Team:
 # Server Generators
 # ============================================================================
 
+
 def generate_mcp_server(
     owner_id: UUID | None = None,
     team_id: UUID | None = None,
     sensitivity_level: SensitivityLevel = SensitivityLevel.MEDIUM,
     server_status: ServerStatus = ServerStatus.ACTIVE,
-    transport: TransportType = TransportType.HTTP
+    transport: TransportType = TransportType.HTTP,
 ) -> MCPServer:
     """
     Generate a single MCP server with realistic data.
@@ -136,8 +144,14 @@ def generate_mcp_server(
         MCPServer object
     """
     server_types = [
-        "api-gateway", "data-processor", "ml-model", "analytics",
-        "monitoring", "logging", "auth-service", "notification"
+        "api-gateway",
+        "data-processor",
+        "ml-model",
+        "analytics",
+        "monitoring",
+        "logging",
+        "auth-service",
+        "notification",
     ]
 
     server_type = random.choice(server_types)
@@ -166,16 +180,17 @@ def generate_mcp_server(
         owner_id=owner_id,
         team_id=team_id,
         status=server_status,
-        health_check_url=f"http://{server_name}.{fake.domain_name()}/health" if transport == TransportType.HTTP else None,
+        health_check_url=(
+            f"http://{server_name}.{fake.domain_name()}/health"
+            if transport == TransportType.HTTP
+            else None
+        ),
         created_at=datetime.now(UTC) - timedelta(days=random.randint(1, 180)),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
 
-def generate_servers(
-    count: int,
-    **kwargs
-) -> list[MCPServer]:
+def generate_servers(count: int, **kwargs) -> list[MCPServer]:
     """
     Generate multiple MCP servers.
 
@@ -190,10 +205,7 @@ def generate_servers(
 
 
 def generate_server_with_tools(
-    tool_count: int = 5,
-    prompt_count: int = 3,
-    resource_count: int = 2,
-    **kwargs
+    tool_count: int = 5, prompt_count: int = 3, resource_count: int = 2, **kwargs
 ) -> MCPServer:
     """
     Generate MCP server with tools, prompts, and resources.
@@ -212,42 +224,44 @@ def generate_server_with_tools(
     # Add tools
     tools = []
     for i in range(tool_count):
-        tools.append({
-            "name": f"{fake.word()}_tool_{i}",
-            "description": fake.sentence(),
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "query": {"type": "string"},
-                    "limit": {"type": "integer", "default": 10}
-                }
+        tools.append(
+            {
+                "name": f"{fake.word()}_tool_{i}",
+                "description": fake.sentence(),
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "query": {"type": "string"},
+                        "limit": {"type": "integer", "default": 10},
+                    },
+                },
             }
-        })
+        )
 
     # Add prompts
     prompts = []
     for i in range(prompt_count):
-        prompts.append({
-            "name": f"{fake.word()}_prompt_{i}",
-            "description": fake.sentence(),
-            "template": fake.paragraph()
-        })
+        prompts.append(
+            {
+                "name": f"{fake.word()}_prompt_{i}",
+                "description": fake.sentence(),
+                "template": fake.paragraph(),
+            }
+        )
 
     # Add resources
     resources = []
     for i in range(resource_count):
-        resources.append({
-            "name": f"{fake.word()}_resource_{i}",
-            "description": fake.sentence(),
-            "uri": fake.url()
-        })
+        resources.append(
+            {
+                "name": f"{fake.word()}_resource_{i}",
+                "description": fake.sentence(),
+                "uri": fake.url(),
+            }
+        )
 
     # Update server metadata
-    server.extra_metadata = {
-        "tools": tools,
-        "prompts": prompts,
-        "resources": resources
-    }
+    server.extra_metadata = {"tools": tools, "prompts": prompts, "resources": resources}
 
     return server
 
@@ -255,15 +269,14 @@ def generate_server_with_tools(
 def generate_high_sensitivity_server(**kwargs) -> MCPServer:
     """Generate a high-sensitivity server."""
     return generate_mcp_server(
-        sensitivity_level=SensitivityLevel.HIGH,
-        server_status=ServerStatus.ACTIVE,
-        **kwargs
+        sensitivity_level=SensitivityLevel.HIGH, server_status=ServerStatus.ACTIVE, **kwargs
     )
 
 
 # ============================================================================
 # Policy Generators
 # ============================================================================
+
 
 def generate_policy(
     policy_type: str = "authorization",
@@ -284,7 +297,7 @@ def generate_policy(
         "tool-invocation-policy",
         "data-access-policy",
         "admin-action-policy",
-        "team-collaboration-policy"
+        "team-collaboration-policy",
     ]
 
     return Policy(
@@ -294,7 +307,7 @@ def generate_policy(
         policy_type=policy_type,
         status=status,
         created_at=datetime.now(UTC) - timedelta(days=random.randint(1, 365)),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
 
@@ -322,10 +335,7 @@ def generate_authorization_policy() -> Policy:
     """
 
     # Create policy version
-    policy.extra_metadata = {
-        "rego_code": rego_code,
-        "version": 1
-    }
+    policy.extra_metadata = {"rego_code": rego_code, "version": 1}
 
     return policy
 
@@ -335,20 +345,11 @@ def generate_validation_policy() -> Policy:
     policy = generate_policy(policy_type="validation")
 
     validation_rules = {
-        "server_name": {
-            "pattern": "^[a-z0-9-]+$",
-            "min_length": 3,
-            "max_length": 63
-        },
-        "endpoint": {
-            "type": "url",
-            "required": True
-        }
+        "server_name": {"pattern": "^[a-z0-9-]+$", "min_length": 3, "max_length": 63},
+        "endpoint": {"type": "url", "required": True},
     }
 
-    policy.extra_metadata = {
-        "validation_rules": validation_rules
-    }
+    policy.extra_metadata = {"validation_rules": validation_rules}
 
     return policy
 
@@ -357,11 +358,12 @@ def generate_validation_policy() -> Policy:
 # Audit Event Generators
 # ============================================================================
 
+
 def generate_audit_event(
     user_id: UUID | None = None,
     resource_id: UUID | None = None,
     event_type: AuditEventType = AuditEventType.SERVER_REGISTERED,
-    severity: SeverityLevel = SeverityLevel.LOW
+    severity: SeverityLevel = SeverityLevel.LOW,
 ) -> AuditEvent:
     """
     Generate an audit event.
@@ -388,7 +390,7 @@ def generate_audit_event(
         AuditEventType.USER_LOGOUT: "logout",
         AuditEventType.TOOL_INVOKED: "invoke",
         AuditEventType.AUTHORIZATION_ALLOWED: "allow",
-        AuditEventType.AUTHORIZATION_DENIED: "deny"
+        AuditEventType.AUTHORIZATION_DENIED: "deny",
     }
 
     return AuditEvent(
@@ -399,20 +401,14 @@ def generate_audit_event(
         resource_id=resource_id,
         resource_type="server",
         action=actions.get(event_type, "unknown"),
-        details={
-            "correlation_id": str(uuid4()),
-            "message": fake.sentence()
-        },
+        details={"correlation_id": str(uuid4()), "message": fake.sentence()},
         ip_address=fake.ipv4(),
         user_agent=fake.user_agent(),
-        timestamp=datetime.now(UTC) - timedelta(minutes=random.randint(1, 1440))
+        timestamp=datetime.now(UTC) - timedelta(minutes=random.randint(1, 1440)),
     )
 
 
-def generate_audit_trail(
-    user_id: uuid4,
-    event_count: int = 10
-) -> list[AuditEvent]:
+def generate_audit_trail(user_id: uuid4, event_count: int = 10) -> list[AuditEvent]:
     """
     Generate a series of related audit events (audit trail).
 
@@ -432,14 +428,16 @@ def generate_audit_trail(
         AuditEventType.SERVER_UPDATED,
         AuditEventType.TOOL_INVOKED,
         AuditEventType.AUTHORIZATION_ALLOWED,
-        AuditEventType.USER_LOGOUT
+        AuditEventType.USER_LOGOUT,
     ]
 
     for i, event_type in enumerate(random.sample(event_types, min(event_count, len(event_types)))):
         event = generate_audit_event(
             user_id=user_id,
             event_type=event_type,
-            severity=SeverityLevel.LOW if i < event_count - 1 else random.choice(list(SeverityLevel))
+            severity=(
+                SeverityLevel.LOW if i < event_count - 1 else random.choice(list(SeverityLevel))
+            ),
         )
         event.details["correlation_id"] = correlation_id
         event.timestamp = datetime.now(UTC) - timedelta(minutes=event_count - i)
@@ -452,12 +450,13 @@ def generate_audit_trail(
 # Bulk Data Generators
 # ============================================================================
 
+
 def generate_realistic_dataset(
     user_count: int = 100,
     team_count: int = 10,
     server_count: int = 500,
     policy_count: int = 20,
-    audit_event_count: int = 1000
+    audit_event_count: int = 1000,
 ) -> dict:
     """
     Generate a complete realistic dataset for testing.
@@ -480,42 +479,33 @@ def generate_realistic_dataset(
     for _ in range(user_count):
         team_id = random.choice(teams).id if teams else None
         role = random.choices(
-            ["developer", "analyst", "admin"],
-            weights=[70, 25, 5],  # Distribution
-            k=1
+            ["developer", "analyst", "admin"], weights=[70, 25, 5], k=1  # Distribution
         )[0]
         is_admin = role == "admin"
 
-        user = generate_user(
-            role=role,
-            is_admin=is_admin,
-            team_id=team_id
-        )
+        user = generate_user(role=role, is_admin=is_admin, team_id=team_id)
         users.append(user)
 
     # Generate servers owned by users
     servers = []
     for _ in range(server_count):
         owner = random.choice(users)
-        team_id = UUID(owner.extra_metadata.get("team_id")) if owner.extra_metadata.get("team_id") else uuid4()
+        team_id = (
+            UUID(owner.extra_metadata.get("team_id"))
+            if owner.extra_metadata.get("team_id")
+            else uuid4()
+        )
 
         sensitivity = random.choices(
-            list(SensitivityLevel),
-            weights=[30, 40, 20, 10],  # low, medium, high, critical
-            k=1
+            list(SensitivityLevel), weights=[30, 40, 20, 10], k=1  # low, medium, high, critical
         )[0]
 
         transport = random.choices(
-            list(TransportType),
-            weights=[70, 20, 10],  # http, stdio, sse
-            k=1
+            list(TransportType), weights=[70, 20, 10], k=1  # http, stdio, sse
         )[0]
 
         server = generate_mcp_server(
-            owner_id=owner.id,
-            team_id=team_id,
-            sensitivity_level=sensitivity,
-            transport=transport
+            owner_id=owner.id, team_id=team_id, sensitivity_level=sensitivity, transport=transport
         )
         servers.append(server)
 
@@ -533,14 +523,10 @@ def generate_realistic_dataset(
         severity = random.choices(
             list(SeverityLevel),
             weights=[40, 30, 20, 7, 3],  # info, low, medium, high, critical
-            k=1
+            k=1,
         )[0]
 
-        event = generate_audit_event(
-            user_id=user.id,
-            event_type=event_type,
-            severity=severity
-        )
+        event = generate_audit_event(user_id=user.id, event_type=event_type, severity=severity)
         audit_events.append(event)
 
     return {
@@ -556,15 +542,24 @@ def generate_realistic_dataset(
             "total_policies": len(policies),
             "total_audit_events": len(audit_events),
             "admin_users": len([u for u in users if u.is_admin]),
-            "active_servers": len([s for s in servers if s.status in [ServerStatus.ACTIVE, ServerStatus.REGISTERED]]),
-            "high_severity_events": len([e for e in audit_events if e.severity in [SeverityLevel.HIGH, SeverityLevel.CRITICAL]])
-        }
+            "active_servers": len(
+                [s for s in servers if s.status in [ServerStatus.ACTIVE, ServerStatus.REGISTERED]]
+            ),
+            "high_severity_events": len(
+                [
+                    e
+                    for e in audit_events
+                    if e.severity in [SeverityLevel.HIGH, SeverityLevel.CRITICAL]
+                ]
+            ),
+        },
     }
 
 
 # ============================================================================
 # Test Functions
 # ============================================================================
+
 
 def test_generate_user():
     """Test user generation."""
@@ -646,11 +641,7 @@ def test_generate_audit_trail():
 def test_generate_realistic_dataset():
     """Test complete dataset generation."""
     dataset = generate_realistic_dataset(
-        user_count=50,
-        team_count=5,
-        server_count=100,
-        policy_count=10,
-        audit_event_count=200
+        user_count=50, team_count=5, server_count=100, policy_count=10, audit_event_count=200
     )
 
     assert len(dataset["users"]) == 50

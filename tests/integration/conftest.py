@@ -25,6 +25,7 @@ from sark.services.policy.opa_client import OPAClient
 # Database Fixtures
 # ============================================================================
 
+
 @pytest.fixture
 async def test_db():
     """
@@ -76,6 +77,7 @@ async def test_audit_db():
 # Authentication Fixtures
 # ============================================================================
 
+
 @pytest.fixture
 def jwt_handler():
     """JWT handler for creating auth tokens."""
@@ -83,7 +85,7 @@ def jwt_handler():
         secret_key="test-secret-key-for-integration-tests",
         algorithm="HS256",
         access_token_expire_minutes=30,
-        refresh_token_expire_days=7
+        refresh_token_expire_days=7,
     )
 
 
@@ -96,6 +98,7 @@ def api_key_service():
 # ============================================================================
 # User Fixtures
 # ============================================================================
+
 
 @pytest.fixture
 def test_user():
@@ -110,7 +113,7 @@ def test_user():
         is_admin=False,
         extra_metadata={},
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
 
@@ -127,7 +130,7 @@ def admin_user():
         is_admin=True,
         extra_metadata={},
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
 
@@ -159,6 +162,7 @@ def admin_headers(admin_token):
 # Server Fixtures
 # ============================================================================
 
+
 @pytest.fixture
 def test_server(test_user):
     """Sample MCP server for testing."""
@@ -173,7 +177,7 @@ def test_server(test_user):
         team_id=uuid4(),
         is_active=True,
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
 
@@ -191,7 +195,7 @@ def high_sensitivity_server(admin_user):
         team_id=uuid4(),
         is_active=True,
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
 
@@ -206,13 +210,14 @@ def sample_server_data():
         "sensitivity_level": "medium",
         "tools": [],
         "prompts": [],
-        "resources": []
+        "resources": [],
     }
 
 
 # ============================================================================
 # Policy Fixtures
 # ============================================================================
+
 
 @pytest.fixture
 async def opa_client():
@@ -229,17 +234,13 @@ def allow_policy_response():
 @pytest.fixture
 def deny_policy_response():
     """Mock OPA response that denies the action."""
-    return {
-        "result": {
-            "allow": False,
-            "reason": "Insufficient permissions"
-        }
-    }
+    return {"result": {"allow": False, "reason": "Insufficient permissions"}}
 
 
 # ============================================================================
 # HTTP Client Fixtures
 # ============================================================================
+
 
 @pytest.fixture
 async def async_client():
@@ -270,6 +271,7 @@ async def async_client():
 # Audit/SIEM Fixtures
 # ============================================================================
 
+
 @pytest.fixture
 def mock_splunk_client():
     """Mock Splunk HEC client."""
@@ -290,29 +292,14 @@ def mock_datadog_client():
 # Pytest Configuration
 # ============================================================================
 
+
 def pytest_configure(config):
     """Configure pytest with custom markers."""
-    config.addinivalue_line(
-        "markers", "integration: mark test as integration test"
-    )
-    config.addinivalue_line(
-        "markers", "auth: mark test as authentication test"
-    )
-    config.addinivalue_line(
-        "markers", "policy: mark test as policy enforcement test"
-    )
-    config.addinivalue_line(
-        "markers", "siem: mark test as SIEM integration test"
-    )
-    config.addinivalue_line(
-        "markers", "api: mark test as API endpoint test"
-    )
-    config.addinivalue_line(
-        "markers", "slow: mark test as slow running (>5 seconds)"
-    )
-    config.addinivalue_line(
-        "markers", "requires_opa: mark test as requiring OPA service"
-    )
-    config.addinivalue_line(
-        "markers", "requires_db: mark test as requiring database"
-    )
+    config.addinivalue_line("markers", "integration: mark test as integration test")
+    config.addinivalue_line("markers", "auth: mark test as authentication test")
+    config.addinivalue_line("markers", "policy: mark test as policy enforcement test")
+    config.addinivalue_line("markers", "siem: mark test as SIEM integration test")
+    config.addinivalue_line("markers", "api: mark test as API endpoint test")
+    config.addinivalue_line("markers", "slow: mark test as slow running (>5 seconds)")
+    config.addinivalue_line("markers", "requires_opa: mark test as requiring OPA service")
+    config.addinivalue_line("markers", "requires_db: mark test as requiring database")

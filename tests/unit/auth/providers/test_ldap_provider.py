@@ -147,7 +147,9 @@ class TestLDAPProvider:
     @pytest.mark.asyncio
     async def test_authenticate_exception_handling(self, provider):
         """Test authentication handles exceptions gracefully."""
-        with patch.object(provider, "_search_user", side_effect=Exception("LDAP connection failed")):
+        with patch.object(
+            provider, "_search_user", side_effect=Exception("LDAP connection failed")
+        ):
             result = await provider.authenticate("testuser", "password")
 
             assert result.success is False

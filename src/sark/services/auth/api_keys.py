@@ -58,8 +58,8 @@ class APIKeyService:
             - key_hash: bcrypt hash of the full key for storage
         """
         # Generate cryptographically secure random values
-        prefix = secrets.token_urlsafe(cls.PREFIX_LENGTH)[:cls.PREFIX_LENGTH]
-        secret = secrets.token_urlsafe(cls.SECRET_LENGTH)[:cls.SECRET_LENGTH]
+        prefix = secrets.token_urlsafe(cls.PREFIX_LENGTH)[: cls.PREFIX_LENGTH]
+        secret = secrets.token_urlsafe(cls.SECRET_LENGTH)[: cls.SECRET_LENGTH]
 
         # Construct full key: sark_sk_<env>_<prefix>_<secret>
         full_key = f"{cls.KEY_PREFIX}_sk_{environment}_{prefix}_{secret}"

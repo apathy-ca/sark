@@ -46,7 +46,11 @@ async def db_session() -> AsyncMock:
     session.add = MagicMock()
     session.commit = AsyncMock()
     session.flush = AsyncMock()
-    session.execute = AsyncMock(return_value=MagicMock(scalars=MagicMock(return_value=MagicMock(all=MagicMock(return_value=[])))))
+    session.execute = AsyncMock(
+        return_value=MagicMock(
+            scalars=MagicMock(return_value=MagicMock(all=MagicMock(return_value=[])))
+        )
+    )
     session.close = AsyncMock()
     session.rollback = AsyncMock()
     session.refresh = AsyncMock()
@@ -68,12 +72,14 @@ def mock_redis() -> MagicMock:
     redis.keys = AsyncMock(return_value=[])
     redis.mget = AsyncMock(return_value=[])
     redis.mset = AsyncMock(return_value=True)
-    redis.pipeline = MagicMock(return_value=MagicMock(
-        execute=AsyncMock(return_value=[]),
-        get=MagicMock(),
-        set=MagicMock(),
-        delete=MagicMock(),
-    ))
+    redis.pipeline = MagicMock(
+        return_value=MagicMock(
+            execute=AsyncMock(return_value=[]),
+            get=MagicMock(),
+            set=MagicMock(),
+            delete=MagicMock(),
+        )
+    )
     redis.ping = AsyncMock(return_value=True)
     redis.close = AsyncMock()
 

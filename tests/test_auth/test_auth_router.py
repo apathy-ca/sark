@@ -170,9 +170,7 @@ class TestLogin:
             assert data["session"] is not None
             assert data["user_id"] is not None
 
-    def test_login_ldap_invalid_credentials(
-        self, client, app, mock_settings, mock_session_service
-    ):
+    def test_login_ldap_invalid_credentials(self, client, app, mock_settings, mock_session_service):
         """Test LDAP login with invalid credentials."""
         from sark.api.routers.auth import get_session_service, get_settings
 
@@ -215,9 +213,7 @@ class TestLogin:
 
         assert response.status_code == 400
 
-    def test_login_unsupported_provider(
-        self, client, app, mock_settings, mock_session_service
-    ):
+    def test_login_unsupported_provider(self, client, app, mock_settings, mock_session_service):
         """Test login with unsupported provider."""
         from sark.api.routers.auth import get_session_service, get_settings
 
@@ -250,7 +246,9 @@ class TestOIDCAuthorize:
 
         with patch("sark.api.routers.auth.OIDCProvider") as mock_oidc_class:
             mock_oidc_instance = AsyncMock()
-            mock_oidc_instance.get_authorization_url.return_value = "https://accounts.google.com/auth"
+            mock_oidc_instance.get_authorization_url.return_value = (
+                "https://accounts.google.com/auth"
+            )
             mock_oidc_class.return_value = mock_oidc_instance
 
             response = client.get(
@@ -320,9 +318,7 @@ class TestOIDCCallback:
             assert data["success"] is True
             assert data["session"] is not None
 
-    def test_oidc_callback_auth_failure(
-        self, client, app, mock_settings, mock_session_service
-    ):
+    def test_oidc_callback_auth_failure(self, client, app, mock_settings, mock_session_service):
         """Test OIDC callback when authentication fails."""
         from sark.api.routers.auth import get_session_service, get_settings
 
@@ -398,9 +394,7 @@ class TestLogout:
         assert data["success"] is True
         assert data["sessions_invalidated"] == 1
 
-        mock_session_service.invalidate_session.assert_called_once_with(
-            mock_session.session_id
-        )
+        mock_session_service.invalidate_session.assert_called_once_with(mock_session.session_id)
 
     def test_logout_not_authenticated(self, client, app):
         """Test logout when not authenticated."""

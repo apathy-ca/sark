@@ -317,9 +317,7 @@ class TestSessionListing:
                 user_agent="Test Agent",
             )
 
-        with patch.object(
-            session_service, "get_session", side_effect=mock_get_session_side_effect
-        ):
+        with patch.object(session_service, "get_session", side_effect=mock_get_session_side_effect):
             sessions = await session_service.list_user_sessions(user_id)
 
             assert len(sessions) == 2
@@ -330,9 +328,7 @@ class TestSessionListing:
         user_id = uuid.uuid4()
         mock_redis.smembers.return_value = set()
 
-        sessions = await session_service.list_user_sessions(
-            user_id, include_expired=True
-        )
+        sessions = await session_service.list_user_sessions(user_id, include_expired=True)
 
         assert isinstance(sessions, list)
 
@@ -376,9 +372,10 @@ class TestConcurrentSessionLimits:
             for i in range(3, 0, -1)  # 3, 2, 1 hours ago
         ]
 
-        with patch.object(
-            session_service, "list_user_sessions", return_value=existing_sessions
-        ), patch.object(session_service, "invalidate_session", new=AsyncMock()) as mock_invalidate:
+        with (
+            patch.object(session_service, "list_user_sessions", return_value=existing_sessions),
+            patch.object(session_service, "invalidate_session", new=AsyncMock()) as mock_invalidate,
+        ):
             await session_service._enforce_session_limit(user_id)
 
             # Should invalidate oldest session
@@ -404,9 +401,10 @@ class TestConcurrentSessionLimits:
             for _ in range(2)
         ]
 
-        with patch.object(
-            session_service, "list_user_sessions", return_value=existing_sessions
-        ), patch.object(session_service, "invalidate_session", new=AsyncMock()) as mock_invalidate:
+        with (
+            patch.object(session_service, "list_user_sessions", return_value=existing_sessions),
+            patch.object(session_service, "invalidate_session", new=AsyncMock()) as mock_invalidate,
+        ):
             await session_service._enforce_session_limit(user_id)
 
             # Should not invalidate any sessions
@@ -546,9 +544,10 @@ class TestSessionCleanup:
             ),
         ]
 
-        with patch.object(
-            session_service, "list_user_sessions", return_value=sessions
-        ), patch.object(session_service, "invalidate_session", new=AsyncMock()) as mock_invalidate:
+        with (
+            patch.object(session_service, "list_user_sessions", return_value=sessions),
+            patch.object(session_service, "invalidate_session", new=AsyncMock()) as mock_invalidate,
+        ):
             count = await session_service.cleanup_expired_sessions(user_id)
 
             assert count == 1

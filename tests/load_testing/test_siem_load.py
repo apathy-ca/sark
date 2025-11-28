@@ -189,7 +189,9 @@ class SIEMLoadTester:
             elapsed = time.time() - start_time
             current_progress = int((elapsed / duration_seconds) * 100)
             if current_progress >= last_progress + 10:
-                print(f"Progress: {current_progress}% - Sent: {events_sent}, Failed: {events_failed}")
+                print(
+                    f"Progress: {current_progress}% - Sent: {events_sent}, Failed: {events_failed}"
+                )
                 last_progress = current_progress
 
             # Rate limiting
@@ -230,7 +232,9 @@ class SIEMLoadTester:
         print(f"{'='*80}")
         print(f"Events Sent: {events_sent:,} / {int(target_events):,}")
         print(f"Success Rate: {success_rate:.2f}%")
-        print(f"Actual Throughput: {actual_throughput:.2f} events/min ({actual_throughput/60:.2f} events/sec)")
+        print(
+            f"Actual Throughput: {actual_throughput:.2f} events/min ({actual_throughput/60:.2f} events/sec)"
+        )
         print(f"Throughput Achievement: {results['throughput_percentage']:.2f}%")
         print("\nLatency Statistics:")
         print(f"  Average: {results['latency_avg_ms']:.2f}ms")
@@ -319,7 +323,9 @@ class SIEMLoadTester:
             elapsed = time.time() - start_time
             current_progress = int((elapsed / duration_seconds) * 100)
             if current_progress >= last_progress + 10:
-                print(f"Progress: {current_progress}% - Sent: {events_sent}, Failed: {events_failed}")
+                print(
+                    f"Progress: {current_progress}% - Sent: {events_sent}, Failed: {events_failed}"
+                )
                 last_progress = current_progress
 
             # Rate limiting
@@ -360,7 +366,9 @@ class SIEMLoadTester:
         print(f"{'='*80}")
         print(f"Events Sent: {events_sent:,} / {int(target_events):,}")
         print(f"Success Rate: {success_rate:.2f}%")
-        print(f"Actual Throughput: {actual_throughput:.2f} events/min ({actual_throughput/60:.2f} events/sec)")
+        print(
+            f"Actual Throughput: {actual_throughput:.2f} events/min ({actual_throughput/60:.2f} events/sec)"
+        )
         print(f"Throughput Achievement: {results['throughput_percentage']:.2f}%")
         print("\nLatency Statistics:")
         print(f"  Average: {results['latency_avg_ms']:.2f}ms")
@@ -465,7 +473,8 @@ class SIEMLoadTester:
             (t for t in results["tests"] if t["siem_type"] == "datadog" and t["use_batch"]), None
         )
         datadog_single = next(
-            (t for t in results["tests"] if t["siem_type"] == "datadog" and not t["use_batch"]), None
+            (t for t in results["tests"] if t["siem_type"] == "datadog" and not t["use_batch"]),
+            None,
         )
 
         # Throughput comparison

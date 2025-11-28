@@ -61,9 +61,7 @@ class TestRetryHandler:
     @pytest.mark.asyncio
     async def test_retry_on_retryable_exception(self, retry_handler: RetryHandler):
         """Test retry behavior on retryable exception."""
-        mock_operation = AsyncMock(
-            side_effect=[ConnectionError("Connection failed"), "success"]
-        )
+        mock_operation = AsyncMock(side_effect=[ConnectionError("Connection failed"), "success"])
 
         result = await retry_handler.execute_with_retry(mock_operation, "test_operation")
 
@@ -151,9 +149,7 @@ class TestRetryHandler:
         def failing_callback(attempt: int, exception: Exception):
             raise RuntimeError("Callback error")
 
-        mock_operation = AsyncMock(
-            side_effect=[ConnectionError("Fail"), "success"]
-        )
+        mock_operation = AsyncMock(side_effect=[ConnectionError("Fail"), "success"])
 
         # Should still succeed despite callback error
         result = await retry_handler.execute_with_retry(

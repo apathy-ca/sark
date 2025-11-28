@@ -77,15 +77,12 @@ class TestSAMLProviderInitialization:
     def test_custom_name_id_format(self, saml_config):
         """Test SAML provider with custom NameID format."""
         config_dict = saml_config.copy()
-        config_dict[
-            "name_id_format"
-        ] = "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
+        config_dict["name_id_format"] = "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
         config = SAMLProviderConfig(**config_dict)
         provider = SAMLProvider(config)
 
         assert (
-            provider.config.name_id_format
-            == "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
+            provider.config.name_id_format == "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
         )
 
 
@@ -113,9 +110,7 @@ class TestAuthentication:
                     "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress": [
                         "user@example.com"
                     ],
-                    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name": [
-                        "Test User"
-                    ],
+                    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name": ["Test User"],
                 }
             )
             mock_auth_class.return_value = mock_auth
@@ -139,9 +134,7 @@ class TestAuthentication:
             mock_auth.get_errors = MagicMock(return_value=["Invalid signature"])
             mock_auth_class.return_value = mock_auth
 
-            result = await azure_saml_provider.authenticate(
-                {"saml_response": mock_saml_response}
-            )
+            result = await azure_saml_provider.authenticate({"saml_response": mock_saml_response})
 
             assert result is None
 
@@ -155,9 +148,7 @@ class TestAuthentication:
             mock_auth.is_authenticated = MagicMock(return_value=False)
             mock_auth_class.return_value = mock_auth
 
-            result = await azure_saml_provider.authenticate(
-                {"saml_response": mock_saml_response}
-            )
+            result = await azure_saml_provider.authenticate({"saml_response": mock_saml_response})
 
             assert result is None
 
@@ -168,9 +159,7 @@ class TestAuthentication:
             "sark.services.auth.providers.saml.OneLogin_Saml2_Auth",
             side_effect=Exception("SAML processing error"),
         ):
-            result = await azure_saml_provider.authenticate(
-                {"saml_response": mock_saml_response}
-            )
+            result = await azure_saml_provider.authenticate({"saml_response": mock_saml_response})
 
             assert result is None
 
@@ -511,9 +500,7 @@ class TestLogout:
             mock_auth.process_slo = MagicMock(return_value="https://app.example.com/")
             mock_auth_class.return_value = mock_auth
 
-            await azure_saml_provider.process_logout_request(
-                "base64EncodedLogoutRequest"
-            )
+            await azure_saml_provider.process_logout_request("base64EncodedLogoutRequest")
 
             # In real implementation, this would return the logout response
             # For now, we're just testing the flow

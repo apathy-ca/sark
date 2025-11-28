@@ -21,6 +21,7 @@ from sark.services.auth.jwt import JWTHandler
 # User Registration & Authentication Flow
 # ============================================================================
 
+
 @pytest.mark.e2e
 @pytest.mark.user_flow
 @pytest.mark.critical
@@ -43,7 +44,7 @@ async def test_complete_user_registration_to_server_management():
     user_data = {
         "email": "newuser@example.com",
         "password": "SecurePassword123!",
-        "full_name": "New User"
+        "full_name": "New User",
     }
 
     # Mock user creation
@@ -58,7 +59,7 @@ async def test_complete_user_registration_to_server_management():
         is_admin=False,
         extra_metadata={},
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
     # Step 2: Email Verification (would be async in real app)
@@ -67,16 +68,12 @@ async def test_complete_user_registration_to_server_management():
 
     # Step 3: User Login
     jwt_handler = JWTHandler(
-        secret_key="test-secret",
-        algorithm="HS256",
-        access_token_expire_minutes=30
+        secret_key="test-secret", algorithm="HS256", access_token_expire_minutes=30
     )
 
     # Create access token
     access_token = jwt_handler.create_access_token(
-        user_id=created_user.id,
-        email=created_user.email,
-        role=created_user.role
+        user_id=created_user.id, email=created_user.email, role=created_user.role
     )
 
     assert access_token is not None
@@ -87,7 +84,7 @@ async def test_complete_user_registration_to_server_management():
         "description": "My first MCP server",
         "transport": "http",
         "endpoint": "http://localhost:3000/mcp",
-        "sensitivity_level": "medium"
+        "sensitivity_level": "medium",
     }
 
     server_id = uuid4()
@@ -102,7 +99,7 @@ async def test_complete_user_registration_to_server_management():
         team_id=uuid4(),
         status=ServerStatus.ACTIVE,
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
     assert registered_server.owner_id == created_user.id
@@ -114,14 +111,9 @@ async def test_complete_user_registration_to_server_management():
     assert retrieved_server.name == server_data["name"]
 
     # Step 6: Update Server Configuration
-    update_data = {
-        "description": "Updated description",
-        "is_active": False
-    }
+    update_data = {"description": "Updated description", "is_active": False}
 
-    updated_server = MCPServer(
-        **{**registered_server.__dict__, **update_data}
-    )
+    updated_server = MCPServer(**{**registered_server.__dict__, **update_data})
     assert updated_server.description == update_data["description"]
     assert updated_server.status == ServerStatus.ACTIVE is False
 
@@ -141,7 +133,7 @@ async def test_complete_user_registration_to_server_management():
             resource_type="user",
             action="register",
             details={"email": created_user.email},
-            timestamp=datetime.now(UTC)
+            timestamp=datetime.now(UTC),
         ),
         AuditEvent(
             id=uuid4(),
@@ -152,7 +144,7 @@ async def test_complete_user_registration_to_server_management():
             resource_type="server",
             action="register",
             details={"server_name": server_data["name"]},
-            timestamp=datetime.now(UTC)
+            timestamp=datetime.now(UTC),
         ),
         AuditEvent(
             id=uuid4(),
@@ -163,8 +155,8 @@ async def test_complete_user_registration_to_server_management():
             resource_type="server",
             action="update",
             details={"changes": update_data},
-            timestamp=datetime.now(UTC)
-        )
+            timestamp=datetime.now(UTC),
+        ),
     ]
 
     assert len(audit_events) == 3
@@ -174,6 +166,7 @@ async def test_complete_user_registration_to_server_management():
 # ============================================================================
 # Admin Policy Creation and Enforcement Flow
 # ============================================================================
+
 
 @pytest.mark.e2e
 @pytest.mark.admin_flow
@@ -203,26 +196,22 @@ async def test_admin_policy_creation_to_enforcement():
         is_admin=True,
         extra_metadata={},
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
     jwt_handler = JWTHandler(
-        secret_key="test-secret",
-        algorithm="HS256",
-        access_token_expire_minutes=30
+        secret_key="test-secret", algorithm="HS256", access_token_expire_minutes=30
     )
 
     jwt_handler.create_access_token(
-        user_id=admin_user.id,
-        email=admin_user.email,
-        role=admin_user.role
+        user_id=admin_user.id, email=admin_user.email, role=admin_user.role
     )
 
     # Step 2: Create Authorization Policy
     policy_data = {
         "name": "server-registration-policy",
         "description": "Controls who can register servers",
-        "policy_type": "authorization"
+        "policy_type": "authorization",
     }
 
     policy_id = uuid4()
@@ -234,13 +223,12 @@ async def test_admin_policy_creation_to_enforcement():
         status=PolicyStatus.DRAFT,
         created_by=admin_user.id,
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
     assert created_policy.created_by == admin_user.id
 
     # Step 3: Create Policy Version with Rego Code
-
 
     # Mock policy version creation
     policy_version_created = True
@@ -265,7 +253,7 @@ async def test_admin_policy_creation_to_enforcement():
         is_admin=False,
         extra_metadata={},
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
     # Attempt 1: Register medium sensitivity server (should succeed)
@@ -273,7 +261,7 @@ async def test_admin_policy_creation_to_enforcement():
     {
         "user": {"id": str(regular_user.id), "role": regular_user.role},
         "action": "register",
-        "resource": {"type": "server", "sensitivity": "medium"}
+        "resource": {"type": "server", "sensitivity": "medium"},
     }
 
     # Mock OPA evaluation - should allow
@@ -292,7 +280,7 @@ async def test_admin_policy_creation_to_enforcement():
     {
         "user": {"id": str(regular_user.id), "role": regular_user.role},
         "action": "register",
-        "resource": {"type": "server", "sensitivity": "high"}
+        "resource": {"type": "server", "sensitivity": "high"},
     }
 
     # Mock OPA evaluation - should deny
@@ -301,7 +289,7 @@ async def test_admin_policy_creation_to_enforcement():
         mock_response.json.return_value = {
             "result": {
                 "allow": False,
-                "reason": "User with role 'developer' cannot register high sensitivity servers"
+                "reason": "User with role 'developer' cannot register high sensitivity servers",
             }
         }
         mock_post.return_value = mock_response
@@ -309,7 +297,7 @@ async def test_admin_policy_creation_to_enforcement():
         # Policy denies this
         policy_decision_high = {
             "allow": False,
-            "reason": "User with role 'developer' cannot register high sensitivity servers"
+            "reason": "User with role 'developer' cannot register high sensitivity servers",
         }
 
     assert policy_decision_high["allow"] is False
@@ -326,9 +314,9 @@ async def test_admin_policy_creation_to_enforcement():
         details={
             "policy": "server-registration-policy",
             "decision": "deny",
-            "reason": policy_decision_high["reason"]
+            "reason": policy_decision_high["reason"],
         },
-        timestamp=datetime.now(UTC)
+        timestamp=datetime.now(UTC),
     )
 
     assert policy_evaluation_event.event_type == AuditEventType.AUTHORIZATION_ALLOWED
@@ -338,6 +326,7 @@ async def test_admin_policy_creation_to_enforcement():
 # ============================================================================
 # Multi-Team Collaboration Flow
 # ============================================================================
+
 
 @pytest.mark.e2e
 @pytest.mark.user_flow
@@ -362,7 +351,7 @@ async def test_multi_team_server_sharing():
         description="Engineering team",
         extra_metadata={},
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
     data_science_team = Team(
@@ -371,7 +360,7 @@ async def test_multi_team_server_sharing():
         description="Data Science team",
         extra_metadata={},
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
     # Step 2: Create Users and Assign to Teams
@@ -385,7 +374,7 @@ async def test_multi_team_server_sharing():
         is_admin=False,
         extra_metadata={"team_id": str(engineering_team.id)},
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
     data_scientist_user = User(
@@ -398,7 +387,7 @@ async def test_multi_team_server_sharing():
         is_admin=False,
         extra_metadata={"team_id": str(data_science_team.id)},
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
     # Step 3: Each Team Registers Servers
@@ -413,7 +402,7 @@ async def test_multi_team_server_sharing():
         team_id=engineering_team.id,
         status=ServerStatus.ACTIVE,
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
     MCPServer(
@@ -427,7 +416,7 @@ async def test_multi_team_server_sharing():
         team_id=data_science_team.id,
         status=ServerStatus.ACTIVE,
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
     # Step 4: Configure Team-Scoped Access Policy
@@ -448,10 +437,7 @@ async def test_multi_team_server_sharing():
     with patch("httpx.AsyncClient.post", new=AsyncMock()) as mock_post:
         mock_response = MagicMock()
         mock_response.json.return_value = {
-            "result": {
-                "allow": False,
-                "reason": "User not member of server's team"
-            }
+            "result": {"allow": False, "reason": "User not member of server's team"}
         }
         mock_post.return_value = mock_response
 
@@ -469,7 +455,7 @@ async def test_multi_team_server_sharing():
     # Share engineering server with data science team
     {
         **engineering_server.__dict__,
-        "extra_metadata": {"shared_with_teams": [str(data_science_team.id)]}
+        "extra_metadata": {"shared_with_teams": [str(data_science_team.id)]},
     }
 
     # Now data scientist can access the shared server
@@ -486,6 +472,7 @@ async def test_multi_team_server_sharing():
 # ============================================================================
 # Complete Audit Trail Flow
 # ============================================================================
+
 
 @pytest.mark.e2e
 @pytest.mark.asyncio
@@ -511,7 +498,7 @@ async def test_complete_audit_trail_flow():
         is_admin=False,
         extra_metadata={},
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
     correlation_id = str(uuid4())
@@ -527,7 +514,7 @@ async def test_complete_audit_trail_flow():
             resource_type="session",
             action="login",
             details={"correlation_id": correlation_id, "ip": "192.168.1.100"},
-            timestamp=datetime.now(UTC)
+            timestamp=datetime.now(UTC),
         ),
         # Register server
         AuditEvent(
@@ -539,7 +526,7 @@ async def test_complete_audit_trail_flow():
             resource_type="server",
             action="register",
             details={"correlation_id": correlation_id, "server_name": "my-server"},
-            timestamp=datetime.now(UTC)
+            timestamp=datetime.now(UTC),
         ),
         # Failed access attempt (high severity)
         AuditEvent(
@@ -550,11 +537,8 @@ async def test_complete_audit_trail_flow():
             resource_id=uuid4(),
             resource_type="server",
             action="access_denied",
-            details={
-                "correlation_id": correlation_id,
-                "reason": "Insufficient permissions"
-            },
-            timestamp=datetime.now(UTC)
+            details={"correlation_id": correlation_id, "reason": "Insufficient permissions"},
+            timestamp=datetime.now(UTC),
         ),
         # Logout
         AuditEvent(
@@ -565,13 +549,14 @@ async def test_complete_audit_trail_flow():
             resource_type="session",
             action="logout",
             details={"correlation_id": correlation_id},
-            timestamp=datetime.now(UTC)
-        )
+            timestamp=datetime.now(UTC),
+        ),
     ]
 
     # Step 3: High-Severity Events Forwarded to SIEM
     high_severity_events = [
-        event for event in actions_and_events
+        event
+        for event in actions_and_events
         if event.severity in [SeverityLevel.HIGH, SeverityLevel.CRITICAL]
     ]
 
@@ -595,14 +580,13 @@ async def test_complete_audit_trail_flow():
         AuditEventType.USER_LOGIN,
         AuditEventType.SERVER_REGISTERED,
         AuditEventType.AUTHORIZATION_DENIED,
-        AuditEventType.USER_LOGOUT
+        AuditEventType.USER_LOGOUT,
     ]
     assert event_types == expected_order
 
     # Step 6: Test Audit Event Correlation
     correlated_events = [
-        e for e in actions_and_events
-        if e.details.get("correlation_id") == correlation_id
+        e for e in actions_and_events if e.details.get("correlation_id") == correlation_id
     ]
     assert len(correlated_events) == 4
     assert all(e.user_id == user.id for e in correlated_events)
@@ -611,6 +595,7 @@ async def test_complete_audit_trail_flow():
 # ============================================================================
 # Bulk Operations Workflow
 # ============================================================================
+
 
 @pytest.mark.e2e
 @pytest.mark.slow
@@ -638,7 +623,7 @@ async def test_bulk_registration_with_validation():
         is_admin=False,
         extra_metadata={},
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
     # Step 1: Prepare Bulk Server Data
@@ -649,7 +634,7 @@ async def test_bulk_registration_with_validation():
             "description": f"Bulk registered server {i}",
             "transport": "http",
             "endpoint": f"http://server{i}.example.com/mcp",
-            "sensitivity_level": "medium" if i < 45 else "high"  # Last 5 are high sensitivity
+            "sensitivity_level": "medium" if i < 45 else "high",  # Last 5 are high sensitivity
         }
         bulk_server_data.append(server_data)
 
@@ -671,7 +656,7 @@ async def test_bulk_registration_with_validation():
         "successful": 0,
         "failed": 50,
         "error": "Transaction rolled back due to policy violation on server bulk-server-45",
-        "results": []
+        "results": [],
     }
 
     # Step 4 & 5: One Server Fails, Entire Batch Rolled Back
@@ -684,24 +669,24 @@ async def test_bulk_registration_with_validation():
         "mode": "best_effort",
         "total": 50,
         "successful": 45,  # First 45 medium sensitivity servers
-        "failed": 5,       # Last 5 high sensitivity servers
-        "results": []
+        "failed": 5,  # Last 5 high sensitivity servers
+        "results": [],
     }
 
     # Add results for each server
     for i in range(50):
         if i < 45:
-            best_effort_results["results"].append({
-                "success": True,
-                "server_id": str(uuid4()),
-                "name": f"bulk-server-{i}"
-            })
+            best_effort_results["results"].append(
+                {"success": True, "server_id": str(uuid4()), "name": f"bulk-server-{i}"}
+            )
         else:
-            best_effort_results["results"].append({
-                "success": False,
-                "name": f"bulk-server-{i}",
-                "error": "Policy violation: insufficient permissions for high sensitivity"
-            })
+            best_effort_results["results"].append(
+                {
+                    "success": False,
+                    "name": f"bulk-server-{i}",
+                    "error": "Policy violation: insufficient permissions for high sensitivity",
+                }
+            )
 
     # Step 7: Verify Partial Success
     assert best_effort_results["successful"] == 45

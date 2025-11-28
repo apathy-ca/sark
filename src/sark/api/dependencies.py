@@ -184,9 +184,7 @@ def require_permission(required_permission: str):
             return {"message": "Server created"}
     """
 
-    def _check_permission(
-        user: Annotated[UserContext, Depends(get_current_user)]
-    ) -> UserContext:
+    def _check_permission(user: Annotated[UserContext, Depends(get_current_user)]) -> UserContext:
         if not user.has_permission(required_permission):
             logger.warning(
                 "permission_access_denied",

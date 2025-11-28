@@ -175,9 +175,7 @@ class BaseSIEM(ABC):
         self.metrics.total_latency_ms += latency_ms
         self.metrics.last_success = datetime.now(UTC)
 
-    async def _update_failure_metrics(
-        self, event_count: int, error_type: str = "unknown"
-    ) -> None:
+    async def _update_failure_metrics(self, event_count: int, error_type: str = "unknown") -> None:
         """Update metrics after failed operation.
 
         Args:

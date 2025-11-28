@@ -31,7 +31,23 @@ policy_evaluation_duration = Histogram(
     "sark_policy_evaluation_duration_seconds",
     "Policy evaluation latency in seconds",
     ["action", "sensitivity_level", "cache_status"],
-    buckets=(0.001, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1.0, 2.5, 5.0, 7.5, 10.0),
+    buckets=(
+        0.001,
+        0.005,
+        0.01,
+        0.025,
+        0.05,
+        0.075,
+        0.1,
+        0.25,
+        0.5,
+        0.75,
+        1.0,
+        2.5,
+        5.0,
+        7.5,
+        10.0,
+    ),
 )
 
 opa_request_duration = Histogram(
@@ -231,7 +247,9 @@ def track_policy_evaluation(func):
 
             # Track evaluation duration
             duration = time.perf_counter() - start_time
-            cache_status = "hit" if hasattr(result, "_from_cache") and result._from_cache else "miss"
+            cache_status = (
+                "hit" if hasattr(result, "_from_cache") and result._from_cache else "miss"
+            )
 
             policy_evaluation_duration.labels(
                 action=action, sensitivity_level=sensitivity, cache_status=cache_status

@@ -224,9 +224,7 @@ class TestDatadogSIEM:
     @pytest.mark.asyncio
     async def test_send_event_timeout(self, datadog_siem: DatadogSIEM, audit_event: AuditEvent):
         """Test event send with timeout."""
-        with patch.object(
-            datadog_siem._client, "post", new_callable=AsyncMock
-        ) as mock_post:
+        with patch.object(datadog_siem._client, "post", new_callable=AsyncMock) as mock_post:
             mock_post.side_effect = httpx.TimeoutException("Request timeout")
 
             with pytest.raises(httpx.TimeoutException):
@@ -240,9 +238,7 @@ class TestDatadogSIEM:
         self, datadog_siem: DatadogSIEM, audit_event: AuditEvent
     ):
         """Test event send with connection error."""
-        with patch.object(
-            datadog_siem._client, "post", new_callable=AsyncMock
-        ) as mock_post:
+        with patch.object(datadog_siem._client, "post", new_callable=AsyncMock) as mock_post:
             mock_post.side_effect = httpx.ConnectError("Connection refused")
 
             with pytest.raises(httpx.ConnectError):
@@ -256,9 +252,7 @@ class TestDatadogSIEM:
         self, datadog_siem: DatadogSIEM, audit_event: AuditEvent
     ):
         """Test event send with generic exception."""
-        with patch.object(
-            datadog_siem._client, "post", new_callable=AsyncMock
-        ) as mock_post:
+        with patch.object(datadog_siem._client, "post", new_callable=AsyncMock) as mock_post:
             mock_post.side_effect = ValueError("Invalid data")
 
             with pytest.raises(ValueError):
@@ -321,9 +315,7 @@ class TestDatadogSIEM:
         """Test batch send with timeout."""
         events = [audit_event, audit_event]
 
-        with patch.object(
-            datadog_siem._client, "post", new_callable=AsyncMock
-        ) as mock_post:
+        with patch.object(datadog_siem._client, "post", new_callable=AsyncMock) as mock_post:
             mock_post.side_effect = httpx.TimeoutException("Request timeout")
 
             with pytest.raises(httpx.TimeoutException):
@@ -403,9 +395,7 @@ class TestDatadogSIEM:
     @pytest.mark.asyncio
     async def test_close(self, datadog_siem: DatadogSIEM):
         """Test closing the SIEM connection."""
-        with patch.object(
-            datadog_siem._client, "aclose", new_callable=AsyncMock
-        ) as mock_close:
+        with patch.object(datadog_siem._client, "aclose", new_callable=AsyncMock) as mock_close:
             await datadog_siem.close()
             assert mock_close.call_count == 1
 

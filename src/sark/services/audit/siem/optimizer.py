@@ -162,6 +162,7 @@ class SIEMOptimizer:
             CircuitBreakerError: If circuit is open
             Exception: If send fails
         """
+
         async def _send():
             return await self.siem.send_event(event)
 
@@ -186,6 +187,7 @@ class SIEMOptimizer:
             CircuitBreakerError: If circuit is open
             Exception: If send fails
         """
+
         async def _send():
             return await self.siem.send_batch(events)
 

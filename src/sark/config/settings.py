@@ -66,10 +66,14 @@ class Settings(BaseSettings):
     # OIDC (OpenID Connect) Configuration
     oidc_enabled: bool = False
     oidc_provider: str = "google"  # google, azure, okta, custom
-    oidc_discovery_url: str | None = None  # e.g., "https://idp.example.com/.well-known/openid-configuration"
+    oidc_discovery_url: str | None = (
+        None  # e.g., "https://idp.example.com/.well-known/openid-configuration"
+    )
     oidc_client_id: str | None = None
     oidc_client_secret: str | None = None
-    oidc_redirect_uri: str | None = None  # e.g., "https://sark.example.com/api/v1/auth/oidc/callback"
+    oidc_redirect_uri: str | None = (
+        None  # e.g., "https://sark.example.com/api/v1/auth/oidc/callback"
+    )
     oidc_issuer: str | None = None  # Required for custom provider
     oidc_authorization_endpoint: str | None = None
     oidc_token_endpoint: str | None = None

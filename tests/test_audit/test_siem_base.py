@@ -17,9 +17,7 @@ class ConcreteSIEM(BaseSIEM):
         super().__init__(config)
         self.send_event_mock = AsyncMock(return_value=True)
         self.send_batch_mock = AsyncMock(return_value=True)
-        self.health_check_mock = AsyncMock(
-            return_value=SIEMHealth(healthy=True, latency_ms=10.0)
-        )
+        self.health_check_mock = AsyncMock(return_value=SIEMHealth(healthy=True, latency_ms=10.0))
 
     async def send_event(self, event: AuditEvent) -> bool:
         return await self.send_event_mock(event)

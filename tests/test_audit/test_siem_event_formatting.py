@@ -171,7 +171,7 @@ class TestSplunkEventFormatting:
             user_email="test+special@example.com",
             tool_name="bash",
             details={
-                "command": 'echo "Hello, World!" | grep \'test\'',
+                "command": "echo \"Hello, World!\" | grep 'test'",
                 "output": "Line 1\nLine 2\nLine 3",
                 "special": "Chars: <>&\"'",
             },
@@ -349,7 +349,7 @@ class TestDatadogEventFormatting:
             user_email="test+special@example.com",
             tool_name="bash",
             details={
-                "command": 'echo "Hello, World!" | grep \'test\'',
+                "command": "echo \"Hello, World!\" | grep 'test'",
                 "output": "Line 1\nLine 2\nLine 3",
                 "special": "Chars: <>&\"'",
             },
@@ -433,9 +433,7 @@ class TestEventFormattingConsistency:
         # Should be within 1 second of each other (1000ms)
         assert abs(splunk_ms - datadog_ms) < 1000, "Timestamps differ by more than 1 second"
 
-    def test_special_field_handling(
-        self, splunk_siem: SplunkSIEM, datadog_siem: DatadogSIEM
-    ):
+    def test_special_field_handling(self, splunk_siem: SplunkSIEM, datadog_siem: DatadogSIEM):
         """Test that both formats handle special field values consistently."""
         # Test with None values
         event = AuditEvent(

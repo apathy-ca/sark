@@ -69,7 +69,7 @@ class OPAClient:
             self.cache = get_policy_cache(enabled=cache_enabled)
 
         # Set up cache revalidation callback for stale-while-revalidate
-        if hasattr(self.cache, 'set_revalidate_callback'):
+        if hasattr(self.cache, "set_revalidate_callback"):
             self.cache.set_revalidate_callback(self._revalidate_cache_entry)
 
     async def evaluate_policy(
@@ -198,7 +198,7 @@ class OPAClient:
         sensitivity = self._get_sensitivity(auth_input)
 
         # Use optimized TTL settings from cache if available
-        if hasattr(self.cache, 'use_optimized_ttl') and self.cache.use_optimized_ttl:
+        if hasattr(self.cache, "use_optimized_ttl") and self.cache.use_optimized_ttl:
             return self.cache.OPTIMIZED_TTL.get(sensitivity, self.cache.OPTIMIZED_TTL["default"])
 
         # Fallback to legacy TTL settings
@@ -333,7 +333,7 @@ class OPAClient:
 
         # Batch cache lookup
         cached_decisions = []
-        if use_cache and self.cache.enabled and hasattr(self.cache, 'get_batch'):
+        if use_cache and self.cache.enabled and hasattr(self.cache, "get_batch"):
             cached_decisions = await self.cache.get_batch(cache_requests)
         else:
             cached_decisions = [None] * len(auth_inputs)
@@ -350,10 +350,7 @@ class OPAClient:
         miss_decisions = []
         if misses:
             # Create tasks for parallel evaluation
-            tasks = [
-                self._evaluate_opa_policy(auth_input)
-                for auth_input in misses
-            ]
+            tasks = [self._evaluate_opa_policy(auth_input) for auth_input in misses]
 
             miss_results = await asyncio.gather(*tasks, return_exceptions=True)
 
@@ -375,20 +372,22 @@ class OPAClient:
                     miss_decisions.append(result)
 
             # Cache miss results in batch
-            if use_cache and self.cache.enabled and hasattr(self.cache, 'set_batch'):
+            if use_cache and self.cache.enabled and hasattr(self.cache, "set_batch"):
                 cache_entries = []
                 for i, decision in enumerate(miss_decisions):
                     user_id, action, resource, context = cache_requests[miss_indices[i]]
                     ttl_seconds = self._get_cache_ttl(misses[i])
 
-                    cache_entries.append((
-                        user_id,
-                        action,
-                        resource,
-                        decision.model_dump(),
-                        context,
-                        ttl_seconds,
-                    ))
+                    cache_entries.append(
+                        (
+                            user_id,
+                            action,
+                            resource,
+                            decision.model_dump(),
+                            context,
+                            ttl_seconds,
+                        )
+                    )
 
                 await self.cache.set_batch(cache_entries)
 

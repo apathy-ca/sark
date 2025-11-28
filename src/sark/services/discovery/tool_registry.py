@@ -238,9 +238,7 @@ class ToolRegistry:
         """
         return await self.db.get(MCPTool, tool_id)
 
-    async def get_tool_by_name(
-        self, server_id: UUID, tool_name: str
-    ) -> MCPTool | None:
+    async def get_tool_by_name(self, server_id: UUID, tool_name: str) -> MCPTool | None:
         """
         Get tool by server ID and name.
 
@@ -377,9 +375,7 @@ class ToolRegistry:
 
         return history
 
-    async def bulk_detect_sensitivity(
-        self, server_id: UUID
-    ) -> dict[str, SensitivityLevel]:
+    async def bulk_detect_sensitivity(self, server_id: UUID) -> dict[str, SensitivityLevel]:
         """
         Detect sensitivity for all tools on a server.
 
@@ -391,9 +387,7 @@ class ToolRegistry:
         Returns:
             Dictionary mapping tool IDs to detected sensitivity levels
         """
-        result = await self.db.execute(
-            select(MCPTool).where(MCPTool.server_id == server_id)
-        )
+        result = await self.db.execute(select(MCPTool).where(MCPTool.server_id == server_id))
         tools = result.scalars().all()
 
         detections = {}
@@ -413,9 +407,7 @@ class ToolRegistry:
 
         return detections
 
-    async def get_tools_by_sensitivity(
-        self, sensitivity: SensitivityLevel
-    ) -> list[MCPTool]:
+    async def get_tools_by_sensitivity(self, sensitivity: SensitivityLevel) -> list[MCPTool]:
         """
         Get all tools with a specific sensitivity level.
 
@@ -458,10 +450,7 @@ class ToolRegistry:
             stats["by_sensitivity"][tool.sensitivity_level.value] += 1
 
             # Check if sensitivity was manually overridden
-            if (
-                tool.extra_metadata
-                and "sensitivity_override" in tool.extra_metadata
-            ):
+            if tool.extra_metadata and "sensitivity_override" in tool.extra_metadata:
                 stats["overridden_count"] += 1
 
         return stats

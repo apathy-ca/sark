@@ -243,7 +243,9 @@ def on_test_start(environment, **kwargs):
     print("SARK POLICY EVALUATION LOAD TEST")
     print("=" * 60)
     print(f"Target: {environment.host}")
-    print(f"Users: {environment.runner.target_user_count if hasattr(environment.runner, 'target_user_count') else 'N/A'}")
+    print(
+        f"Users: {environment.runner.target_user_count if hasattr(environment.runner, 'target_user_count') else 'N/A'}"
+    )
     print("=" * 60)
 
 
@@ -261,7 +263,9 @@ def on_test_stop(environment, **kwargs):
 
     print(f"Total Requests: {total_requests}")
     print(f"Total Failures: {total_failures}")
-    print(f"Failure Rate: {(total_failures/total_requests*100):.2f}%" if total_requests > 0 else "0%")
+    print(
+        f"Failure Rate: {(total_failures/total_requests*100):.2f}%" if total_requests > 0 else "0%"
+    )
     print(f"Current RPS: {total_rps:.2f}")
 
     print("\nResponse Time Percentiles:")

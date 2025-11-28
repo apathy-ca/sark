@@ -105,19 +105,13 @@ class PolicyAuditService:
             # Extract advanced policy results
             policy_results = getattr(decision, "policy_results", {})
             time_based_allowed = (
-                policy_results.get("time_based", {}).get("allow")
-                if policy_results
-                else None
+                policy_results.get("time_based", {}).get("allow") if policy_results else None
             )
             ip_filtering_allowed = (
-                policy_results.get("ip_filtering", {}).get("allow")
-                if policy_results
-                else None
+                policy_results.get("ip_filtering", {}).get("allow") if policy_results else None
             )
             mfa_required_satisfied = (
-                policy_results.get("mfa_required", {}).get("allow")
-                if policy_results
-                else None
+                policy_results.get("mfa_required", {}).get("allow") if policy_results else None
             )
 
             # Determine resource type
@@ -218,9 +212,8 @@ class PolicyAuditService:
         """
         try:
             # Get current version
-            stmt = (
-                select(func.max(PolicyChangeLog.policy_version))
-                .where(PolicyChangeLog.policy_name == policy_name)
+            stmt = select(func.max(PolicyChangeLog.policy_version)).where(
+                PolicyChangeLog.policy_name == policy_name
             )
             result = await self.db.execute(stmt)
             current_version = result.scalar() or 0
@@ -570,9 +563,7 @@ class PolicyAuditService:
         durations = [log.evaluation_duration_ms for log in logs if log.evaluation_duration_ms]
         avg_duration = sum(durations) / len(durations) if durations else 0
         durations_sorted = sorted(durations)
-        p50_duration = (
-            durations_sorted[len(durations_sorted) // 2] if durations_sorted else 0
-        )
+        p50_duration = durations_sorted[len(durations_sorted) // 2] if durations_sorted else 0
         p95_duration = (
             durations_sorted[int(len(durations_sorted) * 0.95)] if durations_sorted else 0
         )

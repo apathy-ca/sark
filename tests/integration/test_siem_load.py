@@ -148,12 +148,16 @@ class LoadTestMetrics:
         print(f"   Events failed: {self.events_failed:,}")
         print(f"   Success rate: {self.success_rate:.2f}%")
         print(f"   Events/second: {self.events_per_second:.1f}")
-        print(f"   Events/minute: {self.events_per_minute:.0f} {'✅' if self.events_per_minute >= MIN_THROUGHPUT_PER_MINUTE else '❌'}")
+        print(
+            f"   Events/minute: {self.events_per_minute:.0f} {'✅' if self.events_per_minute >= MIN_THROUGHPUT_PER_MINUTE else '❌'}"
+        )
         print(f"   Target: {TOTAL_EVENTS:,} events in ~{TARGET_DURATION_SECONDS}s")
         print("\n📦 Batching:")
         print(f"   Batches sent: {self.batches_sent:,}")
         print(f"   Batches failed: {self.batches_failed:,}")
-        print(f"   Avg batch size: {self.events_sent / self.batches_sent if self.batches_sent > 0 else 0:.1f}")
+        print(
+            f"   Avg batch size: {self.events_sent / self.batches_sent if self.batches_sent > 0 else 0:.1f}"
+        )
         print("\n🗜️  Compression:")
         if self.total_bytes_compressed > 0:
             compression_rate = (
@@ -346,7 +350,9 @@ class TestSplunkLoad:
                 if (i + 1) % 1000 == 0:
                     elapsed = time.time() - metrics.start_time
                     current_rate = (i + 1) / elapsed * 60
-                    print(f"   Progress: {i + 1:,}/{TOTAL_EVENTS:,} events ({current_rate:.0f}/min)")
+                    print(
+                        f"   Progress: {i + 1:,}/{TOTAL_EVENTS:,} events ({current_rate:.0f}/min)"
+                    )
 
             # Flush remaining batches
             await batch_handler.stop(flush=True)
@@ -361,12 +367,16 @@ class TestSplunkLoad:
             metrics.print_report("Splunk")
 
             # Assertions
-            assert metrics.events_per_minute >= MIN_THROUGHPUT_PER_MINUTE, (
-                f"Throughput {metrics.events_per_minute:.0f}/min below target {MIN_THROUGHPUT_PER_MINUTE:,}/min"
-            )
-            assert metrics.success_rate >= 95.0, f"Success rate {metrics.success_rate:.2f}% below 95%"
+            assert (
+                metrics.events_per_minute >= MIN_THROUGHPUT_PER_MINUTE
+            ), f"Throughput {metrics.events_per_minute:.0f}/min below target {MIN_THROUGHPUT_PER_MINUTE:,}/min"
+            assert (
+                metrics.success_rate >= 95.0
+            ), f"Success rate {metrics.success_rate:.2f}% below 95%"
             assert optimizer_metrics["health"]["is_healthy"], "SIEM should be healthy"
-            assert optimizer_metrics["circuit_breaker"]["state"] == "closed", "Circuit should be closed"
+            assert (
+                optimizer_metrics["circuit_breaker"]["state"] == "closed"
+            ), "Circuit should be closed"
 
         finally:
             await optimizer.stop_health_monitoring()
@@ -482,7 +492,9 @@ class TestDatadogLoad:
                 if (i + 1) % 1000 == 0:
                     elapsed = time.time() - metrics.start_time
                     current_rate = (i + 1) / elapsed * 60
-                    print(f"   Progress: {i + 1:,}/{TOTAL_EVENTS:,} events ({current_rate:.0f}/min)")
+                    print(
+                        f"   Progress: {i + 1:,}/{TOTAL_EVENTS:,} events ({current_rate:.0f}/min)"
+                    )
 
             # Flush remaining batches
             await batch_handler.stop(flush=True)
@@ -497,12 +509,16 @@ class TestDatadogLoad:
             metrics.print_report("Datadog")
 
             # Assertions
-            assert metrics.events_per_minute >= MIN_THROUGHPUT_PER_MINUTE, (
-                f"Throughput {metrics.events_per_minute:.0f}/min below target {MIN_THROUGHPUT_PER_MINUTE:,}/min"
-            )
-            assert metrics.success_rate >= 95.0, f"Success rate {metrics.success_rate:.2f}% below 95%"
+            assert (
+                metrics.events_per_minute >= MIN_THROUGHPUT_PER_MINUTE
+            ), f"Throughput {metrics.events_per_minute:.0f}/min below target {MIN_THROUGHPUT_PER_MINUTE:,}/min"
+            assert (
+                metrics.success_rate >= 95.0
+            ), f"Success rate {metrics.success_rate:.2f}% below 95%"
             assert optimizer_metrics["health"]["is_healthy"], "SIEM should be healthy"
-            assert optimizer_metrics["circuit_breaker"]["state"] == "closed", "Circuit should be closed"
+            assert (
+                optimizer_metrics["circuit_breaker"]["state"] == "closed"
+            ), "Circuit should be closed"
 
         finally:
             await optimizer.stop_health_monitoring()
@@ -514,15 +530,17 @@ if __name__ == "__main__":
     """Run load tests manually."""
     import sys
 
-    print("="*70)
+    print("=" * 70)
     print("SIEM Load Testing - 10,000 events/minute validation")
-    print("="*70)
+    print("=" * 70)
 
     if not HAS_SPLUNK and not HAS_DATADOG:
         print("\n❌ No SIEM credentials configured")
         print("\nPlease configure at least one SIEM:")
         print("\nSplunk:")
-        print("  export SPLUNK_HEC_URL='https://your-instance.splunkcloud.com:8088/services/collector'")
+        print(
+            "  export SPLUNK_HEC_URL='https://your-instance.splunkcloud.com:8088/services/collector'"
+        )
         print("  export SPLUNK_HEC_TOKEN='your-hec-token'")
         print("  export SPLUNK_INDEX='sark_load_test'")
         print("\nDatadog:")

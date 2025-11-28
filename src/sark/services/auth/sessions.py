@@ -129,9 +129,7 @@ class SessionService:
             logger.error(f"Error parsing session {session_id}: {e}")
             return None
 
-    async def update_activity(
-        self, session_id: str, ip_address: str | None = None
-    ) -> bool:
+    async def update_activity(self, session_id: str, ip_address: str | None = None) -> bool:
         """Update session's last activity timestamp.
 
         Also extends the session TTL.
@@ -349,9 +347,7 @@ class SessionService:
         await self.update_activity(session_id)
         return session
 
-    async def extend_session(
-        self, session_id: str, additional_seconds: int
-    ) -> Session | None:
+    async def extend_session(self, session_id: str, additional_seconds: int) -> Session | None:
         """Extend a session's expiration time.
 
         Args:
@@ -394,9 +390,7 @@ class SessionService:
         session_keys = []
         cursor = 0
         while True:
-            cursor, keys = await self.redis.scan(
-                cursor, match="session:*", count=100
-            )
+            cursor, keys = await self.redis.scan(cursor, match="session:*", count=100)
             session_keys.extend(keys)
             if cursor == 0:
                 break

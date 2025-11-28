@@ -104,9 +104,7 @@ class TestSessionService:
         """Test session expires at correct time."""
         session = service.create_session(user_id=sample_user_id)
 
-        expected_expiry = session.created_at + timedelta(
-            hours=service.session_lifetime_hours
-        )
+        expected_expiry = session.created_at + timedelta(hours=service.session_lifetime_hours)
         assert abs((session.expires_at - expected_expiry).total_seconds()) < 1
 
     def test_create_session_custom_lifetime(self, sample_user_id):

@@ -303,7 +303,9 @@ class ConnectionPoolMonitor:
             "checked_in": self.pool.checkedin(),
             "checked_out": self.pool.checkedout(),
             "overflow": self.pool.overflow(),
-            "max_overflow": self.pool._max_overflow if hasattr(self.pool, "_max_overflow") else None,
+            "max_overflow": (
+                self.pool._max_overflow if hasattr(self.pool, "_max_overflow") else None
+            ),
         }
 
         self.samples.append(sample)
@@ -413,9 +415,7 @@ class CacheAnalyzer:
             "hits": len(hits),
             "misses": len(misses),
             "hit_rate": self.get_hit_rate(),
-            "avg_hit_duration": (
-                sum(hit_durations) / len(hit_durations) if hit_durations else 0
-            ),
+            "avg_hit_duration": (sum(hit_durations) / len(hit_durations) if hit_durations else 0),
             "avg_miss_duration": (
                 sum(miss_durations) / len(miss_durations) if miss_durations else 0
             ),

@@ -115,9 +115,7 @@ class TestAuthentication:
             )
             mock_validate.return_value = expected_user
 
-            result = await google_provider.authenticate(
-                username=None, credential="test-token"
-            )
+            result = await google_provider.authenticate(username=None, credential="test-token")
 
             assert result.user_id == expected_user.user_id
             mock_validate.assert_called_once_with("test-token")

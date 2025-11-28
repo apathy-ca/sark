@@ -22,9 +22,7 @@ class LDAPProviderConfig(AuthProviderConfig):
     user_search_filter: str = "(uid={username})"
     group_search_base: str | None = None
     group_search_filter: str = "(member={user_dn})"
-    attributes: list[str] = Field(
-        default_factory=lambda: ["uid", "mail", "cn", "memberOf"]
-    )
+    attributes: list[str] = Field(default_factory=lambda: ["uid", "mail", "cn", "memberOf"])
     use_ssl: bool = True
     use_tls: bool = False
 

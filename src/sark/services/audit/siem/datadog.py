@@ -18,10 +18,16 @@ class DatadogConfig(SIEMConfig):
 
     api_key: str = Field(default="", description="Datadog API key")
     app_key: str = Field(default="", description="Datadog Application key (optional)")
-    site: str = Field(default="datadoghq.com", description="Datadog site (datadoghq.com, datadoghq.eu, etc.)")
+    site: str = Field(
+        default="datadoghq.com", description="Datadog site (datadoghq.com, datadoghq.eu, etc.)"
+    )
     service: str = Field(default="sark", description="Service name for tagging")
-    environment: str = Field(default="production", description="Environment tag (dev, staging, production)")
-    hostname: str | None = Field(default=None, description="Hostname for log attribution (optional)")
+    environment: str = Field(
+        default="production", description="Environment tag (dev, staging, production)"
+    )
+    hostname: str | None = Field(
+        default=None, description="Hostname for log attribution (optional)"
+    )
 
 
 class DatadogSIEM(BaseSIEM):
@@ -207,9 +213,7 @@ class DatadogSIEM(BaseSIEM):
             )
             raise
         except Exception as e:
-            await self._update_failure_metrics(
-                event_count=len(events), error_type=type(e).__name__
-            )
+            await self._update_failure_metrics(event_count=len(events), error_type=type(e).__name__)
             self._logger.error(
                 "datadog_batch_send_exception",
                 event_count=len(events),

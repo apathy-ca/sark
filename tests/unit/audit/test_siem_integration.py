@@ -73,9 +73,7 @@ class TestSIEMForwardingBehavior:
     """Test SIEM forwarding behavior and requirements."""
 
     @pytest.mark.asyncio
-    async def test_siem_forward_marks_timestamp(
-        self, audit_service, mock_db, high_severity_event
-    ):
+    async def test_siem_forward_marks_timestamp(self, audit_service, mock_db, high_severity_event):
         """Test that SIEM forwarding marks the siem_forwarded timestamp."""
         assert high_severity_event.siem_forwarded is None
 
@@ -86,18 +84,14 @@ class TestSIEMForwardingBehavior:
         mock_db.commit.assert_awaited_once()
 
     @pytest.mark.asyncio
-    async def test_siem_forward_updates_database(
-        self, audit_service, mock_db, high_severity_event
-    ):
+    async def test_siem_forward_updates_database(self, audit_service, mock_db, high_severity_event):
         """Test that SIEM forwarding commits to database."""
         await audit_service._forward_to_siem(high_severity_event)
 
         mock_db.commit.assert_awaited_once()
 
     @pytest.mark.asyncio
-    async def test_siem_forward_only_high_and_critical(
-        self, audit_service, mock_db
-    ):
+    async def test_siem_forward_only_high_and_critical(self, audit_service, mock_db):
         """Test that only high and critical events trigger SIEM forwarding."""
         with patch.object(audit_service, "_forward_to_siem", new=AsyncMock()) as mock_siem:
             # Low severity - no SIEM
@@ -133,9 +127,7 @@ class TestSplunkIntegration:
     """Test Splunk integration patterns (mock-based for future implementation)."""
 
     @pytest.mark.asyncio
-    async def test_splunk_http_event_collector_format(
-        self, audit_service, high_severity_event
-    ):
+    async def test_splunk_http_event_collector_format(self, audit_service, high_severity_event):
         """Test event formatting for Splunk HEC."""
         # Mock future Splunk HEC client
         AsyncMock()
@@ -177,9 +169,7 @@ class TestSplunkIntegration:
         assert actual_payload["sourcetype"] == "_json"
 
     @pytest.mark.asyncio
-    async def test_splunk_network_timeout_graceful_degradation(
-        self, audit_service, mock_db
-    ):
+    async def test_splunk_network_timeout_graceful_degradation(self, audit_service, mock_db):
         """Test graceful degradation when Splunk times out."""
 
         async def mock_splunk_timeout(event):
@@ -285,9 +275,10 @@ class TestDatadogIntegration:
         async def mock_datadog_network_error(event):
             raise ConnectionError("Could not reach Datadog API")
 
-        with patch.object(
-            audit_service, "_forward_to_siem", new=mock_datadog_network_error
-        ), pytest.raises(ConnectionError):
+        with (
+            patch.object(audit_service, "_forward_to_siem", new=mock_datadog_network_error),
+            pytest.raises(ConnectionError),
+        ):
             await audit_service.log_event(
                 event_type=AuditEventType.SECURITY_VIOLATION,
                 severity=SeverityLevel.HIGH,
@@ -311,9 +302,7 @@ class TestCircuitBreakerPattern:
             # After max failures, circuit is open, don't even try
             return None
 
-        with patch.object(
-            audit_service, "_forward_to_siem", new=mock_siem_with_circuit_breaker
-        ):
+        with patch.object(audit_service, "_forward_to_siem", new=mock_siem_with_circuit_breaker):
             # First 3 failures should increment counter
             for _i in range(max_failures):
                 with pytest.raises(ConnectionError):
@@ -368,9 +357,7 @@ class TestCircuitBreakerPattern:
 
         # In a real implementation, this would timeout and increment failure counter
         # For now, we just verify the pattern is testable
-        with patch.object(
-            audit_service, "_forward_to_siem", new=mock_siem_slow_response
-        ):
+        with patch.object(audit_service, "_forward_to_siem", new=mock_siem_slow_response):
             # This test demonstrates how timeout would be tested
             # In production, this should timeout and not wait forever
             pass
@@ -380,9 +367,7 @@ class TestGracefulDegradation:
     """Test graceful degradation when SIEM is unavailable."""
 
     @pytest.mark.asyncio
-    async def test_audit_succeeds_even_if_siem_fails(
-        self, audit_service, mock_db
-    ):
+    async def test_audit_succeeds_even_if_siem_fails(self, audit_service, mock_db):
         """Test that audit events are still logged even if SIEM forwarding fails."""
 
         async def mock_failing_siem(event):
@@ -400,9 +385,7 @@ class TestGracefulDegradation:
                 )
 
     @pytest.mark.asyncio
-    async def test_fallback_queue_for_failed_siem_events(
-        self, audit_service, high_severity_event
-    ):
+    async def test_fallback_queue_for_failed_siem_events(self, audit_service, high_severity_event):
         """Test pattern for queueing events when SIEM is unavailable."""
         # This demonstrates the pattern for a fallback queue
         failed_events_queue = []
@@ -444,9 +427,7 @@ class TestGracefulDegradation:
                 )
                 raise
 
-        with patch.object(
-            audit_service, "_forward_to_siem", new=mock_siem_with_local_fallback
-        ):
+        with patch.object(audit_service, "_forward_to_siem", new=mock_siem_with_local_fallback):
             with contextlib.suppress(ConnectionError):
                 await audit_service._forward_to_siem(critical_severity_event)
 
@@ -475,9 +456,7 @@ class TestMultipleSIEMTargets:
             with contextlib.suppress(Exception):
                 datadog_called = True
 
-        with patch.object(
-            audit_service, "_forward_to_siem", new=mock_forward_to_multiple
-        ):
+        with patch.object(audit_service, "_forward_to_siem", new=mock_forward_to_multiple):
             await audit_service._forward_to_siem(high_severity_event)
 
         assert splunk_called
@@ -500,9 +479,10 @@ class TestMultipleSIEMTargets:
                 # In production, might still mark as partially forwarded
                 raise
 
-        with patch.object(
-            audit_service, "_forward_to_siem", new=mock_partial_siem_failure
-        ), pytest.raises(ConnectionError):
+        with (
+            patch.object(audit_service, "_forward_to_siem", new=mock_partial_siem_failure),
+            pytest.raises(ConnectionError),
+        ):
             await audit_service._forward_to_siem(
                 AuditEvent(
                     id=uuid4(),

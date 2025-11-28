@@ -61,27 +61,28 @@ from sark.services.audit.siem import (
 # ============================================================================
 
 # Check for integration test credentials
-HAS_SPLUNK_CREDS = all([
-    os.getenv("SPLUNK_HEC_URL"),
-    os.getenv("SPLUNK_HEC_TOKEN"),
-])
+HAS_SPLUNK_CREDS = all(
+    [
+        os.getenv("SPLUNK_HEC_URL"),
+        os.getenv("SPLUNK_HEC_TOKEN"),
+    ]
+)
 
 HAS_DATADOG_CREDS = bool(os.getenv("DATADOG_API_KEY"))
 
 integration = pytest.mark.integration
 requires_splunk = pytest.mark.skipif(
-    not HAS_SPLUNK_CREDS,
-    reason="Splunk credentials not configured"
+    not HAS_SPLUNK_CREDS, reason="Splunk credentials not configured"
 )
 requires_datadog = pytest.mark.skipif(
-    not HAS_DATADOG_CREDS,
-    reason="Datadog credentials not configured"
+    not HAS_DATADOG_CREDS, reason="Datadog credentials not configured"
 )
 
 
 # ============================================================================
 # Fixtures
 # ============================================================================
+
 
 @pytest.fixture
 def test_event() -> AuditEvent:
@@ -144,8 +145,12 @@ def test_events(test_event: AuditEvent) -> list[AuditEvent]:
 def splunk_config() -> SplunkConfig:
     """Create Splunk configuration (from env or mock)."""
     return SplunkConfig(
-        hec_url=os.getenv("SPLUNK_HEC_URL", "https://mock.splunk.example.com:8088/services/collector"),
-        hec_token=os.getenv("SPLUNK_HEC_TOKEN", "mock-hec-token-12345678-1234-1234-1234-123456789012"),
+        hec_url=os.getenv(
+            "SPLUNK_HEC_URL", "https://mock.splunk.example.com:8088/services/collector"
+        ),
+        hec_token=os.getenv(
+            "SPLUNK_HEC_TOKEN", "mock-hec-token-12345678-1234-1234-1234-123456789012"
+        ),
         index=os.getenv("SPLUNK_INDEX", "sark_test"),
         sourcetype="sark:audit:event",
         source="sark_qa_test",
@@ -182,6 +187,7 @@ def datadog_siem(datadog_config: DatadogConfig) -> DatadogSIEM:
 # ============================================================================
 # Splunk Integration Tests
 # ============================================================================
+
 
 class TestSplunkEventFormatting:
     """Test Splunk event formatting and structure."""
@@ -230,8 +236,7 @@ class TestSplunkEventFormatting:
         """Verify Splunk batch event format (newline-delimited JSON)."""
         # Format batch payload
         batch_payload = "\n".join(
-            json.dumps(splunk_siem._format_hec_event(event))
-            for event in test_events
+            json.dumps(splunk_siem._format_hec_event(event)) for event in test_events
         )
 
         # Verify newline separation
@@ -344,7 +349,9 @@ class TestSplunkIntegration:
         assert result is True, "Real event delivery should succeed"
 
     @pytest.mark.asyncio
-    async def test_real_batch_delivery(self, splunk_siem: SplunkSIEM, test_events: list[AuditEvent]):
+    async def test_real_batch_delivery(
+        self, splunk_siem: SplunkSIEM, test_events: list[AuditEvent]
+    ):
         """Test actual batch delivery to Splunk."""
         result = await splunk_siem.send_batch(test_events)
         assert result is True, "Real batch delivery should succeed"
@@ -374,6 +381,7 @@ class TestSplunkIntegration:
 # ============================================================================
 # Datadog Integration Tests
 # ============================================================================
+
 
 class TestDatadogEventFormatting:
     """Test Datadog event formatting and structure."""
@@ -502,7 +510,9 @@ class TestDatadogIntegration:
         assert result is True, "Real event delivery should succeed"
 
     @pytest.mark.asyncio
-    async def test_real_batch_delivery(self, datadog_siem: DatadogSIEM, test_events: list[AuditEvent]):
+    async def test_real_batch_delivery(
+        self, datadog_siem: DatadogSIEM, test_events: list[AuditEvent]
+    ):
         """Test actual batch delivery to Datadog."""
         result = await datadog_siem.send_batch(test_events)
         assert result is True, "Real batch delivery should succeed"
@@ -511,6 +521,7 @@ class TestDatadogIntegration:
 # ============================================================================
 # Failover and Degradation Tests
 # ============================================================================
+
 
 class TestSIEMFailover:
     """Test SIEM failover and graceful degradation."""
@@ -573,6 +584,7 @@ class TestSIEMFailover:
 # ============================================================================
 # Batching and Compression Tests
 # ============================================================================
+
 
 class TestEventBatching:
     """Test event batching functionality."""
@@ -644,14 +656,16 @@ class TestEventCompression:
     def test_compression_reduces_size(self, test_events: list[AuditEvent]):
         """Test that compression reduces payload size."""
         # Serialize events to JSON
-        events_json = json.dumps([
-            {
-                "id": str(event.id),
-                "event_type": event.event_type.value,
-                "details": event.details,
-            }
-            for event in test_events
-        ])
+        events_json = json.dumps(
+            [
+                {
+                    "id": str(event.id),
+                    "event_type": event.event_type.value,
+                    "details": event.details,
+                }
+                for event in test_events
+            ]
+        )
 
         uncompressed_size = len(events_json.encode("utf-8"))
 
@@ -681,6 +695,7 @@ class TestEventCompression:
 # ============================================================================
 # Circuit Breaker Tests
 # ============================================================================
+
 
 class TestCircuitBreaker:
     """Test circuit breaker functionality."""
@@ -838,6 +853,7 @@ class TestCircuitBreakerWithSIEM:
 # Metrics and Monitoring Tests
 # ============================================================================
 
+
 class TestSIEMMetrics:
     """Test SIEM delivery metrics collection."""
 
@@ -926,6 +942,7 @@ class TestSIEMMetrics:
 # Health Check Tests
 # ============================================================================
 
+
 class TestSIEMHealthChecks:
     """Test SIEM health check functionality."""
 
@@ -937,8 +954,7 @@ class TestSIEMHealthChecks:
     ):
         """Test successful Splunk health check."""
         health_url = splunk_siem.splunk_config.hec_url.replace(
-            "/services/collector",
-            "/services/collector/health"
+            "/services/collector", "/services/collector/health"
         )
 
         httpx_mock.add_response(

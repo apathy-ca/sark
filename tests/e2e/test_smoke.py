@@ -21,6 +21,7 @@ from sark.services.policy.opa_client import AuthorizationInput, OPAClient
 # System Health Checks
 # ============================================================================
 
+
 @pytest.mark.smoke
 @pytest.mark.e2e
 @pytest.mark.critical
@@ -91,6 +92,7 @@ def test_consul_service_registry():
 # Core API Endpoint Smoke Tests
 # ============================================================================
 
+
 @pytest.mark.smoke
 @pytest.mark.e2e
 @pytest.mark.critical
@@ -100,7 +102,7 @@ def test_health_check_endpoint():
     health_response = {
         "status": "healthy",
         "version": "0.1.0",
-        "timestamp": datetime.now(UTC).isoformat()
+        "timestamp": datetime.now(UTC).isoformat(),
     }
 
     assert health_response["status"] == "healthy"
@@ -112,14 +114,7 @@ def test_health_check_endpoint():
 def test_readiness_check_endpoint():
     """Verify /ready endpoint returns ready status."""
     # Mock readiness check
-    ready_response = {
-        "ready": True,
-        "checks": {
-            "database": True,
-            "opa": True,
-            "redis": True
-        }
-    }
+    ready_response = {"ready": True, "checks": {"database": True, "opa": True, "redis": True}}
 
     assert ready_response["ready"] is True
     assert all(ready_response["checks"].values())
@@ -152,21 +147,18 @@ def test_api_documentation_endpoint():
 # Authentication Smoke Tests
 # ============================================================================
 
+
 @pytest.mark.smoke
 @pytest.mark.e2e
 @pytest.mark.critical
 def test_jwt_token_generation():
     """Verify JWT token can be generated."""
     jwt_handler = JWTHandler(
-        secret_key="test-secret",
-        algorithm="HS256",
-        access_token_expire_minutes=30
+        secret_key="test-secret", algorithm="HS256", access_token_expire_minutes=30
     )
 
     token = jwt_handler.create_access_token(
-        user_id=uuid4(),
-        email="test@example.com",
-        role="developer"
+        user_id=uuid4(), email="test@example.com", role="developer"
     )
 
     assert token is not None
@@ -179,16 +171,12 @@ def test_jwt_token_generation():
 def test_jwt_token_validation():
     """Verify JWT token can be validated."""
     jwt_handler = JWTHandler(
-        secret_key="test-secret",
-        algorithm="HS256",
-        access_token_expire_minutes=30
+        secret_key="test-secret", algorithm="HS256", access_token_expire_minutes=30
     )
 
     user_id = uuid4()
     token = jwt_handler.create_access_token(
-        user_id=user_id,
-        email="test@example.com",
-        role="developer"
+        user_id=user_id, email="test@example.com", role="developer"
     )
 
     # Verify token
@@ -207,9 +195,7 @@ def test_session_creation():
     session_service = SessionService(session_lifetime_hours=24)
 
     session = session_service.create_session(
-        user_id=uuid4(),
-        user_agent="Mozilla/5.0",
-        ip_address="192.168.1.100"
+        user_id=uuid4(), user_agent="Mozilla/5.0", ip_address="192.168.1.100"
     )
 
     assert session is not None
@@ -236,6 +222,7 @@ def test_api_key_authentication():
 # Server Management Smoke Tests
 # ============================================================================
 
+
 @pytest.mark.smoke
 @pytest.mark.e2e
 @pytest.mark.critical
@@ -253,7 +240,7 @@ def test_server_registration():
         team_id=uuid4(),
         status=ServerStatus.ACTIVE,
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
     assert server.name == "smoke-test-server"
@@ -277,7 +264,7 @@ def test_server_retrieval():
         team_id=uuid4(),
         status=ServerStatus.ACTIVE,
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
     # Mock retrieval
@@ -302,7 +289,7 @@ def test_server_search():
             team_id=uuid4(),
             status=ServerStatus.ACTIVE,
             created_at=datetime.now(UTC),
-            updated_at=datetime.now(UTC)
+            updated_at=datetime.now(UTC),
         )
     ]
 
@@ -324,7 +311,7 @@ def test_server_status_update():
         team_id=uuid4(),
         status=ServerStatus.ACTIVE,
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
     # Update status
@@ -335,6 +322,7 @@ def test_server_status_update():
 # ============================================================================
 # Policy Enforcement Smoke Tests
 # ============================================================================
+
 
 @pytest.mark.smoke
 @pytest.mark.e2e
@@ -354,7 +342,7 @@ async def test_policy_evaluation():
             user={"role": "developer", "id": str(uuid4())},
             action="register",
             server={"type": "mcp"},
-            context={}
+            context={},
         )
         decision = await opa_client.evaluate_policy(auth_input)
 
@@ -376,9 +364,7 @@ async def test_authorization_decision():
         mock_post.return_value = mock_response
 
         allow_input = AuthorizationInput(
-            user={"role": "developer", "id": str(uuid4())},
-            action="read",
-            context={}
+            user={"role": "developer", "id": str(uuid4())}, action="read", context={}
         )
         allow_decision = await opa_client.evaluate_policy(allow_input)
 
@@ -393,9 +379,7 @@ async def test_authorization_decision():
         mock_post.return_value = mock_response
 
         deny_input = AuthorizationInput(
-            user={"role": "guest", "id": str(uuid4())},
-            action="delete",
-            context={}
+            user={"role": "guest", "id": str(uuid4())}, action="delete", context={}
         )
         deny_decision = await opa_client.evaluate_policy(deny_input)
 
@@ -414,9 +398,7 @@ async def test_fail_closed_verification():
     # Simulate OPA error
     with patch.object(opa_client.client, "post", new=AsyncMock(side_effect=Exception("OPA error"))):
         fail_input = AuthorizationInput(
-            user={"role": "developer", "id": str(uuid4())},
-            action="read",
-            context={}
+            user={"role": "developer", "id": str(uuid4())}, action="read", context={}
         )
         decision = await opa_client.evaluate_policy(fail_input)
 
@@ -427,6 +409,7 @@ async def test_fail_closed_verification():
 # ============================================================================
 # Audit System Smoke Tests
 # ============================================================================
+
 
 @pytest.mark.smoke
 @pytest.mark.e2e
@@ -441,7 +424,7 @@ def test_audit_event_creation():
         user_id=uuid4(),
         server_id=uuid4(),
         details={"server_name": "test"},
-        timestamp=datetime.now(UTC)
+        timestamp=datetime.now(UTC),
     )
 
     assert event.event_type == AuditEventType.SERVER_REGISTERED
@@ -469,6 +452,7 @@ async def test_siem_forwarding():
 # Performance Smoke Tests
 # ============================================================================
 
+
 @pytest.mark.smoke
 @pytest.mark.e2e
 def test_jwt_generation_performance():
@@ -476,20 +460,14 @@ def test_jwt_generation_performance():
     import time
 
     jwt_handler = JWTHandler(
-        secret_key="test-secret",
-        algorithm="HS256",
-        access_token_expire_minutes=30
+        secret_key="test-secret", algorithm="HS256", access_token_expire_minutes=30
     )
 
     start = time.time()
 
     # Generate 100 tokens
     for _ in range(100):
-        jwt_handler.create_access_token(
-            user_id=uuid4(),
-            email="test@example.com",
-            role="developer"
-        )
+        jwt_handler.create_access_token(user_id=uuid4(), email="test@example.com", role="developer")
 
     elapsed = time.time() - start
 
@@ -518,7 +496,7 @@ def test_server_search_performance():
             team_id=uuid4(),
             status=ServerStatus.ACTIVE,
             created_at=datetime.now(UTC),
-            updated_at=datetime.now(UTC)
+            updated_at=datetime.now(UTC),
         )
 
     elapsed = time.time() - start
@@ -530,6 +508,7 @@ def test_server_search_performance():
 # ============================================================================
 # Integration Smoke Tests
 # ============================================================================
+
 
 @pytest.mark.smoke
 @pytest.mark.e2e
@@ -547,20 +526,14 @@ def test_end_to_end_quick_flow():
         is_admin=False,
         extra_metadata={},
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
     # 2. Generate token
     jwt_handler = JWTHandler(
-        secret_key="test-secret",
-        algorithm="HS256",
-        access_token_expire_minutes=30
+        secret_key="test-secret", algorithm="HS256", access_token_expire_minutes=30
     )
-    token = jwt_handler.create_access_token(
-        user_id=user.id,
-        email=user.email,
-        role=user.role
-    )
+    token = jwt_handler.create_access_token(user_id=user.id, email=user.email, role=user.role)
 
     # 3. Register server
     server = MCPServer(
@@ -574,7 +547,7 @@ def test_end_to_end_quick_flow():
         team_id=uuid4(),
         status=ServerStatus.ACTIVE,
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
     # Verify complete flow

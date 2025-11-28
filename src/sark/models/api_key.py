@@ -60,9 +60,7 @@ class APIKey(Base):
 
     # Audit timestamps
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
-    )
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     revoked_at = Column(DateTime, nullable=True)
     revoked_by = Column(UUID(as_uuid=True), nullable=True)
 

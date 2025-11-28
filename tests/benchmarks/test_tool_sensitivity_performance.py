@@ -250,9 +250,7 @@ async def test_detection_throughput(tool_registry):
     """Benchmark: Sensitivity detection throughput (detections/second)."""
     import asyncio
 
-    test_tools = [
-        (f"tool_{i}", f"Test tool {i}") for i in range(1000)
-    ]
+    test_tools = [(f"tool_{i}", f"Test tool {i}") for i in range(1000)]
 
     start_time = time.perf_counter()
 
@@ -326,9 +324,7 @@ async def test_detection_memory_efficiency(tool_registry):
 async def test_detection_long_descriptions(tool_registry):
     """Benchmark: Performance with very long descriptions."""
     # Create a very long description
-    long_desc = " ".join([
-        "This is a very long tool description that contains many words " * 100
-    ])
+    long_desc = " ".join(["This is a very long tool description that contains many words " * 100])
 
     latencies = []
 
@@ -366,8 +362,7 @@ async def test_detection_many_parameters(tool_registry):
     """Benchmark: Performance with many parameters."""
     # Create many parameters
     parameters = {
-        f"param_{i}": {"type": "string", "description": "Test parameter"}
-        for i in range(100)
+        f"param_{i}": {"type": "string", "description": "Test parameter"} for i in range(100)
     }
 
     latencies = []

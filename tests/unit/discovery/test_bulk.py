@@ -170,12 +170,13 @@ class TestBulkRegisterServers:
             mock_server.name = "server-1"
             mock_server.status = ServerStatus.REGISTERED
 
-            with patch.object(
-                bulk_service.discovery_service,
-                "register_server",
-                new=AsyncMock(return_value=mock_server),
-            ), patch.object(
-                bulk_service.audit_service, "log_event", new=AsyncMock()
+            with (
+                patch.object(
+                    bulk_service.discovery_service,
+                    "register_server",
+                    new=AsyncMock(return_value=mock_server),
+                ),
+                patch.object(bulk_service.audit_service, "log_event", new=AsyncMock()),
             ):
                 result = await bulk_service.bulk_register_servers(
                     servers=servers,
@@ -214,12 +215,13 @@ class TestBulkRegisterServers:
             mock_server.name = "server-1"
             mock_server.status = ServerStatus.REGISTERED
 
-            with patch.object(
-                bulk_service.discovery_service,
-                "register_server",
-                new=AsyncMock(return_value=mock_server),
-            ), patch.object(
-                bulk_service.audit_service, "log_event", new=AsyncMock()
+            with (
+                patch.object(
+                    bulk_service.discovery_service,
+                    "register_server",
+                    new=AsyncMock(return_value=mock_server),
+                ),
+                patch.object(bulk_service.audit_service, "log_event", new=AsyncMock()),
             ):
                 result = await bulk_service.bulk_register_servers(
                     servers=servers,
@@ -257,12 +259,13 @@ class TestBulkRegisterServers:
             mock_server.name = "server-1"
             mock_server.status = ServerStatus.REGISTERED
 
-            with patch.object(
-                bulk_service.discovery_service,
-                "register_server",
-                new=AsyncMock(side_effect=[mock_server, Exception("DB error")]),
-            ), patch.object(
-                bulk_service.audit_service, "log_event", new=AsyncMock()
+            with (
+                patch.object(
+                    bulk_service.discovery_service,
+                    "register_server",
+                    new=AsyncMock(side_effect=[mock_server, Exception("DB error")]),
+                ),
+                patch.object(bulk_service.audit_service, "log_event", new=AsyncMock()),
             ):
                 result = await bulk_service.bulk_register_servers(
                     servers=servers,
@@ -304,12 +307,13 @@ class TestBulkRegisterServers:
             mock_server.name = "server-1"
             mock_server.status = ServerStatus.REGISTERED
 
-            with patch.object(
-                bulk_service.discovery_service,
-                "register_server",
-                new=AsyncMock(return_value=mock_server),
-            ), patch.object(
-                bulk_service.audit_service, "log_event", new=AsyncMock()
+            with (
+                patch.object(
+                    bulk_service.discovery_service,
+                    "register_server",
+                    new=AsyncMock(return_value=mock_server),
+                ),
+                patch.object(bulk_service.audit_service, "log_event", new=AsyncMock()),
             ):
                 result = await bulk_service.bulk_register_servers(
                     servers=servers,
@@ -411,11 +415,14 @@ class TestBulkUpdateServerStatus:
         mock_server.name = "test-server"
         mock_server.status = ServerStatus.ACTIVE
 
-        with patch.object(
-            bulk_service.discovery_service,
-            "update_server_status",
-            new=AsyncMock(return_value=mock_server),
-        ), patch.object(bulk_service.audit_service, "log_event", new=AsyncMock()):
+        with (
+            patch.object(
+                bulk_service.discovery_service,
+                "update_server_status",
+                new=AsyncMock(return_value=mock_server),
+            ),
+            patch.object(bulk_service.audit_service, "log_event", new=AsyncMock()),
+        ):
             result = await bulk_service.bulk_update_server_status(
                 updates=updates,
                 fail_on_first_error=False,
@@ -445,11 +452,14 @@ class TestBulkUpdateServerStatus:
                 raise ValueError("Invalid UUID")
             return mock_server
 
-        with patch.object(
-            bulk_service.discovery_service,
-            "update_server_status",
-            new=AsyncMock(side_effect=update_side_effect),
-        ), patch.object(bulk_service.audit_service, "log_event", new=AsyncMock()):
+        with (
+            patch.object(
+                bulk_service.discovery_service,
+                "update_server_status",
+                new=AsyncMock(side_effect=update_side_effect),
+            ),
+            patch.object(bulk_service.audit_service, "log_event", new=AsyncMock()),
+        ):
             result = await bulk_service.bulk_update_server_status(
                 updates=updates,
                 fail_on_first_error=False,
@@ -477,11 +487,14 @@ class TestBulkUpdateServerStatus:
         mock_server.name = "test-server"
         mock_server.status = ServerStatus.ACTIVE
 
-        with patch.object(
-            bulk_service.discovery_service,
-            "update_server_status",
-            new=AsyncMock(return_value=mock_server),
-        ), patch.object(bulk_service.audit_service, "log_event", new=AsyncMock()):
+        with (
+            patch.object(
+                bulk_service.discovery_service,
+                "update_server_status",
+                new=AsyncMock(return_value=mock_server),
+            ),
+            patch.object(bulk_service.audit_service, "log_event", new=AsyncMock()),
+        ):
             result = await bulk_service.bulk_update_server_status(
                 updates=updates,
                 fail_on_first_error=True,

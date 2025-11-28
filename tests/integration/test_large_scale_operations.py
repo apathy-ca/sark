@@ -40,29 +40,23 @@ def large_server_dataset():
             sensitivity_level=(
                 SensitivityLevel.CRITICAL
                 if i % 10 == 0
-                else SensitivityLevel.HIGH
-                if i % 5 == 0
-                else SensitivityLevel.MEDIUM
-                if i % 3 == 0
-                else SensitivityLevel.LOW
+                else (
+                    SensitivityLevel.HIGH
+                    if i % 5 == 0
+                    else SensitivityLevel.MEDIUM if i % 3 == 0 else SensitivityLevel.LOW
+                )
             ),
             status=(
                 ServerStatus.ACTIVE
                 if i % 3 == 0
-                else ServerStatus.REGISTERED
-                if i % 2 == 0
-                else ServerStatus.INACTIVE
+                else ServerStatus.REGISTERED if i % 2 == 0 else ServerStatus.INACTIVE
             ),
             team_id=uuid4() if i % 10 == 0 else None,
             owner_id=uuid4() if i % 5 == 0 else None,
             tags=(
                 ["production", "critical"]
                 if i % 10 == 0
-                else ["production"]
-                if i % 5 == 0
-                else ["development"]
-                if i % 3 == 0
-                else []
+                else ["production"] if i % 5 == 0 else ["development"] if i % 3 == 0 else []
             ),
             created_at=base_time,
         )
@@ -365,7 +359,9 @@ class TestBulkOperationsIntegration:
         # Execute bulk registration
         start_time = time.perf_counter()
 
-        result = await bulk_service.bulk_register_servers(servers=servers, fail_on_first_error=False)
+        result = await bulk_service.bulk_register_servers(
+            servers=servers, fail_on_first_error=False
+        )
 
         elapsed = time.perf_counter() - start_time
 
@@ -528,7 +524,9 @@ class TestBulkOperationsIntegration:
         bulk_service.audit_service.log_event = AsyncMock()
 
         # Execute bulk registration (best-effort)
-        result = await bulk_service.bulk_register_servers(servers=servers, fail_on_first_error=False)
+        result = await bulk_service.bulk_register_servers(
+            servers=servers, fail_on_first_error=False
+        )
 
         # Verify results
         assert result.total == 100

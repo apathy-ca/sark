@@ -168,6 +168,7 @@ class TestCircuitBreaker:
     @pytest.mark.asyncio
     async def test_timeout_counts_as_failure(self, breaker: CircuitBreaker):
         """Test operation timeout counts as failure."""
+
         async def slow_op():
             await asyncio.sleep(10)  # Longer than timeout
             return "success"

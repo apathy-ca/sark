@@ -163,6 +163,50 @@ class KongConfig:
 
 
 @dataclass
+class FeatureFlags:
+    """Feature flags for v2.0 features (gradual rollout)."""
+
+    enable_protocol_adapters: bool
+    enable_federation: bool
+    enable_cost_attribution: bool
+    enable_programmatic_policies: bool
+
+    @classmethod
+    def from_env(cls) -> "FeatureFlags":
+        """Load feature flags from environment variables."""
+        return cls(
+            enable_protocol_adapters=os.getenv("FEATURE_PROTOCOL_ADAPTERS", "false").lower() == "true",
+            enable_federation=os.getenv("FEATURE_FEDERATION", "false").lower() == "true",
+            enable_cost_attribution=os.getenv("FEATURE_COST_ATTRIBUTION", "false").lower() == "true",
+            enable_programmatic_policies=os.getenv("FEATURE_PROGRAMMATIC_POLICIES", "false").lower() == "true",
+        )
+
+
+@dataclass
+class ProtocolConfig:
+    """Protocol-specific configuration (v2.0 preparation)."""
+
+    enabled_protocols: list[str]
+    mcp_discovery_enabled: bool
+    http_openapi_validation: bool
+    grpc_reflection_enabled: bool
+
+    @classmethod
+    def from_env(cls) -> "ProtocolConfig":
+        """Load protocol configuration from environment variables."""
+        # Parse enabled protocols (comma-separated)
+        enabled = os.getenv("PROTOCOLS_ENABLED", "mcp").split(",")
+        enabled_protocols = [p.strip() for p in enabled if p.strip()]
+
+        return cls(
+            enabled_protocols=enabled_protocols,
+            mcp_discovery_enabled=os.getenv("PROTOCOL_MCP_DISCOVERY", "true").lower() == "true",
+            http_openapi_validation=os.getenv("PROTOCOL_HTTP_OPENAPI_VALIDATION", "true").lower() == "true",
+            grpc_reflection_enabled=os.getenv("PROTOCOL_GRPC_REFLECTION", "true").lower() == "true",
+        )
+
+
+@dataclass
 class AppConfig:
     """Main application configuration."""
 
@@ -172,6 +216,8 @@ class AppConfig:
     postgres: PostgreSQLConfig
     redis: RedisConfig
     kong: KongConfig
+    features: FeatureFlags
+    protocols: ProtocolConfig
 
     @classmethod
     def from_env(cls) -> "AppConfig":
@@ -183,6 +229,8 @@ class AppConfig:
             postgres=PostgreSQLConfig.from_env(),
             redis=RedisConfig.from_env(),
             kong=KongConfig.from_env(),
+            features=FeatureFlags.from_env(),
+            protocols=ProtocolConfig.from_env(),
         )
 
     def validate(self) -> list[str]:

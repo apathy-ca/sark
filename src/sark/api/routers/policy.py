@@ -54,9 +54,7 @@ class PolicyValidationRequest(BaseModel):
     """Policy validation request."""
 
     policy_content: str = Field(..., description="Rego policy content to validate")
-    test_cases: list[dict[str, Any]] | None = Field(
-        None, description="Optional test cases to run"
-    )
+    test_cases: list[dict[str, Any]] | None = Field(None, description="Optional test cases to run")
 
 
 class PolicyValidationResponse(BaseModel):
@@ -221,7 +219,9 @@ async def validate_policy(
 
         # Check for common issues
         if "default allow" in request.policy_content and "= true" in request.policy_content:
-            warnings.append("Policy has 'default allow = true' - this allows all actions by default")
+            warnings.append(
+                "Policy has 'default allow = true' - this allows all actions by default"
+            )
 
         # Run test cases if provided
         test_results = None

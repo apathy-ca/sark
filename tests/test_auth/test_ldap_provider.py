@@ -95,9 +95,7 @@ class TestAuthentication:
             # Second call returns user connection (password verify)
             mock_get_conn.side_effect = [mock_service_conn, mock_user_conn]
 
-            user_info = await ldap_provider.authenticate(
-                {"username": "jdoe", "password": "secret"}
-            )
+            user_info = await ldap_provider.authenticate({"username": "jdoe", "password": "secret"})
 
             assert user_info is not None
             assert user_info.user_id == "uid=jdoe,ou=users,dc=example,dc=com"
@@ -164,9 +162,7 @@ class TestAuthentication:
         with patch.object(
             ldap_provider, "_get_connection", side_effect=LDAPException("Connection error")
         ):
-            user_info = await ldap_provider.authenticate(
-                {"username": "jdoe", "password": "secret"}
-            )
+            user_info = await ldap_provider.authenticate({"username": "jdoe", "password": "secret"})
 
             assert user_info is None
 
@@ -183,14 +179,13 @@ class TestAuthentication:
 
         mock_user_conn = Mock(spec=Connection)
 
-        with patch.object(ldap_provider, "_get_connection") as mock_get_conn, patch.object(
-            ldap_provider, "_get_user_groups", return_value=["developers", "admins"]
+        with (
+            patch.object(ldap_provider, "_get_connection") as mock_get_conn,
+            patch.object(ldap_provider, "_get_user_groups", return_value=["developers", "admins"]),
         ):
             mock_get_conn.side_effect = [mock_service_conn, mock_user_conn]
 
-            user_info = await ldap_provider.authenticate(
-                {"username": "jdoe", "password": "secret"}
-            )
+            user_info = await ldap_provider.authenticate({"username": "jdoe", "password": "secret"})
 
             assert user_info is not None
             assert user_info.groups == ["developers", "admins"]
@@ -215,9 +210,7 @@ class TestGroupLookup:
         mock_conn.entries = [mock_entry1, mock_entry2]
 
         with patch.object(ldap_provider, "_get_connection", return_value=mock_conn):
-            groups = await ldap_provider._get_user_groups(
-                "uid=jdoe,ou=users,dc=example,dc=com"
-            )
+            groups = await ldap_provider._get_user_groups("uid=jdoe,ou=users,dc=example,dc=com")
 
             assert groups == ["developers", "admins"]
             mock_conn.unbind.assert_called_once()
@@ -229,9 +222,7 @@ class TestGroupLookup:
         mock_conn.entries = []
 
         with patch.object(ldap_provider, "_get_connection", return_value=mock_conn):
-            groups = await ldap_provider._get_user_groups(
-                "uid=jdoe,ou=users,dc=example,dc=com"
-            )
+            groups = await ldap_provider._get_user_groups("uid=jdoe,ou=users,dc=example,dc=com")
 
             assert groups == []
             mock_conn.unbind.assert_called_once()
@@ -254,9 +245,7 @@ class TestGroupLookup:
         with patch.object(
             ldap_provider, "_get_connection", side_effect=LDAPException("Connection error")
         ):
-            groups = await ldap_provider._get_user_groups(
-                "uid=jdoe,ou=users,dc=example,dc=com"
-            )
+            groups = await ldap_provider._get_user_groups("uid=jdoe,ou=users,dc=example,dc=com")
 
             assert groups == []
 
@@ -281,9 +270,7 @@ class TestUserLookup:
         mock_conn.entries = [mock_entry]
 
         with patch.object(ldap_provider, "_get_connection", return_value=mock_conn):
-            with patch.object(
-                ldap_provider, "_get_user_groups", return_value=["developers"]
-            ):
+            with patch.object(ldap_provider, "_get_user_groups", return_value=["developers"]):
                 user_info = await ldap_provider.lookup_user("jdoe")
 
                 assert user_info is not None

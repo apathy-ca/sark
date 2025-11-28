@@ -92,8 +92,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         # If rate limit exceeded, return 429
         if not rate_info.allowed:
             logger.warning(
-                f"Rate limit exceeded for {identifier}: "
-                f"{rate_info.limit} requests per window"
+                f"Rate limit exceeded for {identifier}: " f"{rate_info.limit} requests per window"
             )
             response = JSONResponse(
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS,
@@ -155,7 +154,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
             # If no user_id in state, use token hash as identifier
             token = auth_header.split(" ", 1)[1]
-            token_hash = hash(token) % (10 ** 8)  # Use hash for privacy
+            token_hash = hash(token) % (10**8)  # Use hash for privacy
             return f"token:{token_hash}", self.settings.rate_limit_per_user
 
         # Fallback to IP address

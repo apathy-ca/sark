@@ -305,9 +305,7 @@ class TestAPIKeyServiceValidation:
         result.scalar_one_or_none.return_value = sample_api_key
         api_key_service.db.execute.return_value = result
 
-        validated_key, error = await api_key_service.validate_api_key(
-            "sark_sk_live_abc12345_wrong"
-        )
+        validated_key, error = await api_key_service.validate_api_key("sark_sk_live_abc12345_wrong")
 
         assert validated_key is None
         assert error == "Invalid API key"
@@ -476,9 +474,7 @@ class TestAPIKeyServiceUpdate:
         result.scalar_one_or_none.return_value = sample_api_key
         api_key_service.db.execute.return_value = result
 
-        updated_key = await api_key_service.update_api_key(
-            sample_api_key.id, name="New Name"
-        )
+        updated_key = await api_key_service.update_api_key(sample_api_key.id, name="New Name")
 
         assert updated_key is not None
         assert updated_key.name == "New Name"
@@ -491,9 +487,7 @@ class TestAPIKeyServiceUpdate:
         api_key_service.db.execute.return_value = result
 
         new_scopes = ["server:read", "policy:read"]
-        updated_key = await api_key_service.update_api_key(
-            sample_api_key.id, scopes=new_scopes
-        )
+        updated_key = await api_key_service.update_api_key(sample_api_key.id, scopes=new_scopes)
 
         assert updated_key.scopes == new_scopes
 
@@ -505,9 +499,7 @@ class TestAPIKeyServiceUpdate:
         api_key_service.db.execute.return_value = result
 
         with pytest.raises(ValueError, match="Invalid scopes"):
-            await api_key_service.update_api_key(
-                sample_api_key.id, scopes=["invalid:scope"]
-            )
+            await api_key_service.update_api_key(sample_api_key.id, scopes=["invalid:scope"])
 
 
 class TestRateLimiting:
@@ -581,8 +573,6 @@ class TestAPIKeyServiceList:
         result.scalars.return_value.all.return_value = []
         api_key_service.db.execute.return_value = result
 
-        keys = await api_key_service.list_api_keys(
-            user_id=sample_user_id, include_revoked=True
-        )
+        keys = await api_key_service.list_api_keys(user_id=sample_user_id, include_revoked=True)
 
         assert isinstance(keys, list)

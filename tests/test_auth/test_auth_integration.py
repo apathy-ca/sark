@@ -142,9 +142,7 @@ class TestCompleteAuthFlows:
                 mock_group_conn,
             ]
 
-            user_info = await ldap_provider.authenticate(
-                {"username": "jdoe", "password": "secret"}
-            )
+            user_info = await ldap_provider.authenticate({"username": "jdoe", "password": "secret"})
 
             assert user_info is not None
             assert user_info.user_id == "uid=jdoe,ou=users,dc=example,dc=com"
@@ -229,9 +227,7 @@ class TestProviderFailover:
                 assert isinstance(healthy_providers[0], OIDCProvider)
 
     @pytest.mark.asyncio
-    async def test_all_providers_down(
-        self, oidc_provider, saml_provider, ldap_provider
-    ):
+    async def test_all_providers_down(self, oidc_provider, saml_provider, ldap_provider):
         """Test scenario when all providers are down."""
         providers = [oidc_provider, saml_provider, ldap_provider]
 
@@ -247,9 +243,7 @@ class TestProviderFailover:
                     assert len(healthy_providers) == 0
 
     @pytest.mark.asyncio
-    async def test_multi_provider_round_robin(
-        self, oidc_provider, ldap_provider, saml_provider
-    ):
+    async def test_multi_provider_round_robin(self, oidc_provider, ldap_provider, saml_provider):
         """Test round-robin load balancing across multiple healthy providers."""
         providers = [oidc_provider, ldap_provider, saml_provider]
 
@@ -413,10 +407,10 @@ class TestRateLimiting:
 
         # Test various usage levels
         test_cases = [
-            (0, True),    # Start
-            (10, True),   # Low usage
-            (25, True),   # Medium usage
-            (49, True),   # Just under limit
+            (0, True),  # Start
+            (10, True),  # Low usage
+            (25, True),  # Medium usage
+            (49, True),  # Just under limit
             (50, False),  # At limit
             (60, False),  # Over limit
         ]
@@ -433,9 +427,7 @@ class TestCrossProviderScenarios:
     """Test scenarios involving multiple authentication methods."""
 
     @pytest.mark.asyncio
-    async def test_user_with_multiple_auth_methods(
-        self, oidc_provider, ldap_provider
-    ):
+    async def test_user_with_multiple_auth_methods(self, oidc_provider, ldap_provider):
         """Test user can authenticate via multiple methods."""
         # OIDC authentication
         mock_claims = {
