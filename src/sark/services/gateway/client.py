@@ -168,7 +168,9 @@ async def get_gateway_client() -> GatewayClient:
         settings = get_settings()
 
         if not settings.gateway_enabled:
-            logger.warning("gateway_disabled", message="Gateway integration is disabled in settings")
+            logger.warning(
+                "gateway_disabled", message="Gateway integration is disabled in settings"
+            )
 
         _gateway_client = GatewayClient(
             base_url=settings.gateway_url,

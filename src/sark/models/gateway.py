@@ -8,6 +8,7 @@ from enum import Enum
 
 class SensitivityLevel(str, Enum):
     """Tool/server sensitivity classification."""
+
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
@@ -37,7 +38,7 @@ class GatewayServerInfo(BaseModel):
                 "sensitivity_level": "high",
                 "authorized_teams": ["data-eng", "backend-dev"],
                 "health_status": "healthy",
-                "tools_count": 15
+                "tools_count": 15,
             }
         }
     )
@@ -50,7 +51,9 @@ class GatewayToolInfo(BaseModel):
     server_name: str = Field(..., description="Parent server name")
     description: str = Field(..., description="Tool description")
     sensitivity_level: SensitivityLevel = Field(default=SensitivityLevel.MEDIUM)
-    parameters: list[dict[str, Any]] = Field(default_factory=list, description="Tool parameters schema")
+    parameters: list[dict[str, Any]] = Field(
+        default_factory=list, description="Tool parameters schema"
+    )
     sensitive_params: list[str] = Field(default_factory=list, description="Parameters to filter")
     required_capabilities: list[str] = Field(default_factory=list)
 
@@ -63,9 +66,9 @@ class GatewayToolInfo(BaseModel):
                 "sensitivity_level": "high",
                 "parameters": [
                     {"name": "query", "type": "string", "required": True},
-                    {"name": "database", "type": "string", "required": True}
+                    {"name": "database", "type": "string", "required": True},
                 ],
-                "sensitive_params": ["password", "secret"]
+                "sensitive_params": ["password", "secret"],
             }
         }
     )
@@ -73,6 +76,7 @@ class GatewayToolInfo(BaseModel):
 
 class AgentType(str, Enum):
     """Agent classification types."""
+
     SERVICE = "service"
     WORKER = "worker"
     QUERY = "query"
@@ -80,6 +84,7 @@ class AgentType(str, Enum):
 
 class TrustLevel(str, Enum):
     """Agent trust levels."""
+
     TRUSTED = "trusted"
     LIMITED = "limited"
     UNTRUSTED = "untrusted"
@@ -106,14 +111,14 @@ class GatewayAuthorizationRequest(BaseModel):
     parameters: dict[str, Any] = Field(default_factory=dict, description="Request parameters")
     gateway_metadata: dict[str, Any] = Field(default_factory=dict, description="Gateway context")
 
-    @field_validator('action')
+    @field_validator("action")
     @classmethod
     def validate_action(cls, v: str) -> str:
         valid_actions = [
-            'gateway:tool:invoke',
-            'gateway:server:list',
-            'gateway:tool:discover',
-            'gateway:server:info'
+            "gateway:tool:invoke",
+            "gateway:server:list",
+            "gateway:tool:discover",
+            "gateway:server:info",
         ]
         if v not in valid_actions:
             raise ValueError(f"Action must be one of {valid_actions}")
@@ -139,10 +144,10 @@ class A2AAuthorizationRequest(BaseModel):
     message_type: str = Field(..., description="Message type (request/response/notification)")
     payload_metadata: dict[str, Any] = Field(default_factory=dict)
 
-    @field_validator('capability')
+    @field_validator("capability")
     @classmethod
     def validate_capability(cls, v: str) -> str:
-        valid_capabilities = ['execute', 'query', 'delegate']
+        valid_capabilities = ["execute", "query", "delegate"]
         if v not in valid_capabilities:
             raise ValueError(f"Capability must be one of {valid_capabilities}")
         return v

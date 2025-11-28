@@ -56,7 +56,9 @@ async def authorize_gateway_request(
             "resource": {
                 "server": request.server_name,
                 "tool": request.tool_name,
-                "sensitivity": request.sensitivity_level.value if request.sensitivity_level else "medium",
+                "sensitivity": (
+                    request.sensitivity_level.value if request.sensitivity_level else "medium"
+                ),
             },
             "parameters": request.parameters or {},
             "context": request.context or {},
@@ -298,7 +300,9 @@ async def filter_tools_by_permission(
                     "type": "tool",
                     "server": tool.server_name,
                     "tool": tool.name,
-                    "sensitivity": tool.sensitivity_level.value if tool.sensitivity_level else "medium",
+                    "sensitivity": (
+                        tool.sensitivity_level.value if tool.sensitivity_level else "medium"
+                    ),
                 },
             }
 
@@ -346,11 +350,11 @@ def _get_cache_ttl(sensitivity_level: SensitivityLevel | None) -> int:
         return 300  # 5 minutes default
 
     ttl_map = {
-        SensitivityLevel.PUBLIC: 3600,      # 1 hour
-        SensitivityLevel.LOW: 1800,         # 30 minutes
-        SensitivityLevel.MEDIUM: 300,       # 5 minutes
-        SensitivityLevel.HIGH: 60,          # 1 minute
-        SensitivityLevel.CRITICAL: 0,       # No caching
+        SensitivityLevel.PUBLIC: 3600,  # 1 hour
+        SensitivityLevel.LOW: 1800,  # 30 minutes
+        SensitivityLevel.MEDIUM: 300,  # 5 minutes
+        SensitivityLevel.HIGH: 60,  # 1 minute
+        SensitivityLevel.CRITICAL: 0,  # No caching
     }
 
     return ttl_map.get(sensitivity_level, 300)
