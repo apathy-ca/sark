@@ -217,6 +217,14 @@ class Settings(BaseSettings):
     kafka_audit_topic: str = "sark-audit-events"
     kafka_consumer_group: str = "sark-audit-consumers"
 
+    # Gateway Integration
+    gateway_enabled: bool = False
+    gateway_url: str = "http://localhost:8080"
+    gateway_api_key: str | None = None
+    gateway_timeout_seconds: float = 5.0
+    gateway_retry_attempts: int = 3
+    gateway_circuit_breaker_threshold: int = 5
+
     # Discovery Service
     discovery_interval_seconds: int = 300  # 5 minutes
     discovery_network_scan_enabled: bool = False

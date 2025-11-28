@@ -7,7 +7,7 @@ import structlog
 
 from sark.api.middleware import AuthMiddleware
 from sark.api.middleware.security_headers import add_security_middleware
-from sark.api.routers import auth, bulk, export, health, metrics, policy, servers, tools, websocket
+from sark.api.routers import auth, bulk, export, gateway, health, metrics, policy, servers, tools, websocket
 from sark.config import get_settings
 from sark.db import init_db
 
@@ -107,6 +107,10 @@ See the documentation for complete details.
                 "name": "websocket",
                 "description": "WebSocket endpoints for real-time updates (audit logs, server status, metrics)",
             },
+            {
+                "name": "Gateway Integration",
+                "description": "Gateway authorization endpoints for MCP tool invocations and A2A communication",
+            },
         ],
     )
 
@@ -142,6 +146,7 @@ See the documentation for complete details.
     app.include_router(metrics.router, prefix="/api/v1/metrics", tags=["metrics"])
     app.include_router(export.router, prefix="/api/v1/export", tags=["export"])
     app.include_router(websocket.router, prefix="/api/v1/ws", tags=["websocket"])
+    app.include_router(gateway.router, prefix="/api/v1", tags=["Gateway Integration"])
 
     # Prometheus metrics endpoint
     if settings.metrics_enabled:
