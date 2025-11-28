@@ -1,0 +1,425 @@
+name: SARK v2.0 Integration Tests
+
+on:
+  push:
+    branches:
+      - main
+      - 'feat/v2*'
+      - 'release/v2*'
+  pull_request:
+    branches:
+      - main
+      - 'feat/v2*'
+  workflow_dispatch:
+    inputs:
+      test_scope:
+        description: 'Test scope to run'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - adapter
+          - multi_protocol
+          - federation
+          - chaos
+
+env:
+  PYTHON_VERSION: '3.11'
+  POETRY_VERSION: '1.7.1'
+
+jobs:
+  # ============================================================================
+  # Adapter Integration Tests
+  # ============================================================================
+
+  adapter-tests:
+    name: Protocol Adapter Tests
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' &&
+      (inputs.test_scope == 'all' || inputs.test_scope == 'adapter') ||
+      github.event_name != 'workflow_dispatch'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        adapter: [mcp, http, grpc]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: ${{ env.POETRY_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          poetry install --with dev,test
+
+      - name: Run adapter tests
+        run: |
+          poetry run pytest \
+            tests/integration/v2/test_adapter_integration.py \
+            -v \
+            -m "v2 and adapter" \
+            --tb=short \
+            --junit-xml=test-results/adapter-${{ matrix.adapter }}.xml \
+            --cov=src/sark/adapters \
+            --cov-report=xml:coverage-adapter-${{ matrix.adapter }}.xml
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results-adapter-${{ matrix.adapter }}
+          path: test-results/
+
+      - name: Upload coverage
+        if: always()
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage-adapter-${{ matrix.adapter }}.xml
+          flags: adapter-${{ matrix.adapter }}
+
+  # ============================================================================
+  # Multi-Protocol Orchestration Tests
+  # ============================================================================
+
+  multi-protocol-tests:
+    name: Multi-Protocol Orchestration Tests
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' &&
+      (inputs.test_scope == 'all' || inputs.test_scope == 'multi_protocol') ||
+      github.event_name != 'workflow_dispatch'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: ${{ env.POETRY_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          poetry install --with dev,test
+
+      - name: Start mock services
+        run: |
+          docker-compose -f docker-compose.v2-testing.yml up -d \
+            mock-mcp-server \
+            mock-http-api \
+            mock-grpc-service
+
+      - name: Wait for services
+        run: |
+          timeout 30 sh -c 'until docker-compose -f docker-compose.v2-testing.yml ps | grep -q "Up"; do sleep 1; done'
+
+      - name: Run multi-protocol tests
+        run: |
+          poetry run pytest \
+            tests/integration/v2/test_multi_protocol.py \
+            -v \
+            -m "v2 and multi_protocol" \
+            --tb=short \
+            --junit-xml=test-results/multi-protocol.xml \
+            --cov=src/sark/adapters \
+            --cov-report=xml:coverage-multi-protocol.xml
+
+      - name: Cleanup services
+        if: always()
+        run: |
+          docker-compose -f docker-compose.v2-testing.yml down -v
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results-multi-protocol
+          path: test-results/
+
+      - name: Upload coverage
+        if: always()
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage-multi-protocol.xml
+          flags: multi-protocol
+
+  # ============================================================================
+  # Federation Integration Tests
+  # ============================================================================
+
+  federation-tests:
+    name: Federation Flow Tests
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' &&
+      (inputs.test_scope == 'all' || inputs.test_scope == 'federation') ||
+      github.event_name != 'workflow_dispatch'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: ${{ env.POETRY_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          poetry install --with dev,test
+
+      - name: Start federation test environment
+        run: |
+          docker-compose -f docker-compose.v2-testing.yml up -d \
+            sark-node-a \
+            sark-node-b \
+            sark-node-c
+
+      - name: Wait for SARK nodes
+        run: |
+          timeout 60 sh -c 'until curl -f http://localhost:8000/health 2>/dev/null; do sleep 2; done'
+          timeout 60 sh -c 'until curl -f http://localhost:8001/health 2>/dev/null; do sleep 2; done'
+          timeout 60 sh -c 'until curl -f http://localhost:8002/health 2>/dev/null; do sleep 2; done'
+
+      - name: Run federation tests
+        run: |
+          poetry run pytest \
+            tests/integration/v2/test_federation_flow.py \
+            -v \
+            -m "v2 and federation" \
+            --tb=short \
+            --junit-xml=test-results/federation.xml \
+            --cov=src/sark/federation \
+            --cov-report=xml:coverage-federation.xml
+
+      - name: Collect federation logs
+        if: failure()
+        run: |
+          docker-compose -f docker-compose.v2-testing.yml logs sark-node-a > logs-node-a.txt
+          docker-compose -f docker-compose.v2-testing.yml logs sark-node-b > logs-node-b.txt
+          docker-compose -f docker-compose.v2-testing.yml logs sark-node-c > logs-node-c.txt
+
+      - name: Upload logs
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: federation-logs
+          path: logs-*.txt
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker-compose -f docker-compose.v2-testing.yml down -v
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results-federation
+          path: test-results/
+
+      - name: Upload coverage
+        if: always()
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage-federation.xml
+          flags: federation
+
+  # ============================================================================
+  # Chaos Engineering Tests
+  # ============================================================================
+
+  chaos-tests:
+    name: Federation Chaos Tests
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' &&
+      (inputs.test_scope == 'all' || inputs.test_scope == 'chaos') ||
+      github.event_name != 'workflow_dispatch'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: ${{ env.POETRY_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          poetry install --with dev,test
+
+      - name: Start full test environment
+        run: |
+          docker-compose -f docker-compose.v2-testing.yml up -d
+
+      - name: Wait for all services
+        run: |
+          sleep 30  # Give all services time to start
+
+      - name: Run chaos tests
+        run: |
+          poetry run pytest \
+            tests/chaos/test_federation_chaos.py \
+            -v \
+            -m "v2 and chaos" \
+            --tb=short \
+            --junit-xml=test-results/chaos.xml
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker-compose -f docker-compose.v2-testing.yml down -v
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results-chaos
+          path: test-results/
+
+  # ============================================================================
+  # Full Integration Test Suite
+  # ============================================================================
+
+  full-integration-suite:
+    name: Full v2.0 Integration Suite
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [adapter-tests, multi-protocol-tests, federation-tests, chaos-tests]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: ${{ env.POETRY_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          poetry install --with dev,test
+
+      - name: Start complete test environment
+        run: |
+          docker-compose -f docker-compose.v2-testing.yml up -d
+
+      - name: Wait for all services
+        run: |
+          sleep 60
+
+      - name: Run complete v2.0 test suite
+        run: |
+          poetry run pytest \
+            tests/integration/v2 \
+            tests/chaos \
+            -v \
+            -m "v2" \
+            --tb=short \
+            --junit-xml=test-results/full-suite.xml \
+            --cov=src/sark \
+            --cov-report=xml:coverage-full.xml \
+            --cov-report=html:htmlcov
+
+      - name: Generate test report
+        if: always()
+        run: |
+          poetry run pytest \
+            tests/integration/v2 \
+            tests/chaos \
+            --collect-only \
+            -q > test-inventory.txt
+
+      - name: Upload test inventory
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-inventory
+          path: test-inventory.txt
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-html
+          path: htmlcov/
+
+      - name: Upload full coverage
+        if: always()
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage-full.xml
+          flags: v2-full-suite
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker-compose -f docker-compose.v2-testing.yml down -v
+
+  # ============================================================================
+  # Test Summary and Reporting
+  # ============================================================================
+
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [adapter-tests, multi-protocol-tests, federation-tests, chaos-tests]
+
+    steps:
+      - name: Download all test results
+        uses: actions/download-artifact@v3
+        with:
+          path: all-test-results
+
+      - name: Generate summary
+        run: |
+          echo "# SARK v2.0 Integration Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ -d "all-test-results" ]; then
+            find all-test-results -name "*.xml" -exec echo "- {}" \; >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Job Status" >> $GITHUB_STEP_SUMMARY
+          echo "- Adapter Tests: ${{ needs.adapter-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Multi-Protocol Tests: ${{ needs.multi-protocol-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Federation Tests: ${{ needs.federation-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Chaos Tests: ${{ needs.chaos-tests.result }}" >> $GITHUB_STEP_SUMMARY
