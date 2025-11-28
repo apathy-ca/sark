@@ -5,6 +5,18 @@ from sark.models.mcp_server import MCPServer, MCPTool
 from sark.models.policy import Policy, PolicyVersion
 from sark.models.session import Session, SessionCreateRequest, SessionListResponse, SessionResponse
 from sark.models.user import Team, User
+from sark.models.gateway import (
+    SensitivityLevel,
+    GatewayServerInfo,
+    GatewayToolInfo,
+    AgentType,
+    TrustLevel,
+    AgentContext,
+    GatewayAuthorizationRequest,
+    GatewayAuthorizationResponse,
+    A2AAuthorizationRequest,
+    GatewayAuditEvent,
+)
 
 __all__ = [
     "AuditEvent",
@@ -18,4 +30,15 @@ __all__ = [
     "SessionResponse",
     "Team",
     "User",
+    # Gateway models
+    "SensitivityLevel",
+    "GatewayServerInfo",
+    "GatewayToolInfo",
+    "AgentType",
+    "TrustLevel",
+    "AgentContext",
+    "GatewayAuthorizationRequest",
+    "GatewayAuthorizationResponse",
+    "A2AAuthorizationRequest",
+    "GatewayAuditEvent",
 ]
