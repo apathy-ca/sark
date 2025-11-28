@@ -80,9 +80,7 @@ async def get_tool_sensitivity(
         )
 
     # Check if sensitivity was manually overridden
-    is_overridden = bool(
-        tool.extra_metadata and "sensitivity_override" in tool.extra_metadata
-    )
+    is_overridden = bool(tool.extra_metadata and "sensitivity_override" in tool.extra_metadata)
 
     return SensitivityResponse(
         tool_id=tool.id,
@@ -340,9 +338,7 @@ async def bulk_detect_sensitivity(
         return {
             "server_id": str(server_id),
             "tool_count": len(detections),
-            "detections": {
-                tool_id: level.value for tool_id, level in detections.items()
-            },
+            "detections": {tool_id: level.value for tool_id, level in detections.items()},
         }
 
     except Exception as e:

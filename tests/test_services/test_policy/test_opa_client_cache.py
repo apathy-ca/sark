@@ -62,6 +62,7 @@ async def test_evaluate_policy_cache_hit(mock_post, opa_client, mock_redis):
         "audit_id": None,
     }
     import json
+
     mock_redis.get.return_value = json.dumps(cached_decision)
 
     auth_input = AuthorizationInput(
@@ -139,9 +140,7 @@ async def test_cache_ttl_critical_sensitivity(mock_post, opa_client, mock_redis)
     """Test cache TTL is lower for critical sensitivity."""
     opa_response = MagicMock()
     opa_response.status_code = 200
-    opa_response.json.return_value = {
-        "result": {"allow": True, "audit_reason": "Test"}
-    }
+    opa_response.json.return_value = {"result": {"allow": True, "audit_reason": "Test"}}
     opa_response.raise_for_status = MagicMock()
     mock_post.return_value = opa_response
 
@@ -167,9 +166,7 @@ async def test_cache_ttl_low_sensitivity(mock_post, opa_client, mock_redis):
     """Test cache TTL is higher for low sensitivity."""
     opa_response = MagicMock()
     opa_response.status_code = 200
-    opa_response.json.return_value = {
-        "result": {"allow": True, "audit_reason": "Test"}
-    }
+    opa_response.json.return_value = {"result": {"allow": True, "audit_reason": "Test"}}
     opa_response.raise_for_status = MagicMock()
     mock_post.return_value = opa_response
 
@@ -195,9 +192,7 @@ async def test_cache_ttl_server_sensitivity(mock_post, opa_client, mock_redis):
     """Test cache TTL uses server sensitivity."""
     opa_response = MagicMock()
     opa_response.status_code = 200
-    opa_response.json.return_value = {
-        "result": {"allow": True, "audit_reason": "Test"}
-    }
+    opa_response.json.return_value = {"result": {"allow": True, "audit_reason": "Test"}}
     opa_response.raise_for_status = MagicMock()
     mock_post.return_value = opa_response
 
@@ -228,14 +223,13 @@ async def test_evaluate_policy_bypass_cache(mock_post, opa_client, mock_redis):
     """Test policy evaluation can bypass cache."""
     opa_response = MagicMock()
     opa_response.status_code = 200
-    opa_response.json.return_value = {
-        "result": {"allow": True, "audit_reason": "Test"}
-    }
+    opa_response.json.return_value = {"result": {"allow": True, "audit_reason": "Test"}}
     opa_response.raise_for_status = MagicMock()
     mock_post.return_value = opa_response
 
     # Setup cached decision
     import json
+
     cached = {"allow": False, "reason": "Cached deny"}
     mock_redis.get.return_value = json.dumps(cached)
 
@@ -262,6 +256,7 @@ async def test_evaluate_policy_bypass_cache(mock_post, opa_client, mock_redis):
 @pytest.mark.asyncio
 async def test_invalidate_cache_all(opa_client, mock_redis):
     """Test invalidating all cache entries."""
+
     async def async_iter(keys):
         for key in keys:
             yield key
@@ -278,6 +273,7 @@ async def test_invalidate_cache_all(opa_client, mock_redis):
 @pytest.mark.asyncio
 async def test_invalidate_cache_by_user(opa_client, mock_redis):
     """Test invalidating cache for specific user."""
+
     async def async_iter(keys):
         for key in keys:
             yield key
@@ -326,6 +322,7 @@ async def test_get_cache_metrics(mock_post, opa_client, mock_redis):
 @pytest.mark.asyncio
 async def test_get_cache_size(opa_client, mock_redis):
     """Test getting cache size."""
+
     async def async_iter(keys):
         for key in keys:
             yield key
@@ -433,9 +430,7 @@ async def test_disabled_cache_always_queries_opa(mock_post, opa_client_no_cache)
     """Test that disabled cache always queries OPA."""
     opa_response = MagicMock()
     opa_response.status_code = 200
-    opa_response.json.return_value = {
-        "result": {"allow": True, "audit_reason": "Test"}
-    }
+    opa_response.json.return_value = {"result": {"allow": True, "audit_reason": "Test"}}
     opa_response.raise_for_status = MagicMock()
     mock_post.return_value = opa_response
 
@@ -468,9 +463,7 @@ async def test_cache_workflow_complete(mock_post, opa_client, mock_redis):
 
     opa_response = MagicMock()
     opa_response.status_code = 200
-    opa_response.json.return_value = {
-        "result": {"allow": True, "audit_reason": "Admin access"}
-    }
+    opa_response.json.return_value = {"result": {"allow": True, "audit_reason": "Admin access"}}
     opa_response.raise_for_status = MagicMock()
     mock_post.return_value = opa_response
 
@@ -508,7 +501,7 @@ async def test_cache_workflow_complete(mock_post, opa_client, mock_redis):
 @pytest.mark.asyncio
 async def test_close_connections(opa_client, mock_redis):
     """Test closing all connections."""
-    with patch.object(opa_client.client, 'aclose', new=AsyncMock()) as mock_client_close:
+    with patch.object(opa_client.client, "aclose", new=AsyncMock()) as mock_client_close:
         await opa_client.close()
 
         mock_client_close.assert_called_once()

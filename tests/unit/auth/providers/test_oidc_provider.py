@@ -227,7 +227,11 @@ class TestOIDCProvider:
     async def test_validate_token_failed(self, provider):
         """Test token validation failure."""
         with patch.object(
-            provider, "_get_userinfo", side_effect=httpx.HTTPStatusError("Unauthorized", request=MagicMock(), response=MagicMock())
+            provider,
+            "_get_userinfo",
+            side_effect=httpx.HTTPStatusError(
+                "Unauthorized", request=MagicMock(), response=MagicMock()
+            ),
         ):
             result = await provider.validate_token("invalid_token")
 

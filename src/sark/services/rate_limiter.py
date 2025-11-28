@@ -189,9 +189,7 @@ class RateLimiter:
             key = f"rate_limit:{identifier}"
 
             # Add multiple entries if amount > 1
-            entries = {
-                f"{current_time}:{i}": current_time for i in range(amount)
-            }
+            entries = {f"{current_time}:{i}": current_time for i in range(amount)}
 
             pipe = self.redis.pipeline()
             pipe.zadd(key, entries)

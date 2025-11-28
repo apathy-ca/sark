@@ -68,17 +68,11 @@ class AuthMiddleware(BaseHTTPMiddleware):
         if self.settings.jwt_algorithm == "RS256":
             self.jwt_key = self.settings.jwt_public_key
             if not self.jwt_key:
-                raise ValueError(
-                    "JWT_PUBLIC_KEY must be set when using RS256 algorithm"
-                )
+                raise ValueError("JWT_PUBLIC_KEY must be set when using RS256 algorithm")
         else:  # HS256
-            self.jwt_key = (
-                self.settings.jwt_secret_key or self.settings.secret_key
-            )
+            self.jwt_key = self.settings.jwt_secret_key or self.settings.secret_key
 
-    async def dispatch(
-        self, request: Request, call_next: Callable
-    ) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:
         """Process the request and validate JWT token.
 
         Args:
@@ -186,9 +180,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
         scheme, token = parts
 
         if scheme.lower() != "bearer":
-            raise AuthenticationError(
-                f"Invalid authorization scheme: {scheme}. Expected 'Bearer'"
-            )
+            raise AuthenticationError(f"Invalid authorization scheme: {scheme}. Expected 'Bearer'")
 
         return token
 
@@ -275,8 +267,6 @@ class AuthMiddleware(BaseHTTPMiddleware):
 
         # Ensure user_id is present
         if not user_context["user_id"]:
-            raise AuthenticationError(
-                "Token missing required 'sub' (subject) claim"
-            )
+            raise AuthenticationError("Token missing required 'sub' (subject) claim")
 
         return user_context

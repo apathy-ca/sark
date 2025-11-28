@@ -402,28 +402,32 @@ async def test_get_tools_by_sensitivity(db_session, mock_server):
 async def test_get_sensitivity_statistics(db_session, mock_server):
     """Test getting sensitivity statistics."""
     # Create tools with different sensitivities
-    tools = [
-        MCPTool(
-            server_id=mock_server.id,
-            name=f"tool_low_{i}",
-            sensitivity_level=SensitivityLevel.LOW,
-        )
-        for i in range(2)
-    ] + [
-        MCPTool(
-            server_id=mock_server.id,
-            name=f"tool_medium_{i}",
-            sensitivity_level=SensitivityLevel.MEDIUM,
-        )
-        for i in range(3)
-    ] + [
-        MCPTool(
-            server_id=mock_server.id,
-            name=f"tool_high_{i}",
-            sensitivity_level=SensitivityLevel.HIGH,
-        )
-        for i in range(1)
-    ]
+    tools = (
+        [
+            MCPTool(
+                server_id=mock_server.id,
+                name=f"tool_low_{i}",
+                sensitivity_level=SensitivityLevel.LOW,
+            )
+            for i in range(2)
+        ]
+        + [
+            MCPTool(
+                server_id=mock_server.id,
+                name=f"tool_medium_{i}",
+                sensitivity_level=SensitivityLevel.MEDIUM,
+            )
+            for i in range(3)
+        ]
+        + [
+            MCPTool(
+                server_id=mock_server.id,
+                name=f"tool_high_{i}",
+                sensitivity_level=SensitivityLevel.HIGH,
+            )
+            for i in range(1)
+        ]
+    )
 
     db_session.add_all(tools)
     db_session.commit()

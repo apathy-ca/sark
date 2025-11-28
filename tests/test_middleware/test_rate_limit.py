@@ -153,10 +153,7 @@ class TestIdentifierDetection:
             request.state.user_id = "user-uuid-123"
             return {"message": "success"}
 
-        response = client.get(
-            "/test-auth",
-            headers={"Authorization": "Bearer fake-jwt-token"}
-        )
+        response = client.get("/test-auth", headers={"Authorization": "Bearer fake-jwt-token"})
 
         assert response.status_code == 200
         # Note: In real scenario, auth middleware would set request.state.user_id
@@ -183,10 +180,7 @@ class TestIdentifierDetection:
             allowed=True, limit=100, remaining=99, reset_at=1234567890
         )
 
-        response = client.get(
-            "/test",
-            headers={"X-Forwarded-For": "203.0.113.1, 198.51.100.1"}
-        )
+        response = client.get("/test", headers={"X-Forwarded-For": "203.0.113.1, 198.51.100.1"})
 
         assert response.status_code == 200
         call_args = mock_rate_limiter.check_rate_limit.call_args
@@ -198,10 +192,7 @@ class TestIdentifierDetection:
             allowed=True, limit=100, remaining=99, reset_at=1234567890
         )
 
-        response = client.get(
-            "/test",
-            headers={"X-Real-IP": "198.51.100.42"}
-        )
+        response = client.get("/test", headers={"X-Real-IP": "198.51.100.42"})
 
         assert response.status_code == 200
         call_args = mock_rate_limiter.check_rate_limit.call_args
