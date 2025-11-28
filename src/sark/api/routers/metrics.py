@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import structlog
 
 from sark.db import get_db
-from sark.models.mcp_server import MCPServer, MCPTool, ServerStatus, SensitivityLevel
+from sark.models.mcp_server import MCPServer, MCPTool, ServerStatus
 from sark.services.auth import UserContext, get_current_user
 
 logger = structlog.get_logger()
@@ -32,9 +32,7 @@ class ServerMetricsSummary(BaseModel):
     servers_by_sensitivity: dict[str, int] = Field(
         ..., description="Count of servers by sensitivity level"
     )
-    average_tools_per_server: float = Field(
-        ..., description="Average number of tools per server"
-    )
+    average_tools_per_server: float = Field(..., description="Average number of tools per server")
 
 
 class ServerMetricsDetail(BaseModel):
@@ -49,9 +47,7 @@ class ServerMetricsDetail(BaseModel):
     tools_by_sensitivity: dict[str, int]
     created_at: str
     last_health_check: str | None
-    uptime_percentage: float | None = Field(
-        None, description="Uptime percentage over last 30 days"
-    )
+    uptime_percentage: float | None = Field(None, description="Uptime percentage over last 30 days")
 
 
 class TimeSeriesDataPoint(BaseModel):
@@ -118,18 +114,18 @@ async def get_metrics_summary(
         total_tools = tools_result.scalar() or 0
 
         # Servers by transport
-        transport_query = select(
-            MCPServer.transport, func.count(MCPServer.id)
-        ).group_by(MCPServer.transport)
+        transport_query = select(MCPServer.transport, func.count(MCPServer.id)).group_by(
+            MCPServer.transport
+        )
         transport_result = await db.execute(transport_query)
         servers_by_transport = {
             str(transport.value): count for transport, count in transport_result.fetchall()
         }
 
         # Servers by sensitivity
-        sensitivity_query = select(
-            MCPServer.sensitivity_level, func.count(MCPServer.id)
-        ).group_by(MCPServer.sensitivity_level)
+        sensitivity_query = select(MCPServer.sensitivity_level, func.count(MCPServer.id)).group_by(
+            MCPServer.sensitivity_level
+        )
         sensitivity_result = await db.execute(sensitivity_query)
         servers_by_sensitivity = {
             str(level.value): count for level, count in sensitivity_result.fetchall()
@@ -192,9 +188,11 @@ async def get_server_metrics(
         total_tools = tools_result.scalar() or 0
 
         # Get tools by sensitivity for this server
-        sensitivity_query = select(
-            MCPTool.sensitivity_level, func.count(MCPTool.id)
-        ).where(MCPTool.server_id == server_id).group_by(MCPTool.sensitivity_level)
+        sensitivity_query = (
+            select(MCPTool.sensitivity_level, func.count(MCPTool.id))
+            .where(MCPTool.server_id == server_id)
+            .group_by(MCPTool.sensitivity_level)
+        )
         sensitivity_result = await db.execute(sensitivity_query)
         tools_by_sensitivity = {
             str(level.value): count for level, count in sensitivity_result.fetchall()

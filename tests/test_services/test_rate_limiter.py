@@ -261,10 +261,7 @@ class TestConcurrentRequests:
         mock_redis.pipeline.return_value = mock_pipeline
 
         # Make 10 concurrent requests
-        tasks = [
-            rate_limiter.check_rate_limit("test:concurrent")
-            for _ in range(10)
-        ]
+        tasks = [rate_limiter.check_rate_limit("test:concurrent") for _ in range(10)]
         results = await asyncio.gather(*tasks)
 
         # All should be allowed (under 100 limit)

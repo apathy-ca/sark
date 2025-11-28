@@ -1,0 +1,241 @@
+name: Gateway Integration Tests
+
+on:
+  pull_request:
+    paths:
+      - 'src/sark/services/gateway/**'
+      - 'src/sark/api/routers/gateway.py'
+      - 'src/sark/models/gateway.py'
+      - 'opa/policies/gateway_*.rego'
+      - 'tests/integration/gateway/**'
+      - 'tests/performance/gateway/**'
+      - 'tests/security/gateway/**'
+      - '.github/workflows/gateway-integration-tests.yml'
+  push:
+    branches:
+      - main
+      - 'feat/gateway-*'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: sark
+          POSTGRES_PASSWORD: sark_test_password
+          POSTGRES_DB: sark_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+      opa:
+        image: openpolicyagent/opa:latest
+        options: >-
+          --entrypoint "opa run --server --addr :8181"
+        ports:
+          - 8181:8181
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Setup test database
+        env:
+          DATABASE_URL: postgresql://sark:sark_test_password@localhost:5432/sark_test
+        run: |
+          # Run database migrations
+          alembic upgrade head || echo "No migrations yet"
+
+      - name: Load OPA policies
+        run: |
+          # Load gateway policies into OPA
+          if [ -d "opa/policies" ]; then
+            for policy in opa/policies/gateway_*.rego; do
+              if [ -f "$policy" ]; then
+                curl -X PUT --data-binary @"$policy" \
+                  http://localhost:8181/v1/policies/$(basename "$policy")
+              fi
+            done
+          fi
+
+      - name: Run linting
+        run: |
+          ruff check src/sark/services/gateway/ src/sark/api/routers/gateway.py || true
+          black --check src/sark/services/gateway/ src/sark/api/routers/gateway.py || true
+
+      - name: Run type checking
+        run: |
+          mypy src/sark/services/gateway/ src/sark/api/routers/gateway.py || true
+
+      - name: Run integration tests
+        env:
+          DATABASE_URL: postgresql://sark:sark_test_password@localhost:5432/sark_test
+          REDIS_URL: redis://localhost:6379/0
+          OPA_URL: http://localhost:8181
+          GATEWAY_ENABLED: true
+          GATEWAY_URL: http://localhost:8000
+        run: |
+          pytest tests/integration/gateway/ \
+            -v \
+            --cov=src/sark/services/gateway \
+            --cov=src/sark/api/routers/gateway \
+            --cov-report=xml \
+            --cov-report=term \
+            --cov-report=html
+
+      - name: Run performance tests
+        env:
+          DATABASE_URL: postgresql://sark:sark_test_password@localhost:5432/sark_test
+          REDIS_URL: redis://localhost:6379/0
+          OPA_URL: http://localhost:8181
+          GATEWAY_ENABLED: true
+        run: |
+          pytest tests/performance/gateway/ \
+            -m performance \
+            -v \
+            --timeout=300
+
+      - name: Run security tests
+        env:
+          DATABASE_URL: postgresql://sark:sark_test_password@localhost:5432/sark_test
+          REDIS_URL: redis://localhost:6379/0
+          OPA_URL: http://localhost:8181
+          GATEWAY_ENABLED: true
+        run: |
+          pytest tests/security/gateway/ \
+            -m security \
+            -v
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage.xml
+          flags: gateway-integration
+          name: gateway-integration-tests
+
+      - name: Upload coverage HTML report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: htmlcov/
+
+      - name: Generate test report
+        if: always()
+        run: |
+          echo "## Gateway Integration Test Results" > test-report.md
+          echo "" >> test-report.md
+          echo "### Test Summary" >> test-report.md
+          pytest tests/integration/gateway/ tests/performance/gateway/ tests/security/gateway/ \
+            --collect-only -q | tee -a test-report.md || true
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-report
+          path: test-report.md
+
+      - name: Check coverage threshold
+        run: |
+          coverage report --fail-under=80 || echo "Warning: Coverage below 80%"
+
+  validate-opa-policies:
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.changed_files, 'opa/policies/gateway_')
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup OPA
+        uses: open-policy-agent/setup-opa@v2
+        with:
+          version: latest
+
+      - name: Validate OPA policies
+        run: |
+          if [ -d "opa/policies" ]; then
+            for policy in opa/policies/gateway_*.rego; do
+              if [ -f "$policy" ]; then
+                echo "Validating $policy"
+                opa check "$policy"
+              fi
+            done
+          fi
+
+      - name: Run OPA policy tests
+        run: |
+          if [ -d "opa/policies" ] && [ -d "opa/tests" ]; then
+            opa test opa/policies/ opa/tests/ -v
+          fi
+
+  dependency-security:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install safety pip-audit
+
+      - name: Run safety check
+        run: |
+          safety check --json || true
+
+      - name: Run pip-audit
+        run: |
+          pip-audit || true
+
+  results:
+    runs-on: ubuntu-latest
+    needs: [test, validate-opa-policies, dependency-security]
+    if: always()
+
+    steps:
+      - name: Check test results
+        run: |
+          if [ "${{ needs.test.result }}" == "failure" ]; then
+            echo "::error::Gateway integration tests failed"
+            exit 1
+          fi
+
+          if [ "${{ needs.validate-opa-policies.result }}" == "failure" ]; then
+            echo "::error::OPA policy validation failed"
+            exit 1
+          fi
+
+          echo "✅ All Gateway integration tests passed!"

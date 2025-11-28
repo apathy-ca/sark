@@ -47,8 +47,7 @@ from sark.services.audit.siem import (
 HAS_CREDENTIALS = bool(os.getenv("DATADOG_API_KEY"))
 
 requires_credentials = pytest.mark.skipif(
-    not HAS_CREDENTIALS,
-    reason="Datadog credentials not configured. Set DATADOG_API_KEY."
+    not HAS_CREDENTIALS, reason="Datadog credentials not configured. Set DATADOG_API_KEY."
 )
 
 
@@ -147,7 +146,9 @@ class TestDatadogEventFormatting:
         print("\n✅ Single event sent successfully")
         print(f"   Event ID: {test_event.id}")
         print(f"   Type: {test_event.event_type.value}")
-        print(f"   Search in Datadog: service:{datadog_siem.datadog_config.service} @event_id:{test_event.id}")
+        print(
+            f"   Search in Datadog: service:{datadog_siem.datadog_config.service} @event_id:{test_event.id}"
+        )
 
     @requires_credentials
     @pytest.mark.asyncio
@@ -202,7 +203,9 @@ class TestDatadogEventFormatting:
         assert result is True
 
         print(f"\n✅ Batch of {len(events)} events sent successfully")
-        print(f"   Search in Datadog: service:{datadog_siem.datadog_config.service} @sark.details.test_batch:true")
+        print(
+            f"   Search in Datadog: service:{datadog_siem.datadog_config.service} @sark.details.test_batch:true"
+        )
 
     @requires_credentials
     @pytest.mark.asyncio
@@ -330,7 +333,9 @@ class TestDatadogWithOptimizations:
 
     @requires_credentials
     @pytest.mark.asyncio
-    async def test_with_error_handler(self, datadog_siem: DatadogSIEM, test_event: AuditEvent, tmp_path):
+    async def test_with_error_handler(
+        self, datadog_siem: DatadogSIEM, test_event: AuditEvent, tmp_path
+    ):
         """Test Datadog with error handler and fallback."""
         error_handler = SIEMErrorHandler(
             fallback_log_dir=tmp_path,
@@ -343,11 +348,13 @@ class TestDatadogWithOptimizations:
         def on_alert(errors):
             alert_fired.append(len(errors))
 
-        error_handler.add_alert(ErrorAlert(
-            name="test_alert",
-            condition=lambda e: high_error_rate_condition(e, threshold=1),
-            callback=on_alert,
-        ))
+        error_handler.add_alert(
+            ErrorAlert(
+                name="test_alert",
+                condition=lambda e: high_error_rate_condition(e, threshold=1),
+                callback=on_alert,
+            )
+        )
 
         # Send event (should succeed)
         try:
@@ -403,6 +410,7 @@ class TestDatadogLoadPerformance:
         try:
             # Send 1000 events
             import time
+
             start_time = time.time()
 
             for i in range(1000):
@@ -440,6 +448,7 @@ class TestDatadogLoadPerformance:
     @pytest.mark.asyncio
     async def test_concurrent_sending(self, datadog_siem: DatadogSIEM):
         """Test concurrent event sending."""
+
         async def send_events(batch_id: int, count: int):
             """Send multiple events concurrently."""
             success_count = 0
@@ -463,6 +472,7 @@ class TestDatadogLoadPerformance:
 
         # Send 10 concurrent batches of 10 events each
         import time
+
         start_time = time.time()
 
         tasks = [send_events(batch_id, 10) for batch_id in range(10)]

@@ -1,0 +1,245 @@
+version: '3.8'
+
+# SARK v1.1.0 - Gateway Integration Example
+# This docker-compose file demonstrates a complete SARK + MCP Gateway setup
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: sark-postgres
+    environment:
+      POSTGRES_DB: sark
+      POSTGRES_USER: sark
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sark_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sark"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sark-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: sark-redis
+    command: redis-server --requirepass ${REDIS_PASSWORD:-redis_password}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - sark-network
+
+  # OPA Policy Engine
+  opa:
+    image: openpolicyagent/opa:latest
+    container_name: sark-opa
+    command:
+      - "run"
+      - "--server"
+      - "--addr"
+      - "0.0.0.0:8181"
+      - "--bundle"
+      - "/bundles/bundle.tar.gz"
+      - "--watch"
+    ports:
+      - "8181:8181"
+    volumes:
+      - ./opa/bundle:/bundles:ro
+      - ./opa/policies:/policies:ro
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8181/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sark-network
+
+  # SARK Application (v1.1.0 with Gateway Integration)
+  sark:
+    image: sark:1.1.0
+    container_name: sark-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      opa:
+        condition: service_healthy
+      mcp-gateway:
+        condition: service_healthy
+    environment:
+      # Database Configuration
+      DATABASE_URL: postgresql://sark:${POSTGRES_PASSWORD:-sark_password}@postgres:5432/sark
+
+      # Redis Configuration
+      REDIS_URL: redis://:${REDIS_PASSWORD:-redis_password}@redis:6379/0
+
+      # OPA Configuration
+      OPA_URL: http://opa:8181
+
+      # Gateway Integration (v1.1.0 Feature)
+      GATEWAY_ENABLED: ${GATEWAY_ENABLED:-true}
+      GATEWAY_URL: ${GATEWAY_URL:-http://mcp-gateway:8080}
+      GATEWAY_API_KEY: ${GATEWAY_API_KEY:-change_me_in_production}
+      GATEWAY_TIMEOUT_SECONDS: ${GATEWAY_TIMEOUT_SECONDS:-30}
+      GATEWAY_RETRY_ATTEMPTS: ${GATEWAY_RETRY_ATTEMPTS:-3}
+
+      # Agent-to-Agent Authorization (Optional)
+      A2A_ENABLED: ${A2A_ENABLED:-false}
+
+      # JWT Configuration
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-change_me_in_production}
+      JWT_ALGORITHM: HS256
+      JWT_EXPIRATION_MINUTES: 60
+
+      # Application Settings
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+
+      # Metrics
+      METRICS_ENABLED: true
+      METRICS_PORT: 9090
+    ports:
+      - "8000:8000"   # API
+      - "9090:9090"   # Prometheus metrics
+    volumes:
+      - ./config:/etc/sark:ro
+      - sark_logs:/var/log/sark
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      - sark-network
+    restart: unless-stopped
+
+  # MCP Gateway Registry (Mock/Example)
+  # Replace with your actual MCP Gateway implementation
+  mcp-gateway:
+    image: mcp-gateway:latest
+    container_name: mcp-gateway
+    environment:
+      # Gateway Configuration
+      GATEWAY_PORT: 8080
+
+      # SARK Authorization Integration
+      AUTH_PROVIDER: sark
+      SARK_URL: http://sark:8000/api/v1/gateway
+      SARK_API_KEY: ${SARK_API_KEY:-change_me_in_production}
+      SARK_TIMEOUT_SECONDS: 30
+
+      # Cache Settings
+      CACHE_ENABLED: true
+      CACHE_TTL_SECONDS: 60
+
+      # MCP Server Registry
+      MCP_SERVERS_CONFIG: /etc/gateway/mcp-servers.json
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./gateway/config:/etc/gateway:ro
+      - gateway_logs:/var/log/gateway
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    networks:
+      - sark-network
+    restart: unless-stopped
+
+  # Example MCP Server: PostgreSQL
+  mcp-postgres:
+    image: mcp-server-postgres:latest
+    container_name: mcp-postgres-server
+    environment:
+      MCP_SERVER_NAME: postgres-mcp
+      MCP_SERVER_PORT: 5000
+      DATABASE_URL: postgresql://sark:${POSTGRES_PASSWORD:-sark_password}@postgres:5432/sark
+    depends_on:
+      - postgres
+    networks:
+      - sark-network
+    restart: unless-stopped
+
+  # Example MCP Server: GitHub
+  mcp-github:
+    image: mcp-server-github:latest
+    container_name: mcp-github-server
+    environment:
+      MCP_SERVER_NAME: github-mcp
+      MCP_SERVER_PORT: 5001
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+    networks:
+      - sark-network
+    restart: unless-stopped
+
+  # Prometheus (Optional - for metrics collection)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: sark-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - sark-network
+    restart: unless-stopped
+
+  # Grafana (Optional - for metrics visualization)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: sark-grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_INSTALL_PLUGINS: grafana-piechart-panel
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources:ro
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - sark-network
+    restart: unless-stopped
+
+networks:
+  sark-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  sark_logs:
+    driver: local
+  gateway_logs:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local

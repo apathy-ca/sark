@@ -140,9 +140,7 @@ class BatchHandler:
                     continue
 
                 # Calculate remaining timeout
-                remaining_timeout = max(
-                    0.1, self.config.batch_timeout_seconds - time_since_flush
-                )
+                remaining_timeout = max(0.1, self.config.batch_timeout_seconds - time_since_flush)
 
                 # Wait for an event with timeout
                 try:

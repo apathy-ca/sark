@@ -31,7 +31,7 @@ def jwt_handler():
         secret_key="test-secret-key-for-integration-tests",
         algorithm="HS256",
         access_token_expire_minutes=30,
-        refresh_token_expire_days=7
+        refresh_token_expire_days=7,
     )
 
 
@@ -48,7 +48,7 @@ def test_user():
         is_admin=False,
         extra_metadata={},
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
 
@@ -65,7 +65,7 @@ def admin_user():
         is_admin=True,
         extra_metadata={},
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
 
@@ -98,13 +98,14 @@ def sample_server_data():
         "sensitivity_level": "medium",
         "tools": [],
         "prompts": [],
-        "resources": []
+        "resources": [],
     }
 
 
 # ============================================================================
 # Server Registration Endpoint Tests
 # ============================================================================
+
 
 @pytest.mark.asyncio
 @pytest.mark.integration
@@ -126,7 +127,7 @@ async def test_register_server_endpoint(auth_headers, sample_server_data):
         **sample_server_data,
         "is_active": True,
         "created_at": datetime.now(UTC).isoformat(),
-        "updated_at": datetime.now(UTC).isoformat()
+        "updated_at": datetime.now(UTC).isoformat(),
     }
 
     assert response_data["name"] == sample_server_data["name"]
@@ -165,6 +166,7 @@ async def test_register_server_validates_input(auth_headers):
 # Server Management Endpoint Tests
 # ============================================================================
 
+
 @pytest.mark.asyncio
 @pytest.mark.integration
 @pytest.mark.api
@@ -179,7 +181,7 @@ async def test_get_server_by_id(auth_headers):
         "name": "test-server",
         "transport": "http",
         "endpoint": "http://example.com",
-        "is_active": True
+        "is_active": True,
     }
 
     assert server_data["id"] == str(server_id)
@@ -192,17 +194,14 @@ async def test_get_server_by_id(auth_headers):
 async def test_update_server_endpoint(auth_headers):
     """Test server update endpoint."""
     server_id = uuid4()
-    update_data = {
-        "description": "Updated description",
-        "is_active": False
-    }
+    update_data = {"description": "Updated description", "is_active": False}
 
     # Simulate update
     updated_server = {
         "id": str(server_id),
         "name": "test-server",
         "description": update_data["description"],
-        "is_active": update_data["is_active"]
+        "is_active": update_data["is_active"],
     }
 
     assert updated_server["description"] == update_data["description"]
@@ -226,6 +225,7 @@ async def test_delete_server_endpoint(admin_headers):
 # Search and Filtering Tests
 # ============================================================================
 
+
 @pytest.mark.asyncio
 @pytest.mark.integration
 @pytest.mark.api
@@ -237,7 +237,7 @@ async def test_search_servers_by_name(auth_headers):
     # Simulate search results
     results = [
         {"id": str(uuid4()), "name": "test-server-1"},
-        {"id": str(uuid4()), "name": "test-server-2"}
+        {"id": str(uuid4()), "name": "test-server-2"},
     ]
 
     assert len(results) == 2
@@ -253,9 +253,7 @@ async def test_filter_servers_by_status(auth_headers):
     ServerSearchFilter().with_status(is_active=True)
 
     # Simulate filtered results
-    results = [
-        {"id": str(uuid4()), "name": "active-server", "is_active": True}
-    ]
+    results = [{"id": str(uuid4()), "name": "active-server", "is_active": True}]
 
     assert all(r["is_active"] is True for r in results)
 
@@ -269,9 +267,7 @@ async def test_filter_servers_by_sensitivity(auth_headers):
     ServerSearchFilter().with_sensitivity(SensitivityLevel.HIGH)
 
     # Simulate filtered results
-    results = [
-        {"id": str(uuid4()), "name": "secure-server", "sensitivity_level": "high"}
-    ]
+    results = [{"id": str(uuid4()), "name": "secure-server", "sensitivity_level": "high"}]
 
     assert all(r["sensitivity_level"] == "high" for r in results)
 
@@ -279,6 +275,7 @@ async def test_filter_servers_by_sensitivity(auth_headers):
 # ============================================================================
 # Pagination Tests
 # ============================================================================
+
 
 @pytest.mark.asyncio
 @pytest.mark.integration
@@ -296,7 +293,7 @@ async def test_pagination_first_page(auth_headers):
         "total": 25,
         "page": page,
         "page_size": page_size,
-        "pages": 3
+        "pages": 3,
     }
 
     assert len(response["items"]) == 10
@@ -320,7 +317,7 @@ async def test_pagination_last_page(auth_headers):
         "total": 25,
         "page": page,
         "page_size": page_size,
-        "pages": 3
+        "pages": 3,
     }
 
     assert len(response["items"]) == 5
@@ -333,13 +330,7 @@ async def test_pagination_last_page(auth_headers):
 @pytest.mark.requires_db
 async def test_pagination_empty_results(auth_headers):
     """Test pagination with no results."""
-    response = {
-        "items": [],
-        "total": 0,
-        "page": 1,
-        "page_size": 10,
-        "pages": 0
-    }
+    response = {"items": [], "total": 0, "page": 1, "page_size": 10, "pages": 0}
 
     assert len(response["items"]) == 0
     assert response["total"] == 0
@@ -348,6 +339,7 @@ async def test_pagination_empty_results(auth_headers):
 # ============================================================================
 # Bulk Operations Tests
 # ============================================================================
+
 
 @pytest.mark.asyncio
 @pytest.mark.integration
@@ -366,9 +358,7 @@ async def test_bulk_register_servers_transactional(auth_headers):
         "total": 3,
         "successful": 3,
         "failed": 0,
-        "results": [
-            {"success": True, "server_id": str(uuid4())} for _ in range(3)
-        ]
+        "results": [{"success": True, "server_id": str(uuid4())} for _ in range(3)],
     }
 
     assert result["successful"] == 3
@@ -391,8 +381,8 @@ async def test_bulk_register_servers_best_effort(auth_headers):
         "results": [
             {"success": True, "server_id": str(uuid4())},
             {"success": False, "error": "Validation failed"},
-            {"success": True, "server_id": str(uuid4())}
-        ]
+            {"success": True, "server_id": str(uuid4())},
+        ],
     }
 
     assert result["successful"] == 2
@@ -413,7 +403,7 @@ async def test_bulk_operation_rollback_on_error(auth_headers):
         "successful": 0,
         "failed": 2,
         "error": "Transaction rolled back due to validation error",
-        "results": []
+        "results": [],
     }
 
     assert result["successful"] == 0
@@ -423,6 +413,7 @@ async def test_bulk_operation_rollback_on_error(auth_headers):
 # ============================================================================
 # Error Response Tests
 # ============================================================================
+
 
 @pytest.mark.asyncio
 @pytest.mark.integration
@@ -446,11 +437,7 @@ async def test_validation_error_response(auth_headers):
     expected_status = status.HTTP_422_UNPROCESSABLE_ENTITY
     expected_response = {
         "detail": [
-            {
-                "loc": ["body", "name"],
-                "msg": "field required",
-                "type": "value_error.missing"
-            }
+            {"loc": ["body", "name"], "msg": "field required", "type": "value_error.missing"}
         ]
     }
 
@@ -482,6 +469,7 @@ async def test_forbidden_access_response(auth_headers):
 # Large-Scale Pagination Tests (10k+ records)
 # ============================================================================
 
+
 @pytest.mark.asyncio
 @pytest.mark.integration
 @pytest.mark.api
@@ -505,14 +493,11 @@ async def test_pagination_with_10k_records(auth_headers):
     # Test first page
     start_time = time.time()
     page_1_response = {
-        "items": [
-            {"id": str(uuid4()), "name": f"server-{i}"}
-            for i in range(page_size)
-        ],
+        "items": [{"id": str(uuid4()), "name": f"server-{i}"} for i in range(page_size)],
         "total": total_servers,
         "page": 1,
         "page_size": page_size,
-        "pages": expected_pages
+        "pages": expected_pages,
     }
     elapsed = time.time() - start_time
 
@@ -524,14 +509,11 @@ async def test_pagination_with_10k_records(auth_headers):
     # Test middle page
     start_time = time.time()
     page_50_response = {
-        "items": [
-            {"id": str(uuid4()), "name": f"server-{i+4900}"}
-            for i in range(page_size)
-        ],
+        "items": [{"id": str(uuid4()), "name": f"server-{i+4900}"} for i in range(page_size)],
         "total": total_servers,
         "page": 50,
         "page_size": page_size,
-        "pages": expected_pages
+        "pages": expected_pages,
     }
     elapsed = time.time() - start_time
 
@@ -541,14 +523,11 @@ async def test_pagination_with_10k_records(auth_headers):
 
     # Test last page
     page_100_response = {
-        "items": [
-            {"id": str(uuid4()), "name": f"server-{i+9900}"}
-            for i in range(page_size)
-        ],
+        "items": [{"id": str(uuid4()), "name": f"server-{i+9900}"} for i in range(page_size)],
         "total": total_servers,
         "page": 100,
         "page_size": page_size,
-        "pages": expected_pages
+        "pages": expected_pages,
     }
 
     assert len(page_100_response["items"]) == page_size
@@ -578,7 +557,7 @@ async def test_pagination_performance_consistency(auth_headers):
             "items": [{"id": str(uuid4())} for _ in range(page_size)],
             "total": total_servers,
             "page": page,
-            "page_size": page_size
+            "page_size": page_size,
         }
 
         elapsed = time.time() - start_time
@@ -609,13 +588,7 @@ async def test_pagination_performance_consistency(auth_headers):
 async def test_pagination_edge_cases(auth_headers):
     """Test pagination edge cases."""
     # Empty results
-    empty_response = {
-        "items": [],
-        "total": 0,
-        "page": 1,
-        "page_size": 100,
-        "pages": 0
-    }
+    empty_response = {"items": [], "total": 0, "page": 1, "page_size": 100, "pages": 0}
     assert len(empty_response["items"]) == 0
     assert empty_response["pages"] == 0
 
@@ -625,7 +598,7 @@ async def test_pagination_edge_cases(auth_headers):
         "total": 25,
         "page": 1,
         "page_size": 100,
-        "pages": 1
+        "pages": 1,
     }
     assert len(single_page_response["items"]) == 25
     assert single_page_response["pages"] == 1
@@ -636,7 +609,7 @@ async def test_pagination_edge_cases(auth_headers):
         "total": 237,
         "page": 3,
         "page_size": 100,
-        "pages": 3
+        "pages": 3,
     }
     assert len(partial_last_response["items"]) == 37
 
@@ -644,6 +617,7 @@ async def test_pagination_edge_cases(auth_headers):
 # ============================================================================
 # Search and Filtering Performance Tests
 # ============================================================================
+
 
 @pytest.mark.asyncio
 @pytest.mark.integration
@@ -666,15 +640,14 @@ async def test_search_performance_with_large_dataset(auth_headers):
 
     # Simulate search
     matching_servers = [
-        {"id": str(uuid4()), "name": f"api-gateway-{i}"}
-        for i in range(50)  # 50 matches
+        {"id": str(uuid4()), "name": f"api-gateway-{i}"} for i in range(50)  # 50 matches
     ]
 
     search_response = {
         "items": matching_servers,
         "total": 50,
         "query": search_query,
-        "searched_total": total_servers
+        "searched_total": total_servers,
     }
 
     elapsed = time.time() - start_time
@@ -702,11 +675,7 @@ async def test_multi_filter_performance(auth_headers):
         start_time = time.time()
 
         # Simulate filtered search
-        {
-            "items": [{"id": str(uuid4())} for _ in range(100)],
-            "total": 100,
-            "filters": filter_combo
-        }
+        {"items": [{"id": str(uuid4())} for _ in range(100)], "total": 100, "filters": filter_combo}
 
         elapsed = time.time() - start_time
         latencies.append(elapsed)
@@ -736,16 +705,19 @@ async def test_complex_search_filters(auth_headers):
     assert team_filter is not None
 
     # Test combined filters
-    combined_filter = (ServerSearchFilter()
-                      .with_search("api")
-                      .with_status(status=ServerStatus.ACTIVE)
-                      .with_sensitivity(SensitivityLevel.MEDIUM))
+    combined_filter = (
+        ServerSearchFilter()
+        .with_search("api")
+        .with_status(status=ServerStatus.ACTIVE)
+        .with_sensitivity(SensitivityLevel.MEDIUM)
+    )
     assert combined_filter is not None
 
 
 # ============================================================================
 # Bulk Operations Tests (100+ items)
 # ============================================================================
+
 
 @pytest.mark.asyncio
 @pytest.mark.integration
@@ -768,7 +740,7 @@ async def test_bulk_register_100_servers_transactional(auth_headers):
             "description": f"Bulk registered server {i}",
             "transport": "http",
             "endpoint": f"http://server{i}.example.com/mcp",
-            "sensitivity_level": "medium"
+            "sensitivity_level": "medium",
         }
         for i in range(150)
     ]
@@ -782,9 +754,8 @@ async def test_bulk_register_100_servers_transactional(auth_headers):
         "successful": 150,
         "failed": 0,
         "results": [
-            {"success": True, "server_id": str(uuid4()), "name": s["name"]}
-            for s in servers
-        ]
+            {"success": True, "server_id": str(uuid4()), "name": s["name"]} for s in servers
+        ],
     }
 
     elapsed = time.time() - start_time
@@ -809,18 +780,22 @@ async def test_bulk_register_best_effort_mode(auth_headers):
     servers = []
     for i in range(200):
         if i % 20 == 0:  # Every 20th server is invalid
-            servers.append({
-                "name": "",  # Invalid - empty name
-                "transport": "http",
-                "endpoint": f"http://server{i}.example.com"
-            })
+            servers.append(
+                {
+                    "name": "",  # Invalid - empty name
+                    "transport": "http",
+                    "endpoint": f"http://server{i}.example.com",
+                }
+            )
         else:
-            servers.append({
-                "name": f"bulk-server-{i}",
-                "transport": "http",
-                "endpoint": f"http://server{i}.example.com",
-                "sensitivity_level": "medium"
-            })
+            servers.append(
+                {
+                    "name": f"bulk-server-{i}",
+                    "transport": "http",
+                    "endpoint": f"http://server{i}.example.com",
+                    "sensitivity_level": "medium",
+                }
+            )
 
     start_time = time.time()
 
@@ -833,23 +808,19 @@ async def test_bulk_register_best_effort_mode(auth_headers):
         "total": 200,
         "successful": successful_count,
         "failed": failed_count,
-        "results": []
+        "results": [],
     }
 
     # Add results
     for i in range(200):
         if i % 20 == 0:
-            result["results"].append({
-                "success": False,
-                "name": "",
-                "error": "Validation failed: name is required"
-            })
+            result["results"].append(
+                {"success": False, "name": "", "error": "Validation failed: name is required"}
+            )
         else:
-            result["results"].append({
-                "success": True,
-                "server_id": str(uuid4()),
-                "name": f"bulk-server-{i}"
-            })
+            result["results"].append(
+                {"success": True, "server_id": str(uuid4()), "name": f"bulk-server-{i}"}
+            )
 
     elapsed = time.time() - start_time
 
@@ -875,12 +846,7 @@ async def test_bulk_update_servers(auth_headers):
 
     start_time = time.time()
 
-    result = {
-        "mode": "bulk_update",
-        "total": 50,
-        "successful": 50,
-        "failed": 0
-    }
+    result = {"mode": "bulk_update", "total": 50, "successful": 50, "failed": 0}
 
     elapsed = time.time() - start_time
 
@@ -898,12 +864,7 @@ async def test_bulk_delete_servers(admin_headers):
 
     start_time = time.time()
 
-    result = {
-        "mode": "bulk_delete",
-        "total": 30,
-        "successful": 30,
-        "failed": 0
-    }
+    result = {"mode": "bulk_delete", "total": 30, "successful": 30, "failed": 0}
 
     elapsed = time.time() - start_time
 
@@ -914,6 +875,7 @@ async def test_bulk_delete_servers(admin_headers):
 # ============================================================================
 # Authentication and Authorization Tests
 # ============================================================================
+
 
 @pytest.mark.asyncio
 @pytest.mark.integration
@@ -942,9 +904,7 @@ async def test_authentication_required_for_all_endpoints():
 async def test_valid_jwt_token_grants_access(jwt_handler, test_user):
     """Test that valid JWT token grants API access."""
     token = jwt_handler.create_access_token(
-        user_id=test_user.id,
-        email=test_user.email,
-        role=test_user.role
+        user_id=test_user.id, email=test_user.email, role=test_user.role
     )
 
     headers = {"Authorization": f"Bearer {token}"}
@@ -994,6 +954,7 @@ async def test_admin_only_endpoints_require_admin_role(admin_headers, auth_heade
 # Error Handling Tests for Malformed Requests
 # ============================================================================
 
+
 @pytest.mark.asyncio
 @pytest.mark.integration
 @pytest.mark.api
@@ -1004,7 +965,7 @@ async def test_malformed_json_rejected(auth_headers):
         "{invalid json",
         '{"name": }',
         '{"name": "test"',  # Missing closing brace
-        '',  # Empty body
+        "",  # Empty body
     ]
 
     for _payload in malformed_payloads:
@@ -1035,8 +996,16 @@ async def test_missing_required_fields(auth_headers):
 async def test_invalid_field_types(auth_headers):
     """Test validation errors for invalid field types."""
     invalid_payloads = [
-        {"name": 123, "transport": "http", "endpoint": "http://example.com"},  # name should be string
-        {"name": "test", "transport": "invalid", "endpoint": "http://example.com"},  # invalid transport
+        {
+            "name": 123,
+            "transport": "http",
+            "endpoint": "http://example.com",
+        },  # name should be string
+        {
+            "name": "test",
+            "transport": "invalid",
+            "endpoint": "http://example.com",
+        },  # invalid transport
         {"name": "test", "transport": "http", "endpoint": 123},  # endpoint should be string
         {"name": "test", "transport": "http", "endpoint": "not-a-url"},  # invalid URL
     ]
@@ -1121,6 +1090,7 @@ async def test_xss_attempts_sanitized(auth_headers):
 # Performance Benchmark Tests
 # ============================================================================
 
+
 @pytest.mark.asyncio
 @pytest.mark.integration
 @pytest.mark.api
@@ -1138,11 +1108,7 @@ async def test_api_latency_p95_under_100ms(auth_headers):
         start_time = time.time()
 
         # Simulate API request
-        {
-            "id": str(uuid4()),
-            "name": f"server-{i}",
-            "status": ServerStatus.ACTIVE
-        }
+        {"id": str(uuid4()), "name": f"server-{i}", "status": ServerStatus.ACTIVE}
 
         elapsed = time.time() - start_time
         latencies.append(elapsed)

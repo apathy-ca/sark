@@ -357,9 +357,7 @@ async def test_mixed_cache_hit_miss_workload(mock_post, redis_mock):
         await asyncio.sleep(0.030)  # 30ms OPA call
         response = MagicMock()
         response.status_code = 200
-        response.json.return_value = {
-            "result": {"allow": True, "audit_reason": "Test"}
-        }
+        response.json.return_value = {"result": {"allow": True, "audit_reason": "Test"}}
         response.raise_for_status = MagicMock()
         return response
 
