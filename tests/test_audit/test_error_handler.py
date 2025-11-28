@@ -334,7 +334,9 @@ class TestErrorAlerts:
 
         alert = ErrorAlert(
             name="high_error_rate",
-            condition=lambda errors: high_error_rate_condition(errors, threshold=3, window_seconds=60),
+            condition=lambda errors: high_error_rate_condition(
+                errors, threshold=3, window_seconds=60
+            ),
             callback=callback,
         )
 
@@ -352,6 +354,7 @@ class TestErrorAlerts:
     @pytest.mark.asyncio
     async def test_critical_error_condition(self, handler: SIEMErrorHandler):
         """Test critical error alert condition."""
+
         # Create alert with critical error condition
         def condition(errors):
             return critical_error_condition(errors)
@@ -388,43 +391,33 @@ class TestAlertConditions:
     def test_high_error_rate_condition_below_threshold(self):
         """Test high error rate when below threshold."""
         errors = [
-            ErrorRecord(Exception("e"), ErrorCategory.UNKNOWN, ErrorSeverity.LOW)
-            for _ in range(5)
+            ErrorRecord(Exception("e"), ErrorCategory.UNKNOWN, ErrorSeverity.LOW) for _ in range(5)
         ]
         assert high_error_rate_condition(errors, threshold=10) is False
 
     def test_high_error_rate_condition_above_threshold(self):
         """Test high error rate when above threshold."""
         errors = [
-            ErrorRecord(Exception("e"), ErrorCategory.UNKNOWN, ErrorSeverity.LOW)
-            for _ in range(15)
+            ErrorRecord(Exception("e"), ErrorCategory.UNKNOWN, ErrorSeverity.LOW) for _ in range(15)
         ]
         assert high_error_rate_condition(errors, threshold=10) is True
 
     def test_critical_error_condition_true(self):
         """Test critical error condition when critical error present."""
-        errors = [
-            ErrorRecord(Exception("e"), ErrorCategory.UNKNOWN, ErrorSeverity.CRITICAL)
-        ]
+        errors = [ErrorRecord(Exception("e"), ErrorCategory.UNKNOWN, ErrorSeverity.CRITICAL)]
         assert critical_error_condition(errors) is True
 
     def test_critical_error_condition_false(self):
         """Test critical error condition with no critical errors."""
-        errors = [
-            ErrorRecord(Exception("e"), ErrorCategory.UNKNOWN, ErrorSeverity.LOW)
-        ]
+        errors = [ErrorRecord(Exception("e"), ErrorCategory.UNKNOWN, ErrorSeverity.LOW)]
         assert critical_error_condition(errors) is False
 
     def test_auth_failure_condition_true(self):
         """Test auth failure condition when auth error present."""
-        errors = [
-            ErrorRecord(Exception("401"), ErrorCategory.AUTHENTICATION, ErrorSeverity.HIGH)
-        ]
+        errors = [ErrorRecord(Exception("401"), ErrorCategory.AUTHENTICATION, ErrorSeverity.HIGH)]
         assert auth_failure_condition(errors) is True
 
     def test_auth_failure_condition_false(self):
         """Test auth failure condition with no auth errors."""
-        errors = [
-            ErrorRecord(Exception("e"), ErrorCategory.NETWORK, ErrorSeverity.LOW)
-        ]
+        errors = [ErrorRecord(Exception("e"), ErrorCategory.NETWORK, ErrorSeverity.LOW)]
         assert auth_failure_condition(errors) is False

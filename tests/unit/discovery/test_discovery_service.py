@@ -455,10 +455,8 @@ class TestDiscoveryServiceListServersPaginated:
             "sark.services.discovery.discovery_service.CursorPaginator.paginate",
             new=AsyncMock(return_value=([sample_server], None, False, None)),
         ):
-            servers, next_cursor, has_more, total = (
-                await discovery_service.list_servers_paginated(
-                    pagination=pagination,
-                )
+            servers, next_cursor, has_more, total = await discovery_service.list_servers_paginated(
+                pagination=pagination,
             )
 
             assert len(servers) == 1
@@ -479,15 +477,13 @@ class TestDiscoveryServiceListServersPaginated:
             "sark.services.discovery.discovery_service.CursorPaginator.paginate",
             new=AsyncMock(return_value=([sample_server], "cursor123", True, 100)),
         ):
-            servers, next_cursor, has_more, total = (
-                await discovery_service.list_servers_paginated(
-                    pagination=pagination,
-                    status=ServerStatus.ACTIVE,
-                    owner_id=uuid4(),
-                    tags=["production"],
-                    search="test",
-                    count_total=True,
-                )
+            servers, next_cursor, has_more, total = await discovery_service.list_servers_paginated(
+                pagination=pagination,
+                status=ServerStatus.ACTIVE,
+                owner_id=uuid4(),
+                tags=["production"],
+                search="test",
+                count_total=True,
             )
 
             assert len(servers) == 1

@@ -176,7 +176,9 @@ async def audit_stream_websocket(
     # Authenticate the WebSocket connection
     user = await authenticate_websocket(token)
     if not user:
-        await websocket.close(code=status.WS_1008_POLICY_VIOLATION, reason="Invalid or missing token")
+        await websocket.close(
+            code=status.WS_1008_POLICY_VIOLATION, reason="Invalid or missing token"
+        )
         return
 
     user_id = str(user.user_id)
@@ -270,7 +272,9 @@ async def server_status_websocket(
     # Authenticate the WebSocket connection
     user = await authenticate_websocket(token)
     if not user:
-        await websocket.close(code=status.WS_1008_POLICY_VIOLATION, reason="Invalid or missing token")
+        await websocket.close(
+            code=status.WS_1008_POLICY_VIOLATION, reason="Invalid or missing token"
+        )
         return
 
     user_id = str(user.user_id)
@@ -361,7 +365,9 @@ async def metrics_live_websocket(
     # Authenticate the WebSocket connection
     user = await authenticate_websocket(token)
     if not user:
-        await websocket.close(code=status.WS_1008_POLICY_VIOLATION, reason="Invalid or missing token")
+        await websocket.close(
+            code=status.WS_1008_POLICY_VIOLATION, reason="Invalid or missing token"
+        )
         return
 
     user_id = str(user.user_id)

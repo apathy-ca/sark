@@ -36,6 +36,7 @@ def user_id_to_uuid(user_id: str, provider: str) -> UUID:
     name = f"{provider}:{user_id}"
     return uuid.uuid5(USER_UUID_NAMESPACE, name)
 
+
 router = APIRouter(prefix="/api/auth", tags=["authentication"])
 
 

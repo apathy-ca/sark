@@ -32,7 +32,7 @@ def jwt_handler():
         secret_key="test-secret-key-for-integration-tests",
         algorithm="HS256",
         access_token_expire_minutes=30,
-        refresh_token_expire_days=7
+        refresh_token_expire_days=7,
     )
 
 
@@ -61,7 +61,7 @@ def test_user():
         is_admin=False,
         extra_metadata={},
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
 
@@ -78,7 +78,7 @@ def admin_user():
         is_admin=True,
         extra_metadata={},
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
 
@@ -93,6 +93,7 @@ async def opa_client():
 # Login/Logout Flow Tests
 # ============================================================================
 
+
 @pytest.mark.asyncio
 @pytest.mark.integration
 @pytest.mark.auth
@@ -100,14 +101,9 @@ async def test_complete_login_flow(jwt_handler, test_user):
     """Test complete login flow with token generation."""
     # Generate access and refresh tokens
     access_token = jwt_handler.create_access_token(
-        user_id=test_user.id,
-        email=test_user.email,
-        role=test_user.role
+        user_id=test_user.id, email=test_user.email, role=test_user.role
     )
-    refresh_token = jwt_handler.create_refresh_token(
-        user_id=test_user.id,
-        email=test_user.email
-    )
+    refresh_token = jwt_handler.create_refresh_token(user_id=test_user.id, email=test_user.email)
 
     assert access_token is not None
     assert refresh_token is not None
@@ -128,14 +124,9 @@ async def test_token_refresh_flow(jwt_handler, test_user):
     """Test token refresh mechanism."""
     # Create initial tokens
     old_access_token = jwt_handler.create_access_token(
-        user_id=test_user.id,
-        email=test_user.email,
-        role=test_user.role
+        user_id=test_user.id, email=test_user.email, role=test_user.role
     )
-    refresh_token = jwt_handler.create_refresh_token(
-        user_id=test_user.id,
-        email=test_user.email
-    )
+    refresh_token = jwt_handler.create_refresh_token(user_id=test_user.id, email=test_user.email)
 
     # Verify refresh token
     user_id = jwt_handler.verify_token(refresh_token, "refresh")
@@ -143,9 +134,7 @@ async def test_token_refresh_flow(jwt_handler, test_user):
 
     # Generate new access token using refresh token
     new_access_token = jwt_handler.create_access_token(
-        user_id=user_id,
-        email=test_user.email,
-        role=test_user.role
+        user_id=user_id, email=test_user.email, role=test_user.role
     )
 
     # Verify new access token works
@@ -163,9 +152,7 @@ async def test_logout_invalidates_session(session_service, test_user):
     """Test that logout properly invalidates session."""
     # Create session
     session = session_service.create_session(
-        user_id=test_user.id,
-        user_agent="Mozilla/5.0",
-        ip_address="127.0.0.1"
+        user_id=test_user.id, user_agent="Mozilla/5.0", ip_address="127.0.0.1"
     )
 
     assert session.is_active is True
@@ -179,6 +166,7 @@ async def test_logout_invalidates_session(session_service, test_user):
 # ============================================================================
 # Authentication Failure Tests
 # ============================================================================
+
 
 @pytest.mark.asyncio
 @pytest.mark.integration
@@ -201,11 +189,7 @@ async def test_expired_token_rejected(jwt_handler, test_user):
     # Create expired token
     now = datetime.now(UTC)
     past = now - timedelta(hours=1)
-    claims = {
-        "sub": str(test_user.id),
-        "exp": past,
-        "type": "access"
-    }
+    claims = {"sub": str(test_user.id), "exp": past, "type": "access"}
     expired_token = jwt.encode(claims, jwt_handler.secret_key, algorithm=jwt_handler.algorithm)
 
     with pytest.raises(HTTPException) as exc_info:
@@ -219,10 +203,7 @@ async def test_expired_token_rejected(jwt_handler, test_user):
 @pytest.mark.auth
 async def test_wrong_token_type_rejected(jwt_handler, test_user):
     """Test that using refresh token for access fails."""
-    refresh_token = jwt_handler.create_refresh_token(
-        user_id=test_user.id,
-        email=test_user.email
-    )
+    refresh_token = jwt_handler.create_refresh_token(user_id=test_user.id, email=test_user.email)
 
     # Try to verify refresh token as access token
     with pytest.raises(HTTPException) as exc_info:
@@ -240,7 +221,7 @@ async def test_malformed_token_rejected(jwt_handler):
         "",
         "not-a-jwt",
         "header.payload",  # Missing signature
-        "header.payload.signature.extra"  # Too many parts
+        "header.payload.signature.extra",  # Too many parts
     ]
 
     for token in malformed_tokens:
@@ -254,6 +235,7 @@ async def test_malformed_token_rejected(jwt_handler):
 # Authorization with OPA Tests
 # ============================================================================
 
+
 @pytest.mark.asyncio
 @pytest.mark.integration
 @pytest.mark.auth
@@ -265,11 +247,13 @@ async def test_opa_authorization_allows_valid_request(opa_client, test_user):
     mock_response.json.return_value = {"result": {"allow": True}}
 
     with patch.object(opa_client.client, "post", new=AsyncMock(return_value=mock_response)):
-        decision = await opa_client.evaluate_policy({
-            "user": {"id": str(test_user.id), "role": "user"},
-            "action": "read",
-            "resource": "servers"
-        })
+        decision = await opa_client.evaluate_policy(
+            {
+                "user": {"id": str(test_user.id), "role": "user"},
+                "action": "read",
+                "resource": "servers",
+            }
+        )
 
     assert decision.allow is True
 
@@ -282,14 +266,18 @@ async def test_opa_authorization_denies_invalid_request(opa_client, test_user):
     """Test that OPA denies unauthorized requests."""
     # Mock OPA to return deny
     mock_response = MagicMock()
-    mock_response.json.return_value = {"result": {"allow": False, "reason": "Insufficient permissions"}}
+    mock_response.json.return_value = {
+        "result": {"allow": False, "reason": "Insufficient permissions"}
+    }
 
     with patch.object(opa_client.client, "post", new=AsyncMock(return_value=mock_response)):
-        decision = await opa_client.evaluate_policy({
-            "user": {"id": str(test_user.id), "role": "user"},
-            "action": "delete",
-            "resource": "servers"
-        })
+        decision = await opa_client.evaluate_policy(
+            {
+                "user": {"id": str(test_user.id), "role": "user"},
+                "action": "delete",
+                "resource": "servers",
+            }
+        )
 
     assert decision.allow is False
     assert decision.reason == "Insufficient permissions"
@@ -302,12 +290,16 @@ async def test_opa_authorization_denies_invalid_request(opa_client, test_user):
 async def test_opa_fail_closed_on_error(opa_client, test_user):
     """Test that OPA defaults to deny on errors (fail-closed)."""
     # Mock OPA to raise exception
-    with patch.object(opa_client.client, "post", new=AsyncMock(side_effect=Exception("OPA unavailable"))):
-        decision = await opa_client.evaluate_policy({
-            "user": {"id": str(test_user.id), "role": "user"},
-            "action": "read",
-            "resource": "servers"
-        })
+    with patch.object(
+        opa_client.client, "post", new=AsyncMock(side_effect=Exception("OPA unavailable"))
+    ):
+        decision = await opa_client.evaluate_policy(
+            {
+                "user": {"id": str(test_user.id), "role": "user"},
+                "action": "read",
+                "resource": "servers",
+            }
+        )
 
     # Should fail closed (deny)
     assert decision.allow is False
@@ -316,6 +308,7 @@ async def test_opa_fail_closed_on_error(opa_client, test_user):
 # ============================================================================
 # Role-Based Access Control Tests
 # ============================================================================
+
 
 @pytest.mark.asyncio
 @pytest.mark.integration
@@ -327,11 +320,13 @@ async def test_admin_has_elevated_permissions(opa_client, admin_user):
     mock_response.json.return_value = {"result": {"allow": True}}
 
     with patch.object(opa_client.client, "post", new=AsyncMock(return_value=mock_response)):
-        decision = await opa_client.evaluate_policy({
-            "user": {"id": str(admin_user.id), "role": "admin"},
-            "action": "delete",
-            "resource": "servers"
-        })
+        decision = await opa_client.evaluate_policy(
+            {
+                "user": {"id": str(admin_user.id), "role": "admin"},
+                "action": "delete",
+                "resource": "servers",
+            }
+        )
 
     assert decision.allow is True
 
@@ -343,19 +338,16 @@ async def test_regular_user_lacks_admin_permissions(opa_client, test_user):
     """Test that regular users lack admin permissions."""
     # Mock OPA to deny user from admin actions
     mock_response = MagicMock()
-    mock_response.json.return_value = {
-        "result": {
-            "allow": False,
-            "reason": "Admin role required"
-        }
-    }
+    mock_response.json.return_value = {"result": {"allow": False, "reason": "Admin role required"}}
 
     with patch.object(opa_client.client, "post", new=AsyncMock(return_value=mock_response)):
-        decision = await opa_client.evaluate_policy({
-            "user": {"id": str(test_user.id), "role": "user"},
-            "action": "delete",
-            "resource": "all_servers"
-        })
+        decision = await opa_client.evaluate_policy(
+            {
+                "user": {"id": str(test_user.id), "role": "user"},
+                "action": "delete",
+                "resource": "all_servers",
+            }
+        )
 
     assert decision.allow is False
 
@@ -363,6 +355,7 @@ async def test_regular_user_lacks_admin_permissions(opa_client, test_user):
 # ============================================================================
 # API Key Authentication Tests
 # ============================================================================
+
 
 @pytest.mark.asyncio
 @pytest.mark.integration

@@ -26,8 +26,7 @@ class TestDataGenerator:
             "transport": transport,
             "version": "2025-06-18",
             "capabilities": random.sample(
-                ["tools", "prompts", "resources", "sampling"],
-                k=random.randint(1, 4)
+                ["tools", "prompts", "resources", "sampling"], k=random.randint(1, 4)
             ),
             "tools": tools,
             "description": fake.sentence(),
@@ -36,7 +35,7 @@ class TestDataGenerator:
                 "environment": random.choice(["dev", "staging", "production"]),
                 "team": fake.company(),
                 "owner": fake.email(),
-            }
+            },
         }
 
         # Add transport-specific fields
@@ -60,7 +59,7 @@ class TestDataGenerator:
                     fake.word(): {"type": "number", "description": fake.sentence()},
                     fake.word(): {"type": "boolean", "description": fake.sentence()},
                 },
-                "required": [fake.word()]
+                "required": [fake.word()],
             },
             "sensitivity_level": random.choice(["low", "medium", "high", "critical"]),
             "requires_approval": random.choice([True, False]),
@@ -86,7 +85,7 @@ class TestDataGenerator:
                 "arg1": fake.word(),
                 "arg2": random.randint(1, 100),
                 "arg3": fake.boolean(),
-            }
+            },
         }
 
     @staticmethod

@@ -162,7 +162,9 @@ class FallbackLogger:
             rotated_name = f"{self.current_file.stem}_{timestamp}.log"
             rotated_path = self.current_file.parent / rotated_name
             self.current_file.rename(rotated_path)
-            logger.info("fallback_log_rotated", old_file=str(self.current_file), new_file=str(rotated_path))
+            logger.info(
+                "fallback_log_rotated", old_file=str(self.current_file), new_file=str(rotated_path)
+            )
 
         self._create_new_log_file()
 
@@ -266,6 +268,7 @@ class SIEMErrorHandler:
             enable_fallback: Whether to enable fallback logging
         """
         import tempfile
+
         self.fallback_log_dir = (
             Path(fallback_log_dir)
             if fallback_log_dir
@@ -306,8 +309,7 @@ class SIEMErrorHandler:
 
         # Network errors
         if any(
-            x in error_type.lower()
-            for x in ["connection", "network", "socket", "dns", "timeout"]
+            x in error_type.lower() for x in ["connection", "network", "socket", "dns", "timeout"]
         ):
             if "timeout" in error_type.lower() or "timeout" in error_msg:
                 return ErrorCategory.TIMEOUT, ErrorSeverity.MEDIUM
@@ -489,7 +491,9 @@ class SIEMErrorHandler:
 
 
 # Predefined alert conditions
-def high_error_rate_condition(errors: list[ErrorRecord], threshold: int = 10, window_seconds: int = 60) -> bool:
+def high_error_rate_condition(
+    errors: list[ErrorRecord], threshold: int = 10, window_seconds: int = 60
+) -> bool:
     """Alert if error rate exceeds threshold.
 
     Args:

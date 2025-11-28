@@ -65,26 +65,26 @@ class ServerRegistrationRequest(BaseModel):
                             "properties": {
                                 "metric_name": {
                                     "type": "string",
-                                    "enum": ["cpu_usage", "memory_usage", "request_count"]
+                                    "enum": ["cpu_usage", "memory_usage", "request_count"],
                                 },
                                 "time_range": {
                                     "type": "string",
                                     "pattern": "^(1h|6h|24h|7d)$",
-                                    "default": "1h"
-                                }
+                                    "default": "1h",
+                                },
                             },
-                            "required": ["metric_name"]
+                            "required": ["metric_name"],
                         },
                         "sensitivity_level": "medium",
-                        "requires_approval": False
+                        "requires_approval": False,
                     }
                 ],
                 "sensitivity_level": "medium",
                 "metadata": {
                     "owner": "analytics-team@example.com",
                     "cost_center": "engineering",
-                    "version": "2.1.0"
-                }
+                    "version": "2.1.0",
+                },
             }
         }
 

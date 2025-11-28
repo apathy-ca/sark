@@ -30,9 +30,7 @@ class ExportRequest(BaseModel):
     filters: dict[str, str] | None = Field(
         None, description="Optional filters (status, sensitivity, etc.)"
     )
-    fields: list[str] | None = Field(
-        None, description="Specific fields to include (default: all)"
-    )
+    fields: list[str] | None = Field(None, description="Specific fields to include (default: all)")
 
 
 class ExportResponse(BaseModel):
@@ -115,29 +113,33 @@ async def export_servers_csv(
         writer = csv.writer(output)
 
         # Write header
-        writer.writerow([
-            "id",
-            "name",
-            "description",
-            "transport",
-            "endpoint",
-            "status",
-            "sensitivity_level",
-            "created_at",
-        ])
+        writer.writerow(
+            [
+                "id",
+                "name",
+                "description",
+                "transport",
+                "endpoint",
+                "status",
+                "sensitivity_level",
+                "created_at",
+            ]
+        )
 
         # Write data
         for server in servers:
-            writer.writerow([
-                str(server.id),
-                server.name,
-                server.description or "",
-                server.transport.value,
-                server.endpoint or "",
-                server.status.value,
-                server.sensitivity_level.value,
-                server.created_at.isoformat(),
-            ])
+            writer.writerow(
+                [
+                    str(server.id),
+                    server.name,
+                    server.description or "",
+                    server.transport.value,
+                    server.endpoint or "",
+                    server.status.value,
+                    server.sensitivity_level.value,
+                    server.created_at.isoformat(),
+                ]
+            )
 
         # Return CSV response
         csv_content = output.getvalue()
@@ -247,29 +249,37 @@ async def export_tools_csv(
         writer = csv.writer(output)
 
         # Write header
-        writer.writerow([
-            "id",
-            "name",
-            "description",
-            "server_id",
-            "server_name",
-            "sensitivity_level",
-            "requires_approval",
-            "created_at",
-        ])
+        writer.writerow(
+            [
+                "id",
+                "name",
+                "description",
+                "server_id",
+                "server_name",
+                "sensitivity_level",
+                "requires_approval",
+                "created_at",
+            ]
+        )
 
         # Write data
         for tool in tools:
-            writer.writerow([
-                str(tool.id),
-                tool.name,
-                tool.description or "",
-                str(tool.server_id),
-                "",  # Would need to join to get server name
-                tool.sensitivity_level.value,
-                tool.extra_metadata.get("requires_approval", False) if tool.extra_metadata else False,
-                tool.created_at.isoformat(),
-            ])
+            writer.writerow(
+                [
+                    str(tool.id),
+                    tool.name,
+                    tool.description or "",
+                    str(tool.server_id),
+                    "",  # Would need to join to get server name
+                    tool.sensitivity_level.value,
+                    (
+                        tool.extra_metadata.get("requires_approval", False)
+                        if tool.extra_metadata
+                        else False
+                    ),
+                    tool.created_at.isoformat(),
+                ]
+            )
 
         # Return CSV response
         csv_content = output.getvalue()
@@ -320,7 +330,9 @@ async def export_tools_json(
                     "description": tool.description,
                     "server_id": str(tool.server_id),
                     "sensitivity_level": tool.sensitivity_level.value,
-                    "parameters": tool.extra_metadata.get("parameters") if tool.extra_metadata else None,
+                    "parameters": (
+                        tool.extra_metadata.get("parameters") if tool.extra_metadata else None
+                    ),
                     "created_at": tool.created_at.isoformat(),
                 }
                 for tool in tools

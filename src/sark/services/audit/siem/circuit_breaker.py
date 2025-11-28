@@ -294,9 +294,7 @@ class CircuitBreaker:
             "success_threshold": self.config.success_threshold,
             "recovery_timeout": self.config.recovery_timeout,
             "opened_at": (
-                datetime.fromtimestamp(self.opened_at, UTC).isoformat()
-                if self.opened_at
-                else None
+                datetime.fromtimestamp(self.opened_at, UTC).isoformat() if self.opened_at else None
             ),
             "retry_after": self._get_retry_after() if self.state == CircuitState.OPEN else 0,
         }

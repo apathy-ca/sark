@@ -494,7 +494,10 @@ class TestGetCurrentUser:
 
             assert exc_info.value.status_code == 401
             # Could be either error message depending on which check fails first
-            assert exc_info.value.detail in ["Invalid token claims", "Could not validate credentials"]
+            assert exc_info.value.detail in [
+                "Invalid token claims",
+                "Could not validate credentials",
+            ]
 
     def test_get_current_user_invalid_uuid(self, handler):
         """Test get_current_user with invalid UUID raises HTTPException."""
@@ -519,7 +522,10 @@ class TestGetCurrentUser:
                 get_current_user(credentials)
 
             assert exc_info.value.status_code == 401
-            assert exc_info.value.detail in ["Invalid token claims", "Could not validate credentials"]
+            assert exc_info.value.detail in [
+                "Invalid token claims",
+                "Could not validate credentials",
+            ]
 
     def test_get_current_user_refresh_token_fails(self, handler, sample_user_data):
         """Test get_current_user with refresh token raises HTTPException."""
