@@ -1,0 +1,154 @@
+---
+# Prometheus Alert Rules for Gateway Integration
+# These alerts monitor the health and performance of the Gateway integration
+
+groups:
+  - name: gateway_integration
+    interval: 30s
+    rules:
+      # ======================================================================
+      # Performance Alerts
+      # ======================================================================
+      - alert: HighGatewayAuthorizationLatency
+        expr: histogram_quantile(0.95, rate(sark_gateway_authz_latency_seconds_bucket[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          component: gateway
+          category: performance
+        annotations:
+          summary: "High Gateway authorization latency detected"
+          description: "P95 latency is {{ $value | humanizeDuration }} (> 50ms) for the last 5 minutes"
+          runbook: "https://docs.sark.io/runbooks/gateway-high-latency"
+
+      - alert: CriticalGatewayAuthorizationLatency
+        expr: histogram_quantile(0.95, rate(sark_gateway_authz_latency_seconds_bucket[5m])) > 0.1
+        for: 2m
+        labels:
+          severity: critical
+          component: gateway
+          category: performance
+        annotations:
+          summary: "Critical Gateway authorization latency detected"
+          description: "P95 latency is {{ $value | humanizeDuration }} (> 100ms) for the last 2 minutes"
+          runbook: "https://docs.sark.io/runbooks/gateway-critical-latency"
+
+      # ======================================================================
+      # Error Rate Alerts
+      # ======================================================================
+      - alert: GatewayClientErrors
+        expr: rate(sark_gateway_client_errors_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: critical
+          component: gateway
+          category: errors
+        annotations:
+          summary: "Gateway client errors detected"
+          description: "Error rate is {{ $value | humanizePercentage }} (> 10%) over the last 5 minutes"
+          runbook: "https://docs.sark.io/runbooks/gateway-client-errors"
+
+      - alert: HighDenyRate
+        expr: |
+          rate(sark_gateway_authz_requests_total{decision="deny"}[10m]) /
+          rate(sark_gateway_authz_requests_total[10m]) > 0.3
+        for: 10m
+        labels:
+          severity: warning
+          component: gateway
+          category: security
+        annotations:
+          summary: "High Gateway authorization denial rate"
+          description: "{{ $value | humanizePercentage }} of requests are being denied (> 30%)"
+          runbook: "https://docs.sark.io/runbooks/gateway-high-denials"
+
+      # ======================================================================
+      # Cache Performance Alerts
+      # ======================================================================
+      - alert: LowPolicyCacheHitRate
+        expr: |
+          rate(sark_gateway_cache_hits_total[10m]) /
+          (rate(sark_gateway_cache_hits_total[10m]) + rate(sark_gateway_cache_misses_total[10m])) < 0.8
+        for: 10m
+        labels:
+          severity: warning
+          component: gateway
+          category: performance
+        annotations:
+          summary: "Low policy cache hit rate"
+          description: "Cache hit rate is {{ $value | humanizePercentage }} (< 80%) over the last 10 minutes"
+          runbook: "https://docs.sark.io/runbooks/gateway-low-cache-hit-rate"
+
+      - alert: ZeroCacheHits
+        expr: |
+          (rate(sark_gateway_cache_hits_total[5m]) + rate(sark_gateway_cache_misses_total[5m])) > 0
+          and
+          rate(sark_gateway_cache_hits_total[5m]) == 0
+        for: 5m
+        labels:
+          severity: critical
+          component: gateway
+          category: performance
+        annotations:
+          summary: "Gateway policy cache not working"
+          description: "No cache hits detected - cache may be disabled or failing"
+          runbook: "https://docs.sark.io/runbooks/gateway-cache-failure"
+
+      # ======================================================================
+      # Volume Alerts
+      # ======================================================================
+      - alert: HighGatewayRequestVolume
+        expr: rate(sark_gateway_authz_requests_total[5m]) > 1000
+        for: 5m
+        labels:
+          severity: warning
+          component: gateway
+          category: capacity
+        annotations:
+          summary: "High Gateway request volume"
+          description: "Request rate is {{ $value | humanize }} requests/sec (> 1000 req/s)"
+          runbook: "https://docs.sark.io/runbooks/gateway-high-volume"
+
+      - alert: NoGatewayRequests
+        expr: rate(sark_gateway_authz_requests_total[10m]) == 0
+        for: 10m
+        labels:
+          severity: warning
+          component: gateway
+          category: availability
+        annotations:
+          summary: "No Gateway requests detected"
+          description: "No authorization requests in the last 10 minutes - service may be down"
+          runbook: "https://docs.sark.io/runbooks/gateway-no-requests"
+
+      # ======================================================================
+      # Audit & SIEM Alerts
+      # ======================================================================
+      - alert: AuditEventLoggingFailed
+        expr: rate(sark_gateway_audit_events_total[5m]) == 0 and rate(sark_gateway_authz_requests_total[5m]) > 0
+        for: 5m
+        labels:
+          severity: critical
+          component: gateway
+          category: compliance
+        annotations:
+          summary: "Gateway audit events not being logged"
+          description: "Authorization requests are being processed but no audit events are being logged"
+          runbook: "https://docs.sark.io/runbooks/gateway-audit-failure"
+
+      # ======================================================================
+      # A2A Communication Alerts
+      # ======================================================================
+      - alert: HighA2ADenyRate
+        expr: |
+          rate(sark_a2a_authz_requests_total{decision="deny"}[10m]) /
+          rate(sark_a2a_authz_requests_total[10m]) > 0.5
+        for: 10m
+        labels:
+          severity: warning
+          component: gateway
+          category: security
+        annotations:
+          summary: "High A2A authorization denial rate"
+          description: "{{ $value | humanizePercentage }} of A2A requests are being denied (> 50%)"
+          runbook: "https://docs.sark.io/runbooks/a2a-high-denials"
