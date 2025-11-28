@@ -836,3 +836,55 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ## Copyright
 
 Copyright 2024 James R. A. Henry. All rights reserved.
+
+---
+
+## 🌐 GRID Protocol Specification
+
+SARK is the **enterprise reference implementation of the GRID Protocol Specification v0.1**.
+
+**GRID (Governed Resource Interaction Definition)** is a universal governance protocol for machine-to-machine interactions that is:
+- **Protocol-agnostic** – Works above HTTP, gRPC, MCP, custom RPC, anything
+- **Federated** – No central authority, org-by-org deployment
+- **Zero-trust** – Default deny, explicit permission required
+- **Policy-first** – Declarative rules, not hard-coded roles
+
+### SARK's GRID Compliance
+
+SARK v1.0 implements **85% of GRID v0.1 specification**:
+
+✅ **Complete:**
+- All core abstractions (Principal, Resource, Action, Policy, Audit)
+- Multi-protocol authentication (OIDC, LDAP, SAML, API keys)
+- Enterprise-grade audit logging with SIEM integration
+- High-performance policy evaluation (<5ms cache hits)
+- Web UI and comprehensive operations
+
+⚠️ **Planned for v2.0:**
+- Protocol adapter abstraction (enable multi-protocol)
+- Federation support (cross-org governance)
+- Cost attribution system
+- Programmatic policy support
+
+### GRID Resources
+
+- **Specification Repository:** https://github.com/apathy-ca/grid-protocol
+- **Full Specification:** GRID_PROTOCOL_SPECIFICATION_v0.1.md (in grid-protocol repo)
+- **Gap Analysis:** GRID_GAP_ANALYSIS_AND_IMPLEMENTATION_NOTES.md (in grid-protocol repo)
+- **SARK Compliance:** 85% of GRID v0.1 ✅
+
+### Roadmap
+
+**SARK v1.x (2025-2026)**
+- Complete MCP governance ✅
+- Multi-protocol authentication ✅
+- Enterprise audit integration ✅
+
+**SARK v2.0 / GRID v1.0 (2026 Q1-Q2)**
+- Protocol adapter abstraction
+- Federation support
+- Cost attribution
+- Multi-protocol governance (HTTP, gRPC, OpenAI, etc.)
+
+See GRID_GAP_ANALYSIS_AND_IMPLEMENTATION_NOTES.md for detailed migration path.
+
