@@ -67,25 +67,60 @@ class ProtocolAdapter(ABC):
     ) -> List[ResourceSchema]:
         """
         Discover available resources for this protocol.
-        
+
+        This method is called when a new resource is being registered with SARK.
+        It should connect to the resource, enumerate its capabilities, and return
+        a structured representation.
+
         Args:
             discovery_config: Protocol-specific discovery configuration
-            
+                The structure of this dict varies by protocol (see examples)
+
         Returns:
-            List of discovered resources with their capabilities
-            
-        Example (MCP):
+            List of discovered resources with their capabilities.
+            May return multiple resources if the discovery process finds more
+            than one (e.g., discovering multiple gRPC services at an endpoint).
+
+        Raises:
+            DiscoveryError: If resource discovery fails
+            ConnectionError: If cannot connect to the resource
+            TimeoutError: If discovery operation times out
+            AdapterConfigurationError: If discovery_config is invalid
+
+        Example (MCP stdio transport):
+            ```python
             discovery_config = {
                 "transport": "stdio",
                 "command": "npx",
-                "args": ["-y", "@modelcontextprotocol/server-filesystem"]
+                "args": ["-y", "@modelcontextprotocol/server-filesystem"],
+                "env": {"HOME": "/path/to/home"}
             }
-        
-        Example (HTTP):
+            resources = await adapter.discover_resources(discovery_config)
+            # Returns list with discovered MCP server and its tools
+            ```
+
+        Example (HTTP with OpenAPI):
+            ```python
             discovery_config = {
                 "base_url": "https://api.example.com",
-                "openapi_spec_url": "https://api.example.com/openapi.json"
+                "openapi_spec_url": "https://api.example.com/openapi.json",
+                "auth": {"type": "bearer", "token": "..."}
             }
+            resources = await adapter.discover_resources(discovery_config)
+            # Returns list with REST API and its endpoints as capabilities
+            ```
+
+        Example (gRPC with reflection):
+            ```python
+            discovery_config = {
+                "host": "grpc.example.com",
+                "port": 50051,
+                "use_tls": True,
+                "reflection": True
+            }
+            resources = await adapter.discover_resources(discovery_config)
+            # Returns list with gRPC services and their methods
+            ```
         """
         pass
     
@@ -96,12 +131,39 @@ class ProtocolAdapter(ABC):
     ) -> List[CapabilitySchema]:
         """
         Get all capabilities for a resource.
-        
+
+        This method retrieves the current list of capabilities (tools, endpoints,
+        methods) available on a resource. Called during resource initialization
+        and when capabilities need to be refreshed.
+
         Args:
             resource: The resource to query
-            
+
         Returns:
-            List of capabilities available on this resource
+            List of capabilities available on this resource.
+            Returns empty list if resource has no capabilities.
+
+        Raises:
+            ResourceNotFoundError: If resource doesn't exist or is unreachable
+            ConnectionError: If cannot connect to the resource
+            TimeoutError: If operation times out
+            ProtocolError: If protocol-specific error occurs
+
+        Example:
+            ```python
+            resource = ResourceSchema(
+                id="mcp-server-1",
+                protocol="mcp",
+                endpoint="npx @modelcontextprotocol/server-filesystem",
+                ...
+            )
+
+            capabilities = await adapter.get_capabilities(resource)
+            # [
+            #     Capability(id="...", name="read_file", ...),
+            #     Capability(id="...", name="write_file", ...),
+            # ]
+            ```
         """
         pass
     
@@ -131,17 +193,51 @@ class ProtocolAdapter(ABC):
     ) -> InvocationResult:
         """
         Invoke a capability on a resource.
-        
+
+        This is the core execution method. It receives a validated and authorized
+        request and executes the protocol-specific invocation.
+
         Args:
-            request: The invocation request
-            
+            request: The invocation request containing:
+                - capability_id: Which capability to invoke
+                - principal_id: Who is invoking (for audit)
+                - arguments: Invocation arguments
+                - context: Additional context (optional)
+
         Returns:
-            The invocation result
-            
-        Note:
+            InvocationResult containing:
+            - success: Whether invocation succeeded
+            - result: The returned data (if successful)
+            - error: Error message (if failed)
+            - metadata: Additional metadata (timing, etc.)
+            - duration_ms: Execution duration
+
+        Raises:
+            InvocationError: If the invocation fails
+            CapabilityNotFoundError: If capability doesn't exist
+            ConnectionError: If cannot connect to resource
+            TimeoutError: If invocation times out
+            ProtocolError: If protocol-specific error occurs
+
+        Important:
             This method should NOT perform authorization checks.
             Authorization is handled by SARK core before calling invoke().
             This method only executes the protocol-specific invocation.
+
+        Example:
+            ```python
+            request = InvocationRequest(
+                capability_id="mcp-filesystem-read_file",
+                principal_id="user-123",
+                arguments={"path": "/etc/hosts"}
+            )
+
+            result = await adapter.invoke(request)
+            if result.success:
+                print(f"File content: {result.result}")
+            else:
+                print(f"Error: {result.error}")
+            ```
         """
         pass
     
@@ -168,28 +264,70 @@ class ProtocolAdapter(ABC):
         resource: ResourceSchema
     ) -> None:
         """
-        Called when a resource is registered.
-        
+        Lifecycle hook called when a resource is registered with SARK.
+
+        This is called AFTER the resource is persisted to the database
+        but BEFORE it's available for invocations.
+
         Override to perform protocol-specific setup (e.g., establish
-        connections, warm caches, etc.).
-        
+        connections, warm caches, validate configuration).
+
         Args:
             resource: The newly registered resource
+
+        Raises:
+            ConnectionError: If setup fails (will prevent registration)
+            AdapterConfigurationError: If resource config is invalid
+
+        Example:
+            ```python
+            async def on_resource_registered(self, resource: ResourceSchema) -> None:
+                # Establish persistent connection
+                self._connections[resource.id] = await self._connect(resource.endpoint)
+                # Warm capability cache
+                await self._cache_capabilities(resource)
+                logger.info("Resource ready", resource_id=resource.id)
+            ```
+
+        Note:
+            If this method raises an exception, the resource registration
+            will be rolled back and marked as failed.
         """
         pass
-    
+
     async def on_resource_unregistered(
         self,
         resource: ResourceSchema
     ) -> None:
         """
-        Called when a resource is unregistered.
+        Lifecycle hook called when a resource is unregistered from SARK.
+
+        This is called BEFORE the resource is removed from the database.
 
         Override to perform protocol-specific cleanup (e.g., close
-        connections, release resources, etc.).
+        connections, release resources, clear caches).
 
         Args:
             resource: The resource being unregistered
+
+        Raises:
+            No exceptions should be raised from this method. Log errors instead.
+
+        Example:
+            ```python
+            async def on_resource_unregistered(self, resource: ResourceSchema) -> None:
+                # Close connection gracefully
+                conn = self._connections.pop(resource.id, None)
+                if conn:
+                    await conn.close()
+                # Clear cached data
+                self._cache.delete(resource.id)
+                logger.info("Resource cleanup complete", resource_id=resource.id)
+            ```
+
+        Note:
+            This method should handle errors gracefully and not raise exceptions.
+            Any raised exceptions will be logged but will not prevent unregistration.
         """
         pass
 
@@ -214,15 +352,34 @@ class ProtocolAdapter(ABC):
         Raises:
             UnsupportedOperationError: If streaming is not supported by this adapter
             StreamingError: If streaming fails mid-stream
+            ValidationError: If the request is invalid
+            InvocationError: If the invocation fails
 
-        Example:
+        Example (MCP SSE streaming):
+            ```python
+            request = InvocationRequest(
+                capability_id="mcp-server-tool",
+                principal_id="user-123",
+                arguments={"query": "stream data"}
+            )
+
             async for chunk in adapter.invoke_streaming(request):
-                # Process each chunk as it arrives
-                process(chunk)
+                # chunk might be: {"type": "progress", "data": {...}}
+                print(f"Received: {chunk}")
+            ```
+
+        Example (gRPC server streaming):
+            ```python
+            async for response in adapter.invoke_streaming(request):
+                # response is a protobuf message
+                process_grpc_response(response)
+            ```
 
         Note:
             The default implementation raises UnsupportedOperationError.
             Adapters supporting streaming should override this method.
+            Streaming is typically used for long-running operations or
+            large result sets where incremental processing is beneficial.
         """
         raise UnsupportedOperationError(
             f"Streaming is not supported by {self.protocol_name} adapter",
@@ -248,11 +405,35 @@ class ProtocolAdapter(ABC):
 
         Raises:
             UnsupportedOperationError: If batch operations are not supported
+            ValidationError: If any request is invalid
+
+        Example (HTTP batch endpoint):
+            ```python
+            requests = [
+                InvocationRequest(
+                    capability_id="POST-/users",
+                    principal_id="admin",
+                    arguments={"name": "Alice"}
+                ),
+                InvocationRequest(
+                    capability_id="POST-/users",
+                    principal_id="admin",
+                    arguments={"name": "Bob"}
+                )
+            ]
+
+            results = await adapter.invoke_batch(requests)
+            # All requests processed in single HTTP call
+            for result in results:
+                print(f"Success: {result.success}")
+            ```
 
         Note:
             The default implementation calls invoke() sequentially.
             Adapters supporting true batch operations should override this
             for better performance (e.g., HTTP batch APIs, gRPC batch calls).
+            Each result corresponds to the request at the same index.
+            If one request fails, the adapter should still attempt remaining requests.
         """
         results = []
         for request in requests:
@@ -371,9 +552,30 @@ class ProtocolAdapter(ABC):
         Get adapter metadata and capabilities.
 
         Returns:
-            Dictionary with adapter information
+            Dictionary with adapter information including:
+            - protocol_name: Protocol identifier
+            - protocol_version: Protocol version supported
+            - adapter_class: Python class name
+            - supports_streaming: Whether streaming is supported
+            - supports_batch: Whether batch operations are optimized
+            - module: Python module path
+            - custom_metadata: Adapter-specific metadata (from get_adapter_metadata)
+
+        Example:
+            ```python
+            info = adapter.get_adapter_info()
+            # {
+            #     "protocol_name": "mcp",
+            #     "protocol_version": "2024-11-05",
+            #     "adapter_class": "MCPAdapter",
+            #     "supports_streaming": True,
+            #     "supports_batch": False,
+            #     "module": "sark.adapters.mcp_adapter",
+            #     "custom_metadata": {"transport_types": ["stdio", "sse"]}
+            # }
+            ```
         """
-        return {
+        info = {
             "protocol_name": self.protocol_name,
             "protocol_version": self.protocol_version,
             "adapter_class": self.__class__.__name__,
@@ -381,6 +583,53 @@ class ProtocolAdapter(ABC):
             "supports_batch": self.supports_batch(),
             "module": self.__class__.__module__,
         }
+
+        # Include custom metadata if provided
+        custom = self.get_adapter_metadata()
+        if custom:
+            info["custom_metadata"] = custom
+
+        return info
+
+    def get_adapter_metadata(self) -> Dict[str, Any]:
+        """
+        Get adapter-specific metadata beyond the standard interface.
+
+        Override this method to provide protocol-specific metadata such as:
+        - Supported transport types
+        - Feature flags
+        - Configuration requirements
+        - Version compatibility info
+
+        Returns:
+            Dictionary with adapter-specific metadata
+
+        Example (MCP Adapter):
+            ```python
+            def get_adapter_metadata(self) -> Dict[str, Any]:
+                return {
+                    "transport_types": ["stdio", "sse", "http"],
+                    "mcp_features": ["tools", "prompts", "resources"],
+                    "max_concurrent_servers": 100,
+                    "connection_pooling": True
+                }
+            ```
+
+        Example (HTTP Adapter):
+            ```python
+            def get_adapter_metadata(self) -> Dict[str, Any]:
+                return {
+                    "supported_auth": ["bearer", "api_key", "oauth2"],
+                    "openapi_versions": ["3.0", "3.1"],
+                    "max_request_size_mb": 10
+                }
+            ```
+
+        Note:
+            The default implementation returns an empty dictionary.
+            Adapters may override to provide additional metadata.
+        """
+        return {}
 
     def __repr__(self) -> str:
         """String representation of the adapter."""

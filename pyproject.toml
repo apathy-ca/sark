@@ -37,6 +37,10 @@ dependencies = [
     "aiokafka>=0.8.0",
     "ldap3>=2.9.1",
     "authlib>=1.2.0",
+    "grpcio>=1.60.0",
+    "grpcio-reflection>=1.60.0",
+    "grpcio-tools>=1.60.0",
+    "protobuf>=4.25.0",
 ]
 
 [project.optional-dependencies]

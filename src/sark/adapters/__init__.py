@@ -4,12 +4,19 @@ Protocol adapters for SARK v2.0.
 This module provides the adapter infrastructure for supporting multiple protocols.
 
 Version: 2.0.0
-Status: Foundation complete (Week 1)
+Status: Foundation complete (Week 1), gRPC adapter complete (Week 2-4)
 """
 
 from sark.adapters.base import ProtocolAdapter
 from sark.adapters.registry import AdapterRegistry, get_registry, reset_registry
 from sark.adapters import exceptions
+
+# Import adapters (conditional to avoid import errors if deps missing)
+try:
+    from sark.adapters.grpc_adapter import GRPCAdapter
+    _grpc_available = True
+except ImportError:
+    _grpc_available = False
 
 __all__ = [
     # Core interface
@@ -23,3 +30,7 @@ __all__ = [
     # Exceptions module (import with: from sark.adapters.exceptions import ...)
     "exceptions",
 ]
+
+# Conditionally export adapters
+if _grpc_available:
+    __all__.append("GRPCAdapter")

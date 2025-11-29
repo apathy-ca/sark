@@ -1,0 +1,180 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  # SARK Gateway Application Logs
+  - job_name: sark-gateway
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: sark-gateway
+          service: gateway
+          tier: application
+          __path__: /var/log/sark/gateway*.log
+    pipeline_stages:
+      # Parse JSON logs
+      - json:
+          expressions:
+            timestamp: timestamp
+            level: level
+            logger: logger
+            message: message
+            request_id: request_id
+            user_id: user_id
+            duration: duration
+            status_code: status_code
+      # Extract labels
+      - labels:
+          level:
+          logger:
+          request_id:
+          user_id:
+      # Parse timestamp
+      - timestamp:
+          source: timestamp
+          format: RFC3339Nano
+      # Add metrics
+      - metrics:
+          log_lines_total:
+            type: Counter
+            description: "Total number of log lines"
+            source: level
+            config:
+              action: inc
+          log_errors_total:
+            type: Counter
+            description: "Total number of error logs"
+            source: level
+            config:
+              match_all: true
+              action: inc
+              match: 'ERROR|CRITICAL'
+
+  # Docker Container Logs
+  - job_name: docker
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+        filters:
+          - name: label
+            values:
+              - logging=promtail
+    relabel_configs:
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/(.*)'
+        target_label: 'container'
+      - source_labels: ['__meta_docker_container_log_stream']
+        target_label: 'stream'
+      - source_labels: ['__meta_docker_container_label_com_docker_compose_project']
+        target_label: 'project'
+      - source_labels: ['__meta_docker_container_label_com_docker_compose_service']
+        target_label: 'service'
+    pipeline_stages:
+      - docker: {}
+      - json:
+          expressions:
+            level: level
+            message: message
+      - labels:
+          level:
+      - timestamp:
+          source: timestamp
+          format: RFC3339
+
+  # System Logs
+  - job_name: system
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: system
+          __path__: /var/log/syslog
+    pipeline_stages:
+      - regex:
+          expression: '^(?P<timestamp>\S+\s+\d+\s+\S+)\s+(?P<hostname>\S+)\s+(?P<service>\S+):\s+(?P<message>.*)$'
+      - labels:
+          hostname:
+          service:
+      - timestamp:
+          source: timestamp
+          format: 'Jan 2 15:04:05'
+
+  # Audit Logs (high priority)
+  - job_name: audit
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: audit
+          service: gateway
+          tier: security
+          __path__: /var/log/sark/audit*.log
+    pipeline_stages:
+      - json:
+          expressions:
+            timestamp: timestamp
+            event_type: event_type
+            user_id: user_id
+            agent_id: agent_id
+            decision: decision
+            server_name: server_name
+            tool_name: tool_name
+            reason: reason
+      - labels:
+          event_type:
+          decision:
+          server_name:
+          tool_name:
+      - timestamp:
+          source: timestamp
+          format: RFC3339Nano
+      # Track audit events as metrics
+      - metrics:
+          audit_events_total:
+            type: Counter
+            description: "Total audit events logged"
+            source: event_type
+            config:
+              action: inc
+          audit_denials_total:
+            type: Counter
+            description: "Total audit denials"
+            source: decision
+            config:
+              match_all: true
+              action: inc
+              match: 'deny'
+
+  # Error Logs (critical priority)
+  - job_name: errors
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: errors
+          tier: application
+          __path__: /var/log/sark/*error*.log
+    pipeline_stages:
+      - json:
+          expressions:
+            timestamp: timestamp
+            level: level
+            error_type: error_type
+            component: component
+            message: message
+            stack_trace: stack_trace
+      - labels:
+          level:
+          error_type:
+          component:
+      - timestamp:
+          source: timestamp
+          format: RFC3339Nano

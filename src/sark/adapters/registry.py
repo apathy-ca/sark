@@ -9,7 +9,7 @@ from typing import Dict, List, Optional
 import structlog
 
 from sark.adapters.base import ProtocolAdapter
-from sark.config import get_config
+from sark.config import get_settings
 
 logger = structlog.get_logger(__name__)
 
@@ -116,10 +116,10 @@ class AdapterRegistry:
             logger.warning("adapter_registry_already_initialized")
             return
         
-        config = get_config()
-        
+        config = get_settings()
+
         # Check if protocol adapters feature is enabled
-        if not config.features.enable_protocol_adapters:
+        if not getattr(config.features, 'enable_protocol_adapters', False):
             logger.info(
                 "protocol_adapters_disabled",
                 message="Protocol adapters feature is disabled. Enable with FEATURE_PROTOCOL_ADAPTERS=true"
@@ -129,9 +129,12 @@ class AdapterRegistry:
         
         # In v2.0, this will register adapters based on config.protocols.enabled_protocols
         # For v1.x, we just log that the feature is ready but not implemented
+        enabled_protocols = getattr(config, 'protocols', None)
+        enabled_list = getattr(enabled_protocols, 'enabled_protocols', []) if enabled_protocols else []
+
         logger.info(
             "adapter_registry_initialized",
-            enabled_protocols=config.protocols.enabled_protocols,
+            enabled_protocols=enabled_list,
             message="Adapter registry ready (v2.0 adapters not yet implemented)"
         )
         

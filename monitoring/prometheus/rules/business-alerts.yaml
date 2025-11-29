@@ -1,0 +1,402 @@
+groups:
+  - name: sark_gateway_business_alerts
+    interval: 60s
+    rules:
+      # ========================================================================
+      # SLA Monitoring
+      # ========================================================================
+
+      - alert: SLALatencyViolation
+        expr: |
+          histogram_quantile(0.99, sum(rate(sark_gateway_request_duration_seconds_bucket[5m])) by (le)) > 0.5
+        for: 15m
+        labels:
+          severity: warning
+          component: business
+          category: sla
+        annotations:
+          summary: "SLA latency target violated"
+          description: "P99 latency {{ $value | humanizeDuration }} exceeds SLA target of 500ms"
+          runbook_url: "https://docs.sark.io/runbooks/business/sla-latency"
+          impact: "SLA breach - potential customer complaints and penalties"
+          action: "Investigate performance bottlenecks, review recent changes, notify stakeholders"
+
+      - alert: SLAAvailabilityViolation
+        expr: |
+          100 * (
+            sum(rate(sark_gateway_requests_total{status="success"}[5m]))
+            / sum(rate(sark_gateway_requests_total[5m]))
+          ) < 99.9
+        for: 15m
+        labels:
+          severity: critical
+          component: business
+          category: sla
+        annotations:
+          summary: "SLA availability target violated"
+          description: "Availability {{ $value | humanizePercentage }} below 99.9% SLA"
+          runbook_url: "https://docs.sark.io/runbooks/business/sla-availability"
+          impact: "CRITICAL SLA breach - financial penalties likely"
+          action: "IMMEDIATE: Escalate to leadership, investigate root cause, prepare incident report"
+
+      - alert: SLAErrorBudgetExhausted
+        expr: |
+          (
+            1 - (
+              sum(rate(sark_gateway_requests_total{status="success"}[30d]))
+              / sum(rate(sark_gateway_requests_total[30d]))
+            )
+          ) > 0.001
+        for: 1h
+        labels:
+          severity: warning
+          component: business
+          category: sla
+        annotations:
+          summary: "Error budget for 99.9% SLA exhausted"
+          description: "Error rate {{ $value | humanizePercentage }} exceeds 0.1% monthly budget"
+          runbook_url: "https://docs.sark.io/runbooks/business/error-budget"
+          impact: "No remaining error budget for the month"
+          action: "Freeze non-critical changes, focus on reliability, review incident trends"
+
+      # ========================================================================
+      # User Experience & Engagement
+      # ========================================================================
+
+      - alert: LowActiveUserCount
+        expr: |
+          sark_gateway_unique_users < 10
+        for: 1h
+        labels:
+          severity: warning
+          component: business
+          category: engagement
+        annotations:
+          summary: "Low active user count"
+          description: "Only {{ $value }} active users (threshold: 10)"
+          runbook_url: "https://docs.sark.io/runbooks/business/low-users"
+          impact: "Low user engagement - potential service issue or adoption problem"
+          action: "Verify service health, check for user communication issues, review onboarding"
+
+      - alert: HighUserChurnRate
+        expr: |
+          (
+            count(sum(rate(sark_gateway_requests_total[1h] offset 24h)) by (user) > 0)
+            - count(sum(rate(sark_gateway_requests_total[1h])) by (user) > 0)
+          ) / count(sum(rate(sark_gateway_requests_total[1h] offset 24h)) by (user) > 0) > 0.2
+        for: 4h
+        labels:
+          severity: warning
+          component: business
+          category: engagement
+        annotations:
+          summary: "High user churn detected"
+          description: "{{ $value | humanizePercentage }} of users from yesterday are inactive"
+          runbook_url: "https://docs.sark.io/runbooks/business/user-churn"
+          impact: "Users abandoning the service"
+          action: "Investigate recent changes, reach out to churned users, review user feedback"
+
+      - alert: NoRequestsReceived
+        expr: |
+          sum(rate(sark_gateway_requests_total[5m])) == 0
+        for: 30m
+        labels:
+          severity: critical
+          component: business
+          category: engagement
+        annotations:
+          summary: "CRITICAL: No requests received for 30 minutes"
+          description: "Zero request volume - complete service outage or routing issue"
+          runbook_url: "https://docs.sark.io/runbooks/business/no-requests"
+          impact: "Service appears completely unused - potential revenue loss"
+          action: "IMMEDIATE: Check service health, DNS, load balancers, network routing"
+
+      # ========================================================================
+      # Usage Quotas & Limits
+      # ========================================================================
+
+      - alert: UserApproachingQuota
+        expr: |
+          (
+            sum(increase(sark_gateway_requests_by_user[24h])) by (user_id)
+            / 10000
+          ) > 0.8
+        for: 1h
+        labels:
+          severity: warning
+          component: business
+          category: quotas
+        annotations:
+          summary: "User {{ $labels.user_id }} approaching daily quota"
+          description: "User at {{ $value | humanizePercentage }} of daily quota (10k requests)"
+          runbook_url: "https://docs.sark.io/runbooks/business/user-quota"
+          impact: "User may hit quota limit - potential service disruption for them"
+          action: "Notify user of approaching limit, offer quota upgrade"
+
+      - alert: UserQuotaExceeded
+        expr: |
+          sum(increase(sark_gateway_rate_limit_exceeded_total{limit_type="quota"}[1h])) by (user) > 10
+        for: 30m
+        labels:
+          severity: info
+          component: business
+          category: quotas
+        annotations:
+          summary: "User {{ $labels.user }} exceeding quota"
+          description: "Quota violations: {{ $value }} in last hour"
+          runbook_url: "https://docs.sark.io/runbooks/business/quota-exceeded"
+          impact: "User experiencing service degradation due to quota limits"
+          action: "Contact user about usage patterns, offer tier upgrade"
+
+      - alert: GlobalQuotaUtilizationHigh
+        expr: |
+          sum(rate(sark_gateway_requests_total[5m])) / 1000 > 0.8
+        for: 1h
+        labels:
+          severity: warning
+          component: business
+          category: quotas
+        annotations:
+          summary: "Platform approaching global capacity limits"
+          description: "At {{ $value | humanizePercentage }} of platform capacity (1000 req/sec)"
+          runbook_url: "https://docs.sark.io/runbooks/business/global-quota"
+          impact: "Risk of hitting platform limits - new users may be rejected"
+          action: "Scale infrastructure, review capacity plans, consider rate limiting"
+
+      # ========================================================================
+      # Revenue & Cost Monitoring
+      # ========================================================================
+
+      - alert: HighInfrastructureCost
+        expr: |
+          (
+            sum(rate(sark_gateway_requests_total[1h])) * 0.0001 * 24 * 30
+          ) > 10000
+        for: 4h
+        labels:
+          severity: warning
+          component: business
+          category: cost
+        annotations:
+          summary: "Projected monthly infrastructure cost high"
+          description: "Current usage projects to ${{ $value }} monthly cost (threshold: $10k)"
+          runbook_url: "https://docs.sark.io/runbooks/business/high-cost"
+          impact: "Budget overrun risk"
+          action: "Review usage patterns, optimize resource usage, consider pricing adjustments"
+
+      - alert: LowRevenuePerRequest
+        expr: |
+          (
+            sum(rate(sark_gateway_requests_total[1h])) * 0.0001
+          ) < 0.0002
+        for: 24h
+        labels:
+          severity: info
+          component: business
+          category: revenue
+        annotations:
+          summary: "Low average revenue per request"
+          description: "Revenue efficiency {{ $value | humanize }} (threshold: $0.0002/req)"
+          runbook_url: "https://docs.sark.io/runbooks/business/low-revenue"
+          impact: "Profitability concerns - may not cover costs"
+          action: "Review pricing strategy, analyze user tiers, consider monetization changes"
+
+      - alert: FreeTierOveruse
+        expr: |
+          (
+            sum(rate(sark_gateway_requests_total{tier="free"}[1h]))
+            / sum(rate(sark_gateway_requests_total[1h]))
+          ) > 0.7
+        for: 12h
+        labels:
+          severity: warning
+          component: business
+          category: revenue
+        annotations:
+          summary: "High percentage of free tier usage"
+          description: "{{ $value | humanizePercentage }} of requests from free tier (threshold: 70%)"
+          runbook_url: "https://docs.sark.io/runbooks/business/free-tier"
+          impact: "Revenue opportunity - many users could be converted"
+          action: "Launch upgrade campaign, review free tier limits, analyze conversion funnel"
+
+      # ========================================================================
+      # Feature Adoption
+      # ========================================================================
+
+      - alert: LowToolInvocationRate
+        expr: |
+          sum(rate(sark_gateway_tool_invocations_total[1h])) < 10
+        for: 4h
+        labels:
+          severity: info
+          component: business
+          category: adoption
+        annotations:
+          summary: "Low tool invocation rate"
+          description: "Only {{ $value | humanize }} tool invocations/sec (threshold: 10/sec)"
+          runbook_url: "https://docs.sark.io/runbooks/business/low-tool-usage"
+          impact: "Core feature underutilized - adoption issue"
+          action: "Review feature visibility, improve documentation, gather user feedback"
+
+      - alert: NewFeatureNotAdopted
+        expr: |
+          sum(rate(sark_gateway_tool_invocations_total{tool=~"new_.*"}[24h])) < 1
+        for: 7d
+        labels:
+          severity: info
+          component: business
+          category: adoption
+        annotations:
+          summary: "New feature {{ $labels.tool }} not being used"
+          description: "No usage of new feature in 7 days"
+          runbook_url: "https://docs.sark.io/runbooks/business/feature-adoption"
+          impact: "Feature launch unsuccessful - wasted development effort"
+          action: "Promote feature, improve documentation, gather feedback, consider deprecation"
+
+      - alert: HighA2AUsageGrowth
+        expr: |
+          (
+            sum(rate(sark_a2a_authz_requests_total[1h]))
+            / sum(rate(sark_a2a_authz_requests_total[1h] offset 24h))
+          ) > 2
+        for: 6h
+        labels:
+          severity: info
+          component: business
+          category: adoption
+        annotations:
+          summary: "Agent-to-Agent usage growing rapidly"
+          description: "A2A requests {{ $value }}x higher than yesterday"
+          runbook_url: "https://docs.sark.io/runbooks/business/a2a-growth"
+          impact: "Strong feature adoption - positive signal"
+          action: "Monitor for capacity needs, prepare marketing materials, track user satisfaction"
+
+      # ========================================================================
+      # Service Quality Trends
+      # ========================================================================
+
+      - alert: CacheHitRateDeclining
+        expr: |
+          (
+            100 * rate(sark_policy_cache_hits_total[1h])
+            / (rate(sark_policy_cache_hits_total[1h]) + rate(sark_policy_cache_misses_total[1h]))
+          ) < 70
+        for: 4h
+        labels:
+          severity: warning
+          component: business
+          category: quality
+        annotations:
+          summary: "Cache hit rate declining"
+          description: "Cache hit rate {{ $value | humanizePercentage }} below target 70%"
+          runbook_url: "https://docs.sark.io/runbooks/business/cache-quality"
+          impact: "Degraded performance - increased latency and costs"
+          action: "Review cache configuration, analyze miss patterns, adjust TTLs"
+
+      - alert: AuthorizationDenyRateIncreasing
+        expr: |
+          (
+            sum(rate(sark_gateway_authz_requests_total{decision="deny"}[1h]))
+            / sum(rate(sark_gateway_authz_requests_total{decision="deny"}[1h] offset 24h))
+          ) > 1.5
+        for: 4h
+        labels:
+          severity: warning
+          component: business
+          category: quality
+        annotations:
+          summary: "Authorization deny rate increasing"
+          description: "Deny rate {{ $value }}x higher than yesterday"
+          runbook_url: "https://docs.sark.io/runbooks/business/deny-trend"
+          impact: "User experience degradation - access issues"
+          action: "Review recent policy changes, analyze denial patterns, gather user feedback"
+
+      # ========================================================================
+      # Compliance & Audit
+      # ========================================================================
+
+      - alert: AuditCoverageInsufficient
+        expr: |
+          (
+            sum(rate(sark_gateway_audit_events_total[5m]))
+            / sum(rate(sark_gateway_requests_total[5m]))
+          ) < 0.8
+        for: 1h
+        labels:
+          severity: critical
+          component: business
+          category: compliance
+        annotations:
+          summary: "CRITICAL: Audit coverage below compliance requirement"
+          description: "Only {{ $value | humanizePercentage }} of requests are audited (required: 80%)"
+          runbook_url: "https://docs.sark.io/runbooks/business/audit-compliance"
+          impact: "Compliance violation - regulatory risk"
+          action: "IMMEDIATE: Investigate audit failures, verify audit configuration, notify compliance team"
+
+      - alert: LongAuditRetention
+        expr: |
+          increase(sark_audit_retention_purges_total[24h]) == 0
+        for: 30d
+        labels:
+          severity: info
+          component: business
+          category: compliance
+        annotations:
+          summary: "Audit retention policy not running"
+          description: "No purges in 30 days - data retention may violate policy"
+          runbook_url: "https://docs.sark.io/runbooks/business/retention"
+          impact: "Compliance risk - storing data beyond required period"
+          action: "Verify retention policy configuration, run manual purge if needed"
+
+      - alert: SIEMForwardingComplianceRisk
+        expr: |
+          100 * sum(rate(sark_siem_forwards_total{status="success"}[1h]))
+          / sum(rate(sark_siem_forwards_total[1h])) < 95
+        for: 24h
+        labels:
+          severity: warning
+          component: business
+          category: compliance
+        annotations:
+          summary: "SIEM forwarding below compliance threshold"
+          description: "SIEM success rate {{ $value | humanizePercentage }} (required: 95%)"
+          runbook_url: "https://docs.sark.io/runbooks/business/siem-compliance"
+          impact: "Compliance risk - incomplete audit trail in SIEM"
+          action: "Investigate SIEM failures, verify connectivity, notify compliance team"
+
+      # ========================================================================
+      # Customer Support Indicators
+      # ========================================================================
+
+      - alert: HighSupportTicketVolume
+        expr: |
+          sum(rate(sark_gateway_client_errors_total[1h])) > 50
+        for: 4h
+        labels:
+          severity: warning
+          component: business
+          category: support
+        annotations:
+          summary: "High client error rate may drive support tickets"
+          description: "Client errors at {{ $value | humanize }}/sec"
+          runbook_url: "https://docs.sark.io/runbooks/business/support-volume"
+          impact: "Increased support load - customer satisfaction risk"
+          action: "Prepare support team, create KB articles, investigate common errors"
+
+      - alert: UserExperienceDegradation
+        expr: |
+          (
+            histogram_quantile(0.95, sum(rate(sark_gateway_request_duration_seconds_bucket[1h])) by (le))
+            / histogram_quantile(0.95, sum(rate(sark_gateway_request_duration_seconds_bucket[1h] offset 24h)) by (le))
+          ) > 1.5
+        for: 2h
+        labels:
+          severity: warning
+          component: business
+          category: support
+        annotations:
+          summary: "User experience degrading - latency increased"
+          description: "P95 latency {{ $value }}x higher than yesterday"
+          runbook_url: "https://docs.sark.io/runbooks/business/ux-degradation"
+          impact: "User frustration - potential churn and complaints"
+          action: "Investigate performance regression, prepare user communication, escalate if needed"

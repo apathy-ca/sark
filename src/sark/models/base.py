@@ -5,11 +5,16 @@ These base classes will be used by all protocol adapters in v2.0.
 For v1.x, they serve as a foundation for gradual migration.
 """
 
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Any, Dict, Optional
-from sqlalchemy import Column, String, JSON, DateTime, Text
+from uuid import uuid4
+from sqlalchemy import Column, String, JSON, DateTime, Text, Numeric, Boolean, Integer, BigInteger, ForeignKey
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import relationship
 from pydantic import BaseModel as PydanticBaseModel
+
+from sark.db.base import Base
 
 
 class ResourceBase:
@@ -159,9 +164,170 @@ class InvocationResult(PydanticBaseModel):
     duration_ms: float
 
 
+
+# ============================================================================
+# SQLAlchemy ORM Models (v2.0)
+# ============================================================================
+
+
+class Resource(Base):
+    """
+    Universal resource model for v2.0.
+
+    Represents any governed entity: MCP servers, REST APIs, gRPC services, etc.
+    Protocol-specific details are stored in the metadata_ JSONB column.
+    """
+
+    __tablename__ = "resources"
+
+    id = Column(String(255), primary_key=True)
+    name = Column(String(255), nullable=False, index=True)
+    protocol = Column(String(50), nullable=False, index=True)
+    endpoint = Column(String(1000), nullable=False)
+    sensitivity_level = Column(String(20), nullable=False, default="medium", index=True)
+    metadata_ = Column("metadata", JSONB, nullable=False, default={})  # Use metadata_ to avoid SQLAlchemy reserved name
+    created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC))
+    updated_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+    )
+
+    # Relationships
+    capabilities = relationship("Capability", back_populates="resource", cascade="all, delete-orphan")
+
+    def __repr__(self) -> str:
+        return f"<Resource(id={self.id}, name={self.name}, protocol={self.protocol})>"
+
+
+class Capability(Base):
+    """
+    Universal capability model for v2.0.
+
+    Represents any executable capability: MCP tools, HTTP endpoints, gRPC methods, etc.
+    Protocol-specific details are stored in the metadata_ JSONB column.
+    """
+
+    __tablename__ = "capabilities"
+
+    id = Column(String(255), primary_key=True)
+    resource_id = Column(String(255), ForeignKey("resources.id", ondelete="CASCADE"), nullable=False, index=True)
+    name = Column(String(255), nullable=False, index=True)
+    description = Column(Text, nullable=True)
+    input_schema = Column(JSONB, nullable=False, default={})
+    output_schema = Column(JSONB, nullable=False, default={})
+    sensitivity_level = Column(String(20), nullable=False, default="medium", index=True)
+    metadata_ = Column("metadata", JSONB, nullable=False, default={})  # Use metadata_ to avoid SQLAlchemy reserved name
+
+    # Relationships
+    resource = relationship("Resource", back_populates="capabilities")
+
+    def __repr__(self) -> str:
+        return f"<Capability(id={self.id}, name={self.name}, resource_id={self.resource_id})>"
+
+
+class FederationNode(Base):
+    """
+    Federation node model for cross-organization governance.
+
+    Represents a trusted SARK instance in another organization.
+    mTLS trust is established via the trust_anchor_cert.
+    """
+
+    __tablename__ = "federation_nodes"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    node_id = Column(String(255), nullable=False, unique=True, index=True)
+    name = Column(String(255), nullable=False)
+    endpoint = Column(String(500), nullable=False)
+    trust_anchor_cert = Column(Text, nullable=False)
+    enabled = Column(Boolean, nullable=False, default=True, index=True)
+    trusted_since = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC))
+    rate_limit_per_hour = Column(Integer, nullable=True, default=10000)
+    metadata_ = Column("metadata", JSONB, nullable=False, default={})  # Use metadata_ to avoid SQLAlchemy reserved name
+    created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC))
+    updated_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+    )
+
+    def __repr__(self) -> str:
+        return f"<FederationNode(node_id={self.node_id}, name={self.name}, enabled={self.enabled})>"
+
+
+class CostTracking(Base):
+    """
+    Cost tracking model for time-series cost attribution.
+
+    Stores per-invocation cost data for budget management and analytics.
+    This table is converted to a TimescaleDB hypertable for efficient time-series queries.
+    """
+
+    __tablename__ = "cost_tracking"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    timestamp = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC), index=True)
+    principal_id = Column(String(255), nullable=False, index=True)
+    resource_id = Column(String(255), nullable=False, index=True)
+    capability_id = Column(String(255), nullable=False, index=True)
+    estimated_cost = Column(Numeric(10, 4), nullable=True)
+    actual_cost = Column(Numeric(10, 4), nullable=True)
+    metadata_ = Column("metadata", JSONB, nullable=False, default={})  # Use metadata_ to avoid SQLAlchemy reserved name
+
+    def __repr__(self) -> str:
+        return f"<CostTracking(id={self.id}, principal_id={self.principal_id}, cost={self.actual_cost})>"
+
+
+class PrincipalBudget(Base):
+    """
+    Principal budget model for cost limits and tracking.
+
+    Stores daily/monthly budget limits and current spending for each principal.
+    Budgets are automatically reset based on last_daily_reset and last_monthly_reset timestamps.
+    """
+
+    __tablename__ = "principal_budgets"
+
+    principal_id = Column(String(255), primary_key=True, index=True)
+    daily_budget = Column(Numeric(10, 2), nullable=True)
+    monthly_budget = Column(Numeric(10, 2), nullable=True)
+    daily_spent = Column(Numeric(10, 4), nullable=False, default=0)
+    monthly_spent = Column(Numeric(10, 4), nullable=False, default=0)
+    last_daily_reset = Column(DateTime(timezone=True), nullable=True)
+    last_monthly_reset = Column(DateTime(timezone=True), nullable=True)
+    currency = Column(String(3), nullable=False, default="USD")
+    created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC))
+    updated_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+    )
+
+    def __repr__(self) -> str:
+        return f"<PrincipalBudget(principal_id={self.principal_id}, daily={self.daily_budget}, monthly={self.monthly_budget})>"
+
+
+# ============================================================================
+# Exports
+# ============================================================================
+
 __all__ = [
+    # Legacy mixin classes (for backward compatibility)
     "ResourceBase",
     "CapabilityBase",
+
+    # v2.0 SQLAlchemy models
+    "Resource",
+    "Capability",
+    "FederationNode",
+    "CostTracking",
+    "PrincipalBudget",
+
+    # Pydantic schemas
     "ResourceSchema",
     "CapabilitySchema",
     "InvocationRequest",

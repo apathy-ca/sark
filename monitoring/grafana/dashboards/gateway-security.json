@@ -1,0 +1,526 @@
+{
+  "dashboard": {
+    "title": "SARK Gateway Security",
+    "tags": ["sark", "gateway", "security", "auth"],
+    "timezone": "browser",
+    "schemaVersion": 38,
+    "version": 1,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Authentication Failures",
+        "type": "timeseries",
+        "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(rate(sark_gateway_auth_failures_total[5m])) by (reason)",
+            "legendFormat": "{{reason}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ops",
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "smooth",
+              "fillOpacity": 20,
+              "spanNulls": false
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "yellow", "value": 5},
+                {"color": "red", "value": 10}
+              ]
+            }
+          }
+        },
+        "options": {
+          "legend": {
+            "displayMode": "table",
+            "placement": "bottom",
+            "calcs": ["mean", "max", "lastNotNull"]
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Authorization Denials by Policy",
+        "type": "timeseries",
+        "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sum(rate(sark_gateway_authz_requests_total{decision=\"deny\"}[5m])) by (action)",
+            "legendFormat": "{{action}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ops",
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "smooth",
+              "fillOpacity": 25,
+              "stackingMode": "normal"
+            }
+          }
+        },
+        "options": {
+          "legend": {
+            "displayMode": "table",
+            "placement": "bottom",
+            "calcs": ["mean", "lastNotNull"]
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Rate Limit Violations",
+        "type": "timeseries",
+        "gridPos": {"x": 0, "y": 8, "w": 12, "h": 7},
+        "targets": [
+          {
+            "expr": "sum(rate(sark_gateway_rate_limit_exceeded_total[5m])) by (limit_type)",
+            "legendFormat": "{{limit_type}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ops",
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "drawStyle": "bars",
+              "lineInterpolation": "linear",
+              "barAlignment": 0,
+              "fillOpacity": 80
+            }
+          }
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom"
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "Suspicious Activity Patterns",
+        "type": "timeseries",
+        "gridPos": {"x": 12, "y": 8, "w": 12, "h": 7},
+        "targets": [
+          {
+            "expr": "sum(rate(sark_gateway_errors_total{severity=\"critical\"}[5m])) by (error_type)",
+            "legendFormat": "Critical: {{error_type}}",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(sark_gateway_auth_failures_total[5m]) > 10",
+            "legendFormat": "High Auth Failure Rate",
+            "refId": "B"
+          },
+          {
+            "expr": "rate(sark_gateway_rate_limit_exceeded_total[5m]) > 5",
+            "legendFormat": "High Rate Limit Violations",
+            "refId": "C"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ops",
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "smooth",
+              "fillOpacity": 30
+            }
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "Failed Requests by User (Last Hour)",
+        "type": "table",
+        "gridPos": {"x": 0, "y": 15, "w": 12, "h": 7},
+        "targets": [
+          {
+            "expr": "topk(10, sum(increase(sark_gateway_auth_failures_total[1h])) by (user))",
+            "format": "table",
+            "instant": true,
+            "refId": "A"
+          }
+        ],
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {
+                "Time": true,
+                "__name__": true
+              },
+              "indexByName": {},
+              "renameByName": {
+                "user": "User",
+                "Value": "Failed Attempts"
+              }
+            }
+          },
+          {
+            "id": "sortBy",
+            "options": {
+              "fields": {},
+              "sort": [
+                {
+                  "field": "Failed Attempts",
+                  "desc": true
+                }
+              ]
+            }
+          }
+        ],
+        "options": {
+          "showHeader": true,
+          "sortBy": []
+        },
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "align": "auto",
+              "displayMode": "auto"
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Failed Attempts"
+              },
+              "properties": [
+                {
+                  "id": "custom.displayMode",
+                  "value": "color-background"
+                },
+                {
+                  "id": "thresholds",
+                  "value": {
+                    "mode": "absolute",
+                    "steps": [
+                      {"color": "green", "value": 0},
+                      {"color": "yellow", "value": 5},
+                      {"color": "red", "value": 10}
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": 6,
+        "title": "Security Alerts Timeline",
+        "type": "timeseries",
+        "gridPos": {"x": 12, "y": 15, "w": 12, "h": 7},
+        "targets": [
+          {
+            "expr": "ALERTS{alertname=~\".*Gateway.*|.*Auth.*|.*Security.*\", alertstate=\"firing\"}",
+            "legendFormat": "{{alertname}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "drawStyle": "points",
+              "pointSize": 8,
+              "showPoints": "always"
+            }
+          }
+        },
+        "options": {
+          "legend": {
+            "displayMode": "list",
+            "placement": "bottom"
+          }
+        }
+      },
+      {
+        "id": 7,
+        "title": "Authorization Deny Rate %",
+        "type": "stat",
+        "gridPos": {"x": 0, "y": 22, "w": 4, "h": 5},
+        "targets": [
+          {
+            "expr": "100 * sum(rate(sark_gateway_authz_requests_total{decision=\"deny\"}[5m])) / sum(rate(sark_gateway_authz_requests_total[5m]))",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "decimals": 2,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "yellow", "value": 10},
+                {"color": "orange", "value": 20},
+                {"color": "red", "value": 30}
+              ]
+            }
+          }
+        },
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": ["lastNotNull"],
+            "fields": "",
+            "values": false
+          }
+        }
+      },
+      {
+        "id": 8,
+        "title": "A2A Authorization Denials",
+        "type": "stat",
+        "gridPos": {"x": 4, "y": 22, "w": 4, "h": 5},
+        "targets": [
+          {
+            "expr": "sum(rate(sark_a2a_authz_requests_total{decision=\"deny\"}[5m]))",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ops",
+            "decimals": 2,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "yellow", "value": 1},
+                {"color": "red", "value": 5}
+              ]
+            }
+          }
+        },
+        "options": {
+          "colorMode": "background",
+          "graphMode": "area",
+          "justifyMode": "auto"
+        }
+      },
+      {
+        "id": 9,
+        "title": "Critical Errors (Last Hour)",
+        "type": "stat",
+        "gridPos": {"x": 8, "y": 22, "w": 4, "h": 5},
+        "targets": [
+          {
+            "expr": "sum(increase(sark_gateway_errors_total{severity=\"critical\"}[1h]))",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "yellow", "value": 1},
+                {"color": "red", "value": 5}
+              ]
+            }
+          }
+        },
+        "options": {
+          "colorMode": "background",
+          "graphMode": "none",
+          "justifyMode": "center",
+          "orientation": "auto"
+        }
+      },
+      {
+        "id": 10,
+        "title": "Unique Users with Failures",
+        "type": "stat",
+        "gridPos": {"x": 12, "y": 22, "w": 4, "h": 5},
+        "targets": [
+          {
+            "expr": "count(sum(rate(sark_gateway_auth_failures_total[1h])) by (user) > 0)",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "yellow", "value": 5},
+                {"color": "red", "value": 10}
+              ]
+            }
+          }
+        },
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area"
+        }
+      },
+      {
+        "id": 11,
+        "title": "Security Events Breakdown",
+        "type": "piechart",
+        "gridPos": {"x": 16, "y": 22, "w": 8, "h": 5},
+        "targets": [
+          {
+            "expr": "sum(increase(sark_gateway_auth_failures_total[1h])) by (reason)",
+            "legendFormat": "{{reason}}",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "pieType": "donut",
+          "displayLabels": ["name", "percent"],
+          "legend": {
+            "displayMode": "table",
+            "placement": "right",
+            "calcs": ["lastNotNull"]
+          }
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short"
+          }
+        }
+      },
+      {
+        "id": 12,
+        "title": "Denied Tool Invocations",
+        "type": "table",
+        "gridPos": {"x": 0, "y": 27, "w": 12, "h": 6},
+        "targets": [
+          {
+            "expr": "topk(10, sum(increase(sark_gateway_audit_events_total{decision=\"deny\", event_type=\"tool_invoke\"}[1h])) by (tool_name, server_name))",
+            "format": "table",
+            "instant": true,
+            "refId": "A"
+          }
+        ],
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {
+                "Time": true,
+                "__name__": true
+              },
+              "renameByName": {
+                "tool_name": "Tool",
+                "server_name": "Server",
+                "Value": "Denials"
+              }
+            }
+          },
+          {
+            "id": "sortBy",
+            "options": {
+              "sort": [{"field": "Denials", "desc": true}]
+            }
+          }
+        ],
+        "options": {
+          "showHeader": true
+        },
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "align": "auto"
+            }
+          }
+        }
+      },
+      {
+        "id": 13,
+        "title": "Client Errors by Type",
+        "type": "timeseries",
+        "gridPos": {"x": 12, "y": 27, "w": 12, "h": 6},
+        "targets": [
+          {
+            "expr": "sum(rate(sark_gateway_client_errors_total[5m])) by (error_type)",
+            "legendFormat": "{{error_type}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ops",
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "smooth",
+              "fillOpacity": 20,
+              "stackingMode": "normal"
+            }
+          }
+        },
+        "options": {
+          "legend": {
+            "displayMode": "table",
+            "placement": "bottom",
+            "calcs": ["mean", "max"]
+          }
+        }
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "datasource",
+          "type": "datasource",
+          "query": "prometheus"
+        },
+        {
+          "name": "user",
+          "type": "query",
+          "query": "label_values(sark_gateway_auth_failures_total, user)",
+          "multi": true,
+          "includeAll": true,
+          "refresh": 1
+        },
+        {
+          "name": "reason",
+          "type": "query",
+          "query": "label_values(sark_gateway_auth_failures_total, reason)",
+          "multi": true,
+          "includeAll": true,
+          "refresh": 1
+        }
+      ]
+    }
+  }
+}

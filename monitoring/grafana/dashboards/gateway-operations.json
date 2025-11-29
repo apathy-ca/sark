@@ -1,0 +1,583 @@
+{
+  "dashboard": {
+    "title": "SARK Gateway Operations",
+    "tags": ["sark", "gateway", "operations", "health"],
+    "timezone": "browser",
+    "schemaVersion": 38,
+    "version": 1,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "System Health Status",
+        "type": "stat",
+        "gridPos": {"x": 0, "y": 0, "w": 6, "h": 4},
+        "targets": [
+          {
+            "expr": "up{job=\"sark-gateway\"}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [
+              {
+                "type": "value",
+                "options": {
+                  "0": {"text": "DOWN", "color": "red"},
+                  "1": {"text": "UP", "color": "green"}
+                }
+              }
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "green", "value": 1}
+              ]
+            }
+          }
+        },
+        "options": {
+          "colorMode": "background",
+          "graphMode": "none",
+          "justifyMode": "center",
+          "orientation": "auto",
+          "textMode": "value_and_name"
+        }
+      },
+      {
+        "id": 2,
+        "title": "Database Health",
+        "type": "stat",
+        "gridPos": {"x": 6, "y": 0, "w": 6, "h": 4},
+        "targets": [
+          {
+            "expr": "sark_health_component_status{component=\"database\"}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [
+              {
+                "type": "value",
+                "options": {
+                  "0": {"text": "UNHEALTHY", "color": "red"},
+                  "1": {"text": "HEALTHY", "color": "green"}
+                }
+              }
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "green", "value": 1}
+              ]
+            }
+          }
+        },
+        "options": {
+          "colorMode": "background",
+          "graphMode": "none"
+        }
+      },
+      {
+        "id": 3,
+        "title": "OPA Health",
+        "type": "stat",
+        "gridPos": {"x": 12, "y": 0, "w": 6, "h": 4},
+        "targets": [
+          {
+            "expr": "sark_health_component_status{component=\"opa\"}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [
+              {
+                "type": "value",
+                "options": {
+                  "0": {"text": "UNHEALTHY", "color": "red"},
+                  "1": {"text": "HEALTHY", "color": "green"}
+                }
+              }
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "green", "value": 1}
+              ]
+            }
+          }
+        },
+        "options": {
+          "colorMode": "background",
+          "graphMode": "none"
+        }
+      },
+      {
+        "id": 4,
+        "title": "SIEM Connection Status",
+        "type": "stat",
+        "gridPos": {"x": 18, "y": 0, "w": 6, "h": 4},
+        "targets": [
+          {
+            "expr": "sark_siem_connection_status",
+            "legendFormat": "{{siem_platform}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [
+              {
+                "type": "value",
+                "options": {
+                  "0": {"text": "DISCONNECTED", "color": "red"},
+                  "1": {"text": "CONNECTED", "color": "green"}
+                }
+              }
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "green", "value": 1}
+              ]
+            }
+          }
+        },
+        "options": {
+          "colorMode": "background",
+          "graphMode": "none",
+          "orientation": "horizontal"
+        }
+      },
+      {
+        "id": 5,
+        "title": "Error Rate by Component",
+        "type": "timeseries",
+        "gridPos": {"x": 0, "y": 4, "w": 12, "h": 7},
+        "targets": [
+          {
+            "expr": "sum(rate(sark_gateway_errors_total[5m])) by (component)",
+            "legendFormat": "{{component}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ops",
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "smooth",
+              "fillOpacity": 20,
+              "stackingMode": "normal"
+            },
+            "color": {
+              "mode": "palette-classic"
+            }
+          }
+        },
+        "options": {
+          "legend": {
+            "displayMode": "table",
+            "placement": "bottom",
+            "calcs": ["mean", "max", "lastNotNull"]
+          }
+        }
+      },
+      {
+        "id": 6,
+        "title": "Error Severity Distribution",
+        "type": "timeseries",
+        "gridPos": {"x": 12, "y": 4, "w": 12, "h": 7},
+        "targets": [
+          {
+            "expr": "sum(rate(sark_gateway_errors_total[5m])) by (severity)",
+            "legendFormat": "{{severity}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ops",
+            "custom": {
+              "drawStyle": "bars",
+              "fillOpacity": 80
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {"id": "byName", "options": "critical"},
+              "properties": [{"id": "color", "value": {"fixedColor": "red", "mode": "fixed"}}]
+            },
+            {
+              "matcher": {"id": "byName", "options": "error"},
+              "properties": [{"id": "color", "value": {"fixedColor": "orange", "mode": "fixed"}}]
+            },
+            {
+              "matcher": {"id": "byName", "options": "warning"},
+              "properties": [{"id": "color", "value": {"fixedColor": "yellow", "mode": "fixed"}}]
+            }
+          ]
+        }
+      },
+      {
+        "id": 7,
+        "title": "SIEM Forward Success Rate",
+        "type": "timeseries",
+        "gridPos": {"x": 0, "y": 11, "w": 8, "h": 6},
+        "targets": [
+          {
+            "expr": "100 * sum(rate(sark_siem_forwards_total{status=\"success\"}[5m])) by (siem_platform) / sum(rate(sark_siem_forwards_total[5m])) by (siem_platform)",
+            "legendFormat": "{{siem_platform}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "smooth",
+              "fillOpacity": 25
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 95},
+                {"color": "green", "value": 99}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 8,
+        "title": "SIEM Backpressure",
+        "type": "timeseries",
+        "gridPos": {"x": 8, "y": 11, "w": 8, "h": 6},
+        "targets": [
+          {
+            "expr": "sark_siem_backpressure_events",
+            "legendFormat": "{{siem_platform}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "smooth",
+              "fillOpacity": 30
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "yellow", "value": 100},
+                {"color": "red", "value": 500}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 9,
+        "title": "Audit Queue Depth",
+        "type": "gauge",
+        "gridPos": {"x": 16, "y": 11, "w": 8, "h": 6},
+        "targets": [
+          {
+            "expr": "sark_audit_queue_depth",
+            "refId": "A"
+          },
+          {
+            "expr": "sark_audit_queue_capacity",
+            "refId": "B"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "min": 0,
+            "thresholds": {
+              "mode": "percentage",
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "yellow", "value": 70},
+                {"color": "red", "value": 90}
+              ]
+            }
+          }
+        },
+        "options": {
+          "showThresholdLabels": true,
+          "showThresholdMarkers": true
+        }
+      },
+      {
+        "id": 10,
+        "title": "Active Alerts",
+        "type": "table",
+        "gridPos": {"x": 0, "y": 17, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "ALERTS{alertstate=\"firing\", job=\"sark-gateway\"}",
+            "format": "table",
+            "instant": true,
+            "refId": "A"
+          }
+        ],
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {
+                "Time": true,
+                "job": true,
+                "alertstate": true,
+                "__name__": true
+              },
+              "renameByName": {
+                "alertname": "Alert",
+                "severity": "Severity",
+                "component": "Component",
+                "Value": "Active Since"
+              }
+            }
+          }
+        ],
+        "options": {
+          "showHeader": true,
+          "sortBy": [
+            {
+              "displayName": "Severity",
+              "desc": false
+            }
+          ]
+        },
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "align": "auto"
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {"id": "byName", "options": "Severity"},
+              "properties": [
+                {
+                  "id": "custom.displayMode",
+                  "value": "color-background"
+                },
+                {
+                  "id": "mappings",
+                  "value": [
+                    {
+                      "type": "value",
+                      "options": {
+                        "critical": {"color": "red"},
+                        "warning": {"color": "yellow"}
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": 11,
+        "title": "Component Latency",
+        "type": "timeseries",
+        "gridPos": {"x": 12, "y": 17, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "sark_health_component_latency_seconds",
+            "legendFormat": "{{component}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "smooth",
+              "fillOpacity": 15
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "yellow", "value": 0.1},
+                {"color": "red", "value": 0.5}
+              ]
+            }
+          }
+        },
+        "options": {
+          "legend": {
+            "displayMode": "table",
+            "placement": "bottom",
+            "calcs": ["mean", "max", "lastNotNull"]
+          }
+        }
+      },
+      {
+        "id": 12,
+        "title": "Audit Write Performance",
+        "type": "timeseries",
+        "gridPos": {"x": 0, "y": 25, "w": 8, "h": 6},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(sark_audit_write_duration_seconds_bucket[5m])) by (le, destination))",
+            "legendFormat": "{{destination}} (P95)",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.50, sum(rate(sark_audit_write_duration_seconds_bucket[5m])) by (le, destination))",
+            "legendFormat": "{{destination}} (P50)",
+            "refId": "B"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "smooth",
+              "fillOpacity": 10
+            }
+          }
+        }
+      },
+      {
+        "id": 13,
+        "title": "Audit Events Written/s",
+        "type": "stat",
+        "gridPos": {"x": 8, "y": 25, "w": 4, "h": 6},
+        "targets": [
+          {
+            "expr": "sum(rate(sark_audit_events_written_total[5m]))",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ops",
+            "decimals": 2,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "yellow", "value": 100},
+                {"color": "red", "value": 1000}
+              ]
+            }
+          }
+        },
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area"
+        }
+      },
+      {
+        "id": 14,
+        "title": "Storage Utilization",
+        "type": "gauge",
+        "gridPos": {"x": 12, "y": 25, "w": 6, "h": 6},
+        "targets": [
+          {
+            "expr": "sark_audit_storage_utilization",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "yellow", "value": 70},
+                {"color": "orange", "value": 85},
+                {"color": "red", "value": 95}
+              ]
+            }
+          }
+        },
+        "options": {
+          "showThresholdLabels": true,
+          "showThresholdMarkers": true
+        }
+      },
+      {
+        "id": 15,
+        "title": "Uptime",
+        "type": "stat",
+        "gridPos": {"x": 18, "y": 25, "w": 6, "h": 6},
+        "targets": [
+          {
+            "expr": "time() - process_start_time_seconds{job=\"sark-gateway\"}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "decimals": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "yellow", "value": 0},
+                {"color": "green", "value": 3600}
+              ]
+            }
+          }
+        },
+        "options": {
+          "colorMode": "value",
+          "graphMode": "none"
+        }
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "datasource",
+          "type": "datasource",
+          "query": "prometheus"
+        },
+        {
+          "name": "component",
+          "type": "query",
+          "query": "label_values(sark_gateway_errors_total, component)",
+          "multi": true,
+          "includeAll": true,
+          "refresh": 1
+        },
+        {
+          "name": "severity",
+          "type": "query",
+          "query": "label_values(sark_gateway_errors_total, severity)",
+          "multi": true,
+          "includeAll": true,
+          "refresh": 1
+        }
+      ]
+    }
+  }
+}

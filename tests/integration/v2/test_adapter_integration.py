@@ -465,10 +465,11 @@ class TestAdapterErrorHandling:
     @pytest.mark.asyncio
     async def test_unsupported_streaming(self, mock_mcp_adapter, sample_invocation_request):
         """Test that adapters without streaming support raise error."""
-        # MCP adapter doesn't override invoke_streaming
+        # MCP adapter doesn't override invoke_streaming, so it raises UnsupportedOperationError
+        # The base implementation raises directly in the async method
         with pytest.raises(UnsupportedOperationError, match="Streaming is not supported"):
-            async for _ in mock_mcp_adapter.invoke_streaming(sample_invocation_request):
-                pass
+            # The error is raised when trying to use the iterator
+            await mock_mcp_adapter.invoke_streaming(sample_invocation_request).__anext__()
 
     @pytest.mark.asyncio
     async def test_batch_invocation_fallback(self, mock_mcp_adapter):

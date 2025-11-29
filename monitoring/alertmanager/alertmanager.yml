@@ -1,0 +1,195 @@
+global:
+  resolve_timeout: 5m
+  # Slack configuration
+  slack_api_url: '${SLACK_WEBHOOK_URL}'
+  # PagerDuty configuration
+  pagerduty_url: 'https://events.pagerduty.com/v2/enqueue'
+  # Email configuration
+  smtp_smarthost: '${SMTP_HOST}:${SMTP_PORT}'
+  smtp_from: '${SMTP_FROM}'
+  smtp_auth_username: '${SMTP_USERNAME}'
+  smtp_auth_password: '${SMTP_PASSWORD}'
+  smtp_require_tls: true
+
+# Templates for notifications
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+# Route tree for alerts
+route:
+  # Default receiver
+  receiver: 'default'
+  # Group alerts by these labels
+  group_by: ['alertname', 'cluster', 'service']
+  # Wait before sending initial notification
+  group_wait: 30s
+  # Wait before sending new alerts for existing groups
+  group_interval: 5m
+  # How long to wait before re-sending notification
+  repeat_interval: 12h
+
+  # Child routes
+  routes:
+    # Critical alerts go to PagerDuty immediately
+    - match:
+        severity: critical
+      receiver: 'pagerduty-critical'
+      group_wait: 10s
+      group_interval: 1m
+      repeat_interval: 5m
+      continue: true  # Also send to other receivers
+
+    # Security alerts
+    - match_re:
+        category: 'security|authentication|authorization'
+      receiver: 'security-team'
+      group_wait: 15s
+      group_interval: 2m
+      repeat_interval: 4h
+
+    # Business alerts to business team
+    - match:
+        component: business
+      receiver: 'business-team'
+      group_wait: 1m
+      group_interval: 15m
+      repeat_interval: 24h
+
+    # Infrastructure alerts
+    - match:
+        component: infrastructure
+      receiver: 'infrastructure-team'
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 8h
+
+    # Compliance and audit alerts
+    - match_re:
+        category: 'compliance|audit'
+      receiver: 'compliance-team'
+      group_wait: 5m
+      group_interval: 30m
+      repeat_interval: 24h
+
+# Inhibition rules - suppress certain alerts when others are firing
+inhibit_rules:
+  # If service is down, don't alert on high latency
+  - source_match:
+      alertname: 'GatewayServiceDown'
+    target_match_re:
+      alertname: '.*Latency.*'
+    equal: ['instance']
+
+  # If database is down, don't alert on slow queries
+  - source_match:
+      alertname: 'DatabaseUnhealthy'
+    target_match:
+      alertname: 'SlowDatabaseQueries'
+    equal: ['cluster']
+
+  # If critical errors, suppress warnings
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'instance']
+
+  # If SLA availability violated, suppress individual errors
+  - source_match:
+      alertname: 'SLAAvailabilityViolation'
+    target_match_re:
+      alertname: '.*Error.*'
+    equal: ['cluster']
+
+# Receivers define notification targets
+receivers:
+  # Default receiver - logs only
+  - name: 'default'
+    webhook_configs:
+      - url: 'http://sark-gateway:8000/webhooks/alerts'
+        send_resolved: true
+
+  # Critical alerts to PagerDuty
+  - name: 'pagerduty-critical'
+    pagerduty_configs:
+      - routing_key: '${PAGERDUTY_ROUTING_KEY}'
+        severity: 'critical'
+        description: '{{ .CommonAnnotations.summary }}'
+        details:
+          firing: '{{ template "pagerduty.default.instances" .Alerts.Firing }}'
+          resolved: '{{ template "pagerduty.default.instances" .Alerts.Resolved }}'
+          impact: '{{ .CommonAnnotations.impact }}'
+          action: '{{ .CommonAnnotations.action }}'
+        send_resolved: true
+
+  # Security team notifications
+  - name: 'security-team'
+    slack_configs:
+      - channel: '#security-alerts'
+        username: 'SARK Security'
+        icon_emoji: ':shield:'
+        title: '{{ .CommonAnnotations.summary }}'
+        text: |
+          *Alert:* {{ .CommonAnnotations.summary }}
+          *Severity:* {{ .CommonLabels.severity }}
+          *Description:* {{ .CommonAnnotations.description }}
+          *Impact:* {{ .CommonAnnotations.impact }}
+          *Action Required:* {{ .CommonAnnotations.action }}
+          *Runbook:* {{ .CommonAnnotations.runbook_url }}
+        send_resolved: true
+    email_configs:
+      - to: '${SECURITY_EMAIL}'
+        subject: '[SARK Security] {{ .CommonAnnotations.summary }}'
+        html: |
+          <h2>{{ .CommonAnnotations.summary }}</h2>
+          <p><strong>Severity:</strong> {{ .CommonLabels.severity }}</p>
+          <p><strong>Description:</strong> {{ .CommonAnnotations.description }}</p>
+          <p><strong>Impact:</strong> {{ .CommonAnnotations.impact }}</p>
+          <p><strong>Action:</strong> {{ .CommonAnnotations.action }}</p>
+          <p><a href="{{ .CommonAnnotations.runbook_url }}">View Runbook</a></p>
+        send_resolved: true
+
+  # Infrastructure team
+  - name: 'infrastructure-team'
+    slack_configs:
+      - channel: '#infrastructure-alerts'
+        username: 'SARK Infrastructure'
+        icon_emoji: ':warning:'
+        title: '{{ .CommonAnnotations.summary }}'
+        text: |
+          *Alert:* {{ .CommonAnnotations.summary }}
+          *Severity:* {{ .CommonLabels.severity }}
+          *Description:* {{ .CommonAnnotations.description }}
+          *Runbook:* {{ .CommonAnnotations.runbook_url }}
+        send_resolved: true
+
+  # Business team
+  - name: 'business-team'
+    email_configs:
+      - to: '${BUSINESS_EMAIL}'
+        subject: '[SARK Business Alert] {{ .CommonAnnotations.summary }}'
+        html: |
+          <h2>{{ .CommonAnnotations.summary }}</h2>
+          <p><strong>Description:</strong> {{ .CommonAnnotations.description }}</p>
+          <p><strong>Impact:</strong> {{ .CommonAnnotations.impact }}</p>
+          <p><strong>Action:</strong> {{ .CommonAnnotations.action }}</p>
+        send_resolved: true
+    slack_configs:
+      - channel: '#business-alerts'
+        username: 'SARK Business'
+        icon_emoji: ':chart_with_upwards_trend:'
+        title: '{{ .CommonAnnotations.summary }}'
+        send_resolved: true
+
+  # Compliance team
+  - name: 'compliance-team'
+    email_configs:
+      - to: '${COMPLIANCE_EMAIL}'
+        subject: '[SARK Compliance] {{ .CommonAnnotations.summary }}'
+        html: |
+          <h2>{{ .CommonAnnotations.summary }}</h2>
+          <p><strong>Severity:</strong> {{ .CommonLabels.severity }}</p>
+          <p><strong>Description:</strong> {{ .CommonAnnotations.description }}</p>
+          <p><strong>Impact:</strong> {{ .CommonAnnotations.impact }}</p>
+          <p><strong>Action Required:</strong> {{ .CommonAnnotations.action }}</p>
+        send_resolved: true
