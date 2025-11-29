@@ -51,6 +51,15 @@ See `advanced_example.py` for rate limiting and circuit breaker usage.
 python advanced_example.py
 ```
 
+### 5. Real-World Integration (GitHub API)
+
+See `github_api_example.py` for a complete real-world example.
+
+```bash
+export GITHUB_TOKEN='your_token_here'
+python github_api_example.py
+```
+
 ## File Structure
 
 ```
@@ -60,7 +69,7 @@ http-adapter-example/
 ├── openapi_discovery.py      # OpenAPI discovery
 ├── auth_examples.py          # Authentication strategies
 ├── advanced_example.py       # Rate limiting and circuit breaker
-└── test_api_spec.json        # Sample OpenAPI spec for testing
+└── github_api_example.py     # Real-world GitHub API integration
 ```
 
 ## Configuration
