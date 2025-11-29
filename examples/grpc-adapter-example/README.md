@@ -17,6 +17,7 @@ The gRPC Adapter enables SARK to:
 - `basic_example.py` - Basic usage of gRPC adapter
 - `streaming_example.py` - Server streaming RPC example
 - `authenticated_example.py` - mTLS and token auth examples
+- `bidirectional_chat_example.py` - **NEW!** Enhanced bidirectional streaming demo
 - `mock_grpc_server.py` - Mock gRPC server for testing
 
 ## Prerequisites
@@ -67,6 +68,19 @@ This demonstrates:
 - Bearer token authentication
 - API key authentication
 - Custom metadata injection
+
+### 5. Run Enhanced Bidirectional Streaming Example (BONUS)
+
+```bash
+python bidirectional_chat_example.py
+```
+
+This demonstrates:
+- Real-time bidirectional communication
+- Chat-like message streaming
+- Advanced stream lifecycle management
+- Response processing as they arrive
+- Error handling and recovery
 
 ## Example Output
 
