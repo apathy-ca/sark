@@ -1,0 +1,113 @@
+classDiagram
+    class ProtocolAdapter {
+        <<abstract>>
+        +protocol_name: str
+        +protocol_version: str
+        +discover_resources(config)* List~Resource~
+        +get_capabilities(resource)* List~Capability~
+        +validate_request(request)* bool
+        +invoke(request)* InvocationResult
+        +health_check(resource)* bool
+        +invoke_streaming(request) AsyncIterator
+        +invoke_batch(requests) List~InvocationResult~
+        +on_resource_registered(resource)
+        +on_resource_unregistered(resource)
+    }
+
+    class MCPAdapter {
+        +protocol_name = "mcp"
+        +protocol_version = "2024-11-05"
+        -servers: Dict
+        +discover_resources(config)
+        +get_capabilities(resource)
+        +validate_request(request)
+        +invoke(request)
+        +health_check(resource)
+        +invoke_streaming(request)
+        -start_mcp_server()
+        -get_server_connection()
+    }
+
+    class HTTPAdapter {
+        +protocol_name = "http"
+        +protocol_version = "1.1"
+        -clients: Dict
+        +discover_resources(config)
+        +get_capabilities(resource)
+        +validate_request(request)
+        +invoke(request)
+        +health_check(resource)
+        +invoke_batch(requests)
+        -fetch_openapi_spec()
+        -build_http_request()
+    }
+
+    class GRPCAdapter {
+        +protocol_name = "grpc"
+        +protocol_version = "1.0"
+        -channels: Dict
+        +discover_resources(config)
+        +get_capabilities(resource)
+        +validate_request(request)
+        +invoke(request)
+        +health_check(resource)
+        +invoke_streaming(request)
+        -use_reflection()
+        -parse_protobuf()
+    }
+
+    class AdapterRegistry {
+        -adapters: Dict
+        +register(adapter)
+        +get(protocol) ProtocolAdapter
+        +list_protocols() List~str~
+        +get_adapter_info(protocol) Dict
+    }
+
+    class ResourceSchema {
+        +id: str
+        +name: str
+        +protocol: str
+        +endpoint: str
+        +sensitivity_level: str
+        +metadata: Dict
+        +created_at: datetime
+        +updated_at: datetime
+    }
+
+    class CapabilitySchema {
+        +id: str
+        +resource_id: str
+        +name: str
+        +description: str
+        +input_schema: Dict
+        +output_schema: Dict
+        +sensitivity_level: str
+        +metadata: Dict
+    }
+
+    class InvocationRequest {
+        +capability_id: str
+        +principal_id: str
+        +arguments: Dict
+        +context: Dict
+    }
+
+    class InvocationResult {
+        +success: bool
+        +result: Any
+        +error: str
+        +metadata: Dict
+        +duration_ms: float
+    }
+
+    ProtocolAdapter <|-- MCPAdapter : implements
+    ProtocolAdapter <|-- HTTPAdapter : implements
+    ProtocolAdapter <|-- GRPCAdapter : implements
+
+    AdapterRegistry o-- ProtocolAdapter : manages
+
+    ProtocolAdapter ..> ResourceSchema : returns
+    ProtocolAdapter ..> CapabilitySchema : returns
+    ProtocolAdapter ..> InvocationRequest : accepts
+    ProtocolAdapter ..> InvocationResult : returns

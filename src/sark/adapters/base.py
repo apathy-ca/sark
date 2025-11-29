@@ -381,11 +381,15 @@ class ProtocolAdapter(ABC):
             Streaming is typically used for long-running operations or
             large result sets where incremental processing is beneficial.
         """
+        # Make this an async generator that raises immediately
+        # This allows it to be used with `async for` syntax
         raise UnsupportedOperationError(
             f"Streaming is not supported by {self.protocol_name} adapter",
             operation="invoke_streaming",
             adapter_name=self.protocol_name
         )
+        # Make this unreachable code to satisfy the async generator requirement
+        yield  # pragma: no cover
 
     async def invoke_batch(
         self,

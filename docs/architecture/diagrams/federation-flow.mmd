@@ -1,0 +1,46 @@
+sequenceDiagram
+    participant Alice as Alice@OrgA
+    participant NodeA as SARK Node A<br/>(Organization A)
+    participant NodeB as SARK Node B<br/>(Organization B)
+    participant Resource as Resource@OrgB
+
+    Note over Alice,Resource: Cross-Organization Authorization Flow
+
+    Alice->>NodeA: Execute capability@orgb.com
+    Note over NodeA: Detect resource<br/>belongs to Org B
+
+    NodeA->>NodeA: Build cross-org<br/>auth request
+
+    NodeA->>NodeB: mTLS: POST /federation/authorize<br/>{principal: alice@orga.com}
+    Note over NodeB: Validate mTLS cert<br/>Check trust anchor
+
+    NodeB->>NodeB: Evaluate policy<br/>for cross-org access
+    Note over NodeB: Check if alice@orga.com<br/>is allowed from OrgA
+
+    alt Policy: Allow
+        NodeB-->>NodeA: 200 OK<br/>{decision: "allow", ttl: 300}
+
+        NodeA->>NodeA: Cache decision (5min)
+        NodeA->>Resource: Invoke capability<br/>(on behalf of alice@orga.com)
+        Resource-->>NodeA: Result
+
+        par Audit Correlation
+            NodeA->>NodeA: Log: cross_org_request<br/>correlation_id: corr-456
+        and
+            NodeB->>NodeB: Log: cross_org_authorization<br/>correlation_id: corr-456
+        end
+
+        NodeA-->>Alice: Success + Result
+    else Policy: Deny
+        NodeB-->>NodeA: 200 OK<br/>{decision: "deny", reason: "..."}
+
+        par Audit Correlation
+            NodeA->>NodeA: Log: cross_org_request_denied<br/>correlation_id: corr-789
+        and
+            NodeB->>NodeB: Log: cross_org_authorization_denied<br/>correlation_id: corr-789
+        end
+
+        NodeA-->>Alice: 403 Forbidden
+    end
+
+    Note over NodeA,NodeB: Both orgs have complete<br/>audit trail with same<br/>correlation_id
