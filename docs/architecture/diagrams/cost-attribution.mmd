@@ -1,0 +1,136 @@
+%% SARK v2.0 Cost Attribution Flow
+%% This diagram shows how costs are estimated, tracked, and enforced
+
+graph TB
+    subgraph "Client Request"
+        Client[API Client]
+        Request[Invocation Request]
+    end
+
+    subgraph "Cost Attribution Layer"
+        CostTracker[Cost Tracker Service]
+        AttributionService[Cost Attribution Service]
+
+        subgraph "Cost Estimators"
+            BaseEstimator[Cost Estimator Interface]
+            OpenAIEstimator[OpenAI Estimator]
+            AnthropicEstimator[Anthropic Estimator]
+            FixedEstimator[Fixed Cost Estimator]
+            NoCostEstimator[No Cost Estimator]
+        end
+    end
+
+    subgraph "Budget Management"
+        BudgetCheck[Budget Checker]
+        BudgetDB[(Principal Budgets)]
+
+        subgraph "Budget Types"
+            DailyBudget[Daily Budget]
+            MonthlyBudget[Monthly Budget]
+        end
+    end
+
+    subgraph "Cost Recording"
+        CostDB[(Cost Tracking DB)]
+
+        subgraph "Cost Types"
+            EstimatedCost[Estimated Cost]
+            ActualCost[Actual Cost]
+        end
+    end
+
+    subgraph "Adapter Layer"
+        Adapter[Protocol Adapter]
+        ResourceMetadata[Resource Metadata]
+    end
+
+    subgraph "Policy Integration"
+        PolicyPlugin[Cost-Aware Policy Plugin]
+        PluginManager[Policy Plugin Manager]
+    end
+
+    subgraph "External Services"
+        OpenAI[OpenAI API]
+        Anthropic[Anthropic API]
+        CustomAPI[Custom API]
+    end
+
+    subgraph "Reporting & Analytics"
+        CostReport[Cost Summary Service]
+
+        subgraph "Report Types"
+            ByPrincipal[By Principal]
+            ByResource[By Resource]
+            ByTimeRange[By Time Range]
+        end
+    end
+
+    %% Pre-invocation Flow
+    Client -->|1. Request with capability_id| Request
+    Request -->|2. Check Budget| CostTracker
+    CostTracker -->|3. Get Metadata| ResourceMetadata
+    ResourceMetadata -->|4. Provider Info| BaseEstimator
+
+    BaseEstimator -->|5. Route to| OpenAIEstimator
+    BaseEstimator -->|5. Route to| AnthropicEstimator
+    BaseEstimator -->|5. Route to| FixedEstimator
+    BaseEstimator -->|5. Route to| NoCostEstimator
+
+    OpenAIEstimator -->|6. Estimate based on tokens| CostTracker
+    AnthropicEstimator -->|6. Estimate based on tokens| CostTracker
+
+    CostTracker -->|7. Check Budget| BudgetCheck
+    BudgetCheck -->|8. Query| BudgetDB
+    BudgetDB -->|9. Daily Limit| DailyBudget
+    BudgetDB -->|9. Monthly Limit| MonthlyBudget
+
+    BudgetCheck -->|10. Budget Status| PolicyPlugin
+    PolicyPlugin -->|11. Policy Decision| PluginManager
+    PluginManager -->|12. Allow/Deny| CostTracker
+
+    %% Invocation
+    CostTracker -->|13. If Allowed| Adapter
+    Adapter -->|14. Execute| OpenAI
+    Adapter -->|14. Execute| Anthropic
+    Adapter -->|14. Execute| CustomAPI
+
+    %% Post-invocation Flow
+    OpenAI -->|15. Response with usage| Adapter
+    Anthropic -->|15. Response with usage| Adapter
+    CustomAPI -->|15. Response| Adapter
+
+    Adapter -->|16. Extract Actual Cost| CostTracker
+    CostTracker -->|17. Record Cost| AttributionService
+
+    AttributionService -->|18. Save Estimated| EstimatedCost
+    AttributionService -->|18. Save Actual| ActualCost
+
+    EstimatedCost -->|19. Store| CostDB
+    ActualCost -->|19. Store| CostDB
+
+    AttributionService -->|20. Update Budget| BudgetDB
+
+    %% Reporting
+    CostDB -->|Query| CostReport
+    CostReport -->|Generate| ByPrincipal
+    CostReport -->|Generate| ByResource
+    CostReport -->|Generate| ByTimeRange
+
+    %% Budget Reset
+    BudgetDB -.->|Daily Reset at Midnight| DailyBudget
+    BudgetDB -.->|Monthly Reset on 1st| MonthlyBudget
+
+    %% Styling
+    classDef service fill:#4a90e2,stroke:#2e5c8a,color:#fff
+    classDef estimator fill:#7cb342,stroke:#558b2f,color:#fff
+    classDef budget fill:#ffa726,stroke:#ef6c00,color:#fff
+    classDef storage fill:#ab47bc,stroke:#7b1fa2,color:#fff
+    classDef external fill:#ef5350,stroke:#c62828,color:#fff
+    classDef report fill:#26a69a,stroke:#00796b,color:#fff
+
+    class CostTracker,AttributionService,BudgetCheck,Adapter,PolicyPlugin,PluginManager service
+    class BaseEstimator,OpenAIEstimator,AnthropicEstimator,FixedEstimator,NoCostEstimator estimator
+    class DailyBudget,MonthlyBudget budget
+    class BudgetDB,CostDB storage
+    class OpenAI,Anthropic,CustomAPI external
+    class CostReport,ByPrincipal,ByResource,ByTimeRange report
