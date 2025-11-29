@@ -108,14 +108,13 @@ class AdapterRegistry:
     def initialize(self) -> None:
         """
         Initialize the registry with built-in adapters.
-        
-        In v1.x, this is a no-op since protocol adapters are not yet implemented.
-        In v2.0, this will register MCP, HTTP, gRPC, and other adapters.
+
+        Registers MCP, HTTP, gRPC, and other adapters based on configuration.
         """
         if self._initialized:
             logger.warning("adapter_registry_already_initialized")
             return
-        
+
         config = get_settings()
 
         # Check if protocol adapters feature is enabled
@@ -126,18 +125,48 @@ class AdapterRegistry:
             )
             self._initialized = True
             return
-        
-        # In v2.0, this will register adapters based on config.protocols.enabled_protocols
-        # For v1.x, we just log that the feature is ready but not implemented
+
+        # Get enabled protocols from config
         enabled_protocols = getattr(config, 'protocols', None)
-        enabled_list = getattr(enabled_protocols, 'enabled_protocols', []) if enabled_protocols else []
+        enabled_list = getattr(enabled_protocols, 'enabled_protocols', ['mcp']) if enabled_protocols else ['mcp']
+
+        # Register MCP adapter if enabled
+        if 'mcp' in enabled_list:
+            try:
+                from sark.adapters.mcp_adapter import MCPAdapter
+                mcp_adapter = MCPAdapter()
+                self.register(mcp_adapter)
+                logger.info("mcp_adapter_registered", protocol="mcp")
+            except Exception as e:
+                logger.error("mcp_adapter_registration_failed", error=str(e))
+
+        # Register HTTP adapter if enabled
+        if 'http' in enabled_list:
+            try:
+                from sark.adapters.http.http_adapter import HTTPAdapter
+                http_adapter = HTTPAdapter()
+                self.register(http_adapter)
+                logger.info("http_adapter_registered", protocol="http")
+            except Exception as e:
+                logger.error("http_adapter_registration_failed", error=str(e))
+
+        # Register gRPC adapter if enabled
+        if 'grpc' in enabled_list:
+            try:
+                from sark.adapters.grpc_adapter import GRPCAdapter
+                grpc_adapter = GRPCAdapter()
+                self.register(grpc_adapter)
+                logger.info("grpc_adapter_registered", protocol="grpc")
+            except Exception as e:
+                logger.error("grpc_adapter_registration_failed", error=str(e))
 
         logger.info(
             "adapter_registry_initialized",
             enabled_protocols=enabled_list,
-            message="Adapter registry ready (v2.0 adapters not yet implemented)"
+            registered_count=len(self._adapters),
+            registered_protocols=list(self._adapters.keys())
         )
-        
+
         self._initialized = True
     
     def get_info(self) -> Dict[str, any]:
