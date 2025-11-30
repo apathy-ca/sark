@@ -231,6 +231,9 @@ markers = [
     "user_flow: marks tests as user flow tests",
     "admin_flow: marks tests as admin flow tests",
     "bulk_operations: marks tests as bulk operation tests",
+    "v2: marks tests for SARK v2.0 features",
+    "federation: marks tests for federation features",
+    "chaos: marks tests for chaos engineering",
 ]
 
 [tool.coverage.run]
