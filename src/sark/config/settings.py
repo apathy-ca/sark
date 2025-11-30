@@ -19,7 +19,7 @@ class Settings(BaseSettings):
 
     # Application
     app_name: str = "SARK"
-    app_version: str = "0.1.0"
+    app_version: str = "2.0.0"
     environment: str = Field(default="development", pattern="^(development|staging|production)$")
     debug: bool = False
     log_level: str = Field(default="INFO", pattern="^(DEBUG|INFO|WARNING|ERROR|CRITICAL)$")
