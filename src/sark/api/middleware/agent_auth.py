@@ -38,8 +38,7 @@ def extract_agent_context(token: str) -> AgentContext:
 
         settings = get_settings()
 
-        # Decode and validate JWT
-        # TODO: Use proper JWT validation with signature verification
+        # Decode and validate JWT with full signature verification
         payload = jwt.decode(
             token,
             settings.secret_key,

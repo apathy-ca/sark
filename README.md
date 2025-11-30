@@ -1,13 +1,17 @@
 # SARK (Security Audit and Resource Kontroler)
 
-**Enterprise-Grade MCP Governance System**
+## 🚀 Now Supporting v2.0 - Protocol-Agnostic AI Governance! 🚀
+
+**Enterprise-Grade Multi-Protocol AI Governance Platform**
 
 > *"He's not any kind of user, SARK, he's a program."*
 > —MCP, probably
 
-SARK provides enterprise-grade security and governance for Model Context Protocol (MCP) deployments at massive scale. This system addresses discovery, authorization, audit, runtime enforcement, and API Gateway integration—enabling safe MCP adoption across large organizations.
+**SARK v2.0** provides enterprise-grade security and governance for AI deployments at massive scale. Originally built for Model Context Protocol (MCP), v2.0 now supports **MCP, HTTP/REST, gRPC, and any future protocol** through a universal adapter interface.
 
-**Target Scale:** 50,000+ employees, 10,000+ MCP servers
+📖 **[What's New in v2.0?](RELEASE_NOTES_v2.0.0.md)** | **[Migration Guide](MIGRATION_v1_to_v2.md)** | **[Get Started in 5 Minutes](docs/GETTING_STARTED_5MIN.md)**
+
+**Target Scale:** 50,000+ employees, 10,000+ AI resources across multiple protocols
 
 ## What is MCP?
 

@@ -1,6 +1,6 @@
 [project]
 name = "sark"
-version = "0.1.0"
+version = "2.0.0"
 description = "SARK - Security Audit and Resource Kontroler for MCP Governance"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -35,8 +35,6 @@ dependencies = [
     "hvac>=1.1.0",
     "kubernetes>=27.0.0",
     "aiokafka>=0.8.0",
-    "ldap3>=2.9.1",
-    "authlib>=1.2.0",
     "grpcio>=1.60.0",
     "grpcio-reflection>=1.60.0",
     "grpcio-tools>=1.60.0",

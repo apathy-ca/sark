@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from sark.api.dependencies import CurrentUser
 from sark.db.session import get_db
 from sark.services.auth.api_keys import APIKeyService
 
@@ -104,10 +105,11 @@ async def get_api_key_service(
 async def create_api_key(
     request: APIKeyCreateRequest,
     service: Annotated[APIKeyService, Depends(get_api_key_service)],
-    # TODO: Add authentication dependency to get current user
-    # current_user: Annotated[User, Depends(get_current_user)],
+    current_user: CurrentUser,
 ) -> APIKeyCreateResponse:
     """Create a new API key.
+
+    **Authentication Required:** This endpoint requires a valid authentication token.
 
     **Important:** The API key secret is returned only once. Save it securely!
 
@@ -120,8 +122,14 @@ async def create_api_key(
     - `audit:read` - Read audit logs
     - `admin` - Full admin access
     """
-    # TODO: Replace with actual user ID from authentication
-    user_id = uuid.uuid4()  # Mock user ID for now
+    # Convert user_id string to UUID (user_id comes from authenticated context)
+    try:
+        user_id = uuid.UUID(current_user.user_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid user ID format",
+        )
 
     try:
         api_key, full_key = await service.create_api_key(
@@ -150,13 +158,22 @@ async def create_api_key(
 @router.get("", response_model=list[APIKeyResponse])
 async def list_api_keys(
     service: Annotated[APIKeyService, Depends(get_api_key_service)],
+    current_user: CurrentUser,
     team_id: uuid.UUID | None = None,
     include_revoked: bool = False,
-    # current_user: Annotated[User, Depends(get_current_user)],
 ) -> list[APIKeyResponse]:
-    """List API keys for the current user or team."""
-    # TODO: Replace with actual user ID from authentication
-    user_id = uuid.uuid4()  # Mock user ID for now
+    """List API keys for the current user or team.
+
+    **Authentication Required:** Returns only keys owned by the authenticated user.
+    """
+    # Convert user_id string to UUID
+    try:
+        user_id = uuid.UUID(current_user.user_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid user ID format",
+        )
 
     api_keys = await service.list_api_keys(
         user_id=user_id,
@@ -171,9 +188,22 @@ async def list_api_keys(
 async def get_api_key(
     key_id: uuid.UUID,
     service: Annotated[APIKeyService, Depends(get_api_key_service)],
-    # current_user: Annotated[User, Depends(get_current_user)],
+    current_user: CurrentUser,
 ) -> APIKeyResponse:
-    """Get an API key by ID."""
+    """Get an API key by ID.
+
+    **Authentication Required:** Users can only access their own API keys.
+    Admins can access all keys.
+    """
+    # Convert user_id string to UUID
+    try:
+        user_id = uuid.UUID(current_user.user_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid user ID format",
+        )
+
     api_key = await service.get_api_key_by_id(key_id)
 
     if not api_key:
@@ -182,7 +212,12 @@ async def get_api_key(
             detail="API key not found",
         )
 
-    # TODO: Check if current user owns this key or has admin access
+    # Ownership check: Users can only access their own keys (unless admin)
+    if api_key.user_id != user_id and not current_user.is_admin():
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: You can only access your own API keys",
+        )
 
     return APIKeyResponse.model_validate(api_key)
 
@@ -192,9 +227,29 @@ async def update_api_key(
     key_id: uuid.UUID,
     request: APIKeyUpdateRequest,
     service: Annotated[APIKeyService, Depends(get_api_key_service)],
-    # current_user: Annotated[User, Depends(get_current_user)],
+    current_user: CurrentUser,
 ) -> APIKeyResponse:
-    """Update an API key's metadata."""
+    """Update an API key's metadata.
+
+    **Authentication Required:** Users can only update their own API keys.
+    """
+    # Convert user_id string to UUID
+    try:
+        user_id = uuid.UUID(current_user.user_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid user ID format",
+        )
+
+    # Check ownership before updating
+    existing_key = await service.get_api_key_by_id(key_id)
+    if existing_key and existing_key.user_id != user_id and not current_user.is_admin():
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: You can only update your own API keys",
+        )
+
     try:
         api_key = await service.update_api_key(
             key_id=key_id,
@@ -224,13 +279,32 @@ async def update_api_key(
 async def rotate_api_key(
     key_id: uuid.UUID,
     service: Annotated[APIKeyService, Depends(get_api_key_service)],
+    current_user: CurrentUser,
     environment: str = "live",
-    # current_user: Annotated[User, Depends(get_current_user)],
 ) -> APIKeyRotateResponse:
     """Rotate an API key (generate new credentials).
 
+    **Authentication Required:** Users can only rotate their own API keys.
+
     **Important:** The new API key is returned only once. Update your applications!
     """
+    # Convert user_id string to UUID
+    try:
+        user_id = uuid.UUID(current_user.user_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid user ID format",
+        )
+
+    # Check ownership before rotating
+    existing_key = await service.get_api_key_by_id(key_id)
+    if existing_key and existing_key.user_id != user_id and not current_user.is_admin():
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: You can only rotate your own API keys",
+        )
+
     result = await service.rotate_api_key(key_id, environment)
 
     if not result:
@@ -251,16 +325,32 @@ async def rotate_api_key(
 async def revoke_api_key(
     key_id: uuid.UUID,
     service: Annotated[APIKeyService, Depends(get_api_key_service)],
-    # current_user: Annotated[User, Depends(get_current_user)],
+    current_user: CurrentUser,
 ) -> None:
     """Revoke an API key.
 
+    **Authentication Required:** Users can only revoke their own API keys.
+
     Revoked keys cannot be used for authentication and cannot be reactivated.
     """
-    # TODO: Get actual user ID from authentication
-    revoked_by = uuid.uuid4()  # Mock user ID
+    # Convert user_id string to UUID
+    try:
+        user_id = uuid.UUID(current_user.user_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid user ID format",
+        )
 
-    success = await service.revoke_api_key(key_id, revoked_by)
+    # Check ownership before revoking
+    existing_key = await service.get_api_key_by_id(key_id)
+    if existing_key and existing_key.user_id != user_id and not current_user.is_admin():
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: You can only revoke your own API keys",
+        )
+
+    success = await service.revoke_api_key(key_id, user_id)
 
     if not success:
         raise HTTPException(
