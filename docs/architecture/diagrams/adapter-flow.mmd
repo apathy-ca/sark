@@ -1,0 +1,102 @@
+%% SARK v2.0 Protocol Adapter Flow
+%% This diagram shows how requests flow through the adapter layer
+
+graph TB
+    subgraph "Client"
+        Client[API Client]
+    end
+
+    subgraph "SARK Core"
+        API[REST API Layer]
+        AuthZ[Authorization Service]
+        PolicyEngine[Policy Engine OPA]
+        AdapterRegistry[Adapter Registry]
+        Audit[Audit Service]
+        CostTracker[Cost Tracker]
+    end
+
+    subgraph "Adapter Layer"
+        MCPAdapter[MCP Adapter]
+        HTTPAdapter[HTTP/REST Adapter]
+        GRPCAdapter[gRPC Adapter]
+    end
+
+    subgraph "Adapter Features"
+        subgraph "HTTP Adapter"
+            OpenAPI[OpenAPI Discovery]
+            Auth[5 Auth Strategies]
+            RateLimit[Rate Limiter]
+            CircuitBreaker[Circuit Breaker]
+        end
+
+        subgraph "gRPC Adapter"
+            Reflection[gRPC Reflection]
+            mTLS[mTLS Support]
+            Streaming[4 RPC Types]
+        end
+
+        subgraph "MCP Adapter"
+            StdIO[stdio Transport]
+            SSE[SSE Transport]
+            Tools[Tool Discovery]
+        end
+    end
+
+    subgraph "External Resources"
+        MCPServer[MCP Server]
+        RESTAPI[REST API]
+        gRPCService[gRPC Service]
+    end
+
+    %% Request Flow
+    Client -->|1. Invoke Capability| API
+    API -->|2. Evaluate Policy| PolicyEngine
+    PolicyEngine -->|3. Check Cost| CostTracker
+    CostTracker -->|4. Estimate Cost| AdapterRegistry
+    AdapterRegistry -->|5. Select Adapter| MCPAdapter
+    AdapterRegistry -->|5. Select Adapter| HTTPAdapter
+    AdapterRegistry -->|5. Select Adapter| GRPCAdapter
+
+    %% Adapter to Features
+    HTTPAdapter --> OpenAPI
+    HTTPAdapter --> Auth
+    HTTPAdapter --> RateLimit
+    HTTPAdapter --> CircuitBreaker
+
+    GRPCAdapter --> Reflection
+    GRPCAdapter --> mTLS
+    GRPCAdapter --> Streaming
+
+    MCPAdapter --> StdIO
+    MCPAdapter --> SSE
+    MCPAdapter --> Tools
+
+    %% Adapter to Resource
+    MCPAdapter -->|6. Invoke via Protocol| MCPServer
+    HTTPAdapter -->|6. Invoke via Protocol| RESTAPI
+    GRPCAdapter -->|6. Invoke via Protocol| gRPCService
+
+    %% Response Flow
+    MCPServer -->|7. Response| MCPAdapter
+    RESTAPI -->|7. Response| HTTPAdapter
+    gRPCService -->|7. Response| GRPCAdapter
+
+    MCPAdapter -->|8. Return Result| AdapterRegistry
+    HTTPAdapter -->|8. Return Result| AdapterRegistry
+    GRPCAdapter -->|8. Return Result| AdapterRegistry
+
+    AdapterRegistry -->|9. Record Cost| CostTracker
+    AdapterRegistry -->|10. Log Audit| Audit
+    AdapterRegistry -->|11. Response| API
+    API -->|12. Return to Client| Client
+
+    %% Styling
+    classDef coreService fill:#4a90e2,stroke:#2e5c8a,color:#fff
+    classDef adapter fill:#7cb342,stroke:#558b2f,color:#fff
+    classDef feature fill:#ffa726,stroke:#ef6c00,color:#fff
+    classDef external fill:#ab47bc,stroke:#7b1fa2,color:#fff
+
+    class API,AuthZ,PolicyEngine,AdapterRegistry,Audit,CostTracker coreService
+    class MCPAdapter,HTTPAdapter,GRPCAdapter adapter
+    class OpenAPI,Auth,RateLimit,CircuitBreaker,Reflection,mTLS,Streaming,StdIO,SSE,Tools feature
+    class MCPServer,RESTAPI,gRPCService external
