@@ -10,59 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Nothing yet
 
-## [2.0.0] - 2025-11-30
-
-### Overview
-**Major Release:** Complete architectural transformation from MCP-specific to protocol-agnostic AI governance platform.
-
-See [RELEASE_NOTES_v2.0.0.md](RELEASE_NOTES_v2.0.0.md) for comprehensive release documentation.
-
-### Added
-- **Protocol-Agnostic Architecture**: Universal `ProtocolAdapter` interface for governing any AI/API protocol
-- **MCP Protocol Adapter**: Full support for MCP (stdio, SSE, HTTP transports)
-- **HTTP/REST Adapter**: OpenAPI discovery, 5 authentication strategies, rate limiting, circuit breaker
-- **gRPC Protocol Adapter**: Reflection-based discovery, all RPC types, mTLS support
-- **Cross-Organization Federation**: Multi-tenant resource sharing with mTLS trust
-- **Cost Attribution & Budgets**: Track and control AI costs across providers (OpenAI, Anthropic)
-- **Policy Plugin System**: Extend policy logic with custom Python plugins
-- **TimescaleDB Integration**: Time-series optimization for invocations and cost tracking
-- **Enhanced Security**: mTLS support, plugin sandbox, multi-tenant isolation
-- **Comprehensive Documentation**: 100+ pages of guides, tutorials, examples, migration docs
-
-### Changed
-- **Architecture**: Separated protocol logic from governance core
-- **Database Schema**: Added protocol-agnostic tables (resources, capabilities, federation_trusts, cost_tracking)
-- **Configuration**: New feature flags for protocol adapters, cost attribution, federation
-
-### Security
-- ✅ **FIXED**: API keys endpoints now require authentication (P0 CRITICAL)
-- ✅ **FIXED**: OIDC state parameter validation for CSRF protection (P0 CRITICAL)
-- Enhanced audit trail for all invocations
-- mTLS support for gRPC and federation
-- Policy plugin sandbox with restricted execution
-- 28 mTLS security tests, 103 penetration test scenarios
-
-### Performance
-- HTTP adapter: 50-200ms invocation latency
-- gRPC adapter: 10-50ms invocation latency
-- Cost estimation: <1ms
-- TimescaleDB query optimization: 10-100x faster for time-series data
-
-### Breaking Changes
-- **None** - v2.0 is 100% backward compatible with v1.x MCP code
-
-### Migration
-- See [MIGRATION_v1_to_v2.md](MIGRATION_v1_to_v2.md) for detailed migration guide
-- Zero code changes required for v1.x functionality
-- Gradual migration supported with feature flags
-
-### Testing
-- Total tests: 1162 collected
-- Integration tests: 79/79 passing
-- Performance tests: 28 scenarios passing
-- Security tests: 131+ scenarios passing
-- Zero regressions from v1.x
-
 ## [1.1.0] - 2025-XX-XX
 
 ### Added
