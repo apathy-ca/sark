@@ -1,0 +1,306 @@
+version: '3.8'
+
+# SARK v2.0 Integration Testing Environment
+#
+# This compose file sets up a complete v2.0 testing environment including:
+# - Multiple SARK nodes for federation testing
+# - Mock protocol servers (MCP, HTTP, gRPC)
+# - Supporting services (PostgreSQL, Redis, OPA)
+
+services:
+  # ============================================================================
+  # SARK Nodes for Federation Testing
+  # ============================================================================
+
+  sark-node-a:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sark-node-a
+    environment:
+      - SARK_NODE_NAME=org-a
+      - SARK_NODE_ENDPOINT=https://sark-node-a:8443
+      - POSTGRES_HOST=postgres-a
+      - POSTGRES_DB=sark_org_a
+      - REDIS_HOST=redis-a
+      - OPA_URL=http://opa-a:8181
+      - FEATURE_PROTOCOL_ADAPTERS=true
+      - FEATURE_FEDERATION=true
+      - FEDERATION_ENABLED=true
+      - FEDERATION_MODE=multi-node
+      - LOG_LEVEL=DEBUG
+    ports:
+      - "8000:8000"
+      - "8443:8443"
+    depends_on:
+      - postgres-a
+      - redis-a
+      - opa-a
+    networks:
+      - sark-v2-test
+    volumes:
+      - ./tests/fixtures/certs:/certs:ro
+      - ./tests/integration/v2:/app/tests/integration/v2:ro
+
+  sark-node-b:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sark-node-b
+    environment:
+      - SARK_NODE_NAME=org-b
+      - SARK_NODE_ENDPOINT=https://sark-node-b:8443
+      - POSTGRES_HOST=postgres-b
+      - POSTGRES_DB=sark_org_b
+      - REDIS_HOST=redis-b
+      - OPA_URL=http://opa-b:8181
+      - FEATURE_PROTOCOL_ADAPTERS=true
+      - FEATURE_FEDERATION=true
+      - FEDERATION_ENABLED=true
+      - FEDERATION_MODE=multi-node
+      - LOG_LEVEL=DEBUG
+    ports:
+      - "8001:8000"
+      - "8444:8443"
+    depends_on:
+      - postgres-b
+      - redis-b
+      - opa-b
+    networks:
+      - sark-v2-test
+    volumes:
+      - ./tests/fixtures/certs:/certs:ro
+
+  sark-node-c:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sark-node-c
+    environment:
+      - SARK_NODE_NAME=org-c
+      - SARK_NODE_ENDPOINT=https://sark-node-c:8443
+      - POSTGRES_HOST=postgres-c
+      - POSTGRES_DB=sark_org_c
+      - REDIS_HOST=redis-c
+      - OPA_URL=http://opa-c:8181
+      - FEATURE_PROTOCOL_ADAPTERS=true
+      - FEATURE_FEDERATION=true
+      - FEDERATION_ENABLED=true
+      - FEDERATION_MODE=multi-node
+      - LOG_LEVEL=DEBUG
+    ports:
+      - "8002:8000"
+      - "8445:8443"
+    depends_on:
+      - postgres-c
+      - redis-c
+      - opa-c
+    networks:
+      - sark-v2-test
+    volumes:
+      - ./tests/fixtures/certs:/certs:ro
+
+  # ============================================================================
+  # Database Services (one per SARK node)
+  # ============================================================================
+
+  postgres-a:
+    image: postgres:15-alpine
+    container_name: postgres-a
+    environment:
+      - POSTGRES_DB=sark_org_a
+      - POSTGRES_USER=sark
+      - POSTGRES_PASSWORD=sark_test_password
+    networks:
+      - sark-v2-test
+    volumes:
+      - postgres-a-data:/var/lib/postgresql/data
+
+  postgres-b:
+    image: postgres:15-alpine
+    container_name: postgres-b
+    environment:
+      - POSTGRES_DB=sark_org_b
+      - POSTGRES_USER=sark
+      - POSTGRES_PASSWORD=sark_test_password
+    networks:
+      - sark-v2-test
+    volumes:
+      - postgres-b-data:/var/lib/postgresql/data
+
+  postgres-c:
+    image: postgres:15-alpine
+    container_name: postgres-c
+    environment:
+      - POSTGRES_DB=sark_org_c
+      - POSTGRES_USER=sark
+      - POSTGRES_PASSWORD=sark_test_password
+    networks:
+      - sark-v2-test
+    volumes:
+      - postgres-c-data:/var/lib/postgresql/data
+
+  # ============================================================================
+  # Redis Services (one per SARK node)
+  # ============================================================================
+
+  redis-a:
+    image: redis:7-alpine
+    container_name: redis-a
+    networks:
+      - sark-v2-test
+    volumes:
+      - redis-a-data:/data
+
+  redis-b:
+    image: redis:7-alpine
+    container_name: redis-b
+    networks:
+      - sark-v2-test
+    volumes:
+      - redis-b-data:/data
+
+  redis-c:
+    image: redis:7-alpine
+    container_name: redis-c
+    networks:
+      - sark-v2-test
+    volumes:
+      - redis-c-data:/data
+
+  # ============================================================================
+  # OPA Services (one per SARK node)
+  # ============================================================================
+
+  opa-a:
+    image: openpolicyagent/opa:latest
+    container_name: opa-a
+    command: run --server --log-level debug
+    ports:
+      - "8181:8181"
+    networks:
+      - sark-v2-test
+    volumes:
+      - ./opa/policies:/policies:ro
+
+  opa-b:
+    image: openpolicyagent/opa:latest
+    container_name: opa-b
+    command: run --server --log-level debug
+    ports:
+      - "8182:8181"
+    networks:
+      - sark-v2-test
+    volumes:
+      - ./opa/policies:/policies:ro
+
+  opa-c:
+    image: openpolicyagent/opa:latest
+    container_name: opa-c
+    command: run --server --log-level debug
+    ports:
+      - "8183:8181"
+    networks:
+      - sark-v2-test
+    volumes:
+      - ./opa/policies:/policies:ro
+
+  # ============================================================================
+  # Mock Protocol Servers for Testing
+  # ============================================================================
+
+  mock-mcp-server:
+    image: node:20-alpine
+    container_name: mock-mcp-server
+    working_dir: /app
+    command: npx -y @modelcontextprotocol/server-filesystem /tmp
+    networks:
+      - sark-v2-test
+    volumes:
+      - mock-mcp-data:/tmp
+
+  mock-http-api:
+    image: kennethreitz/httpbin
+    container_name: mock-http-api
+    ports:
+      - "8080:80"
+    networks:
+      - sark-v2-test
+
+  mock-grpc-service:
+    build:
+      context: ./tests/fixtures/grpc-mock
+      dockerfile: Dockerfile
+    container_name: mock-grpc-service
+    ports:
+      - "50051:50051"
+    networks:
+      - sark-v2-test
+    environment:
+      - GRPC_PORT=50051
+      - LOG_LEVEL=DEBUG
+
+  # ============================================================================
+  # Testing Utilities
+  # ============================================================================
+
+  test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sark-test-runner
+    environment:
+      - PYTEST_ARGS=-v -m "v2"
+      - SARK_NODE_A_URL=http://sark-node-a:8000
+      - SARK_NODE_B_URL=http://sark-node-b:8000
+      - SARK_NODE_C_URL=http://sark-node-c:8000
+    command: pytest tests/integration/v2 tests/chaos -v --tb=short
+    depends_on:
+      - sark-node-a
+      - sark-node-b
+      - sark-node-c
+      - mock-mcp-server
+      - mock-http-api
+      - mock-grpc-service
+    networks:
+      - sark-v2-test
+    volumes:
+      - .:/app
+      - test-results:/app/test-results
+
+  # Chaos testing controller
+  chaos-controller:
+    image: nicolaka/netshoot
+    container_name: chaos-controller
+    command: sleep infinity
+    networks:
+      - sark-v2-test
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - ./tests/chaos:/chaos:ro
+
+# ============================================================================
+# Networks
+# ============================================================================
+
+networks:
+  sark-v2-test:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+# ============================================================================
+# Volumes
+# ============================================================================
+
+volumes:
+  postgres-a-data:
+  postgres-b-data:
+  postgres-c-data:
+  redis-a-data:
+  redis-b-data:
+  redis-c-data:
+  mock-mcp-data:
+  test-results:

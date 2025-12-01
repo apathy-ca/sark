@@ -1,0 +1,329 @@
+groups:
+  - name: sark_gateway_security_alerts
+    interval: 30s
+    rules:
+      # ========================================================================
+      # Authentication & Authorization Alerts
+      # ========================================================================
+
+      - alert: HighAuthenticationFailureRate
+        expr: |
+          sum(rate(sark_gateway_auth_failures_total[5m])) > 10
+        for: 5m
+        labels:
+          severity: warning
+          component: security
+          category: authentication
+        annotations:
+          summary: "High authentication failure rate detected"
+          description: "Authentication failures are occurring at {{ $value | humanize }} failures/sec (threshold: 10/sec)"
+          runbook_url: "https://docs.sark.io/runbooks/security/high-auth-failures"
+          impact: "Potential brute force attack or misconfigured clients"
+          action: "Review auth failure logs, check for IP patterns, consider rate limiting"
+
+      - alert: CriticalAuthenticationFailureRate
+        expr: |
+          sum(rate(sark_gateway_auth_failures_total[5m])) > 50
+        for: 2m
+        labels:
+          severity: critical
+          component: security
+          category: authentication
+        annotations:
+          summary: "CRITICAL: Authentication failure spike detected"
+          description: "Authentication failures at {{ $value | humanize }} failures/sec (threshold: 50/sec)"
+          runbook_url: "https://docs.sark.io/runbooks/security/critical-auth-failures"
+          impact: "Active brute force attack or system compromise likely"
+          action: "IMMEDIATE: Enable IP blocking, review logs, alert security team"
+
+      - alert: HighAuthorizationDenyRate
+        expr: |
+          100 * sum(rate(sark_gateway_authz_requests_total{decision="deny"}[10m]))
+          / sum(rate(sark_gateway_authz_requests_total[10m])) > 30
+        for: 10m
+        labels:
+          severity: warning
+          component: security
+          category: authorization
+        annotations:
+          summary: "High authorization denial rate"
+          description: "{{ $value | humanizePercentage }} of requests are being denied (threshold: 30%)"
+          runbook_url: "https://docs.sark.io/runbooks/security/high-deny-rate"
+          impact: "Users may be attempting unauthorized actions or policies too strict"
+          action: "Review recent policy changes and denial reasons"
+
+      - alert: A2AAuthorizationDenySpike
+        expr: |
+          sum(rate(sark_a2a_authz_requests_total{decision="deny"}[5m])) > 5
+        for: 5m
+        labels:
+          severity: warning
+          component: security
+          category: a2a
+        annotations:
+          summary: "Agent-to-Agent authorization denials increasing"
+          description: "A2A denials at {{ $value | humanize }} denials/sec"
+          runbook_url: "https://docs.sark.io/runbooks/security/a2a-denials"
+          impact: "Agents may be misconfigured or attempting unauthorized communication"
+          action: "Review A2A policies and agent configurations"
+
+      # ========================================================================
+      # Privilege Escalation Detection
+      # ========================================================================
+
+      - alert: PrivilegeEscalationAttempt
+        expr: |
+          sum(rate(sark_gateway_authz_requests_total{decision="deny", action=~".*admin.*|.*root.*|.*elevate.*"}[5m])) > 1
+        for: 5m
+        labels:
+          severity: critical
+          component: security
+          category: privilege_escalation
+        annotations:
+          summary: "Potential privilege escalation attempts detected"
+          description: "Denied admin/root action requests at {{ $value | humanize }} attempts/sec"
+          runbook_url: "https://docs.sark.io/runbooks/security/privilege-escalation"
+          impact: "Possible insider threat or compromised account"
+          action: "IMMEDIATE: Investigate user activity, review audit logs, alert security"
+
+      - alert: UnauthorizedToolInvocation
+        expr: |
+          sum(rate(sark_gateway_audit_events_total{event_type="tool_invoke", decision="deny"}[5m])) > 5
+        for: 5m
+        labels:
+          severity: warning
+          component: security
+          category: authorization
+        annotations:
+          summary: "High rate of unauthorized tool invocations"
+          description: "Tool invocation denials at {{ $value | humanize }} denials/sec"
+          runbook_url: "https://docs.sark.io/runbooks/security/unauthorized-tools"
+          impact: "Users attempting to use tools without proper authorization"
+          action: "Review tool policies and user permissions"
+
+      # ========================================================================
+      # Rate Limiting & Abuse Detection
+      # ========================================================================
+
+      - alert: RateLimitViolations
+        expr: |
+          sum(rate(sark_gateway_rate_limit_exceeded_total[5m])) > 10
+        for: 5m
+        labels:
+          severity: warning
+          component: security
+          category: rate_limiting
+        annotations:
+          summary: "High rate of rate limit violations"
+          description: "Rate limit exceeded {{ $value | humanize }} times/sec"
+          runbook_url: "https://docs.sark.io/runbooks/security/rate-limits"
+          impact: "Potential abuse or misconfigured clients"
+          action: "Review top violators, adjust rate limits if needed"
+
+      - alert: CriticalRateLimitViolations
+        expr: |
+          sum(rate(sark_gateway_rate_limit_exceeded_total[5m])) > 50
+        for: 2m
+        labels:
+          severity: critical
+          component: security
+          category: rate_limiting
+        annotations:
+          summary: "CRITICAL: Rate limit violation spike"
+          description: "Rate limit exceeded {{ $value | humanize }} times/sec (threshold: 50/sec)"
+          runbook_url: "https://docs.sark.io/runbooks/security/critical-rate-limits"
+          impact: "Active abuse or DDoS attempt"
+          action: "IMMEDIATE: Enable IP blocking, investigate traffic patterns"
+
+      - alert: SingleUserRateLimitAbuse
+        expr: |
+          max(rate(sark_gateway_rate_limit_exceeded_total[5m])) by (user) > 5
+        for: 10m
+        labels:
+          severity: warning
+          component: security
+          category: rate_limiting
+        annotations:
+          summary: "User {{ $labels.user }} exceeding rate limits"
+          description: "User rate limit violations at {{ $value | humanize }}/sec"
+          runbook_url: "https://docs.sark.io/runbooks/security/user-rate-abuse"
+          impact: "Individual user abusing API quotas"
+          action: "Contact user, review their integration, consider temporary suspension"
+
+      # ========================================================================
+      # Suspicious Activity Patterns
+      # ========================================================================
+
+      - alert: SuspiciousUserActivity
+        expr: |
+          count(
+            sum(rate(sark_gateway_auth_failures_total[5m])) by (user) > 2
+          ) > 5
+        for: 10m
+        labels:
+          severity: warning
+          component: security
+          category: suspicious_activity
+        annotations:
+          summary: "Multiple users experiencing authentication failures"
+          description: "{{ $value }} users with auth failures (threshold: 5 users)"
+          runbook_url: "https://docs.sark.io/runbooks/security/suspicious-activity"
+          impact: "Coordinated attack or system-wide auth issue"
+          action: "Investigate common patterns, check auth service health"
+
+      - alert: AbnormalToolUsagePattern
+        expr: |
+          sum(rate(sark_gateway_tool_invocations_total[5m])) by (tool, user)
+          / ignoring(user) group_left()
+          avg(sum(rate(sark_gateway_tool_invocations_total[1h])) by (tool)) > 5
+        for: 10m
+        labels:
+          severity: warning
+          component: security
+          category: suspicious_activity
+        annotations:
+          summary: "Abnormal tool usage detected"
+          description: "Tool {{ $labels.tool }} usage by {{ $labels.user }} is {{ $value }}x higher than average"
+          runbook_url: "https://docs.sark.io/runbooks/security/abnormal-usage"
+          impact: "Potential data exfiltration or compromised account"
+          action: "Review user activity logs, verify legitimate use case"
+
+      - alert: MultipleFailedToolInvocations
+        expr: |
+          sum(rate(sark_gateway_tool_invocations_total{status="error"}[5m])) by (user) > 10
+        for: 10m
+        labels:
+          severity: warning
+          component: security
+          category: suspicious_activity
+        annotations:
+          summary: "User {{ $labels.user }} has high tool invocation failure rate"
+          description: "Failed tool invocations at {{ $value | humanize }}/sec"
+          runbook_url: "https://docs.sark.io/runbooks/security/failed-invocations"
+          impact: "User may be probing for vulnerabilities or misconfigured"
+          action: "Review user's tool invocation attempts and error patterns"
+
+      # ========================================================================
+      # Security Event Anomalies
+      # ========================================================================
+
+      - alert: SecurityEventSpike
+        expr: |
+          sum(rate(sark_gateway_audit_events_total{decision="deny"}[5m]))
+          / (sum(rate(sark_gateway_audit_events_total{decision="deny"}[1h])) + 1) > 3
+        for: 5m
+        labels:
+          severity: warning
+          component: security
+          category: anomaly
+        annotations:
+          summary: "Security event rate spike detected"
+          description: "Deny events {{ $value }}x higher than hourly average"
+          runbook_url: "https://docs.sark.io/runbooks/security/event-spike"
+          impact: "Unusual security activity pattern"
+          action: "Investigate recent changes and event patterns"
+
+      - alert: CriticalSecurityErrors
+        expr: |
+          sum(rate(sark_gateway_errors_total{severity="critical", component=~".*auth.*|.*security.*"}[5m])) > 1
+        for: 5m
+        labels:
+          severity: critical
+          component: security
+          category: errors
+        annotations:
+          summary: "Critical security-related errors occurring"
+          description: "Security critical errors at {{ $value | humanize }}/sec"
+          runbook_url: "https://docs.sark.io/runbooks/security/critical-errors"
+          impact: "Security subsystem instability or attack"
+          action: "IMMEDIATE: Check error logs, verify security services health"
+
+      # ========================================================================
+      # Account Security
+      # ========================================================================
+
+      - alert: NewUserHighActivityVolume
+        expr: |
+          sum(rate(sark_gateway_requests_total[5m])) by (user)
+          unless (sum(rate(sark_gateway_requests_total[24h] offset 24h)) by (user) > 0)
+          > 100
+        for: 10m
+        labels:
+          severity: warning
+          component: security
+          category: account_security
+        annotations:
+          summary: "New user {{ $labels.user }} with unusually high activity"
+          description: "Activity rate: {{ $value | humanize }} req/sec for new user"
+          runbook_url: "https://docs.sark.io/runbooks/security/new-user-activity"
+          impact: "Potential bot account or malicious registration"
+          action: "Verify user registration, check for automated behavior"
+
+      - alert: UserAccountCompromiseIndicators
+        expr: |
+          (
+            sum(rate(sark_gateway_auth_failures_total[5m])) by (user) > 5
+          ) and (
+            sum(rate(sark_gateway_authz_requests_total{decision="deny"}[5m])) by (user) > 10
+          )
+        for: 10m
+        labels:
+          severity: critical
+          component: security
+          category: account_security
+        annotations:
+          summary: "CRITICAL: User {{ $labels.user }} shows compromise indicators"
+          description: "High auth failures AND high authorization denials"
+          runbook_url: "https://docs.sark.io/runbooks/security/account-compromise"
+          impact: "Account likely compromised or under attack"
+          action: "IMMEDIATE: Lock account, notify user, review recent activity"
+
+      # ========================================================================
+      # SIEM & Audit Security
+      # ========================================================================
+
+      - alert: AuditLoggingDegraded
+        expr: |
+          sum(rate(sark_audit_write_errors_total[5m])) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+          component: security
+          category: audit
+        annotations:
+          summary: "Audit logging experiencing errors"
+          description: "Audit write errors at {{ $value | humanize }}/sec"
+          runbook_url: "https://docs.sark.io/runbooks/security/audit-errors"
+          impact: "Security events may not be logged - compliance violation"
+          action: "IMMEDIATE: Check audit database, verify SIEM connectivity"
+
+      - alert: SIEMForwardingFailed
+        expr: |
+          sum(rate(sark_siem_forwards_total{status="error"}[5m]))
+          / sum(rate(sark_siem_forwards_total[5m])) > 0.1
+        for: 10m
+        labels:
+          severity: warning
+          component: security
+          category: siem
+        annotations:
+          summary: "SIEM forwarding failure rate elevated"
+          description: "{{ $value | humanizePercentage }} of SIEM forwards failing"
+          runbook_url: "https://docs.sark.io/runbooks/security/siem-failures"
+          impact: "Security events not reaching SIEM - reduced visibility"
+          action: "Check SIEM connectivity, verify credentials, review backpressure"
+
+      - alert: AuditQueueBacklog
+        expr: |
+          sark_audit_queue_depth / sark_audit_queue_capacity > 0.8
+        for: 10m
+        labels:
+          severity: warning
+          component: security
+          category: audit
+        annotations:
+          summary: "Audit queue nearing capacity"
+          description: "Queue at {{ $value | humanizePercentage }} capacity"
+          runbook_url: "https://docs.sark.io/runbooks/security/audit-queue"
+          impact: "Risk of audit event loss"
+          action: "Increase queue capacity or audit write throughput"

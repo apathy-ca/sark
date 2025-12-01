@@ -1,0 +1,422 @@
+groups:
+  - name: sark_gateway_infrastructure_alerts
+    interval: 30s
+    rules:
+      # ========================================================================
+      # Service Availability
+      # ========================================================================
+
+      - alert: GatewayServiceDown
+        expr: |
+          up{job="sark-gateway"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: infrastructure
+          category: availability
+        annotations:
+          summary: "CRITICAL: Gateway service is down"
+          description: "Gateway service has been unreachable for 1 minute"
+          runbook_url: "https://docs.sark.io/runbooks/infrastructure/service-down"
+          impact: "Gateway unavailable - all requests failing"
+          action: "IMMEDIATE: Check service logs, restart service, verify infrastructure"
+
+      - alert: GatewayServiceFlapping
+        expr: |
+          changes(up{job="sark-gateway"}[10m]) > 5
+        for: 5m
+        labels:
+          severity: warning
+          component: infrastructure
+          category: availability
+        annotations:
+          summary: "Gateway service is flapping"
+          description: "Service has restarted {{ $value }} times in 10 minutes"
+          runbook_url: "https://docs.sark.io/runbooks/infrastructure/service-flapping"
+          impact: "Unstable service - intermittent failures"
+          action: "Check for crashes, resource exhaustion, or infrastructure issues"
+
+      - alert: HighRequestErrorRate
+        expr: |
+          100 * sum(rate(sark_gateway_requests_total{status="error"}[5m]))
+          / sum(rate(sark_gateway_requests_total[5m])) > 5
+        for: 10m
+        labels:
+          severity: warning
+          component: infrastructure
+          category: availability
+        annotations:
+          summary: "High request error rate"
+          description: "{{ $value | humanizePercentage }} of requests failing (threshold: 5%)"
+          runbook_url: "https://docs.sark.io/runbooks/infrastructure/error-rate"
+          impact: "Degraded service quality"
+          action: "Review error logs, check dependencies, verify configuration"
+
+      - alert: CriticalRequestErrorRate
+        expr: |
+          100 * sum(rate(sark_gateway_requests_total{status="error"}[5m]))
+          / sum(rate(sark_gateway_requests_total[5m])) > 25
+        for: 5m
+        labels:
+          severity: critical
+          component: infrastructure
+          category: availability
+        annotations:
+          summary: "CRITICAL: Request error rate very high"
+          description: "{{ $value | humanizePercentage }} of requests failing (threshold: 25%)"
+          runbook_url: "https://docs.sark.io/runbooks/infrastructure/critical-error-rate"
+          impact: "Severe service degradation"
+          action: "IMMEDIATE: Check all dependencies, review recent deployments"
+
+      # ========================================================================
+      # Resource Utilization - CPU
+      # ========================================================================
+
+      - alert: HighCPUUsage
+        expr: |
+          100 * rate(process_cpu_seconds_total{job="sark-gateway"}[5m]) > 80
+        for: 15m
+        labels:
+          severity: warning
+          component: infrastructure
+          category: resources
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage at {{ $value | humanizePercentage }} (threshold: 80%)"
+          runbook_url: "https://docs.sark.io/runbooks/infrastructure/high-cpu"
+          impact: "Potential performance degradation"
+          action: "Review CPU-intensive operations, check for infinite loops, consider scaling"
+
+      - alert: CriticalCPUUsage
+        expr: |
+          100 * rate(process_cpu_seconds_total{job="sark-gateway"}[5m]) > 95
+        for: 5m
+        labels:
+          severity: critical
+          component: infrastructure
+          category: resources
+        annotations:
+          summary: "CRITICAL: CPU usage near maximum"
+          description: "CPU usage at {{ $value | humanizePercentage }} (threshold: 95%)"
+          runbook_url: "https://docs.sark.io/runbooks/infrastructure/critical-cpu"
+          impact: "Severe performance degradation - service unresponsive"
+          action: "IMMEDIATE: Scale horizontally, investigate CPU-bound operations"
+
+      # ========================================================================
+      # Resource Utilization - Memory
+      # ========================================================================
+
+      - alert: HighMemoryUsage
+        expr: |
+          process_resident_memory_bytes{job="sark-gateway"} > 2 * 1024 * 1024 * 1024
+        for: 10m
+        labels:
+          severity: warning
+          component: infrastructure
+          category: resources
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage at {{ $value | humanize1024 }} (threshold: 2GB)"
+          runbook_url: "https://docs.sark.io/runbooks/infrastructure/high-memory"
+          impact: "Risk of OOM kills"
+          action: "Review memory-intensive operations, check for memory leaks"
+
+      - alert: MemoryLeakSuspected
+        expr: |
+          rate(process_resident_memory_bytes{job="sark-gateway"}[1h]) > 50 * 1024 * 1024
+        for: 2h
+        labels:
+          severity: warning
+          component: infrastructure
+          category: resources
+        annotations:
+          summary: "Potential memory leak detected"
+          description: "Memory growing at {{ $value | humanize1024 }}/hour"
+          runbook_url: "https://docs.sark.io/runbooks/infrastructure/memory-leak"
+          impact: "Eventual OOM and service crash"
+          action: "Profile application, review recent code changes, plan restart"
+
+      - alert: CriticalMemoryUsage
+        expr: |
+          process_resident_memory_bytes{job="sark-gateway"} > 4 * 1024 * 1024 * 1024
+        for: 5m
+        labels:
+          severity: critical
+          component: infrastructure
+          category: resources
+        annotations:
+          summary: "CRITICAL: Memory usage near limit"
+          description: "Memory at {{ $value | humanize1024 }} (threshold: 4GB)"
+          runbook_url: "https://docs.sark.io/runbooks/infrastructure/critical-memory"
+          impact: "Imminent OOM kill risk"
+          action: "IMMEDIATE: Restart service, investigate memory usage, increase limits"
+
+      # ========================================================================
+      # Resource Utilization - Connections
+      # ========================================================================
+
+      - alert: HighConnectionCount
+        expr: |
+          sum(sark_gateway_active_connections) > 1000
+        for: 10m
+        labels:
+          severity: warning
+          component: infrastructure
+          category: resources
+        annotations:
+          summary: "High number of active connections"
+          description: "{{ $value }} active connections (threshold: 1000)"
+          runbook_url: "https://docs.sark.io/runbooks/infrastructure/high-connections"
+          impact: "Potential connection pool exhaustion"
+          action: "Review connection lifecycle, check for connection leaks"
+
+      - alert: ConnectionPoolExhaustion
+        expr: |
+          sark_gateway_connection_pool_active / sark_gateway_connection_pool_size > 0.9
+        for: 5m
+        labels:
+          severity: critical
+          component: infrastructure
+          category: resources
+        annotations:
+          summary: "Connection pool near capacity"
+          description: "Pool {{ $labels.pool_name }} at {{ $value | humanizePercentage }} capacity"
+          runbook_url: "https://docs.sark.io/runbooks/infrastructure/pool-exhaustion"
+          impact: "New connections will be rejected"
+          action: "IMMEDIATE: Increase pool size, investigate long-running connections"
+
+      # ========================================================================
+      # Dependency Health
+      # ========================================================================
+
+      - alert: DatabaseUnhealthy
+        expr: |
+          sark_health_component_status{component="database"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: infrastructure
+          category: dependencies
+        annotations:
+          summary: "CRITICAL: Database dependency unhealthy"
+          description: "Database health check failing"
+          runbook_url: "https://docs.sark.io/runbooks/infrastructure/database-unhealthy"
+          impact: "Cannot persist audit events or retrieve data"
+          action: "IMMEDIATE: Check database connectivity, verify credentials, check DB status"
+
+      - alert: OPAUnhealthy
+        expr: |
+          sark_health_component_status{component="opa"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: infrastructure
+          category: dependencies
+        annotations:
+          summary: "CRITICAL: OPA policy engine unhealthy"
+          description: "OPA health check failing"
+          runbook_url: "https://docs.sark.io/runbooks/infrastructure/opa-unhealthy"
+          impact: "Cannot evaluate policies - authorization failures"
+          action: "IMMEDIATE: Check OPA service, verify policies loaded, check connectivity"
+
+      - alert: RedisUnhealthy
+        expr: |
+          sark_health_component_status{component="redis"} == 0
+        for: 2m
+        labels:
+          severity: warning
+          component: infrastructure
+          category: dependencies
+        annotations:
+          summary: "Redis cache unhealthy"
+          description: "Redis health check failing"
+          runbook_url: "https://docs.sark.io/runbooks/infrastructure/redis-unhealthy"
+          impact: "Cache unavailable - increased latency and load"
+          action: "Check Redis service, verify connectivity, review Redis logs"
+
+      - alert: SIEMUnhealthy
+        expr: |
+          sark_siem_connection_status == 0
+        for: 5m
+        labels:
+          severity: warning
+          component: infrastructure
+          category: dependencies
+        annotations:
+          summary: "SIEM {{ $labels.siem_platform }} connection lost"
+          description: "SIEM health check failing for {{ $labels.siem_platform }}"
+          runbook_url: "https://docs.sark.io/runbooks/infrastructure/siem-unhealthy"
+          impact: "Security events not forwarded - reduced visibility"
+          action: "Check SIEM service, verify credentials, review network connectivity"
+
+      - alert: HighDependencyLatency
+        expr: |
+          sark_health_component_latency_seconds > 1.0
+        for: 10m
+        labels:
+          severity: warning
+          component: infrastructure
+          category: dependencies
+        annotations:
+          summary: "High latency to {{ $labels.component }}"
+          description: "Latency {{ $value | humanizeDuration }} (threshold: 1s)"
+          runbook_url: "https://docs.sark.io/runbooks/infrastructure/dependency-latency"
+          impact: "Degraded overall performance"
+          action: "Check network, verify dependency health, review dependency logs"
+
+      # ========================================================================
+      # Disk & Storage
+      # ========================================================================
+
+      - alert: HighDiskUsage
+        expr: |
+          (
+            node_filesystem_size_bytes{mountpoint="/var/lib/postgresql"}
+            - node_filesystem_avail_bytes{mountpoint="/var/lib/postgresql"}
+          ) / node_filesystem_size_bytes{mountpoint="/var/lib/postgresql"} > 0.80
+        for: 10m
+        labels:
+          severity: warning
+          component: infrastructure
+          category: storage
+        annotations:
+          summary: "High disk usage on database volume"
+          description: "Disk usage at {{ $value | humanizePercentage }} (threshold: 80%)"
+          runbook_url: "https://docs.sark.io/runbooks/infrastructure/high-disk"
+          impact: "Risk of running out of disk space"
+          action: "Review retention policies, clean old data, plan capacity increase"
+
+      - alert: CriticalDiskUsage
+        expr: |
+          (
+            node_filesystem_size_bytes{mountpoint="/var/lib/postgresql"}
+            - node_filesystem_avail_bytes{mountpoint="/var/lib/postgresql"}
+          ) / node_filesystem_size_bytes{mountpoint="/var/lib/postgresql"} > 0.95
+        for: 5m
+        labels:
+          severity: critical
+          component: infrastructure
+          category: storage
+        annotations:
+          summary: "CRITICAL: Disk near full"
+          description: "Disk usage at {{ $value | humanizePercentage }} (threshold: 95%)"
+          runbook_url: "https://docs.sark.io/runbooks/infrastructure/critical-disk"
+          impact: "Imminent disk full - database writes will fail"
+          action: "IMMEDIATE: Free disk space, implement emergency retention purge"
+
+      - alert: AuditStorageUtilizationHigh
+        expr: |
+          sark_audit_storage_utilization > 85
+        for: 10m
+        labels:
+          severity: warning
+          component: infrastructure
+          category: storage
+        annotations:
+          summary: "Audit storage utilization high"
+          description: "Audit storage at {{ $value | humanizePercentage }} (threshold: 85%)"
+          runbook_url: "https://docs.sark.io/runbooks/infrastructure/audit-storage"
+          impact: "Risk of audit logging failure"
+          action: "Run retention purge, archive old events, increase storage"
+
+      # ========================================================================
+      # Network & Connectivity
+      # ========================================================================
+
+      - alert: HighNetworkErrors
+        expr: |
+          rate(node_network_transmit_errs_total{device!~"lo|docker.*"}[5m]) > 10
+        for: 10m
+        labels:
+          severity: warning
+          component: infrastructure
+          category: network
+        annotations:
+          summary: "High network transmission errors"
+          description: "{{ $value | humanize }} errors/sec on {{ $labels.device }}"
+          runbook_url: "https://docs.sark.io/runbooks/infrastructure/network-errors"
+          impact: "Network instability - potential data loss"
+          action: "Check network interface, review network infrastructure"
+
+      - alert: TooManyOpenFileDescriptors
+        expr: |
+          process_open_fds{job="sark-gateway"} / process_max_fds{job="sark-gateway"} > 0.8
+        for: 10m
+        labels:
+          severity: warning
+          component: infrastructure
+          category: resources
+        annotations:
+          summary: "File descriptor usage high"
+          description: "{{ $value | humanizePercentage }} of max file descriptors in use"
+          runbook_url: "https://docs.sark.io/runbooks/infrastructure/file-descriptors"
+          impact: "Risk of hitting FD limit - new connections rejected"
+          action: "Increase FD limits, check for FD leaks, review open connections"
+
+      # ========================================================================
+      # Performance Degradation
+      # ========================================================================
+
+      - alert: RequestsBackingUp
+        expr: |
+          sark_gateway_requests_in_flight > 100
+        for: 5m
+        labels:
+          severity: warning
+          component: infrastructure
+          category: performance
+        annotations:
+          summary: "High number of requests in flight"
+          description: "{{ $value }} requests currently being processed (threshold: 100)"
+          runbook_url: "https://docs.sark.io/runbooks/infrastructure/requests-backing-up"
+          impact: "Potential request queue backup - increased latency"
+          action: "Check for slow operations, review resource usage, consider scaling"
+
+      - alert: SlowDatabaseQueries
+        expr: |
+          histogram_quantile(0.95, sum(rate(sark_audit_write_duration_seconds_bucket{destination="database"}[5m])) by (le)) > 0.5
+        for: 10m
+        labels:
+          severity: warning
+          component: infrastructure
+          category: performance
+        annotations:
+          summary: "Database write latency elevated"
+          description: "P95 database write latency {{ $value | humanizeDuration }} (threshold: 500ms)"
+          runbook_url: "https://docs.sark.io/runbooks/infrastructure/slow-db"
+          impact: "Degraded overall performance"
+          action: "Check database load, review slow queries, verify indexes"
+
+      # ========================================================================
+      # Capacity Planning
+      # ========================================================================
+
+      - alert: HighRequestVolumeSustained
+        expr: |
+          sum(rate(sark_gateway_requests_total[5m])) > 500
+        for: 1h
+        labels:
+          severity: info
+          component: infrastructure
+          category: capacity
+        annotations:
+          summary: "Sustained high request volume"
+          description: "Request rate at {{ $value | humanize }} req/sec for 1 hour"
+          runbook_url: "https://docs.sark.io/runbooks/infrastructure/capacity-planning"
+          impact: "Approaching capacity limits"
+          action: "Review capacity plans, consider proactive scaling"
+
+      - alert: CacheEvictionRateHigh
+        expr: |
+          sum(rate(sark_gateway_cache_evictions_total[5m])) > 10
+        for: 15m
+        labels:
+          severity: warning
+          component: infrastructure
+          category: capacity
+        annotations:
+          summary: "High cache eviction rate"
+          description: "Cache evictions at {{ $value | humanize }}/sec (threshold: 10/sec)"
+          runbook_url: "https://docs.sark.io/runbooks/infrastructure/cache-evictions"
+          impact: "Reduced cache effectiveness - increased latency"
+          action: "Increase cache size, review cache TTL settings"

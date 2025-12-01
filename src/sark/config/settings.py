@@ -19,7 +19,7 @@ class Settings(BaseSettings):
 
     # Application
     app_name: str = "SARK"
-    app_version: str = "0.1.0"
+    app_version: str = "2.0.0"
     environment: str = Field(default="development", pattern="^(development|staging|production)$")
     debug: bool = False
     log_level: str = Field(default="INFO", pattern="^(DEBUG|INFO|WARNING|ERROR|CRITICAL)$")
@@ -66,10 +66,14 @@ class Settings(BaseSettings):
     # OIDC (OpenID Connect) Configuration
     oidc_enabled: bool = False
     oidc_provider: str = "google"  # google, azure, okta, custom
-    oidc_discovery_url: str | None = None  # e.g., "https://idp.example.com/.well-known/openid-configuration"
+    oidc_discovery_url: str | None = (
+        None  # e.g., "https://idp.example.com/.well-known/openid-configuration"
+    )
     oidc_client_id: str | None = None
     oidc_client_secret: str | None = None
-    oidc_redirect_uri: str | None = None  # e.g., "https://sark.example.com/api/v1/auth/oidc/callback"
+    oidc_redirect_uri: str | None = (
+        None  # e.g., "https://sark.example.com/api/v1/auth/oidc/callback"
+    )
     oidc_issuer: str | None = None  # Required for custom provider
     oidc_authorization_endpoint: str | None = None
     oidc_token_endpoint: str | None = None
@@ -216,6 +220,14 @@ class Settings(BaseSettings):
     kafka_bootstrap_servers: list[str] = ["localhost:9092"]
     kafka_audit_topic: str = "sark-audit-events"
     kafka_consumer_group: str = "sark-audit-consumers"
+
+    # Gateway Integration
+    gateway_enabled: bool = False
+    gateway_url: str = "http://localhost:8080"
+    gateway_api_key: str | None = None
+    gateway_timeout_seconds: float = 5.0
+    gateway_retry_attempts: int = 3
+    gateway_circuit_breaker_threshold: int = 5
 
     # Discovery Service
     discovery_interval_seconds: int = 300  # 5 minutes

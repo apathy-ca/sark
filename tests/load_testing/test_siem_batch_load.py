@@ -201,7 +201,9 @@ class BatchLoadTester:
             "avg_batch_size": avg_batch_size,
             "actual_throughput_per_minute": actual_throughput,
             "throughput_percentage": (actual_throughput / events_per_minute) * 100,
-            "success_rate_percentage": (events_sent / events_enqueued) * 100 if events_enqueued > 0 else 0,
+            "success_rate_percentage": (
+                (events_sent / events_enqueued) * 100 if events_enqueued > 0 else 0
+            ),
             "batch_latency_avg_ms": statistics.mean(batch_latencies) if batch_latencies else 0,
             "batch_latency_p50_ms": statistics.median(batch_latencies) if batch_latencies else 0,
             "batch_latency_p95_ms": (
@@ -219,7 +221,9 @@ class BatchLoadTester:
         print(f"Batches Sent: {batches_sent}")
         print(f"Avg Batch Size: {avg_batch_size:.1f}")
         print(f"Success Rate: {results['success_rate_percentage']:.2f}%")
-        print(f"Actual Throughput: {actual_throughput:,.2f} events/min ({actual_throughput/60:.2f} events/sec)")
+        print(
+            f"Actual Throughput: {actual_throughput:,.2f} events/min ({actual_throughput/60:.2f} events/sec)"
+        )
         print(f"Throughput Achievement: {results['throughput_percentage']:.2f}%")
         print("\nBatch Latency Statistics:")
         print(f"  Average: {results['batch_latency_avg_ms']:.2f}ms")
@@ -345,7 +349,9 @@ class BatchLoadTester:
             "avg_batch_size": avg_batch_size,
             "actual_throughput_per_minute": actual_throughput,
             "throughput_percentage": (actual_throughput / events_per_minute) * 100,
-            "success_rate_percentage": (events_sent / events_enqueued) * 100 if events_enqueued > 0 else 0,
+            "success_rate_percentage": (
+                (events_sent / events_enqueued) * 100 if events_enqueued > 0 else 0
+            ),
             "batch_latency_avg_ms": statistics.mean(batch_latencies) if batch_latencies else 0,
             "batch_latency_p50_ms": statistics.median(batch_latencies) if batch_latencies else 0,
             "batch_latency_p95_ms": (
@@ -363,7 +369,9 @@ class BatchLoadTester:
         print(f"Batches Sent: {batches_sent}")
         print(f"Avg Batch Size: {avg_batch_size:.1f}")
         print(f"Success Rate: {results['success_rate_percentage']:.2f}%")
-        print(f"Actual Throughput: {actual_throughput:,.2f} events/min ({actual_throughput/60:.2f} events/sec)")
+        print(
+            f"Actual Throughput: {actual_throughput:,.2f} events/min ({actual_throughput/60:.2f} events/sec)"
+        )
         print(f"Throughput Achievement: {results['throughput_percentage']:.2f}%")
         print("\nBatch Latency Statistics:")
         print(f"  Average: {results['batch_latency_avg_ms']:.2f}ms")

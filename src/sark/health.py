@@ -34,7 +34,7 @@ async def health_check() -> dict[str, Any]:
     return {
         "status": "healthy",
         "uptime": get_uptime(),
-        "version": os.getenv("APP_VERSION", "0.1.0"),
+        "version": os.getenv("APP_VERSION", "2.0.0"),
     }
 
 

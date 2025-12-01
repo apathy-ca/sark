@@ -55,7 +55,7 @@ def test_policy():
         description="Test policy for integration tests",
         policy_type="authorization",
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
 
@@ -73,7 +73,7 @@ def test_server():
         team_id=uuid4(),
         is_active=True,
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
 
@@ -90,13 +90,14 @@ def test_user():
         is_admin=False,
         extra_metadata={},
         created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC)
+        updated_at=datetime.now(UTC),
     )
 
 
 # ============================================================================
 # Server Registration Policy Tests
 # ============================================================================
+
 
 @pytest.mark.asyncio
 @pytest.mark.integration
@@ -109,15 +110,17 @@ async def test_policy_allows_server_registration(opa_client, test_user, test_ser
     mock_response.json.return_value = {"result": {"allow": True}}
 
     with patch.object(opa_client.client, "post", new=AsyncMock(return_value=mock_response)):
-        decision = await opa_client.evaluate_policy({
-            "user": {"id": str(test_user.id), "role": "user"},
-            "action": "register",
-            "resource": {
-                "type": "server",
-                "name": test_server.name,
-                "sensitivity": test_server.sensitivity_level.value
+        decision = await opa_client.evaluate_policy(
+            {
+                "user": {"id": str(test_user.id), "role": "user"},
+                "action": "register",
+                "resource": {
+                    "type": "server",
+                    "name": test_server.name,
+                    "sensitivity": test_server.sensitivity_level.value,
+                },
             }
-        })
+        )
 
     assert decision.allow is True
 
@@ -133,19 +136,18 @@ async def test_policy_denies_unauthorized_registration(opa_client, test_user):
     mock_response.json.return_value = {
         "result": {
             "allow": False,
-            "reason": "User lacks permission to register high-sensitivity servers"
+            "reason": "User lacks permission to register high-sensitivity servers",
         }
     }
 
     with patch.object(opa_client.client, "post", new=AsyncMock(return_value=mock_response)):
-        decision = await opa_client.evaluate_policy({
-            "user": {"id": str(test_user.id), "role": "user"},
-            "action": "register",
-            "resource": {
-                "type": "server",
-                "sensitivity": "high"
+        decision = await opa_client.evaluate_policy(
+            {
+                "user": {"id": str(test_user.id), "role": "user"},
+                "action": "register",
+                "resource": {"type": "server", "sensitivity": "high"},
             }
-        })
+        )
 
     assert decision.allow is False
     assert "lacks permission" in decision.reason
@@ -162,28 +164,29 @@ async def test_policy_enforces_sensitivity_levels(opa_client, test_user):
     mock_response.json.return_value = {"result": {"allow": True}}
 
     with patch.object(opa_client.client, "post", new=AsyncMock(return_value=mock_response)):
-        decision = await opa_client.evaluate_policy({
-            "user": {"id": str(test_user.id), "role": "user"},
-            "action": "register",
-            "resource": {"type": "server", "sensitivity": "low"}
-        })
+        decision = await opa_client.evaluate_policy(
+            {
+                "user": {"id": str(test_user.id), "role": "user"},
+                "action": "register",
+                "resource": {"type": "server", "sensitivity": "low"},
+            }
+        )
 
     assert decision.allow is True
 
     # High sensitivity - should deny for regular user
     mock_response.json.return_value = {
-        "result": {
-            "allow": False,
-            "reason": "Insufficient clearance for high sensitivity"
-        }
+        "result": {"allow": False, "reason": "Insufficient clearance for high sensitivity"}
     }
 
     with patch.object(opa_client.client, "post", new=AsyncMock(return_value=mock_response)):
-        decision = await opa_client.evaluate_policy({
-            "user": {"id": str(test_user.id), "role": "user"},
-            "action": "register",
-            "resource": {"type": "server", "sensitivity": "high"}
-        })
+        decision = await opa_client.evaluate_policy(
+            {
+                "user": {"id": str(test_user.id), "role": "user"},
+                "action": "register",
+                "resource": {"type": "server", "sensitivity": "high"},
+            }
+        )
 
     assert decision.allow is False
 
@@ -191,6 +194,7 @@ async def test_policy_enforces_sensitivity_levels(opa_client, test_user):
 # ============================================================================
 # Tool Invocation Authorization Tests
 # ============================================================================
+
 
 @pytest.mark.asyncio
 @pytest.mark.integration
@@ -202,15 +206,13 @@ async def test_policy_allows_tool_invocation(opa_client, test_user):
     mock_response.json.return_value = {"result": {"allow": True}}
 
     with patch.object(opa_client.client, "post", new=AsyncMock(return_value=mock_response)):
-        decision = await opa_client.evaluate_policy({
-            "user": {"id": str(test_user.id), "role": "user"},
-            "action": "invoke",
-            "resource": {
-                "type": "tool",
-                "name": "search_tool",
-                "server": "test-server"
+        decision = await opa_client.evaluate_policy(
+            {
+                "user": {"id": str(test_user.id), "role": "user"},
+                "action": "invoke",
+                "resource": {"type": "tool", "name": "search_tool", "server": "test-server"},
             }
-        })
+        )
 
     assert decision.allow is True
 
@@ -223,22 +225,17 @@ async def test_policy_denies_dangerous_tool_invocation(opa_client, test_user):
     """Test that policy denies invocation of dangerous tools."""
     mock_response = MagicMock()
     mock_response.json.return_value = {
-        "result": {
-            "allow": False,
-            "reason": "Tool classified as dangerous"
-        }
+        "result": {"allow": False, "reason": "Tool classified as dangerous"}
     }
 
     with patch.object(opa_client.client, "post", new=AsyncMock(return_value=mock_response)):
-        decision = await opa_client.evaluate_policy({
-            "user": {"id": str(test_user.id), "role": "user"},
-            "action": "invoke",
-            "resource": {
-                "type": "tool",
-                "name": "delete_all_tool",
-                "dangerous": True
+        decision = await opa_client.evaluate_policy(
+            {
+                "user": {"id": str(test_user.id), "role": "user"},
+                "action": "invoke",
+                "resource": {"type": "tool", "name": "delete_all_tool", "dangerous": True},
             }
-        })
+        )
 
     assert decision.allow is False
 
@@ -246,6 +243,7 @@ async def test_policy_denies_dangerous_tool_invocation(opa_client, test_user):
 # ============================================================================
 # Bulk Operations Policy Tests
 # ============================================================================
+
 
 @pytest.mark.asyncio
 @pytest.mark.integration
@@ -260,16 +258,18 @@ async def test_policy_evaluates_bulk_operations(opa_client, test_user):
     servers = [
         {"name": "server-1", "sensitivity": "low"},
         {"name": "server-2", "sensitivity": "low"},
-        {"name": "server-3", "sensitivity": "medium"}
+        {"name": "server-3", "sensitivity": "medium"},
     ]
 
     with patch.object(opa_client.client, "post", new=AsyncMock(return_value=mock_response)):
         for server in servers:
-            decision = await opa_client.evaluate_policy({
-                "user": {"id": str(test_user.id), "role": "user"},
-                "action": "register",
-                "resource": {"type": "server", **server}
-            })
+            decision = await opa_client.evaluate_policy(
+                {
+                    "user": {"id": str(test_user.id), "role": "user"},
+                    "action": "register",
+                    "resource": {"type": "server", **server},
+                }
+            )
             assert decision.allow is True
 
 
@@ -282,26 +282,32 @@ async def test_policy_fails_bulk_on_single_denial(opa_client, test_user):
     servers = [
         {"name": "server-1", "sensitivity": "low"},
         {"name": "server-2", "sensitivity": "high"},  # This will be denied
-        {"name": "server-3", "sensitivity": "medium"}
+        {"name": "server-3", "sensitivity": "medium"},
     ]
 
     # Mock responses - allow first, deny second
     responses = [
         {"result": {"allow": True}},
         {"result": {"allow": False, "reason": "High sensitivity not allowed"}},
-        {"result": {"allow": True}}
+        {"result": {"allow": True}},
     ]
 
-    with patch.object(opa_client.client, "post", new=AsyncMock(side_effect=[
-        MagicMock(json=MagicMock(return_value=resp)) for resp in responses
-    ])):
+    with patch.object(
+        opa_client.client,
+        "post",
+        new=AsyncMock(
+            side_effect=[MagicMock(json=MagicMock(return_value=resp)) for resp in responses]
+        ),
+    ):
         denied_found = False
         for server in servers:
-            decision = await opa_client.evaluate_policy({
-                "user": {"id": str(test_user.id), "role": "user"},
-                "action": "register",
-                "resource": {"type": "server", **server}
-            })
+            decision = await opa_client.evaluate_policy(
+                {
+                    "user": {"id": str(test_user.id), "role": "user"},
+                    "action": "register",
+                    "resource": {"type": "server", **server},
+                }
+            )
             if not decision.allow:
                 denied_found = True
                 break
@@ -313,6 +319,7 @@ async def test_policy_fails_bulk_on_single_denial(opa_client, test_user):
 # Policy Denial Error Handling Tests
 # ============================================================================
 
+
 @pytest.mark.asyncio
 @pytest.mark.integration
 @pytest.mark.policy
@@ -321,18 +328,17 @@ async def test_policy_denial_provides_reason(opa_client, test_user):
     """Test that policy denials provide clear reasons."""
     mock_response = MagicMock()
     mock_response.json.return_value = {
-        "result": {
-            "allow": False,
-            "reason": "User does not belong to the required team"
-        }
+        "result": {"allow": False, "reason": "User does not belong to the required team"}
     }
 
     with patch.object(opa_client.client, "post", new=AsyncMock(return_value=mock_response)):
-        decision = await opa_client.evaluate_policy({
-            "user": {"id": str(test_user.id), "role": "user"},
-            "action": "access",
-            "resource": {"type": "server", "team": "engineering"}
-        })
+        decision = await opa_client.evaluate_policy(
+            {
+                "user": {"id": str(test_user.id), "role": "user"},
+                "action": "access",
+                "resource": {"type": "server", "team": "engineering"},
+            }
+        )
 
     assert decision.allow is False
     assert decision.reason is not None
@@ -346,12 +352,16 @@ async def test_policy_denial_provides_reason(opa_client, test_user):
 async def test_policy_handles_opa_errors_gracefully(opa_client, test_user):
     """Test that OPA errors are handled gracefully (fail-closed)."""
     # Simulate OPA error
-    with patch.object(opa_client.client, "post", new=AsyncMock(side_effect=Exception("OPA connection failed"))):
-        decision = await opa_client.evaluate_policy({
-            "user": {"id": str(test_user.id), "role": "user"},
-            "action": "register",
-            "resource": {"type": "server"}
-        })
+    with patch.object(
+        opa_client.client, "post", new=AsyncMock(side_effect=Exception("OPA connection failed"))
+    ):
+        decision = await opa_client.evaluate_policy(
+            {
+                "user": {"id": str(test_user.id), "role": "user"},
+                "action": "register",
+                "resource": {"type": "server"},
+            }
+        )
 
     # Should fail closed
     assert decision.allow is False
@@ -360,6 +370,7 @@ async def test_policy_handles_opa_errors_gracefully(opa_client, test_user):
 # ============================================================================
 # Multi-Policy Evaluation Tests
 # ============================================================================
+
 
 @pytest.mark.asyncio
 @pytest.mark.integration
@@ -375,7 +386,7 @@ async def test_create_multiple_policy_versions(policy_service, test_policy):
     version1 = await policy_service.create_version(
         policy_id=test_policy.id,
         rego_code="package test\nallow = true",
-        change_description="Initial version"
+        change_description="Initial version",
     )
 
     assert version1.version_number == 1
@@ -386,7 +397,7 @@ async def test_create_multiple_policy_versions(policy_service, test_policy):
     version2 = await policy_service.create_version(
         policy_id=test_policy.id,
         rego_code="package test\nallow = false",
-        change_description="Deny all"
+        change_description="Deny all",
     )
 
     assert version2.version_number == 2
@@ -403,7 +414,7 @@ async def test_activate_policy_version(policy_service, test_policy):
         version_number=1,
         rego_code="package test\nallow = true",
         status=PolicyStatus.DRAFT,
-        created_at=datetime.now(UTC)
+        created_at=datetime.now(UTC),
     )
 
     # Mock database responses
@@ -422,6 +433,7 @@ async def test_activate_policy_version(policy_service, test_policy):
 # Fail-Closed Behavior Tests
 # ============================================================================
 
+
 @pytest.mark.asyncio
 @pytest.mark.integration
 @pytest.mark.policy
@@ -431,12 +443,16 @@ async def test_fail_closed_on_network_error(opa_client, test_user):
     import httpx
 
     # Simulate network timeout
-    with patch.object(opa_client.client, "post", new=AsyncMock(side_effect=httpx.TimeoutException("Timeout"))):
-        decision = await opa_client.evaluate_policy({
-            "user": {"id": str(test_user.id), "role": "user"},
-            "action": "register",
-            "resource": {"type": "server"}
-        })
+    with patch.object(
+        opa_client.client, "post", new=AsyncMock(side_effect=httpx.TimeoutException("Timeout"))
+    ):
+        decision = await opa_client.evaluate_policy(
+            {
+                "user": {"id": str(test_user.id), "role": "user"},
+                "action": "register",
+                "resource": {"type": "server"},
+            }
+        )
 
     assert decision.allow is False
 
@@ -452,11 +468,13 @@ async def test_fail_closed_on_invalid_response(opa_client, test_user):
     mock_response.json.side_effect = ValueError("Invalid JSON")
 
     with patch.object(opa_client.client, "post", new=AsyncMock(return_value=mock_response)):
-        decision = await opa_client.evaluate_policy({
-            "user": {"id": str(test_user.id), "role": "user"},
-            "action": "register",
-            "resource": {"type": "server"}
-        })
+        decision = await opa_client.evaluate_policy(
+            {
+                "user": {"id": str(test_user.id), "role": "user"},
+                "action": "register",
+                "resource": {"type": "server"},
+            }
+        )
 
     assert decision.allow is False
 
@@ -472,10 +490,12 @@ async def test_fail_closed_on_missing_result(opa_client, test_user):
     mock_response.json.return_value = {"error": "Policy not found"}
 
     with patch.object(opa_client.client, "post", new=AsyncMock(return_value=mock_response)):
-        decision = await opa_client.evaluate_policy({
-            "user": {"id": str(test_user.id), "role": "user"},
-            "action": "register",
-            "resource": {"type": "server"}
-        })
+        decision = await opa_client.evaluate_policy(
+            {
+                "user": {"id": str(test_user.id), "role": "user"},
+                "action": "register",
+                "resource": {"type": "server"},
+            }
+        )
 
     assert decision.allow is False

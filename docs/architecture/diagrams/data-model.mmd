@@ -1,0 +1,119 @@
+erDiagram
+    RESOURCES ||--o{ CAPABILITIES : contains
+    RESOURCES {
+        varchar id PK
+        varchar name
+        varchar protocol
+        varchar endpoint
+        varchar sensitivity_level
+        jsonb metadata
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    CAPABILITIES {
+        varchar id PK
+        varchar resource_id FK
+        varchar name
+        text description
+        jsonb input_schema
+        jsonb output_schema
+        varchar sensitivity_level
+        jsonb metadata
+    }
+
+    USERS ||--o{ API_KEYS : has
+    USERS {
+        uuid id PK
+        varchar username
+        varchar email
+        varchar role
+        timestamptz created_at
+    }
+
+    API_KEYS {
+        uuid id PK
+        uuid user_id FK
+        varchar key_hash
+        varchar name
+        timestamptz expires_at
+        timestamptz last_used_at
+    }
+
+    FEDERATION_NODES {
+        uuid id PK
+        varchar node_id UK
+        varchar name
+        varchar endpoint
+        text trust_anchor_cert
+        boolean enabled
+        integer rate_limit_per_hour
+        jsonb metadata
+        timestamptz trusted_since
+        timestamptz created_at
+    }
+
+    AUDIT_LOGS {
+        timestamptz timestamp
+        uuid event_id PK
+        uuid correlation_id
+        varchar event_type
+        varchar principal_id
+        varchar resource_id
+        varchar capability_id
+        varchar decision
+        float duration_ms
+        numeric cost
+        jsonb metadata
+    }
+
+    COST_TRACKING {
+        timestamptz timestamp
+        bigserial id PK
+        varchar principal_id
+        varchar resource_id
+        varchar capability_id
+        numeric estimated_cost
+        numeric actual_cost
+        jsonb metadata
+    }
+
+    PRINCIPAL_BUDGETS {
+        varchar principal_id PK
+        numeric daily_budget
+        numeric monthly_budget
+        numeric daily_spent
+        numeric monthly_spent
+        timestamptz last_daily_reset
+        timestamptz last_monthly_reset
+        varchar currency
+    }
+
+    POLICIES {
+        uuid id PK
+        varchar name
+        varchar package
+        text rego_code
+        boolean enabled
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    POLICY_AUDIT {
+        timestamptz timestamp
+        uuid id PK
+        uuid policy_id FK
+        varchar principal_id
+        varchar resource_id
+        varchar action
+        varchar decision
+        jsonb input
+        jsonb output
+    }
+
+    POLICIES ||--o{ POLICY_AUDIT : evaluated_by
+    USERS ||--o{ PRINCIPAL_BUDGETS : has
+    AUDIT_LOGS }o--|| RESOURCES : references
+    AUDIT_LOGS }o--|| CAPABILITIES : references
+    COST_TRACKING }o--|| RESOURCES : tracks
+    COST_TRACKING }o--|| CAPABILITIES : tracks

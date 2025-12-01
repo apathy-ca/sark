@@ -1,0 +1,101 @@
+graph TB
+    subgraph "Client Layer"
+        CLIENT1[Claude Desktop]
+        CLIENT2[Custom Apps]
+        CLIENT3[Scripts & Services]
+    end
+
+    subgraph "SARK v2.0 Core"
+        subgraph "API Layer"
+            FASTAPI[FastAPI Server]
+            AUTH[Authentication]
+            RATELIMIT[Rate Limiting]
+            METRICS[Metrics Collection]
+        end
+
+        subgraph "Governance Core"
+            RESMGR[Resource Manager]
+            POLEVAL[Policy Evaluator]
+            AUDIT[Audit Service]
+            COST[Cost Attribution]
+            FEDMGR[Federation Manager]
+            REGISTRY[Adapter Registry]
+        end
+
+        subgraph "Adapter Layer"
+            MCPADP[MCP Adapter]
+            HTTPADP[HTTP Adapter]
+            GRPCADP[gRPC Adapter]
+            CUSTOMADP[Custom Adapters]
+        end
+    end
+
+    subgraph "External Services"
+        MCP[MCP Servers]
+        REST[REST APIs]
+        GRPC[gRPC Services]
+    end
+
+    subgraph "Data Layer"
+        POSTGRES[(PostgreSQL<br/>TimescaleDB)]
+        OPA[OPA<br/>Policy Engine]
+        REDIS[(Redis Cache)]
+    end
+
+    subgraph "Federation"
+        ORGA[Organization A<br/>SARK Node]
+        ORGB[Organization B<br/>SARK Node]
+    end
+
+    %% Client connections
+    CLIENT1 -->|HTTPS/REST| FASTAPI
+    CLIENT2 -->|HTTPS/REST| FASTAPI
+    CLIENT3 -->|HTTPS/REST| FASTAPI
+
+    %% API Layer flow
+    FASTAPI --> AUTH
+    AUTH --> RATELIMIT
+    RATELIMIT --> METRICS
+    METRICS --> RESMGR
+    METRICS --> POLEVAL
+
+    %% Governance Core flow
+    RESMGR --> REGISTRY
+    RESMGR --> AUDIT
+    POLEVAL --> OPA
+    POLEVAL --> AUDIT
+    RESMGR --> POSTGRES
+    AUDIT --> POSTGRES
+    COST --> POSTGRES
+    POLEVAL --> REDIS
+
+    %% Federation
+    FEDMGR -->|mTLS| ORGA
+    FEDMGR -->|mTLS| ORGB
+    FEDMGR --> AUDIT
+
+    %% Adapter connections
+    REGISTRY --> MCPADP
+    REGISTRY --> HTTPADP
+    REGISTRY --> GRPCADP
+    REGISTRY --> CUSTOMADP
+
+    %% External service connections
+    MCPADP -->|stdio/SSE| MCP
+    HTTPADP -->|HTTPS| REST
+    GRPCADP -->|gRPC| GRPC
+
+    %% Styling
+    classDef client fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    classDef core fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef adapter fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef data fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
+    classDef external fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    classDef federation fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+
+    class CLIENT1,CLIENT2,CLIENT3 client
+    class FASTAPI,AUTH,RATELIMIT,METRICS,RESMGR,POLEVAL,AUDIT,COST,FEDMGR,REGISTRY core
+    class MCPADP,HTTPADP,GRPCADP,CUSTOMADP adapter
+    class POSTGRES,OPA,REDIS data
+    class MCP,REST,GRPC external
+    class ORGA,ORGB federation

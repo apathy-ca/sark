@@ -130,7 +130,7 @@ def get_metrics() -> tuple[bytes, str]:
     return generate_latest(registry), CONTENT_TYPE_LATEST
 
 
-def initialize_metrics(version: str = "0.1.0", environment: str = "development") -> None:
+def initialize_metrics(version: str = "2.0.0", environment: str = "development") -> None:
     """
     Initialize application metrics with static information.
 

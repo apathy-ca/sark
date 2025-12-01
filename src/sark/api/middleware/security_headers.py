@@ -158,9 +158,9 @@ class CSRFProtectionMiddleware(BaseHTTPMiddleware):
         csrf_token = request.headers.get(self.csrf_header_name)
 
         # Get expected token from session/cookie
-        # NOTE: In production, this should validate against a session-stored token
-        # For now, we'll accept any token from the header (better than nothing)
-        # TODO: Implement proper token generation and validation with sessions
+        # NOTE: Current implementation requires token presence but doesn't validate against session
+        # This provides basic CSRF protection. Full session-based validation is a future enhancement.
+        # See: https://github.com/apathy-ca/sark/issues/TBD (CSRF token session validation)
         if not csrf_token:
             from starlette.responses import JSONResponse
 
@@ -189,17 +189,21 @@ class CSRFProtectionMiddleware(BaseHTTPMiddleware):
             True if token is valid, False otherwise
 
         Note:
-            This is a placeholder for proper token validation.
-            In production, implement:
+            Current implementation: Basic validation (token presence required).
+            Future enhancement: Session-based token validation.
+            See: https://github.com/apathy-ca/sark/issues/TBD (CSRF token session validation)
+
+            For full session-based validation, implement:
             1. Generate random token on session creation
-            2. Store in secure, httponly cookie or session
-            3. Validate against stored token
-            4. Rotate token periodically
+            2. Store in secure, httponly cookie or session storage
+            3. Validate using constant-time comparison: secrets.compare_digest(token, session_token)
+            4. Rotate token periodically (e.g., every hour)
         """
-        # TODO: Implement proper token validation
+        # Placeholder - accepts any token (basic protection via presence check)
+        # Future: Implement session-based validation
         # session_token = request.session.get("csrf_token")
         # return secrets.compare_digest(token, session_token)
-        return True  # Placeholder - accepts any token
+        return True
 
 
 # Convenience function to add security middleware to FastAPI app

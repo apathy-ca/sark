@@ -2,6 +2,7 @@
 
 from datetime import datetime
 import logging
+import secrets
 import uuid
 from uuid import UUID
 
@@ -35,6 +36,7 @@ def user_id_to_uuid(user_id: str, provider: str) -> UUID:
     # Combine provider and user_id to create a unique name
     name = f"{provider}:{user_id}"
     return uuid.uuid5(USER_UUID_NAMESPACE, name)
+
 
 router = APIRouter(prefix="/api/auth", tags=["authentication"])
 
@@ -379,6 +381,7 @@ async def oidc_authorize(
     redirect_uri: str,
     state: str | None = None,
     settings: Settings = Depends(get_settings),
+    session_service: SessionService = Depends(get_session_service),
 ):
     """Get OIDC authorization URL.
 
@@ -386,8 +389,9 @@ async def oidc_authorize(
 
     Args:
         redirect_uri: Callback URL after authentication
-        state: CSRF protection state parameter
+        state: CSRF protection state parameter (auto-generated if not provided)
         settings: Application settings
+        session_service: Session service for state storage
 
     Returns:
         Redirect response to OIDC provider
@@ -401,6 +405,19 @@ async def oidc_authorize(
             detail="OIDC authentication is not enabled",
         )
 
+    # Generate secure random state parameter for CSRF protection
+    if not state:
+        state = secrets.token_urlsafe(32)
+
+    # Store state in Redis with 5-minute TTL (OAuth flow should complete quickly)
+    state_key = f"oidc_state:{state}"
+    await session_service.redis.setex(
+        state_key,
+        300,  # 5 minutes
+        redirect_uri,  # Store redirect_uri for validation
+    )
+    logger.info(f"Stored OIDC state {state[:8]}... for CSRF validation")
+
     # Create OIDC provider
     oidc_provider = OIDCProvider(
         client_id=settings.oidc_client_id,
@@ -413,7 +430,7 @@ async def oidc_authorize(
 
     # Get authorization URL
     auth_url = await oidc_provider.get_authorization_url(
-        state=state or "default_state",
+        state=state,
         redirect_uri=redirect_uri,
     )
 
@@ -466,10 +483,23 @@ async def oidc_callback(
         domain=settings.oidc_okta_domain,
     )
 
-    # TODO: Validate state parameter against stored value
+    # SECURITY: Validate state parameter against stored value (CSRF protection)
+    state_key = f"oidc_state:{state}"
+    stored_redirect_uri = await session_service.redis.get(state_key)
+
+    if not stored_redirect_uri:
+        logger.warning(f"OIDC callback with invalid/expired state: {state[:8]}...")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired state parameter. Please restart the login process.",
+        )
+
+    # Delete state after validation (one-time use)
+    await session_service.redis.delete(state_key)
+    logger.info(f"Validated and consumed OIDC state {state[:8]}...")
 
     # Handle callback and get tokens
-    redirect_uri = request.url_for("oidc_callback").replace(query=None)
+    redirect_uri = stored_redirect_uri.decode("utf-8")
     tokens = await oidc_provider.handle_callback(code, state, redirect_uri)
 
     if not tokens:

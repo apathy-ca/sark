@@ -1,7 +1,9 @@
 """OpenID Connect (OIDC) authentication provider."""
 
+import secrets
 from typing import Any
 from uuid import UUID
+from urllib.parse import urlencode
 
 import httpx
 from pydantic import Field
@@ -199,6 +201,105 @@ class OIDCProvider(AuthProvider):
         # This would need to be implemented based on the specific provider
         self.logger.warning("get_user_info_not_supported", user_id=str(user_id))
         return {"user_id": str(user_id)}
+
+    async def get_authorization_url(
+        self,
+        state: str,
+        redirect_uri: str,
+        nonce: str | None = None,
+    ) -> str:
+        """
+        Generate OIDC authorization URL for initiating auth flow.
+
+        Args:
+            state: CSRF protection state parameter
+            redirect_uri: Callback URL after authentication
+            nonce: Optional nonce for ID token validation
+
+        Returns:
+            Authorization URL to redirect user to
+        """
+        discovery = await self._get_discovery_document()
+        authorization_endpoint = discovery["authorization_endpoint"]
+
+        # Generate nonce if not provided
+        if not nonce:
+            nonce = secrets.token_urlsafe(32)
+
+        # Build authorization URL parameters
+        params = {
+            "client_id": self.config.client_id,
+            "response_type": "code",
+            "scope": " ".join(self.config.scopes),
+            "redirect_uri": redirect_uri,
+            "state": state,
+            "nonce": nonce,
+        }
+
+        auth_url = f"{authorization_endpoint}?{urlencode(params)}"
+        self.logger.info(
+            "oidc_authorization_url_generated",
+            redirect_uri=redirect_uri,
+            state_prefix=state[:8],
+        )
+        return auth_url
+
+    async def handle_callback(
+        self,
+        code: str,
+        state: str,
+        redirect_uri: str,
+    ) -> dict[str, Any] | None:
+        """
+        Handle OIDC callback and exchange authorization code for tokens.
+
+        Args:
+            code: Authorization code from provider
+            state: State parameter (for logging/tracking)
+            redirect_uri: Original redirect URI used in authorization
+
+        Returns:
+            Token response dictionary containing access_token, id_token, etc.
+            None if exchange failed
+        """
+        try:
+            discovery = await self._get_discovery_document()
+            token_endpoint = discovery["token_endpoint"]
+
+            # Exchange authorization code for tokens
+            async with httpx.AsyncClient(verify=self.config.verify_ssl) as client:
+                response = await client.post(
+                    token_endpoint,
+                    data={
+                        "grant_type": "authorization_code",
+                        "code": code,
+                        "client_id": self.config.client_id,
+                        "client_secret": self.config.client_secret,
+                        "redirect_uri": redirect_uri,
+                    },
+                    timeout=self.config.timeout_seconds,
+                )
+
+                if response.status_code != 200:
+                    self.logger.error(
+                        "oidc_token_exchange_failed",
+                        status_code=response.status_code,
+                        error=response.text,
+                    )
+                    return None
+
+                token_data = response.json()
+                self.logger.info(
+                    "oidc_token_exchange_success",
+                    state_prefix=state[:8],
+                    has_access_token=bool(token_data.get("access_token")),
+                    has_id_token=bool(token_data.get("id_token")),
+                )
+                return token_data
+
+        except Exception as e:
+            self.logger.error("oidc_callback_failed", error=str(e))
+            return None
 
     async def health_check(self) -> bool:
         """

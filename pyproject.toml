@@ -1,6 +1,6 @@
 [project]
 name = "sark"
-version = "0.1.0"
+version = "2.0.0"
 description = "SARK - Security Audit and Resource Kontroler for MCP Governance"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -35,8 +35,10 @@ dependencies = [
     "hvac>=1.1.0",
     "kubernetes>=27.0.0",
     "aiokafka>=0.8.0",
-    "ldap3>=2.9.1",
-    "authlib>=1.2.0",
+    "grpcio>=1.60.0",
+    "grpcio-reflection>=1.60.0",
+    "grpcio-tools>=1.60.0",
+    "protobuf>=4.25.0",
 ]
 
 [project.optional-dependencies]
@@ -126,11 +128,24 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = [
     "S101",   # assert allowed in tests
+    "S110",   # try-except-pass acceptable in tests
+    "S311",   # random module is acceptable in tests
     "ARG",    # unused arguments allowed in tests (fixtures)
     "FBT",    # boolean trap allowed in tests
+    "SIM117", # nested with statements are more readable in tests
+    "SIM105", # contextlib.suppress not always clearer in tests
+    "SIM113", # enumerate not always needed in tests
+    "A002",   # shadowing builtins acceptable in test fixtures
+    "B017",   # blind exception assertions intentional in circuit breaker tests
+    "RUF043", # regex patterns in pytest.raises are intentional
+    "E402",   # import order flexible in test files like locustfile
 ]
 "__init__.py" = ["F401"]  # unused imports allowed in __init__.py
 "src/sark/api/routers/saml.py" = ["N803"]  # SAML spec requires specific parameter names
+"src/sark/api/routers/export.py" = ["DTZ005"]  # datetime for file naming doesn't need tz
+"src/sark/api/routers/metrics.py" = ["DTZ005"]  # datetime for metrics placeholders
+"src/sark/api/routers/servers.py" = ["RUF012"]  # Pydantic Config.schema_extra is intentional
+"src/sark/api/routers/websocket.py" = ["SIM105"]  # try-except-pass clearer than contextlib.suppress
 
 [tool.ruff.lint.isort]
 known-first-party = ["sark"]
@@ -214,6 +229,9 @@ markers = [
     "user_flow: marks tests as user flow tests",
     "admin_flow: marks tests as admin flow tests",
     "bulk_operations: marks tests as bulk operation tests",
+    "v2: marks tests for SARK v2.0 features",
+    "federation: marks tests for federation features",
+    "chaos: marks tests for chaos engineering",
 ]
 
 [tool.coverage.run]
