@@ -20,7 +20,7 @@ SARK v2.0 provides zero-trust governance for AI deployments at scale. Originally
 - 🔐 **Authentication** - OIDC, LDAP, SAML, API Keys
 - 🛡️ **Authorization** - Policy-based access control (OPA)
 - 📊 **Audit** - Complete trail of every AI action
-- ⚡ **Performance** - <100ms latency, 1,200+ req/s
+- ⚡ **Performance** - <100ms p95 latency, 847 req/s sustained
 
 **Example:** Developer asks AI "Show P0 bugs for my team" → AI uses MCP → SARK validates auth & policy → If approved, executes → Logs everything.
 
@@ -55,7 +55,7 @@ docker compose --profile full up -d
 ## Features
 
 ### Multi-Protocol Support
-- **MCP** - stdio, SSE, HTTP transports
+- **MCP** - SSE and HTTP transports functional (stdio in development)
 - **HTTP/REST** - OpenAPI discovery, 5 auth strategies
 - **gRPC** - Reflection-based, mTLS support
 - **Custom** - Plugin system for any protocol
@@ -67,8 +67,8 @@ docker compose --profile full up -d
 - **Federation** - Cross-organization governance with mTLS
 
 ### Production Ready
-- ✅ 87% test coverage, 0 P0/P1 vulnerabilities
-- ✅ <100ms p95 latency, 1,200+ req/s throughput
+- ✅ 64% test coverage (improving to 85%), 0 known P0/P1 vulnerabilities
+- ✅ <100ms p95 latency, 847 req/s sustained throughput
 - ✅ Kubernetes-native, Helm charts, Terraform modules
 - ✅ 100+ pages of documentation
 
@@ -148,7 +148,7 @@ kubectl apply -f k8s/
 
 ## Project Status
 
-🎉 **v2.0 - Production Ready** (Pre-release validation in progress)
+🎉 **v2.0.0-rc1 - Release Candidate** (Pre-release validation in progress)
 
 **Completed:**
 - ✅ Multi-protocol architecture (MCP, HTTP, gRPC)
@@ -187,7 +187,9 @@ SARK is the **reference implementation of GRID Protocol Specification v0.1**.
 
 **GRID** (Governed Resource Interaction Definition) is a universal governance protocol for machine-to-machine interactions—protocol-agnostic, federated, zero-trust, policy-first.
 
-**SARK v2.0 Compliance:** 95% of GRID v0.1 specification
+**SARK v2.0-rc1 Compliance:** 85% of GRID v0.1 specification
+
+📖 **[Gap Analysis](docs/specifications/GRID_GAP_ANALYSIS_AND_IMPLEMENTATION_NOTES.md)** - Detailed compliance matrix
 
 📖 **[GRID Specification](docs/specifications/GRID_PROTOCOL_SPECIFICATION_v0.1.md)** | **[Gap Analysis](docs/specifications/GRID_GAP_ANALYSIS_AND_IMPLEMENTATION_NOTES.md)**
 
