@@ -226,6 +226,7 @@ markers = [
     "critical: marks tests as critical for system health",
     "performance: marks tests as performance tests",
     "security: marks tests as security tests",
+    "pentest: marks tests as penetration tests",
     "api: marks tests as API tests",
     "user_flow: marks tests as user flow tests",
     "admin_flow: marks tests as admin flow tests",
