@@ -1,0 +1,61 @@
+{
+  "project": {
+    "name": "sark",
+    "slug": "sark",
+    "repository": "/home/jhenry/Source/sark",
+    "orchestration_dir": ".czarina",
+    "version": "1.2.0",
+    "description": "Gateway Implementation + Policy Validation + Test Fixes"
+  },
+  "workers": [
+    {
+      "id": "gateway-http-sse",
+      "agent": "aider",
+      "branch": "feat/gateway-http-sse-transport",
+      "description": "Gateway HTTP and SSE transport implementation",
+      "versions": ["v1.2.0-http-sse"],
+      "token_budget": 450000
+    },
+    {
+      "id": "gateway-stdio",
+      "agent": "aider",
+      "branch": "feat/gateway-stdio-transport",
+      "description": "Gateway stdio transport for subprocess-based MCP communication",
+      "versions": ["v1.2.0-stdio"],
+      "token_budget": 180000
+    },
+    {
+      "id": "integration",
+      "agent": "aider",
+      "branch": "feat/gateway-integration",
+      "description": "Unified Gateway client and end-to-end testing",
+      "versions": ["v1.2.0-integration"],
+      "token_budget": 350000,
+      "dependencies": ["gateway-http-sse", "gateway-stdio"]
+    },
+    {
+      "id": "policy",
+      "agent": "aider",
+      "branch": "feat/policy-validation",
+      "description": "Policy validation framework to prevent injection attacks",
+      "versions": ["v1.2.0-policy"],
+      "token_budget": 320000
+    },
+    {
+      "id": "qa",
+      "agent": "aider",
+      "branch": "fix/auth-tests-and-coverage",
+      "description": "Test fixes and coverage improvement to 85%+",
+      "versions": ["v1.2.0-qa"],
+      "token_budget": 450000
+    }
+  ],
+  "daemon": {
+    "enabled": true,
+    "auto_approve": [
+      "read",
+      "write",
+      "commit"
+    ]
+  }
+}

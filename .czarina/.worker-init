@@ -1,0 +1,32 @@
+#!/bin/bash
+# Czarina Worker Auto-Init
+# This script helps workers discover their role and setup
+
+CZARINA_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_FILE="$CZARINA_DIR/config.json"
+
+if [ ! -f "$CONFIG_FILE" ]; then
+    echo "❌ Config file not found: $CONFIG_FILE"
+    exit 1
+fi
+
+# Show available workers
+echo "📋 Available workers:"
+jq -r '.workers[] | "  • \(.id) - \(.description)"' "$CONFIG_FILE"
+echo ""
+
+# If worker ID provided, load it
+if [ -n "$1" ]; then
+    WORKER_ID="$1"
+    WORKER_FILE="$CZARINA_DIR/workers/$WORKER_ID.md"
+
+    if [ -f "$WORKER_FILE" ]; then
+        echo "✅ Loading worker: $WORKER_ID"
+        cat "$WORKER_FILE"
+    else
+        echo "❌ Worker file not found: $WORKER_FILE"
+        exit 1
+    fi
+else
+    echo "💡 Usage: ./.czarina/.worker-init <worker-id>"
+fi
