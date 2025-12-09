@@ -225,6 +225,7 @@ markers = [
     "e2e: marks tests as end-to-end tests",
     "critical: marks tests as critical for system health",
     "performance: marks tests as performance tests",
+    "security: marks tests as security tests",
     "api: marks tests as API tests",
     "user_flow: marks tests as user flow tests",
     "admin_flow: marks tests as admin flow tests",
