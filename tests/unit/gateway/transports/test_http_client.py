@@ -503,3 +503,54 @@ class TestGatewayHTTPClient:
             metrics = client.get_cache_metrics()
             assert metrics["cache_enabled"] is False
 
+    async def test_connection_pooling_limits(self):
+        """Test connection pooling configuration."""
+        async with GatewayHTTPClient(
+            base_url="http://test:8080",
+            max_connections=100,
+        ) as client:
+            assert client.client.limits.max_connections == 100
+            assert client.client.limits.max_keepalive_connections == 20
+
+    async def test_timeout_configuration(self):
+        """Test timeout configuration."""
+        async with GatewayHTTPClient(
+            base_url="http://test:8080",
+            timeout=10.0,
+        ) as client:
+            assert client.timeout == 10.0
+
+    async def test_base_url_trailing_slash_removal(self):
+        """Test that trailing slash is removed from base URL."""
+        async with GatewayHTTPClient(
+            base_url="http://test:8080/",
+        ) as client:
+            assert client.base_url == "http://test:8080"
+
+    async def test_invoke_tool_not_cached(self, client, httpx_mock: HTTPXMock):
+        """Test that tool invocations are never cached."""
+        httpx_mock.add_response(
+            method="POST",
+            url="http://test-gateway:8080/api/v1/invoke",
+            json={"status": "success", "result": {"value": 1}},
+        )
+
+        # Make same invocation twice
+        await client.invoke_tool(
+            server_name="test-server",
+            tool_name="test-tool",
+            parameters={},
+            user_token="token",
+            check_authorization=False,
+        )
+        await client.invoke_tool(
+            server_name="test-server",
+            tool_name="test-tool",
+            parameters={},
+            user_token="token",
+            check_authorization=False,
+        )
+
+        # Both should hit the server (2 requests)
+        assert len(httpx_mock.get_requests()) == 2
+        await client.close()

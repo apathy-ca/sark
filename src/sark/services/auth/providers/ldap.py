@@ -1,8 +1,11 @@
 """LDAP authentication provider."""
 
+import asyncio
 from typing import Any
 from uuid import UUID, uuid5
 
+from ldap3 import Server, Connection, ALL, NTLM, SIMPLE
+from ldap3.core.exceptions import LDAPException, LDAPBindError
 from pydantic import Field
 
 from sark.services.auth.providers.base import (
@@ -151,8 +154,6 @@ class LDAPProvider(AuthProvider):
         Returns:
             Tuple of (user_dn, user_attributes)
         """
-        # In production, use actual LDAP search
-        # Mock implementation for testing
         search_filter = self.config.user_search_filter.format(username=username)
 
         self.logger.debug(
@@ -161,9 +162,59 @@ class LDAPProvider(AuthProvider):
             filter=search_filter,
         )
 
-        # Simulate LDAP search
-        # Return None if not found
-        return None, {}
+        def _sync_search():
+            """Synchronous LDAP search operation."""
+            try:
+                # Create server object
+                server = Server(
+                    self.config.server_url,
+                    get_info=ALL,
+                    use_ssl=self.config.use_ssl,
+                )
+
+                # Create connection for service account
+                conn = Connection(
+                    server,
+                    user=self.config.bind_dn,
+                    password=self.config.bind_password,
+                    authentication=SIMPLE,
+                    auto_bind=True,
+                )
+
+                # Search for user
+                conn.search(
+                    search_base=self.config.base_dn,
+                    search_filter=search_filter,
+                    attributes=self.config.attributes,
+                )
+
+                if not conn.entries:
+                    conn.unbind()
+                    return None, {}
+
+                # Get first entry
+                entry = conn.entries[0]
+                user_dn = entry.entry_dn
+
+                # Extract attributes
+                user_attrs = {}
+                for attr in self.config.attributes:
+                    if hasattr(entry, attr):
+                        attr_value = getattr(entry, attr)
+                        if hasattr(attr_value, 'value'):
+                            user_attrs[attr] = attr_value.value
+                        else:
+                            user_attrs[attr] = str(attr_value)
+
+                conn.unbind()
+                return user_dn, user_attrs
+
+            except LDAPException as e:
+                self.logger.error("ldap_search_failed", error=str(e))
+                return None, {}
+
+        # Run synchronous LDAP operation in thread pool
+        return await asyncio.get_event_loop().run_in_executor(None, _sync_search)
 
     async def _bind_user(self, user_dn: str, password: str) -> bool:
         """
@@ -176,11 +227,38 @@ class LDAPProvider(AuthProvider):
         Returns:
             True if bind succeeds
         """
-        # In production, perform actual LDAP bind
         self.logger.debug("ldap_bind_attempt", user_dn=user_dn)
 
-        # Mock implementation
-        return False
+        def _sync_bind():
+            """Synchronous LDAP bind operation."""
+            try:
+                server = Server(
+                    self.config.server_url,
+                    get_info=ALL,
+                    use_ssl=self.config.use_ssl,
+                )
+
+                # Attempt to bind as the user
+                conn = Connection(
+                    server,
+                    user=user_dn,
+                    password=password,
+                    authentication=SIMPLE,
+                    auto_bind=True,
+                )
+
+                # If we get here, bind succeeded
+                conn.unbind()
+                return True
+
+            except LDAPBindError:
+                self.logger.debug("ldap_bind_failed", user_dn=user_dn)
+                return False
+            except LDAPException as e:
+                self.logger.error("ldap_bind_error", user_dn=user_dn, error=str(e))
+                return False
+
+        return await asyncio.get_event_loop().run_in_executor(None, _sync_bind)
 
     async def _get_user_groups(self, user_dn: str) -> list[str]:
         """
@@ -195,7 +273,6 @@ class LDAPProvider(AuthProvider):
         if not self.config.group_search_base:
             return []
 
-        # In production, search for groups
         search_filter = self.config.group_search_filter.format(user_dn=user_dn)
 
         self.logger.debug(
@@ -204,8 +281,47 @@ class LDAPProvider(AuthProvider):
             filter=search_filter,
         )
 
-        # Mock implementation
-        return []
+        def _sync_group_search():
+            """Synchronous LDAP group search."""
+            try:
+                server = Server(
+                    self.config.server_url,
+                    get_info=ALL,
+                    use_ssl=self.config.use_ssl,
+                )
+
+                conn = Connection(
+                    server,
+                    user=self.config.bind_dn,
+                    password=self.config.bind_password,
+                    authentication=SIMPLE,
+                    auto_bind=True,
+                )
+
+                # Search for groups
+                conn.search(
+                    search_base=self.config.group_search_base,
+                    search_filter=search_filter,
+                    attributes=["cn"],
+                )
+
+                groups = []
+                for entry in conn.entries:
+                    if hasattr(entry, "cn"):
+                        cn_value = entry.cn
+                        if hasattr(cn_value, "value"):
+                            groups.append(cn_value.value)
+                        else:
+                            groups.append(str(cn_value))
+
+                conn.unbind()
+                return groups
+
+            except LDAPException as e:
+                self.logger.error("ldap_group_search_failed", error=str(e))
+                return []
+
+        return await asyncio.get_event_loop().run_in_executor(None, _sync_group_search)
 
     async def health_check(self) -> bool:
         """
@@ -214,11 +330,44 @@ class LDAPProvider(AuthProvider):
         Returns:
             True if LDAP server is reachable
         """
-        try:
-            # In production, attempt connection to LDAP server
-            # For mock, check if config is valid
-            return self.config.enabled and bool(self.config.server_url)
+        if not self.config.enabled or not self.config.server_url:
+            return False
 
+        def _sync_health_check():
+            """Synchronous LDAP health check."""
+            try:
+                server = Server(
+                    self.config.server_url,
+                    get_info=ALL,
+                    use_ssl=self.config.use_ssl,
+                    connect_timeout=5,
+                )
+
+                conn = Connection(
+                    server,
+                    user=self.config.bind_dn,
+                    password=self.config.bind_password,
+                    authentication=SIMPLE,
+                    auto_bind=True,
+                )
+
+                # Perform a simple search to verify connectivity
+                conn.search(
+                    search_base=self.config.base_dn,
+                    search_filter="(objectClass=*)",
+                    search_scope="BASE",
+                    attributes=["objectClass"],
+                )
+
+                conn.unbind()
+                return True
+
+            except Exception as e:
+                self.logger.error("ldap_health_check_failed", error=str(e))
+                return False
+
+        try:
+            return await asyncio.get_event_loop().run_in_executor(None, _sync_health_check)
         except Exception as e:
             self.logger.error("ldap_health_check_failed", error=str(e))
             return False
