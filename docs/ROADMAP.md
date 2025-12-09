@@ -31,27 +31,164 @@ Critical analysis revealed that while v1.1.0 has excellent architecture, the Gat
 **Version Plan:**
 - **v1.1.0** (Current): Gateway infrastructure merged but stubbed
 - **v1.2.0** (Weeks 1-8): Gateway working + policy validation + tests passing
-- **v1.3.0** (Q2 2026): Lethal Trifecta advanced mitigations (prompt injection, anomaly detection, etc.)
+- **v1.3.0** (8 weeks): Lethal Trifecta mitigations (prompt injection, anomaly, network, secrets, MFA)
+- **v1.4.0** (6-8 weeks): Rust foundation (OPA engine + fast cache) - 5-10x performance
+- **v1.5.0** (4-5 weeks): Rust detection (injection, anomaly, MCP parsing) - 10-100x performance
 - **v2.0.0** (Production): Security audit passed + production deployment
 
 ---
 
-## Revised Timeline Overview
+## Complete Version Timeline
+
+```
+v1.1.0 ──► v1.2.0 ──► v1.3.0 ──► v1.4.0 ──► v1.5.0 ──► v2.0.0
+(NOW)    (8 wks)   (8 wks)   (6-8 wks) (4-5 wks) (Production)
+  │         │         │          │         │         │
+Gateway  Gateway   Advanced   Rust      Rust    Security
+Stubbed  Working   Security   Core      Fast    Audit
+                   Features   (5-10x)   (10-100x) Passed
+```
+
+### v1.2.0: Gateway + Policy + Tests (8 weeks)
 
 ```
 ┌─────────────┬─────────────┬─────────────┬─────────────┐
-│   Week 1-4  │   Week 5-6  │   Week 7-8  │  Week 9-10  │
-├─────────────┼─────────────┼─────────────┼─────────────┤
-│   Phase 1:  │   Phase 2:  │   Phase 3:  │   Phase 4:  │
-│   Gateway   │   Policy    │  Fix Tests  │  Security   │
-│ Client Impl │  Validation │  & Polish   │   Audit     │
+│   Week 1-4  │   Week 5-6  │   Week 7-8  │             │
+├─────────────┼─────────────┼─────────────┤             │
+│   Gateway   │   Policy    │  Fix Tests  │   Release   │
+│ HTTP/SSE/   │  Validation │  Auth Tests │   v1.2.0    │
+│  stdio      │  Framework  │  Coverage   │             │
 └─────────────┴─────────────┴─────────────┴─────────────┘
-        ↓             ↓             ↓             ↓
-   Real MCP      Validate      85% Test     External
-   Transport     Policies      Coverage     Pen Test
 ```
 
-**Critical Path:** Gateway (4 weeks) → Policy Validation (2 weeks) → Fix Tests (2 weeks) → Security Audit (2 weeks)
+**Deliverables:**
+- Real MCP communication (HTTP, SSE, stdio)
+- Policy validation prevents injection
+- 100% test pass rate, 85%+ coverage
+
+**See:** `docs/v1.2.0/IMPLEMENTATION_PLAN.md`
+
+### v1.3.0: Advanced Security (8 weeks)
+
+```
+┌──────────┬──────────┬──────────┬──────────┬──────────┬──────────┬──────────┬──────────┐
+│  Week 1-2│  Week 3-4│  Week 5  │  Week 6  │  Week 7  │  Week 8  │          │          │
+├──────────┼──────────┼──────────┼──────────┼──────────┼──────────┤          │          │
+│ Prompt   │ Anomaly  │ Network  │  Secret  │   MFA    │  E2E     │ Release  │          │
+│Injection │Detection │ Controls │ Scanning │  System  │   Test   │  v1.3.0  │          │
+└──────────┴──────────┴──────────┴──────────┴──────────┴──────────┴──────────┴──────────┘
+```
+
+**Deliverables:**
+- Prompt injection detection (95%+ rate)
+- Anomaly detection (80%+ rate)
+- Network policies + egress filtering
+- Secret scanning + redaction
+- MFA for critical actions
+
+**See:** `docs/v1.3.0/IMPLEMENTATION_PLAN.md`
+
+### v1.4.0: Rust Foundation (6-8 weeks)
+
+```
+┌──────────┬──────────┬──────────┬──────────┬──────────┬──────────┐
+│  Week 1-3│  Week 2-3│  Week 4-5│  Week 5-6│  Week 6  │          │
+├──────────┼──────────┼──────────┼──────────┼──────────┤          │
+│   Rust   │   Rust   │   A/B    │ Perf     │   Docs   │ Release  │
+│  OPA     │  Cache   │  Testing │ Testing  │          │  v1.4.0  │
+│  Engine  │          │          │          │          │          │
+└──────────┴──────────┴──────────┴──────────┴──────────┴──────────┘
+```
+
+**Deliverables:**
+- Embedded Rust OPA engine (4-10x faster)
+- Rust in-memory cache (10-50x faster)
+- Build system (maturin + PyO3)
+- 2,000+ req/s throughput
+
+**Performance Gains:**
+- Authorization: 20-50ms → <5ms
+- Cache ops: 1-5ms → <0.5ms
+- Throughput: 850 → 2,000+ req/s
+
+**See:** `docs/v1.4.0/IMPLEMENTATION_PLAN.md`
+
+### v1.5.0: Rust Detection (4-5 weeks)
+
+```
+┌──────────┬──────────┬──────────┬──────────┬──────────┐
+│  Week 1-2│  Week 2-3│  Week 3  │  Week 4-5│          │
+├──────────┼──────────┼──────────┼──────────┤          │
+│ Injection│ Anomaly  │   MCP    │   E2E    │ Release  │
+│ Detector │ Detector │  Parser  │   Test   │  v1.5.0  │
+│  (Rust)  │  (Rust)  │  (Rust)  │          │          │
+└──────────┴──────────┴──────────┴──────────┴──────────┘
+```
+
+**Deliverables:**
+- Rust injection detector (10-50x faster)
+- Rust anomaly detector (5-10x faster)
+- Rust MCP parser (5-10x faster)
+- 5,000+ req/s throughput
+
+**Performance Gains:**
+- Injection detection: 10-50ms → <1ms
+- Anomaly detection: 5-20ms → <1ms
+- MCP parsing: 5-10ms → <1ms
+- Throughput: 2,000 → 5,000+ req/s
+
+**See:** `docs/v1.5.0/IMPLEMENTATION_PLAN.md`
+
+### v2.0.0: Production Release (After Security Audit)
+
+```
+┌──────────┬──────────┬──────────┬──────────┬──────────┐
+│  Week 1-2│  Week 3-4│  Week 5-6│  Week 7  │          │
+├──────────┼──────────┼──────────┼──────────┤          │
+│  Audit   │ External │Remediate │  Deploy  │ Release  │
+│   Prep   │ Pen Test │  & Test  │ Staging  │  v2.0.0  │
+│          │          │          │  to Prod │          │
+└──────────┴──────────┴──────────┴──────────┴──────────┘
+```
+
+**Deliverables:**
+- Zero critical/high vulnerabilities
+- External security certification
+- Production deployment successful
+- 99.9% uptime target
+
+**See:** Phases 4 (Security Audit) below
+
+---
+
+## Total Timeline to Production
+
+**Path 1: Minimum Viable (v1.2.0 → v2.0.0):**
+- v1.2.0: 8 weeks (Gateway + Policy + Tests)
+- Security Audit: 6-7 weeks
+- **Total: 14-15 weeks** to basic production
+
+**Path 2: Enhanced Security (v1.2.0 → v1.3.0 → v2.0.0):**
+- v1.2.0: 8 weeks
+- v1.3.0: 8 weeks (Advanced security)
+- Security Audit: 6-7 weeks
+- **Total: 22-23 weeks** to production with advanced features
+
+**Path 3: Full Performance (v1.2.0 → v1.3.0 → v1.4.0 → v1.5.0 → v2.0.0):**
+- v1.2.0: 8 weeks
+- v1.3.0: 8 weeks
+- v1.4.0: 6-8 weeks (Rust foundation)
+- v1.5.0: 4-5 weeks (Rust detection)
+- Security Audit: 6-7 weeks
+- **Total: 32-36 weeks** to production with maximum performance
+
+**Recommended:** Path 2 (Enhanced Security) - Balance of security and time-to-market
+
+---
+
+## v1.2.0 Detailed Timeline (Next Phase)
+
+**Critical Path:** Gateway (4 weeks) → Policy Validation (2 weeks) → Fix Tests (2 weeks)
 
 **Shelved Until Post-Production:**
 - CI/CD improvements (defer until core development complete)
