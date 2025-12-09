@@ -7,7 +7,7 @@ import structlog
 from sqlalchemy import text
 
 from sark.models.gateway import GatewayAuditEvent
-from sark.db.session import get_db_session
+from sark.db.session import get_db
 
 logger = structlog.get_logger()
 
@@ -28,7 +28,7 @@ async def log_gateway_event(event: GatewayAuditEvent) -> str:
     audit_id = str(uuid.uuid4())
 
     try:
-        async with get_db_session() as session:
+        async for session in get_db():
             await session.execute(
                 text("""
                     INSERT INTO gateway_audit_events (
