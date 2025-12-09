@@ -2,20 +2,21 @@
 
 **Document Version:** 2.0
 **Last Updated:** 2025-12-09
-**Status:** v2.0.0 Release Halted - Critical Implementation Gaps Identified
-**Target Production Date:** Q1 2026 (8-10 weeks from gateway completion)
+**Current Release:** v1.1.0 (Gateway infrastructure merged but stubbed)
+**Target Release:** v1.2.0 (Gateway implementation + policy validation + test fixes)
+**Target Production:** v2.0.0 (Q1 2026 - after security audit)
 
 ---
 
 ## Executive Summary
 
 **Current Situation:**
-The v2.0.0 release was halted after critical analysis revealed serious implementation gaps that make SARK not production-ready. The **Lethal Trifecta Analysis** (Dec 8, 2025) identified that while SARK has excellent architecture, the Gateway client is stubbed and several critical security features are missing.
+Critical analysis revealed that while v1.1.0 has excellent architecture, the Gateway client is stubbed and several critical security features are missing. Rather than rush to v2.0.0, we're taking an incremental approach with v1.2.0. The **Lethal Trifecta Analysis** (Dec 8, 2025) identified specific gaps blocking production readiness.
 
-**What We Have:**
+**What We Have (v1.1.0):**
 - ✅ Strong architectural foundation (multi-layer auth/authz)
-- ✅ Gateway v1.1.0 infrastructure merged (models, tests, docs)
-- ✅ v2.0.0 features implemented (adapters, federation, GRID protocol)
+- ✅ Gateway infrastructure merged (models, tests, docs)
+- ✅ Advanced features (adapters, federation, GRID protocol)
 - ✅ Comprehensive audit logging and SIEM integration
 
 **What's Missing (Blocking Production):**
@@ -25,7 +26,13 @@ The v2.0.0 release was halted after critical analysis revealed serious implement
 - ❌ No external security audit completed
 
 **Revised Strategy:**
-Focus on **production-critical implementation work** before proceeding with v2.0.0 release. This roadmap reflects the revised priorities based on the Implementation Plan and Lethal Trifecta Analysis.
+**v1.2.0** will complete the production-critical implementation work (Gateway, policy validation, test fixes). **v2.0.0** will be released only after external security audit passes. This roadmap reflects incremental, honest versioning based on the Implementation Plan and Lethal Trifecta Analysis.
+
+**Version Plan:**
+- **v1.1.0** (Current): Gateway infrastructure merged but stubbed
+- **v1.2.0** (Weeks 1-8): Gateway working + policy validation + tests passing
+- **v1.3.0** (Q2 2026): Lethal Trifecta advanced mitigations (prompt injection, anomaly detection, etc.)
+- **v2.0.0** (Production): Security audit passed + production deployment
 
 ---
 
@@ -476,11 +483,12 @@ filtered_params := input.params  # Don't filter anything!
 
 ---
 
-## Phase 5: Lethal Trifecta Advanced Mitigations (Future)
+## Phase 5: Lethal Trifecta Advanced Mitigations (v1.3.0)
 
-**Priority:** 🔵 P5 - DISTANT FUTURE
-**Status:** Deferred post-production
+**Priority:** 🔵 P5 - POST v1.2.0
+**Status:** Deferred to v1.3.0
 **Timeline:** Q2 2026
+**Target Release:** v1.3.0
 
 These are **nice-to-have** security enhancements identified in the Lethal Trifecta Analysis but not blockers for production:
 
@@ -520,7 +528,8 @@ These are **nice-to-have** security enhancements identified in the Lethal Trifec
    - **Effort:** 1 week
 
 **Total Effort:** ~7-8 weeks
-**Recommendation:** Defer to post-production (Q2 2026)
+**Recommendation:** Target for v1.3.0 release (Q2 2026)
+**Note:** These features enhance security but are not blockers for v2.0.0 production deployment
 
 ---
 
@@ -667,7 +676,7 @@ Before production deployment, ALL of the following must be complete:
 - Option 3: Defer production until re-test passes
 
 **If test coverage can't reach 85%:**
-- Option 1: Accept 80% for v2.0, target 85% for v2.1
+- Option 1: Accept 80% for v1.2, target 85% for v2.0
 - Option 2: Focus coverage on critical paths only
 - Option 3: Technical debt sprint post-production
 
@@ -740,13 +749,14 @@ The following items are **intentionally deferred** to focus on production-critic
 - Blue-green deployment automation
 - **Reason:** Current CI works; optimize after core dev complete
 
-### Advanced Lethal Trifecta Mitigations (Phase 5)
+### Advanced Lethal Trifecta Mitigations (v1.3.0)
 - Prompt injection detection
 - Anomaly detection
 - Network-level controls
 - Secret scanning
 - MFA for critical actions
-- **Reason:** Not blockers for production; add incrementally Q2 2026
+- **Reason:** Important security enhancements but not blockers for v2.0.0 production
+- **Target:** v1.3.0 release (Q2 2026)
 
 ### Web UI Enhancements
 - Advanced policy editor features
@@ -787,10 +797,10 @@ The following items are **intentionally deferred** to focus on production-critic
 
 ---
 
-## Appendix: What Halted v2.0.0 Release
+## Appendix: Version Strategy & Critical Findings
 
 **Context:**
-On December 8, 2025, a comprehensive security analysis using Simon Willison's "Lethal Trifecta" framework revealed that SARK, while architecturally sound, has critical implementation gaps:
+On December 8, 2025, a comprehensive security analysis using Simon Willison's "Lethal Trifecta" framework revealed critical implementation gaps:
 
 **Key Findings:**
 1. **Gateway Client Stubbed:** Returns empty lists and NotImplementedError - cannot communicate with real MCP servers
@@ -799,7 +809,10 @@ On December 8, 2025, a comprehensive security analysis using Simon Willison's "L
 4. **Untested End-to-End:** Critical security flows not verified in practice
 
 **Decision:**
-Halt v2.0.0 release and focus on completing production-critical implementation work before proceeding.
+Adopt honest, incremental versioning with clear milestones:
+- **v1.2.0:** Complete gateway implementation + critical fixes (Weeks 1-8)
+- **v1.3.0:** Advanced Lethal Trifecta security features (Q2 2026)
+- **v2.0.0:** Production release after security audit (Week 15)
 
 **This Roadmap:**
-Addresses these gaps with a focused 15-week plan to production readiness.
+Addresses these gaps with a focused 15-week plan using semantic versioning that reflects actual readiness.

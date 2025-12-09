@@ -4,8 +4,9 @@
 **Version:** 1.0
 **Date:** December 8, 2025
 **Based on:** LETHAL_TRIFECTA_ANALYSIS.md
-**Target:** Production-ready v2.1.0
-**Estimated Timeline:** 8-12 weeks
+**Target Release:** v1.2.0 (Gateway + policy validation + test fixes)
+**Production Release:** v2.0.0 (After security audit)
+**Estimated Timeline:** 8-12 weeks to v1.2.0, 15 weeks to v2.0.0
 
 ---
 
