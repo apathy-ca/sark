@@ -224,7 +224,18 @@ class TestLDAPProvider:
     @pytest.mark.asyncio
     async def test_health_check_enabled(self, provider):
         """Test health check succeeds when enabled and configured."""
-        result = await provider.health_check()
+        # Mock the LDAP connection for unit test
+        from unittest.mock import AsyncMock, patch
+        import asyncio
+
+        async def mock_health_check():
+            return True
+
+        with patch.object(asyncio, "get_event_loop") as mock_loop:
+            mock_loop.return_value.run_in_executor.return_value = asyncio.Future()
+            mock_loop.return_value.run_in_executor.return_value.set_result(True)
+
+            result = await provider.health_check()
 
         assert result is True
 
