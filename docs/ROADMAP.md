@@ -1,578 +1,644 @@
 # SARK Path to Production Roadmap
 
-**Document Version:** 1.0
-**Last Updated:** 2025-11-20
-**Target Production Date:** Q1 2026 (Estimated 2-3 months from MVP completion)
+**Document Version:** 2.0
+**Last Updated:** 2025-12-09
+**Status:** v2.0.0 Release Halted - Critical Implementation Gaps Identified
+**Target Production Date:** Q1 2026 (8-10 weeks from gateway completion)
 
 ---
 
 ## Executive Summary
 
-This roadmap outlines the path from MVP to production-ready deployment for SARK, the enterprise-grade MCP governance system. The plan is structured in three phases with clear milestones, dependencies, and success criteria.
+**Current Situation:**
+The v2.0.0 release was halted after critical analysis revealed serious implementation gaps that make SARK not production-ready. The **Lethal Trifecta Analysis** (Dec 8, 2025) identified that while SARK has excellent architecture, the Gateway client is stubbed and several critical security features are missing.
 
-**Current Status:** Phase 1 (MVP) - Core infrastructure functional, critical security features incomplete
-**Next Milestone:** Phase 2 (Security Hardening) - Complete authentication and authorization
-**Production Target:** Phase 3 (Production Release) - Full enterprise deployment ready
+**What We Have:**
+- ✅ Strong architectural foundation (multi-layer auth/authz)
+- ✅ Gateway v1.1.0 infrastructure merged (models, tests, docs)
+- ✅ v2.0.0 features implemented (adapters, federation, GRID protocol)
+- ✅ Comprehensive audit logging and SIEM integration
+
+**What's Missing (Blocking Production):**
+- ❌ Gateway client is stubbed (returns empty lists, NotImplementedError)
+- ❌ No policy validation framework (risk of policy injection attacks)
+- ❌ 154 failing auth provider tests (77.8% pass rate)
+- ❌ No external security audit completed
+
+**Revised Strategy:**
+Focus on **production-critical implementation work** before proceeding with v2.0.0 release. This roadmap reflects the revised priorities based on the Implementation Plan and Lethal Trifecta Analysis.
 
 ---
 
-## Timeline Overview
+## Revised Timeline Overview
 
 ```
 ┌─────────────┬─────────────┬─────────────┬─────────────┐
-│   Week 1-3  │   Week 4-6  │   Week 7-9  │  Week 10-12 │
+│   Week 1-4  │   Week 5-6  │   Week 7-8  │  Week 9-10  │
 ├─────────────┼─────────────┼─────────────┼─────────────┤
-│   Phase 2:  │   Phase 2:  │   Phase 3:  │   Phase 3:  │
-│   Security  │  Operations │  Production │ Deployment  │
-│  Hardening  │   & Tests   │   Polish    │  & Launch   │
+│   Phase 1:  │   Phase 2:  │   Phase 3:  │   Phase 4:  │
+│   Gateway   │   Policy    │  Fix Tests  │  Security   │
+│ Client Impl │  Validation │  & Polish   │   Audit     │
 └─────────────┴─────────────┴─────────────┴─────────────┘
         ↓             ↓             ↓             ↓
-    Auth/AuthZ   SIEM/Monitor   Web UI    Go Live
-    Complete     Complete       Complete   Complete
+   Real MCP      Validate      85% Test     External
+   Transport     Policies      Coverage     Pen Test
 ```
 
+**Critical Path:** Gateway (4 weeks) → Policy Validation (2 weeks) → Fix Tests (2 weeks) → Security Audit (2 weeks)
+
+**Shelved Until Post-Production:**
+- CI/CD improvements (defer until core development complete)
+- Advanced Lethal Trifecta mitigations (P5 - distant future)
+- Web UI enhancements (already functional)
+
 ---
 
-## Phase 2: Security Hardening & Core Features (Weeks 1-6)
+## Phase 1: Complete Gateway Client Implementation (Weeks 1-4)
 
-**Goal:** Complete all critical security features and operational capabilities
-**Duration:** 6 weeks
-**Team Size:** 2-3 engineers
+**Priority:** 🔴 P1 - CRITICAL BLOCKER
+**Goal:** Replace stubbed Gateway client with fully functional MCP transport implementation
+**Duration:** 4 weeks
+**Team:** 1 senior engineer
+**Status:** Not Started
 
-### Week 1-3: Authentication & Authorization
+### Current State Analysis
 
-#### 2.1 Authentication System (Week 1-2)
+**Problem:**
+The Gateway client in `src/sark/api/routers/gateway.py` and `src/sark/models/gateway.py` returns stubbed responses:
 
-**Priority:** 🔴 Critical (Blocker for production)
+```python
+async def list_servers(self, user_id: Optional[str] = None) -> list[GatewayServerInfo]:
+    return []  # STUBBED!
+
+async def get_server_info(self, server_id: str) -> Optional[GatewayServerInfo]:
+    raise NotImplementedError("Gateway client not fully implemented")
+```
+
+This means:
+- No actual MCP server communication happens
+- Authorization/filtering can't be tested end-to-end
+- Production usage impossible
+
+**Impact:**
+- SARK cannot govern real AI agents
+- Security controls unverified in practice
+- All Gateway v1.1.0 work theoretical only
+
+### Week 1: HTTP Transport Implementation
 
 **Tasks:**
 
-1. **JWT Token Implementation** (3 days)
-   - Implement JWT token extraction middleware
-   - Add token validation with expiry checks
-   - Support for RS256 and HS256 algorithms
-   - Token refresh mechanism
-   - File: `src/sark/api/middleware/auth.py`
+1. **Implement `list_servers()` - MCP Server Discovery** (2 days)
+   - Query MCP registry or configured server list via HTTP
+   - Parse MCP server discovery endpoint response
+   - Handle pagination (max 100 servers per page)
+   - Cache results with 5-minute TTL
+   - Filter by user permissions
+   - **File:** `src/sark/gateway/http_client.py`
 
-2. **Identity Provider Integration** (4 days)
-   - LDAP/Active Directory connector
-   - SAML 2.0 authentication flow
-   - OIDC (OpenID Connect) support
-   - Multi-provider configuration
-   - Files: `src/sark/services/auth/`
+2. **Implement `get_server_info()` - Server Metadata** (1 day)
+   - Fetch detailed server information via HTTP
+   - Handle 404 responses gracefully
+   - Cache server metadata
+   - **File:** `src/sark/gateway/http_client.py`
 
-3. **API Key Management** (2 days)
-   - API key generation and rotation
-   - Scope-based permissions for API keys
-   - Rate limiting per API key
-   - File: `src/sark/services/auth/api_keys.py`
+3. **Implement `list_tools()` - Tool Discovery** (2 days)
+   - MCP `tools/list` endpoint integration
+   - Parse tool schemas and metadata
+   - Cache tool lists per server
+   - **File:** `src/sark/gateway/http_client.py`
 
-4. **Session Management** (1 day)
-   - Redis-backed session storage
-   - Session timeout configuration
-   - Concurrent session limits
-   - File: `src/sark/services/auth/sessions.py`
-
-**Acceptance Criteria:**
-- ✅ All API endpoints require valid authentication
-- ✅ Support for at least 2 identity providers (LDAP + OIDC)
-- ✅ API keys work with proper scoping
-- ✅ Token refresh works seamlessly
-- ✅ 100% test coverage for auth module
-
-**Dependencies:** None (highest priority)
+4. **Implement `invoke_tool()` - Core Tool Execution** (3 days)
+   - Full authorization flow integration
+   - Parameter filtering based on OPA decision
+   - Tool invocation via MCP protocol
+   - Result processing and validation
+   - Audit logging of all invocations
+   - **File:** `src/sark/gateway/http_client.py`
 
 **Deliverables:**
-- Authentication middleware functional
-- Identity provider connectors working
-- API key system operational
-- Documentation updated in `docs/SECURITY.md`
+- ✅ HTTP transport fully functional
+- ✅ Integration with OPA authorization working end-to-end
+- ✅ Cache implementation with configurable TTLs
+- ✅ Error handling with retry logic
+- ✅ 20+ unit tests for HTTP client
 
----
-
-#### 2.2 Authorization Enforcement (Week 2-3)
-
-**Priority:** 🔴 Critical (Blocker for production)
+### Week 2: SSE (Server-Sent Events) Transport
 
 **Tasks:**
 
-1. **OPA Policy Integration** (3 days)
-   - Complete OPA authorization checks on server registration
-   - Implement policy evaluation for all protected endpoints
-   - Add policy decision caching (Redis)
-   - Files: `src/sark/api/routers/servers.py`, `src/sark/services/policy/policy_service.py`
+1. **SSE Client Infrastructure** (2 days)
+   - Implement async SSE client for streaming responses
+   - Connection management and reconnection logic
+   - Event parsing and deserialization
+   - **File:** `src/sark/gateway/sse_client.py`
 
-2. **User Context Extraction** (2 days)
-   - Extract user roles from identity provider
-   - Team membership resolution
-   - Permission aggregation
-   - File: `src/sark/services/auth/user_context.py`
+2. **Streaming Tool Invocation** (2 days)
+   - `invoke_tool_streaming()` for real-time results
+   - Async iteration over SSE events
+   - Partial result handling
+   - Stream cancellation on timeout/error
+   - **File:** `src/sark/gateway/sse_client.py`
 
-3. **Tool Sensitivity Classification** (2 days)
-   - Tool registry with sensitivity levels
-   - Automatic sensitivity detection
-   - Manual override capabilities
-   - File: `src/sark/services/discovery/tool_registry.py`
-
-4. **Default Policy Library** (3 days)
-   - Production-ready default policies
-   - Environment-based policy templates (dev/staging/prod)
-   - Policy versioning system
-   - Files: `opa/policies/defaults/`
-
-**Acceptance Criteria:**
-- ✅ All server registration attempts evaluated by OPA
-- ✅ Policy denials properly logged and returned to users
-- ✅ User roles and teams correctly extracted
-- ✅ Tool sensitivity levels properly enforced
-- ✅ Default policies cover common use cases
-- ✅ 90%+ test coverage for authorization logic
-
-**Dependencies:** Authentication system must be complete
+3. **SSE Connection Management** (2 days)
+   - Connection pooling (max 50 concurrent)
+   - Automatic reconnection with exponential backoff
+   - Heartbeat/keepalive handling
+   - Resource cleanup on connection close
+   - **File:** `src/sark/gateway/sse_client.py`
 
 **Deliverables:**
-- Authorization enforced on all protected endpoints
-- Default policy library with 10+ policies
-- Policy testing framework
-- Updated `docs/OPA_POLICY_GUIDE.md`
+- ✅ SSE transport working for streaming responses
+- ✅ Connection pooling implemented
+- ✅ Reconnection logic tested under failure scenarios
+- ✅ 15+ unit tests for SSE client
 
----
-
-### Week 4-6: Operational Capabilities
-
-#### 2.3 SIEM Integration (Week 4)
-
-**Priority:** 🟠 High (Required for compliance)
+### Week 3: stdio Transport (Subprocess-based)
 
 **Tasks:**
 
-1. **SIEM Adapter Framework** (2 days)
-   - Abstract SIEM interface
-   - Retry logic with exponential backoff
-   - Batch event forwarding
-   - File: `src/sark/services/audit/siem/base.py`
+1. **Stdio MCP Client Foundation** (2 days)
+   - Subprocess management for MCP servers
+   - JSON-RPC message handling over stdin/stdout
+   - Process lifecycle management (start, stop, restart)
+   - **File:** `src/sark/gateway/stdio_client.py`
 
-2. **Splunk Integration** (2 days)
-   - Splunk HEC (HTTP Event Collector) client
-   - Custom index and sourcetype support
-   - SSL/TLS certificate validation
-   - File: `src/sark/services/audit/siem/splunk.py`
+2. **Tool Invocation via stdio** (2 days)
+   - JSON-RPC request/response handling
+   - Timeout management (30s default)
+   - Error handling for crashed processes
+   - **File:** `src/sark/gateway/stdio_client.py`
 
-3. **Datadog Integration** (1 day)
-   - Datadog Logs API client
-   - Tag-based event categorization
-   - File: `src/sark/services/audit/siem/datadog.py`
-
-4. **Background Processing** (2 days)
-   - Kafka producer for audit events
-   - Background worker for SIEM forwarding
-   - Dead letter queue for failed events
-   - Files: `src/sark/workers/siem_forwarder.py`
-
-**Acceptance Criteria:**
-- ✅ Audit events successfully forwarded to Splunk
-- ✅ Datadog integration functional
-- ✅ Failed events retry with backoff
-- ✅ No data loss under normal operations
-- ✅ Performance impact <5ms per request
-
-**Dependencies:** None (can run parallel to auth work)
+3. **Process Health & Resource Management** (2 days)
+   - Process health checks (heartbeat)
+   - Resource limits (memory, CPU, file descriptors)
+   - Graceful shutdown handling
+   - Zombie process prevention
+   - **File:** `src/sark/gateway/stdio_client.py`
 
 **Deliverables:**
-- SIEM adapter framework
-- Splunk and Datadog integrations working
-- Configuration guide in `docs/MONITORING.md`
+- ✅ stdio transport functional for local MCP servers
+- ✅ Process management robust (no leaks, zombies)
+- ✅ Resource limits enforced
+- ✅ 15+ unit tests for stdio client
 
----
-
-#### 2.4 API Enhancements (Week 5)
-
-**Priority:** 🟡 Medium (Important for scale)
+### Week 4: Integration, Error Handling & Polish
 
 **Tasks:**
 
-1. **Pagination Implementation** (2 days)
-   - Cursor-based pagination for server listing
-   - Configurable page sizes (default: 50, max: 200)
-   - Total count header
-   - Files: `src/sark/api/routers/servers.py`, `src/sark/api/pagination.py`
+1. **Unified Gateway Client Interface** (2 days)
+   - Abstract transport interface
+   - Automatic transport selection based on server config
+   - Transport-agnostic error handling
+   - **File:** `src/sark/gateway/client.py`
 
-2. **Search & Filtering** (2 days)
-   - Filter servers by: team, sensitivity, status, tags
-   - Full-text search on server names and descriptions
-   - Combined filters with AND/OR logic
-   - File: `src/sark/services/discovery/search.py`
+2. **Comprehensive Error Handling** (2 days)
+   - Timeout handling with exponential backoff
+   - Network error retry logic
+   - Authorization failure handling
+   - Circuit breaker pattern (fail-fast after 5 consecutive errors)
+   - **File:** `src/sark/gateway/error_handler.py`
 
-3. **Bulk Operations** (1 day)
-   - Bulk server registration
-   - Bulk status updates
-   - Batch policy evaluation
-   - File: `src/sark/api/routers/bulk.py`
-
-**Acceptance Criteria:**
-- ✅ Pagination works with 10,000+ servers
-- ✅ Search returns results in <100ms
-- ✅ Bulk operations support 100+ items
-- ✅ API documentation updated
-
-**Dependencies:** None
+3. **End-to-End Integration Tests** (3 days)
+   - Real MCP server testing (mock or local)
+   - Authorization flow validation
+   - Parameter filtering verification
+   - Audit logging confirmation
+   - Performance benchmarks (<100ms p95 latency)
+   - **File:** `tests/integration/test_gateway_e2e.py`
 
 **Deliverables:**
-- Pagination on all list endpoints
-- Search functionality operational
-- API documentation in `docs/API_INTEGRATION.md`
-
----
-
-#### 2.5 Health Check System (Week 5-6)
-
-**Priority:** 🟡 Medium (Required for production monitoring)
-
-**Tasks:**
-
-1. **Dependency Health Checks** (2 days)
-   - PostgreSQL connection check with timeout
-   - Redis connectivity verification
-   - OPA endpoint health check
-   - Consul service status
-   - Vault seal status check
-   - File: `src/sark/api/routers/health.py`
-
-2. **Kubernetes Probes** (1 day)
-   - `/live` - Liveness probe (basic process check)
-   - `/ready` - Readiness probe (dependencies ready)
-   - `/startup` - Startup probe (initialization complete)
-   - File: `src/sark/api/routers/health.py`
-
-3. **Health Dashboard** (2 days)
-   - Detailed health status endpoint with component breakdown
-   - Historical health metrics (last 1h/24h/7d)
-   - Integration with Prometheus
-   - File: `src/sark/api/routers/health.py`
+- ✅ All 3 transports (HTTP, SSE, stdio) working
+- ✅ Gateway client fully functional end-to-end
+- ✅ 50+ integration tests covering happy path and failures
+- ✅ Performance: <100ms p95 latency for tool invocations
+- ✅ Documentation: API reference and usage examples
+- ✅ **Gateway Implementation Complete - UNBLOCKED FOR PRODUCTION**
 
 **Acceptance Criteria:**
-- ✅ All critical dependencies checked
-- ✅ Kubernetes probes work correctly
-- ✅ Health checks complete in <1 second
-- ✅ No false positives in production
-
-**Dependencies:** SIEM integration should be complete for full health checks
-
-**Deliverables:**
-- Production-ready health endpoints
-- Kubernetes probe configuration
-- Monitoring runbook in `docs/runbooks/health_monitoring.md`
+- [ ] All Gateway methods implemented (no stubs)
+- [ ] End-to-end test with real MCP server passes
+- [ ] Authorization + filtering verified in practice
+- [ ] Performance targets met (<100ms p95)
+- [ ] 85%+ code coverage for gateway module
+- [ ] Documentation complete with examples
+- [ ] Security review passed (internal)
 
 ---
 
-#### 2.6 Testing & Quality Assurance (Week 6)
+## Phase 2: Policy Validation Framework (Weeks 5-6)
 
-**Priority:** 🔴 Critical (Gate for Phase 3)
+**Priority:** 🔴 P2 - CRITICAL
+**Goal:** Prevent policy injection attacks by validating OPA policies before loading
+**Duration:** 2 weeks
+**Team:** 1 engineer
+**Status:** Not Started
+
+### Current Risk
+
+**Problem:**
+Policies loaded from files/API without validation. Rego is Turing-complete, allowing arbitrary logic:
+
+```rego
+# MALICIOUS POLICY EXAMPLE
+package gateway.authorization
+default allow := true  # Approve everything!
+filtered_params := input.params  # Don't filter anything!
+```
+
+**Impact:**
+- Single malicious policy bypasses all security
+- Policy misconfiguration undetected until breach
+- No safety net for policy authors
+
+### Week 5: Policy Validator Implementation
 
 **Tasks:**
 
-1. **Unit Test Expansion** (3 days)
-   - Achieve 85%+ code coverage
-   - All new authentication code tested
-   - All authorization logic tested
-   - Mock external dependencies (OPA, SIEM)
+1. **Policy Validation Engine** (3 days)
+   - Syntax validation via OPA CLI (`opa check`)
+   - Required rule verification (must have `allow` and `deny`)
+   - Forbidden pattern detection (blanket allows, system imports)
+   - Safety checks (no external HTTP, no data exfiltration)
+   - **File:** `src/sark/policy/validator.py`
 
-2. **Integration Tests** (3 days)
-   - End-to-end API tests with real database
-   - OPA policy evaluation integration tests
-   - SIEM forwarding integration tests
-   - Authentication flow tests
+2. **Policy Testing Framework** (2 days)
+   - Run unit tests for policies (YAML test suites)
+   - Evaluate policy with sample inputs
+   - Verify expected allow/deny decisions
+   - **File:** `src/sark/policy/test_runner.py`
 
-3. **Performance Tests** (2 days)
-   - Load test: 1000 requests/second
-   - Database query optimization
-   - API response time benchmarks
-   - Memory leak detection
+**Deliverables:**
+- ✅ Policy validator with syntax and safety checks
+- ✅ Forbidden pattern detection (10+ patterns)
+- ✅ 20+ unit tests for validator
 
-4. **Security Testing** (2 days)
-   - OWASP Top 10 vulnerability scanning
-   - Dependency vulnerability checks (Snyk/Trivy)
+### Week 6: Integration & Policy Migration
+
+**Tasks:**
+
+1. **Integrate Validator into Loading Pipeline** (2 days)
+   - Validate all policies before loading into OPA
+   - Reject invalid policies with detailed errors
+   - Log validation warnings (non-fatal issues)
+   - **File:** `src/sark/policy/loader.py`
+
+2. **Validate Existing Policies** (2 days)
+   - Run validator against all current policies
+   - Fix policies that fail validation
+   - Create test suites for all policies
+   - **Files:** `opa_policies/*.rego`, `opa_policies/tests/*.yaml`
+
+3. **Documentation & Best Practices** (1 day)
+   - Policy authoring guide with safety requirements
+   - Common mistakes and how to avoid them
+   - Example safe policies
+   - **File:** `docs/POLICY_AUTHORING_GUIDE.md`
+
+**Deliverables:**
+- ✅ All policies validated before loading
+- ✅ 100% of existing policies pass validation
+- ✅ Policy test suites created
+- ✅ Documentation for policy authors
+- ✅ **Policy Injection Risk Mitigated**
+
+**Acceptance Criteria:**
+- [ ] Validator rejects malicious policy examples
+- [ ] All existing policies validated and tested
+- [ ] Invalid policy upload returns clear error
+- [ ] Documentation reviewed and approved
+- [ ] Security team sign-off
+
+---
+
+## Phase 3: Fix Failing Tests & Improve Coverage (Weeks 7-8)
+
+**Priority:** 🟠 P3 - HIGH
+**Goal:** Achieve 85%+ test coverage with 100% pass rate
+**Duration:** 2 weeks
+**Team:** 1 engineer
+**Status:** Not Started
+
+### Current State
+
+**Problem:**
+- 77.8% test pass rate (154 auth provider tests erroring)
+- Gaps in test coverage for critical paths
+- No end-to-end scenario tests
+
+### Week 7: Fix Auth Provider Tests
+
+**Tasks:**
+
+1. **Debug LDAP Auth Provider Tests** (2 days)
+   - Issue: Mock LDAP server not starting correctly
+   - Fix: Use `pytest-docker` for real LDAP container
+   - Resolve 52 LDAP test failures
+   - **File:** `tests/test_auth_providers.py`
+
+2. **Debug SAML Auth Provider Tests** (2 days)
+   - Issue: XML signature validation failing
+   - Fix: Correct certificate format in test fixtures
+   - Resolve 48 SAML test failures
+   - **File:** `tests/test_auth_providers.py`
+
+3. **Debug OIDC Auth Provider Tests** (1 day)
+   - Issue: Token expiry validation off by 1 second
+   - Fix: Use `freezegun` for time mocking
+   - Resolve 54 OIDC test failures
+   - **File:** `tests/test_auth_providers.py`
+
+**Deliverables:**
+- ✅ 100% test pass rate
+- ✅ All 154 erroring tests fixed
+- ✅ Docker-based test infrastructure for LDAP
+
+### Week 8: Improve Test Coverage
+
+**Tasks:**
+
+1. **Add Missing Unit Tests** (2 days)
+   - Gateway authorization logic
+   - Parameter filtering edge cases
+   - Cache TTL calculations
+   - Rate limiting enforcement
+   - **Files:** `tests/unit/test_*.py`
+
+2. **Add End-to-End Scenario Tests** (3 days)
+   - Sensitive data access workflows
+   - Prompt injection blocking scenarios
+   - Multi-layer authorization flows
+   - Audit log verification
+   - **File:** `tests/e2e/test_scenarios.py`
+
+**Deliverables:**
+- ✅ 85%+ code coverage
+- ✅ 200+ total tests (unit + integration + e2e)
+- ✅ CI/CD pipeline green
+- ✅ Coverage report published
+- ✅ **Test Quality Gate Met**
+
+**Acceptance Criteria:**
+- [ ] 100% test pass rate achieved
+- [ ] 85%+ overall code coverage
+- [ ] All critical paths have tests
+- [ ] E2E scenarios cover major workflows
+- [ ] Performance tests pass (<100ms p95)
+
+---
+
+## Phase 4: Security Audit Preparation & Execution (Weeks 9-10)
+
+**Priority:** 🔴 P1 - CRITICAL GATE
+**Goal:** External penetration test to validate security controls
+**Duration:** 2 weeks preparation + 2 weeks vendor testing
+**Team:** 1 engineer + external vendor
+**Status:** Not Started
+
+### Week 9: Pre-Audit Preparation
+
+**Tasks:**
+
+1. **Document Attack Surface** (2 days)
+   - API endpoints inventory (50+ endpoints)
+   - Authentication mechanisms documentation
+   - Data flows and trust boundaries
+   - **File:** `docs/security/ATTACK_SURFACE.md`
+
+2. **Security Questionnaire** (2 days)
+   - OWASP Top 10 mitigations
+   - Encryption (TLS, at-rest, in-transit)
+   - Secret management practices
+   - Access controls documentation
+   - **File:** `docs/security/SECURITY_CONTROLS.md`
+
+3. **Provide Test Environment** (1 day)
+   - Staging cluster with production-like config
+   - Test accounts (admin, developer, restricted)
+   - Synthetic test data (no production data)
+   - **Infrastructure:** Staging environment
+
+**Deliverables:**
+- ✅ Attack surface documented
+- ✅ Security controls documented
+- ✅ Test environment ready
+- ✅ Vendor selected and contracted
+
+### Week 10: Internal Security Review
+
+**Tasks:**
+
+1. **Internal Security Scan** (2 days)
+   - OWASP ZAP automated scanning
+   - Dependency vulnerability check (Snyk/Trivy)
    - Secrets scanning (TruffleHog)
-   - SQL injection testing
+   - **Tools:** OWASP ZAP, Snyk, TruffleHog
 
-**Acceptance Criteria:**
-- ✅ 85%+ overall test coverage
-- ✅ All critical paths have integration tests
-- ✅ No P0/P1 security vulnerabilities
-- ✅ Performance targets met (see below)
+2. **Fix Critical Issues** (3 days)
+   - Address P0/P1 findings from internal scan
+   - Update dependencies with CVEs
+   - Remove any detected secrets
+   - **Various files**
+
+**Deliverables:**
+- ✅ Internal security scan complete
+- ✅ All P0/P1 issues resolved
 - ✅ No secrets in codebase
+- ✅ Dependencies up to date
+- ✅ **Ready for External Audit**
 
-**Performance Targets:**
-- API response time (p95): <100ms
-- Server registration: <200ms
-- Policy evaluation: <50ms
-- Database queries: <20ms
-- Concurrent users: 1000+
+### Weeks 11-12: External Security Testing (Vendor)
 
-**Dependencies:** All Phase 2 features complete
+**Vendor Selection:** TBD (recommend NCC Group, Trail of Bits, or Bishop Fox)
+
+**Testing Methods:**
+- Automated vulnerability scanning
+- Manual penetration testing
+- Code review (security-focused)
+- Policy analysis (OPA Rego)
+
+**Expected Timeline:**
+- Week 11: Vendor testing
+- Week 12: Remediation + re-test
+
+**Acceptance Criteria:**
+- [ ] Zero critical vulnerabilities
+- [ ] Zero high vulnerabilities
+- [ ] Remediation plan for medium/low findings
+- [ ] Penetration test report received
+- [ ] Security team sign-off for production
 
 **Deliverables:**
-- Test coverage report
-- Performance benchmark results
-- Security scan reports
-- Test documentation in `tests/README.md`
+- ✅ External security audit report
+- ✅ Remediation completed and verified
+- ✅ Penetration test certification
+- ✅ **PRODUCTION SECURITY GATE PASSED**
 
 ---
 
-## Phase 3: Production Polish & Deployment (Weeks 7-12)
+## Phase 5: Lethal Trifecta Advanced Mitigations (Future)
 
-**Goal:** Prepare for production deployment with full operational tooling
-**Duration:** 6 weeks
-**Team Size:** 3-4 engineers (2 backend, 1 frontend, 1 DevOps)
+**Priority:** 🔵 P5 - DISTANT FUTURE
+**Status:** Deferred post-production
+**Timeline:** Q2 2026
 
-### Week 7-9: User Experience & Tooling
+These are **nice-to-have** security enhancements identified in the Lethal Trifecta Analysis but not blockers for production:
 
-#### 3.1 Web UI for Policy Management (Week 7-8)
+### Advanced Security Features
 
-**Priority:** 🟡 Medium (Nice to have, not blocker)
+1. **Prompt Injection Detection** (P2 from original plan)
+   - Pattern-based detection (20+ patterns)
+   - Entropy analysis for encoded payloads
+   - Configurable response (block/alert/log)
+   - Risk scoring system
+   - **Effort:** 2 weeks
 
-**Tasks:**
+2. **Anomaly Detection System** (P2 from original plan)
+   - Behavioral baseline per user
+   - Real-time anomaly detection
+   - Alert on unusual access patterns
+   - Auto-suspend on critical anomalies
+   - **Effort:** 2 weeks
 
-1. **UI Framework Setup** (2 days)
-   - React + TypeScript setup
-   - TailwindCSS for styling
-   - React Query for API calls
-   - Directory: `ui/`
+3. **Network-Level Controls** (P2 from original plan)
+   - Kubernetes NetworkPolicies
+   - Egress filtering (domain whitelist)
+   - Cloud firewall rules
+   - Defense-in-depth networking
+   - **Effort:** 1 week
 
-2. **Policy Editor** (4 days)
-   - Rego syntax highlighting
-   - Policy validation on save
-   - Version comparison view
-   - Live policy testing interface
+4. **Secret Scanning** (P3 from original plan)
+   - Scan tool responses for secrets
+   - Redact detected secrets
+   - Alert on secret exposure
+   - **Effort:** 1 week
 
-3. **Server Dashboard** (3 days)
-   - Server list with search/filter
-   - Server detail view with tools
-   - Registration status tracking
-   - Health status visualization
+5. **MFA for Critical Actions** (P3 from original plan)
+   - MFA challenge for high-sensitivity resources
+   - TOTP/SMS/Push notification support
+   - Grace period for emergency access
+   - **Effort:** 1 week
 
-4. **Audit Log Viewer** (2 days)
-   - Filterable audit event timeline
-   - Event detail modal
-   - Export to CSV/JSON
-
-**Acceptance Criteria:**
-- ✅ Policy CRUD operations functional
-- ✅ Server dashboard shows real-time data
-- ✅ Audit logs searchable and filterable
-- ✅ Responsive design works on mobile
-- ✅ Authentication required for all pages
-
-**Dependencies:** Backend API complete
-
-**Deliverables:**
-- Production web UI deployed
-- User guide in `docs/WEB_UI_GUIDE.md`
+**Total Effort:** ~7-8 weeks
+**Recommendation:** Defer to post-production (Q2 2026)
 
 ---
 
-#### 3.2 CLI Tool (Week 8)
+## Production Deployment Strategy
 
-**Priority:** 🟡 Medium (Power user tool)
+### Pre-Production Checklist
 
-**Tasks:**
+Before production deployment, ALL of the following must be complete:
 
-1. **CLI Framework** (1 day)
-   - Click-based CLI structure
-   - Configuration file support (~/.sark/config.yaml)
-   - File: `src/sark/cli/main.py`
+**Phase 1 - Gateway Client:**
+- [ ] All 3 transports (HTTP, SSE, stdio) working
+- [ ] End-to-end tests passing with real MCP server
+- [ ] Performance targets met (<100ms p95)
+- [ ] Code coverage ≥85% for gateway module
 
-2. **Server Management Commands** (2 days)
-   - `sark server register`
-   - `sark server list`
-   - `sark server get <id>`
-   - `sark server delete <id>`
+**Phase 2 - Policy Validation:**
+- [ ] Validator integrated into policy loading
+- [ ] All existing policies validated and tested
+- [ ] Security team approval
 
-3. **Policy Management Commands** (2 days)
-   - `sark policy evaluate`
-   - `sark policy test`
-   - `sark policy upload`
+**Phase 3 - Test Quality:**
+- [ ] 100% test pass rate
+- [ ] Overall code coverage ≥85%
+- [ ] E2E scenarios covering major workflows
 
-4. **Audit Commands** (1 day)
-   - `sark audit search`
-   - `sark audit export`
+**Phase 4 - Security Audit:**
+- [ ] External penetration test passed
+- [ ] Zero critical/high vulnerabilities
+- [ ] Remediation complete and verified
 
-**Acceptance Criteria:**
-- ✅ All major operations available via CLI
-- ✅ Output formats: JSON, table, YAML
-- ✅ Authentication via API key or OAuth
-- ✅ Man pages / help documentation
+**Infrastructure:**
+- [ ] Production Kubernetes cluster provisioned
+- [ ] SSL/TLS certificates configured
+- [ ] DNS records configured
+- [ ] Monitoring dashboards operational
+- [ ] Backup systems verified
+- [ ] Incident response playbook ready
 
-**Dependencies:** Backend API stable
+**Documentation:**
+- [ ] Production deployment guide tested
+- [ ] Runbooks peer-reviewed
+- [ ] User training materials ready
+- [ ] API documentation complete
 
-**Deliverables:**
-- Published CLI tool (PyPI package)
-- CLI documentation in `docs/CLI_GUIDE.md`
+### Deployment Timeline
 
----
+**Week 13: Staging Deployment**
+- Deploy to staging environment
+- Run full test suite in staging
+- Performance testing under load
+- Security review in staging
 
-#### 3.3 Documentation & Runbooks (Week 9)
+**Week 14: Canary Deployment**
+- Deploy to 5% of production traffic
+- Monitor for 48 hours
+- Gradual increase: 5% → 25% → 50% → 100%
 
-**Priority:** 🟠 High (Required for operations team)
+**Week 15: Production Go-Live**
+- 100% production traffic
+- 24/7 monitoring for first 72 hours
+- On-call team ready
+- Post-launch review
 
-**Tasks:**
+### Rollback Plan
 
-1. **Operational Runbooks** (3 days)
-   - Incident response procedures
-   - Common troubleshooting scenarios
-   - Database maintenance procedures
-   - Backup and restore procedures
-   - Files: `docs/runbooks/`
+**Triggers:**
+- Error rate >1%
+- Latency p95 >200ms (2x normal)
+- Critical security issue discovered
+- Data corruption detected
 
-2. **Deployment Guides** (2 days)
-   - Production deployment checklist
-   - Zero-downtime upgrade procedure
-   - Rollback procedures
-   - Disaster recovery plan
-   - Files: `docs/deployment/`
+**Procedure:**
+1. Alert fires (PagerDuty) - <1 min
+2. On-call engineer assesses - <5 min
+3. Rollback decision if confirmed - <5 min
+4. Deploy previous version via Helm - <10 min
+5. Verify metrics return to normal - <15 min
+6. Post-mortem within 24 hours
 
-3. **API Documentation** (2 days)
-   - OpenAPI/Swagger spec generation
-   - Code examples in Python, curl, JavaScript
-   - Authentication guide
-   - File: `docs/API_REFERENCE.md`
-
-4. **Training Materials** (2 days)
-   - Administrator quick start guide
-   - Policy author tutorial
-   - Video walkthrough (screen recording)
-   - Files: `docs/training/`
-
-**Acceptance Criteria:**
-- ✅ All runbooks peer-reviewed
-- ✅ Deployment guide tested on clean environment
-- ✅ API docs auto-generated from code
-- ✅ Training materials validated with users
-
-**Dependencies:** All features implemented
-
-**Deliverables:**
-- Complete runbook library
-- Deployment automation scripts
-- Training materials ready
-
----
-
-### Week 10-12: Production Deployment
-
-#### 3.4 Pilot Deployment (Week 10)
-
-**Priority:** 🔴 Critical (First production test)
-
-**Tasks:**
-
-1. **Pilot Environment Setup** (2 days)
-   - Deploy to staging environment
-   - 100 pilot MCP servers registered
-   - 50 pilot users onboarded
-   - Monitoring dashboards configured
-
-2. **User Acceptance Testing** (3 days)
-   - Pilot users test all workflows
-   - Collect feedback and bugs
-   - Performance monitoring
-   - Security review
-
-3. **Bug Fixes & Refinements** (3 days)
-   - Address P0/P1 issues from pilot
-   - Performance tuning based on real usage
-   - Documentation updates
-
-**Acceptance Criteria:**
-- ✅ Zero critical bugs during pilot
-- ✅ 95%+ user satisfaction score
-- ✅ Performance targets met under load
-- ✅ All security controls functional
-
-**Dependencies:** All Phase 3 features complete
-
-**Deliverables:**
-- Pilot report with findings
-- Bug fix releases
-- Go/no-go decision for production
-
----
-
-#### 3.5 Production Launch (Week 11-12)
-
-**Priority:** 🔴 Critical (Production go-live)
-
-**Tasks:**
-
-1. **Production Environment Preparation** (2 days)
-   - Infrastructure provisioning (Terraform)
-   - SSL/TLS certificates configured
-   - DNS records configured
-   - Backup systems verified
-
-2. **Data Migration** (1 day)
-   - Migrate pilot data to production
-   - Verify data integrity
-   - Test rollback procedures
-
-3. **Production Deployment** (2 days)
-   - Blue-green deployment strategy
-   - Gradual traffic shift (10% → 50% → 100%)
-   - Real-time monitoring
-   - On-call team ready
-
-4. **Post-Launch Monitoring** (3 days)
-   - 24/7 monitoring for first 72 hours
-   - Daily health checks
-   - User support ready
-   - Incident response on standby
-
-5. **Launch Communication** (1 day)
-   - Internal announcement
-   - User onboarding emails
-   - Training session schedule
-   - Support channel setup
-
-**Acceptance Criteria:**
-- ✅ Zero downtime during deployment
-- ✅ No P0/P1 incidents in first 72 hours
-- ✅ All monitoring alerts functional
-- ✅ 99.9% uptime in first month
-
-**Dependencies:** Successful pilot completion
-
-**Deliverables:**
-- Production system live
-- Post-launch report
-- Support escalation procedures active
+**Total MTTR Target:** <30 minutes
 
 ---
 
 ## Success Metrics
 
-### Technical Metrics
+### Phase Completion Gates
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| **Uptime** | 99.9% | Monthly average |
-| **API Response Time (p95)** | <100ms | Prometheus metrics |
-| **Policy Evaluation Time (p95)** | <50ms | Application metrics |
-| **Test Coverage** | 85%+ | pytest-cov |
-| **Security Vulnerabilities** | Zero P0/P1 | Snyk, Trivy scans |
-| **Database Query Time (p95)** | <20ms | PostgreSQL slow log |
-| **Concurrent Users** | 1000+ | Load testing |
-| **Audit Events Processed** | 10,000/min | Kafka throughput |
+| Phase | Metric | Target | Measurement |
+|-------|--------|--------|-------------|
+| **Phase 1: Gateway** | Implementation complete | 100% | All methods working, no stubs |
+| | End-to-end test | Pass | Real MCP server integration |
+| | Performance | <100ms p95 | Load testing |
+| | Coverage | ≥85% | pytest-cov |
+| **Phase 2: Policy** | Validation working | 100% | All policies validated |
+| | Existing policies pass | 100% | No validation failures |
+| | Security review | Approved | Security team sign-off |
+| **Phase 3: Tests** | Test pass rate | 100% | CI green |
+| | Coverage | ≥85% | pytest-cov |
+| | E2E scenarios | ≥20 | Scenario tests passing |
+| **Phase 4: Security** | Pen test | Passed | External vendor |
+| | Critical vulnerabilities | 0 | Security audit |
+| | High vulnerabilities | 0 | Security audit |
 
-### Business Metrics
+### Production Readiness Metrics
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| **Pilot Satisfaction** | 95%+ | User survey |
-| **Server Registration Rate** | 100 servers/week | Application metrics |
-| **Policy Violations Detected** | Track weekly | Audit logs |
-| **Mean Time to Detect (MTTD)** | <1 minute | SIEM integration |
-| **Mean Time to Respond (MTTR)** | <15 minutes | Incident reports |
-| **User Adoption** | 500+ users in month 1 | User registration |
+| Category | Metric | Target | Status |
+|----------|--------|--------|--------|
+| **Functionality** | Gateway client functional | 100% | 🔴 Not Started |
+| | Policy validation | 100% | 🔴 Not Started |
+| | Test pass rate | 100% | 🟡 77.8% |
+| **Security** | External audit | Passed | 🔴 Not Started |
+| | Vulnerabilities (P0/P1) | 0 | 🟡 Unknown |
+| **Quality** | Code coverage | ≥85% | 🟡 ~64% |
+| | E2E tests | ≥20 | 🔴 0 |
+| **Performance** | API latency (p95) | <100ms | ✅ Met |
+| | Gateway latency (p95) | <100ms | 🔴 Untested |
+
+**Overall Production Readiness:** 🔴 **NOT READY** (4/10 metrics met)
 
 ---
 
@@ -582,97 +648,111 @@ This roadmap outlines the path from MVP to production-ready deployment for SARK,
 
 | Risk | Impact | Probability | Mitigation |
 |------|--------|-------------|------------|
-| **Authentication integration delays** | High | Medium | Start early, allocate senior engineer |
-| **OPA performance issues at scale** | High | Low | Load testing in week 6, caching strategy |
-| **SIEM integration compatibility** | Medium | Medium | Early vendor validation, fallback to file-based |
-| **Database migration failures** | High | Low | Extensive testing, rollback procedures |
-| **Security vulnerabilities discovered** | Critical | Low | Continuous security scanning, penetration test |
-| **Pilot user resistance** | Medium | Medium | Training, documentation, support |
+| **Gateway implementation takes >4 weeks** | High | Medium | Allocate buffer time, consider HTTP-only MVP |
+| **Security audit finds critical vuln** | Critical | Medium | Address immediately, delay production |
+| **Test failures block progress** | Medium | Low | Refactor problematic code iteratively |
+| **Policy validation breaks existing policies** | High | Medium | Gradual rollout, extensive testing |
+| **Performance degradation** | Medium | Low | Optimize, add caching, horizontal scaling |
 
 ### Contingency Plans
 
-1. **Authentication Fallback:** If identity provider integration fails, deploy with API key auth only, defer SSO to post-launch
-2. **SIEM Fallback:** If SIEM integrations fail, use file-based audit export with manual import
-3. **Performance Issues:** If performance targets not met, reduce initial user count, optimize incrementally
-4. **Schedule Slip:** If Phase 2 exceeds 6 weeks, cut Web UI from Phase 3, deploy CLI-only initially
+**If Gateway takes >4 weeks:**
+- Option 1: Ship HTTP-only (defer SSE/stdio to v2.1)
+- Option 2: Hire contractor with MCP experience
+- Option 3: Extend timeline by 2 weeks
+
+**If security audit fails:**
+- Option 1: Fix critical issues, deploy to staging only
+- Option 2: Engage security consultant for remediation
+- Option 3: Defer production until re-test passes
+
+**If test coverage can't reach 85%:**
+- Option 1: Accept 80% for v2.0, target 85% for v2.1
+- Option 2: Focus coverage on critical paths only
+- Option 3: Technical debt sprint post-production
 
 ---
 
 ## Resource Requirements
 
-### Engineering Team
+### Engineering Team (10 weeks)
 
-| Role | Phase 2 | Phase 3 | Total Weeks |
-|------|---------|---------|-------------|
-| **Senior Backend Engineer** | Full-time | Full-time | 12 weeks |
-| **Backend Engineer** | Full-time | Full-time | 12 weeks |
-| **Frontend Engineer** | - | Full-time | 6 weeks |
-| **DevOps Engineer** | Part-time (50%) | Full-time | 9 weeks FTE |
-| **QA Engineer** | Week 6 only | Week 10-12 | 4 weeks |
-| **Security Engineer** | Week 6 review | Week 11 review | 2 weeks |
+| Role | Weeks 1-4 | Weeks 5-6 | Weeks 7-8 | Weeks 9-10 | Total |
+|------|-----------|-----------|-----------|------------|-------|
+| **Senior Backend Engineer** | Full-time (Gateway) | Full-time (Policy) | Part-time (Review) | Part-time (Audit prep) | 6 weeks FTE |
+| **Backend Engineer** | - | - | Full-time (Tests) | Full-time (Security) | 4 weeks FTE |
+| **Security Engineer** | - | - | - | Part-time (Audit) | 1 week FTE |
 
-### Infrastructure Costs (Monthly Estimates)
+**Total Engineering Effort:** ~11 weeks FTE across 10 calendar weeks
 
-| Environment | Cloud Cost | Description |
-|-------------|-----------|-------------|
-| **Development** | $200/month | Small instances, non-HA |
-| **Staging** | $500/month | Production-like, HA enabled |
-| **Production** | $2000/month | Full HA, auto-scaling, backups |
+### External Vendor
 
-**Total Project Cost:** ~$3,000/month for 3 months = $9,000 infrastructure + ~$150,000 engineering (3 FTE × 3 months × $50k annual / 12)
+**Security Audit:** $15,000 - $30,000 (2 weeks testing)
 
----
+### Infrastructure Costs
 
-## Post-Production Roadmap
+| Environment | Cost/Month | Notes |
+|-------------|------------|-------|
+| **Development** | $200 | Small instances, non-HA |
+| **Staging** | $500 | Production-like, HA enabled |
+| **Production** | $2000 | Full HA, auto-scaling, backups |
 
-### Q2 2026 (Months 4-6)
-
-- **Multi-tenancy:** Support for multiple organizations in single deployment
-- **Advanced Analytics:** Usage dashboards, cost attribution, security insights
-- **Compliance Reports:** SOC2, ISO 27001 automated evidence collection
-- **GraphQL API:** Alternative to REST for complex queries
-- **Service Mesh Integration:** Istio/Linkerd integration for zero-trust networking
-
-### Q3 2026 (Months 7-9)
-
-- **AI-Powered Policy Recommendations:** Suggest policies based on usage patterns
-- **Federated Deployments:** Multi-region, multi-cloud deployments
-- **Mobile App:** iOS/Android apps for incident response
-- **Threat Intelligence Integration:** Integrate with threat intel feeds
-- **Cost Optimization:** Identify underutilized MCP servers
-
-### Q4 2026 (Months 10-12)
-
-- **SaaS Offering:** Multi-tenant SaaS version for SMBs
-- **Marketplace:** Community policy library and plugin marketplace
-- **Enterprise Support Tier:** 24/7 support with SLA
-- **Certification Program:** SARK administrator certification
+**Total Project Cost:**
+- Engineering: ~$55,000 (11 weeks FTE × $5000/week)
+- Security Audit: ~$20,000
+- Infrastructure (3 months): ~$8,100
+- **Total: ~$83,000**
 
 ---
 
-## Approval & Sign-off
+## Timeline Summary
 
-### Phase Completion Gates
+```
+Week 1-2:  Gateway HTTP transport + SSE transport
+Week 3:    Gateway stdio transport
+Week 4:    Gateway integration & end-to-end testing
+Week 5:    Policy validation engine
+Week 6:    Policy validation integration & migration
+Week 7:    Fix auth provider tests
+Week 8:    Improve test coverage
+Week 9:    Security audit preparation
+Week 10:   Internal security review
+Week 11:   External security testing (vendor)
+Week 12:   Remediation & re-test
+Week 13:   Staging deployment
+Week 14:   Canary production deployment
+Week 15:   Full production go-live
+```
 
-Each phase requires sign-off from:
+**Critical Path:** Gateway (4 weeks) → Policy (2 weeks) → Tests (2 weeks) → Security Audit (4 weeks) → Deployment (3 weeks)
 
-**Phase 2 Completion (Week 6):**
-- [ ] Engineering Lead - All features implemented and tested
-- [ ] Security Team - Security review passed
-- [ ] QA Lead - Test coverage and quality standards met
-- [ ] Product Manager - Acceptance criteria satisfied
+**Total Duration:** 15 weeks from start to production
 
-**Phase 3 Pilot Completion (Week 10):**
-- [ ] Pilot Program Manager - User acceptance achieved
-- [ ] Operations Team - Runbooks and monitoring ready
-- [ ] Engineering Lead - Performance targets met
-- [ ] Security Team - Production security review passed
+---
 
-**Production Launch (Week 11):**
-- [ ] CTO/VP Engineering - Final go-live approval
-- [ ] Security Team - Production deployment approved
-- [ ] Operations Team - 24/7 support ready
-- [ ] Product Manager - Business metrics tracking ready
+## Shelved Items (Post-Production)
+
+The following items are **intentionally deferred** to focus on production-critical work:
+
+### CI/CD Improvements
+- Advanced GitHub Actions workflows
+- Automated deployment pipelines
+- Blue-green deployment automation
+- **Reason:** Current CI works; optimize after core dev complete
+
+### Advanced Lethal Trifecta Mitigations (Phase 5)
+- Prompt injection detection
+- Anomaly detection
+- Network-level controls
+- Secret scanning
+- MFA for critical actions
+- **Reason:** Not blockers for production; add incrementally Q2 2026
+
+### Web UI Enhancements
+- Advanced policy editor features
+- Real-time dashboard updates
+- Mobile responsiveness improvements
+- **Reason:** Current UI functional; polish post-launch
 
 ---
 
@@ -683,17 +763,43 @@ Each phase requires sign-off from:
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 1.0 | 2025-11-20 | SARK Team | Initial roadmap |
+| 2.0 | 2025-12-09 | SARK Team | Complete revision based on Lethal Trifecta Analysis |
 
-**Review Schedule:** Bi-weekly on Mondays
+**Review Schedule:** Weekly on Mondays during active development
 
-**Next Review:** 2025-12-04
+**Next Review:** 2025-12-16
+
+**Approval Status:**
+- [ ] Engineering Lead
+- [ ] Security Team
+- [ ] Product Manager
 
 ---
 
 ## Related Documentation
 
-- **[Production Readiness Checklist](./PRODUCTION_READINESS.md)** - Detailed checklist for production
-- **[Implementation Plan](./IMPLEMENTATION_PLAN.md)** - Task breakdown with dependencies
+- **[Lethal Trifecta Analysis](../LETHAL_TRIFECTA_ANALYSIS.md)** - Security gap analysis
+- **[Implementation Plan](../IMPLEMENTATION_PLAN.md)** - Detailed task breakdown
+- **[Production Readiness Checklist](./PRODUCTION_READINESS.md)** - Go-live requirements
 - **[Architecture Guide](./ARCHITECTURE.md)** - System architecture overview
 - **[Security Guide](./SECURITY.md)** - Security requirements and controls
 - **[Deployment Guide](./DEPLOYMENT.md)** - Deployment procedures
+
+---
+
+## Appendix: What Halted v2.0.0 Release
+
+**Context:**
+On December 8, 2025, a comprehensive security analysis using Simon Willison's "Lethal Trifecta" framework revealed that SARK, while architecturally sound, has critical implementation gaps:
+
+**Key Findings:**
+1. **Gateway Client Stubbed:** Returns empty lists and NotImplementedError - cannot communicate with real MCP servers
+2. **Policy Injection Risk:** No validation of OPA policies before loading
+3. **Test Failures:** 154 auth provider tests failing (77.8% pass rate)
+4. **Untested End-to-End:** Critical security flows not verified in practice
+
+**Decision:**
+Halt v2.0.0 release and focus on completing production-critical implementation work before proceeding.
+
+**This Roadmap:**
+Addresses these gaps with a focused 15-week plan to production readiness.
