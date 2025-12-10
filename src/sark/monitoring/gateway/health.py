@@ -148,10 +148,12 @@ class HealthChecker:
 
         try:
             # Import here to avoid circular dependency
-            from sark.db.session import get_db_session
+            from sark.db.session import get_db
+            from sqlalchemy import text
 
-            async with get_db_session() as session:
-                await session.execute("SELECT 1")
+            async for session in get_db():
+                await session.execute(text("SELECT 1"))
+                break  # Only need one iteration
 
             latency_ms = (time.time() - start_time) * 1000
 

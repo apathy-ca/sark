@@ -1,0 +1,112 @@
+suite_name: "Agent-to-Agent Authorization Policy Tests"
+description: "Test suite for MCP agent-to-agent authorization policy"
+policy: "../examples/a2a.rego"
+
+tests:
+  # =========================================================================
+  # Trust Level Tests
+  # =========================================================================
+  - name: "Critical trust agent can access high trust agent"
+    description: "Higher trust level agents should access lower trust level agents"
+    input:
+      source_agent:
+        id: "agent-critical-1"
+        name: "SecurityMonitor"
+        trust_level: "critical"
+      target_agent:
+        id: "agent-high-1"
+        name: "DataAnalyzer"
+        trust_level: "high"
+      action: "agent:send_message"
+    expected:
+      allow: true
+
+  - name: "Low trust agent cannot access high trust agent"
+    description: "Lower trust level agents should not access higher trust level agents"
+    input:
+      source_agent:
+        id: "agent-low-1"
+        name: "BasicAgent"
+        trust_level: "low"
+      target_agent:
+        id: "agent-high-1"
+        name: "DataAnalyzer"
+        trust_level: "high"
+      action: "agent:send_message"
+    expected:
+      allow: false
+
+  - name: "Same trust level agents can communicate"
+    description: "Agents with same trust level should communicate"
+    input:
+      source_agent:
+        id: "agent-medium-1"
+        name: "Agent1"
+        trust_level: "medium"
+      target_agent:
+        id: "agent-medium-2"
+        name: "Agent2"
+        trust_level: "medium"
+      action: "agent:send_message"
+    expected:
+      allow: true
+
+  - name: "Medium trust agent cannot access critical agent"
+    description: "Medium trust agents should not access critical agents"
+    input:
+      source_agent:
+        id: "agent-medium-1"
+        name: "StandardAgent"
+        trust_level: "medium"
+      target_agent:
+        id: "agent-critical-1"
+        name: "SecurityAgent"
+        trust_level: "critical"
+      action: "agent:send_message"
+    expected:
+      allow: false
+
+  # =========================================================================
+  # Network Zone Tests
+  # =========================================================================
+  - name: "Internal agents can communicate within same zone"
+    description: "Agents in the same network zone should communicate"
+    input:
+      source_agent:
+        id: "agent-internal-1"
+        network_zone: "internal"
+      target_agent:
+        id: "agent-internal-2"
+        network_zone: "internal"
+      action: "agent:send_message"
+    expected:
+      allow: true
+
+  - name: "DMZ agent cannot access internal zone"
+    description: "DMZ agents should not access internal network zone"
+    input:
+      source_agent:
+        id: "agent-dmz-1"
+        network_zone: "dmz"
+      target_agent:
+        id: "agent-internal-1"
+        network_zone: "internal"
+      action: "agent:send_message"
+    expected:
+      allow: false
+
+  # =========================================================================
+  # Default Deny Tests
+  # =========================================================================
+  - name: "Default deny when no rules match"
+    description: "Requests that don't match any allow rule should be denied"
+    input:
+      source_agent:
+        id: "agent-unknown"
+        trust_level: "low"
+      target_agent:
+        id: "agent-restricted"
+        trust_level: "critical"
+      action: "agent:send_message"
+    expected:
+      allow: false

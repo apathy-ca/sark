@@ -141,7 +141,12 @@ filtered_parameters := filtered if {
 
 # Default: no filtering (pass through parameters)
 filtered_parameters := input.parameters if {
-    not filtered_parameters  # If no specific filtering rule matched
+    not input.server_name == "postgres-mcp"
+}
+
+filtered_parameters := input.parameters if {
+    input.server_name == "postgres-mcp"
+    not input.tool_name == "execute_query"
 }
 
 # =============================================================================

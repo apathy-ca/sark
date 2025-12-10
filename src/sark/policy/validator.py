@@ -129,7 +129,7 @@ FORBIDDEN_PATTERNS = [
         "suggestion": "Add conditions to allow rules using 'if { ... }' blocks",
     },
     {
-        "pattern": r"allow\s*if\s*\{\s*\}",
+        "pattern": r"allow\s+if\s*\{\s*\}",
         "code": "EMPTY_ALLOW_CONDITION",
         "severity": Severity.CRITICAL,
         "message": "Empty allow condition detected - this allows everything",
@@ -178,7 +178,7 @@ FORBIDDEN_PATTERNS = [
         "suggestion": "Remove eval() calls. Write explicit policy logic instead.",
     },
     {
-        "pattern": r"#\s*TODO|#\s*FIXME|#\s*HACK",
+        "pattern": r"#\s*(TODO|FIXME|HACK)",
         "code": "TODO_COMMENT",
         "severity": Severity.INFO,
         "message": "TODO/FIXME/HACK comment found - policy may be incomplete",
@@ -252,10 +252,15 @@ class PolicyValidator:
             result.issues.extend(test_issues)
 
         # Determine if policy is valid
-        result.valid = not any(
-            issue.severity in [Severity.CRITICAL, Severity.HIGH if self.strict else None]
+        # CRITICAL issues always fail validation
+        # HIGH issues fail in strict mode
+        # MEDIUM issues fail in strict mode
+        has_blocking_issues = any(
+            issue.severity == Severity.CRITICAL
+            or (self.strict and issue.severity in [Severity.HIGH, Severity.MEDIUM])
             for issue in result.issues
         )
+        result.valid = not has_blocking_issues
 
         if not result.valid:
             logger.warning(
@@ -431,11 +436,12 @@ class PolicyValidator:
 
         for pattern_def in FORBIDDEN_PATTERNS:
             pattern = pattern_def["pattern"]
-            regex = re.compile(pattern, re.MULTILINE)
+            regex = re.compile(pattern, re.MULTILINE | re.DOTALL)
 
+            # Search line by line for single-line patterns
             for line_num, line in enumerate(lines, start=1):
-                # Skip comments
-                if line.strip().startswith("#"):
+                # Skip comments (but still check for TODO/FIXME/HACK)
+                if line.strip().startswith("#") and pattern_def["code"] != "TODO_COMMENT":
                     continue
 
                 match = regex.search(line)
@@ -450,6 +456,32 @@ class PolicyValidator:
                             suggestion=pattern_def.get("suggestion"),
                         )
                     )
+
+            # Also search whole content for multi-line patterns (like empty braces)
+            # Use a separate search for patterns that might span lines
+            if any(char in pattern for char in [r'\s*\{', r'\}']):
+                whole_matches = regex.finditer(policy_content)
+                for match in whole_matches:
+                    # Calculate line number
+                    line_num = policy_content[:match.start()].count('\n') + 1
+                    # Get context (the matched text)
+                    context = match.group().replace('\n', ' ').strip()
+
+                    # Skip if we already found this on a single line
+                    if not any(
+                        issue.line_number == line_num and issue.code == pattern_def["code"]
+                        for issue in issues
+                    ):
+                        issues.append(
+                            ValidationIssue(
+                                severity=pattern_def["severity"],
+                                code=pattern_def["code"],
+                                message=pattern_def["message"],
+                                line_number=line_num,
+                                context=context,
+                                suggestion=pattern_def.get("suggestion"),
+                            )
+                        )
 
         return issues
 
