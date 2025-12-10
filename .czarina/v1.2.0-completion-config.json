@@ -1,0 +1,179 @@
+{
+  "project": "sark",
+  "version": "1.2.0-completion",
+  "phase": "test-quality",
+  "description": "Complete v1.2.0 by fixing 444 test issues and boosting coverage to 85%+",
+  "workers": {
+    "test-1": {
+      "name": "Gateway Test Specialist",
+      "branch": "fix/gateway-test-failures",
+      "agent": "aider",
+      "autonomy": "high",
+      "role": "Fix 15 Gateway test failures (E2E import, SSE async, HTTP mocking)",
+      "budget": {
+        "tokens_projected": 400000,
+        "tokens_max": 440000
+      },
+      "tasks": [
+        "Fix E2E import error (export GatewayClient from __init__.py)",
+        "Fix SSE async context manager (8 test failures)",
+        "Fix HTTP connection pooling (2 test failures)",
+        "Fix HTTP mock matching (1 failure + 2 errors)"
+      ],
+      "files": [
+        "src/sark/gateway/__init__.py",
+        "src/sark/gateway/transports/sse_client.py",
+        "tests/unit/gateway/transports/test_http_client.py",
+        "tests/unit/gateway/transports/test_sse_client.py"
+      ],
+      "completion_criteria": [
+        "E2E import error fixed",
+        "All 15 gateway test issues resolved",
+        "Gateway module 100% test pass rate",
+        "E2E test suite can run",
+        "No regressions"
+      ]
+    },
+    "test-2": {
+      "name": "Auth Test Specialist",
+      "branch": "fix/auth-integration-tests",
+      "agent": "aider",
+      "autonomy": "high",
+      "role": "Fix 32 auth integration test failures (LDAP, OIDC, SAML, failover)",
+      "budget": {
+        "tokens_projected": 500000,
+        "tokens_max": 550000
+      },
+      "tasks": [
+        "Fix LDAP integration tests (10+ errors - docker_ip API issue)",
+        "Fix OIDC integration tests (7+ errors)",
+        "Fix SAML integration tests",
+        "Fix provider failover tests (5 failures)"
+      ],
+      "files": [
+        "tests/integration/auth/test_ldap_integration.py",
+        "tests/integration/auth/test_oidc_integration.py",
+        "tests/integration/auth/test_saml_integration.py",
+        "tests/test_auth/test_auth_integration.py"
+      ],
+      "completion_criteria": [
+        "All 32 auth test issues fixed",
+        "LDAP integration 100% passing",
+        "OIDC/SAML integration 100% passing",
+        "Provider failover verified",
+        "Auth integration 100% pass rate"
+      ]
+    },
+    "test-3": {
+      "name": "Integration Test Specialist",
+      "branch": "fix/integration-tests",
+      "agent": "aider",
+      "autonomy": "high",
+      "role": "Fix 200+ integration test issues (API, SIEM, discovery)",
+      "budget": {
+        "tokens_projected": 600000,
+        "tokens_max": 660000
+      },
+      "tasks": [
+        "Fix API pagination tests (12 failures)",
+        "Fix SIEM event formatting tests (8 failures)",
+        "Fix discovery services tests (180+ errors)"
+      ],
+      "files": [
+        "tests/test_api_pagination.py",
+        "tests/test_audit/test_siem_event_formatting.py",
+        "tests/unit/services/test_discovery*.py"
+      ],
+      "completion_criteria": [
+        "All 200+ integration issues fixed",
+        "API pagination 100% passing",
+        "SIEM formatting 100% passing",
+        "Discovery services 100% passing"
+      ]
+    },
+    "test-4": {
+      "name": "Coverage Engineer",
+      "branch": "feat/coverage-boost",
+      "agent": "aider",
+      "autonomy": "high",
+      "role": "Add 800-1,000 tests to boost coverage from 13.64% to 85%+",
+      "budget": {
+        "tokens_projected": 1000000,
+        "tokens_max": 1100000
+      },
+      "tasks": [
+        "Add gateway error handler tests (20+ tests) - 0% → 90%",
+        "Add policy OPA client tests (25+ tests) - 35% → 90%",
+        "Add policy audit tests (20+ tests) - 0% → 90%",
+        "Add services tests (170+ tests) - 0-27% → 85%",
+        "Add E2E scenario tests (30+ tests)"
+      ],
+      "files": [
+        "tests/unit/gateway/test_error_handler.py (NEW)",
+        "tests/unit/policy/test_opa_client.py (UPDATE)",
+        "tests/unit/policy/test_audit.py (NEW)",
+        "tests/unit/policy/test_cache.py (NEW)",
+        "tests/unit/services/test_discovery_service.py (NEW)",
+        "tests/unit/services/test_federation_*.py (NEW)",
+        "tests/unit/services/test_siem_*.py (NEW)",
+        "tests/e2e/test_complete_flows.py (NEW)",
+        "tests/e2e/test_security_scenarios.py (NEW)",
+        "tests/e2e/test_performance.py (NEW)"
+      ],
+      "completion_criteria": [
+        "Overall coverage ≥85%",
+        "Gateway modules ≥90%",
+        "Policy modules ≥90%",
+        "Services modules ≥85%",
+        "800-1,000 new tests added",
+        "E2E scenarios complete"
+      ],
+      "dependencies": ["test-1"]
+    }
+  },
+  "daemon": {
+    "auto_approve": true,
+    "patterns": ["test", "fix", "coverage", "pytest"],
+    "exclude_patterns": ["production", "deploy", "release"]
+  },
+  "milestones": {
+    "phase1_complete": {
+      "description": "Critical test failures fixed",
+      "criteria": {
+        "test_pass_rate": "95%+",
+        "gateway_tests": "100% passing",
+        "auth_tests": "100% passing",
+        "e2e_unblocked": true
+      },
+      "workers_complete": ["test-1", "test-2"]
+    },
+    "phase2_complete": {
+      "description": "All tests passing, coverage at 60%",
+      "criteria": {
+        "test_pass_rate": "100%",
+        "test_failures": 0,
+        "test_errors": 0,
+        "coverage": "60%+"
+      },
+      "workers_complete": ["test-1", "test-2", "test-3"]
+    },
+    "v1.2.0_release": {
+      "description": "v1.2.0 production-ready",
+      "criteria": {
+        "test_pass_rate": "100%",
+        "coverage": "85%+",
+        "performance_verified": true,
+        "documentation_complete": true
+      },
+      "workers_complete": ["test-1", "test-2", "test-3", "test-4"]
+    }
+  },
+  "metrics": {
+    "current_test_pass_rate": "89.8%",
+    "current_coverage": "13.64%",
+    "tests_passing": 1469,
+    "tests_failing": 166,
+    "tests_errors": 278,
+    "tests_skipped": 124
+  }
+}

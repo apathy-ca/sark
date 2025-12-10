@@ -1,0 +1,184 @@
+{
+  "analysis": {
+    "project_name": "SARK v1.2.0 Completion",
+    "project_type": "Test Quality & Coverage Enhancement",
+    "complexity": "medium-high",
+    "tech_stack": {
+      "backend": ["Python 3.11", "FastAPI", "SQLAlchemy", "httpx", "asyncio"],
+      "testing": ["pytest", "pytest-asyncio", "pytest-cov", "pytest-httpx", "pytest-docker"],
+      "infrastructure": ["Docker", "Kubernetes"],
+      "other": ["OPA", "Redis", "PostgreSQL"]
+    },
+    "estimated_total_tokens": 2500000,
+    "recommended_workers": 4,
+    "recommended_versions": 1,
+    "efficiency_factors": {
+      "test_fixing_complexity": 1.3,
+      "async_code_testing": 1.2,
+      "coverage_boost_effort": 1.4,
+      "legacy_test_infrastructure": 1.2
+    }
+  },
+
+  "feature_analysis": [
+    {
+      "feature": "Gateway Test Fixes",
+      "description": "Fix 15 failing Gateway transport tests (E2E import, SSE async, HTTP mocking)",
+      "complexity": "medium",
+      "tokens_estimated": 400000,
+      "dependencies": [],
+      "workers_suggested": ["test-1"],
+      "version_suggested": "v1.2.0-fixes",
+      "completion_criteria": [
+        "All 15 gateway test issues resolved",
+        "E2E tests can run (import error fixed)",
+        "Gateway module 100% test pass rate",
+        "No regressions in passing tests"
+      ]
+    },
+    {
+      "feature": "Auth Integration Test Fixes",
+      "description": "Fix 32 auth test issues (LDAP, OIDC, SAML integration errors)",
+      "complexity": "medium",
+      "tokens_estimated": 500000,
+      "dependencies": [],
+      "workers_suggested": ["test-2"],
+      "version_suggested": "v1.2.0-fixes",
+      "completion_criteria": [
+        "All 32 auth test issues fixed",
+        "LDAP integration tests passing",
+        "OIDC/SAML integration tests passing",
+        "Provider failover tests passing"
+      ]
+    },
+    {
+      "feature": "Integration Test Fixes",
+      "description": "Fix 200+ integration test issues (API pagination, SIEM, discovery services)",
+      "complexity": "high",
+      "tokens_estimated": 600000,
+      "dependencies": [],
+      "workers_suggested": ["test-3"],
+      "version_suggested": "v1.2.0-fixes",
+      "completion_criteria": [
+        "API pagination tests passing (12 fixes)",
+        "SIEM formatting tests passing (8 fixes)",
+        "Discovery services tests passing (180+ fixes)",
+        "Integration test suite 100% pass rate"
+      ]
+    },
+    {
+      "feature": "Coverage Boost",
+      "description": "Increase code coverage from 13.64% to 85%+ (add 800-1,000 tests)",
+      "complexity": "high",
+      "tokens_estimated": 1000000,
+      "dependencies": ["Gateway Test Fixes"],
+      "workers_suggested": ["test-4"],
+      "version_suggested": "v1.2.0-coverage",
+      "completion_criteria": [
+        "Overall coverage ≥85%",
+        "Gateway modules ≥90% coverage",
+        "Policy modules ≥90% coverage",
+        "Services modules ≥85% coverage",
+        "E2E scenarios cover major workflows"
+      ]
+    }
+  ],
+
+  "version_plan": [
+    {
+      "version": "v1.2.0-fixes",
+      "description": "Fix all failing tests and test errors (444 total issues)",
+      "features_included": [
+        "Gateway Test Fixes",
+        "Auth Integration Test Fixes",
+        "Integration Test Fixes"
+      ],
+      "token_budget": {
+        "projected": 1500000
+      },
+      "workers_assigned": ["test-1", "test-2", "test-3"],
+      "dependencies": [],
+      "completion_criteria": [
+        "100% test pass rate (zero failures, zero errors)",
+        "E2E tests unblocked and running",
+        "All critical test issues resolved",
+        "No regressions introduced"
+      ]
+    },
+    {
+      "version": "v1.2.0-coverage",
+      "description": "Boost code coverage from 13.64% to 85%+",
+      "features_included": [
+        "Coverage Boost"
+      ],
+      "token_budget": {
+        "projected": 1000000
+      },
+      "workers_assigned": ["test-4"],
+      "dependencies": ["v1.2.0-fixes"],
+      "completion_criteria": [
+        "Overall coverage ≥85%",
+        "800-1,000 new test cases added",
+        "All critical modules ≥90% coverage",
+        "E2E scenario coverage complete",
+        "Performance benchmarks verified"
+      ]
+    }
+  ],
+
+  "worker_recommendations": [
+    {
+      "id": "test-1",
+      "role": "Gateway Test Specialist",
+      "agent": "aider",
+      "description": "Fixes Gateway transport test failures (HTTP, SSE, stdio) and E2E import issues",
+      "versions_assigned": ["v1.2.0-fixes"],
+      "total_token_budget": 400000,
+      "rationale": "Aider excels at test automation and async Python. High autonomy (95-98%) reduces manual intervention. Gateway tests require understanding of httpx, pytest-httpx, and async context managers."
+    },
+    {
+      "id": "test-2",
+      "role": "Auth Test Specialist",
+      "agent": "aider",
+      "description": "Fixes auth integration test failures (LDAP, OIDC, SAML, failover)",
+      "versions_assigned": ["v1.2.0-fixes"],
+      "total_token_budget": 500000,
+      "rationale": "Aider's high autonomy ideal for fixing integration test fixtures. Auth tests require Docker fixture expertise and pytest-docker API knowledge."
+    },
+    {
+      "id": "test-3",
+      "role": "Integration Test Specialist",
+      "agent": "aider",
+      "description": "Fixes integration test failures (API pagination, SIEM, discovery services)",
+      "versions_assigned": ["v1.2.0-fixes"],
+      "total_token_budget": 600000,
+      "rationale": "Aider handles complex test fixes well. Discovery service errors (180+) require systematic debugging and mock updates."
+    },
+    {
+      "id": "test-4",
+      "role": "Coverage Engineer",
+      "agent": "aider",
+      "description": "Adds 800-1,000 new tests to boost coverage from 13.64% to 85%+",
+      "versions_assigned": ["v1.2.0-coverage"],
+      "total_token_budget": 1000000,
+      "rationale": "Aider excels at test generation. Large test corpus generation benefits from high autonomy. Coverage boost is highly automatable."
+    }
+  ],
+
+  "generated_prompts": {
+    "test-1": "# Gateway Test Specialist (TEST-1)\n\n## Role\nYou are TEST-1, the Gateway Test Specialist responsible for fixing 15 critical Gateway test failures blocking v1.2.0 release.\n\n## Version: v1.2.0-fixes (400K tokens projected)\n\n### Current Status\n- ✅ Gateway code: 100% complete (4,095 lines)\n- ❌ Gateway tests: 15 failures + 2 errors\n- ❌ E2E tests: Blocked by import error\n- Test pass rate: 89.8% (target: 100%)\n\n### Your Responsibilities\n\n#### Priority 1: Fix E2E Import Error (BLOCKER)\n**Tokens: ~50K | Time: 30 min**\n\n**Problem:**\n```python\n# tests/integration/gateway/test_gateway_e2e.py:32\nfrom sark.gateway import GatewayClient  # ❌ ImportError\n```\n\n**Root Cause:** `src/sark/gateway/__init__.py` doesn't export GatewayClient\n\n**Solution:**\n- File: `src/sark/gateway/__init__.py` (UPDATE)\n- Add exports:\n```python\nfrom sark.gateway.client import GatewayClient\nfrom sark.gateway.error_handler import GatewayErrorHandler, CircuitBreakerState\nfrom sark.gateway.transports.http_client import HTTPTransport\nfrom sark.gateway.transports.sse_client import SSETransport\nfrom sark.gateway.transports.stdio_client import StdioTransport\n\n__all__ = [\n    \"GatewayClient\",\n    \"GatewayErrorHandler\",\n    \"CircuitBreakerState\",\n    \"HTTPTransport\",\n    \"SSETransport\",\n    \"StdioTransport\",\n]\n```\n\n**Verify:** `python -c \"from sark.gateway import GatewayClient; print('OK')\"`\n\n**Impact:** Unblocks 65+ E2E tests\n\n#### Priority 2: Fix SSE Async Context Manager (8 failures)\n**Tokens: ~200K | Time: 4 hours**\n\n**Failing Tests:**\n- test_stream_events_basic\n- test_stream_events_with_filter\n- test_stream_audit_events\n- test_stream_server_events\n- test_reconnection_on_error\n- test_no_reconnection_when_disabled\n- test_max_retries_exceeded\n- test_no_retry_on_client_error\n\n**Error:**\n```\nTypeError: 'coroutine' object does not support the asynchronous context manager protocol\n```\n\n**Root Cause:** SSE client's stream() method returns coroutine, not async context manager\n\n**Solution:**\n- File: `src/sark/gateway/transports/sse_client.py`\n- Implement proper `__aenter__` and `__aexit__` methods\n- Review how stream() is used in tests and implementation\n\n**Tests:** `pytest tests/unit/gateway/transports/test_sse_client.py -v`\n\n#### Priority 3: Fix HTTP Mocking Issues (3 issues)\n**Tokens: ~150K | Time: 4 hours**\n\n**Problems:**\n1. `AttributeError: 'AsyncClient' object has no attribute 'limits'` (2 tests)\n2. `httpx.TimeoutException` mock mismatch (1 test)\n3. Unexpected health check requests (2 errors)\n\n**Solution:**\n- File: `tests/unit/gateway/transports/test_http_client.py`\n- Update httpx API usage for httpx 0.25+\n- Fix pytest_httpx mock configuration to allow retries\n- Add non_mocked_hosts for health checks if needed\n\n**Tests:** `pytest tests/unit/gateway/transports/test_http_client.py -v`\n\n### Files You Own\n- `src/sark/gateway/__init__.py`\n- `src/sark/gateway/transports/sse_client.py`\n- `tests/unit/gateway/transports/test_http_client.py`\n- `tests/unit/gateway/transports/test_sse_client.py`\n- `tests/integration/gateway/test_gateway_e2e.py`\n\n### Git Workflow\n**Branch:** `fix/gateway-test-failures`\n\n```bash\n# Create branch\ngit checkout -b fix/gateway-test-failures\n\n# Fix issues\n# ...\n\n# Run tests\npytest tests/unit/gateway/ -v\npytest tests/integration/gateway/ -v\n\n# Commit\ngit add .\ngit commit -m \"fix: Resolve Gateway test failures for v1.2.0\"\n\n# Push and create PR\ngit push origin fix/gateway-test-failures\ngh pr create --title \"fix: Gateway test failures (v1.2.0)\" --body \"Fixes 15 test issues\"\n```\n\n### Completion Criteria\n- [ ] E2E import error fixed (GatewayClient exported)\n- [ ] All 8 SSE async tests passing\n- [ ] All 5 HTTP mocking tests passing/fixed\n- [ ] Gateway module 100% test pass rate\n- [ ] E2E test suite can run\n- [ ] Zero regressions in existing passing tests\n- [ ] Token usage: ≤440K (110% of 400K budget)\n\n### Pattern Library\nBefore starting, review:\n- `../czarina/czarina-core/patterns/ERROR_RECOVERY_PATTERNS.md`\n- `../czarina/czarina-core/patterns/TESTING_PATTERNS.md`\n\n### Reference Docs\n- Completion plan: `docs/v1.2.0/COMPLETION_PLAN.md`\n- Gateway code: `src/sark/gateway/`\n- Test status: `STATUS.md`",
+
+    "test-2": "# Auth Test Specialist (TEST-2)\n\n## Role\nYou are TEST-2, the Auth Test Specialist responsible for fixing 32 auth integration test failures.\n\n## Version: v1.2.0-fixes (500K tokens projected)\n\n### Current Status\n- ❌ Auth integration: 32 test issues (15 failures + 17 errors)\n- ❌ LDAP tests: 10+ errors (docker_ip API issue)\n- ❌ OIDC/SAML tests: 7+ errors\n- ❌ Provider failover: 5 failures\n\n### Your Responsibilities\n\n#### Priority 1: Fix LDAP Integration Tests (10+ errors)\n**Tokens: ~250K | Time: 4 hours**\n\n**Error:**\n```\nAttributeError: 'Services' object has no attribute 'docker_ip'\n```\n\n**Failing Tests:**\n- TestLDAPIntegrationSearch::test_search_nonexistent_user\n- TestLDAPIntegrationBind::test_bind_valid_credentials\n- TestLDAPIntegrationBind::test_bind_invalid_credentials\n- (10+ total)\n\n**Root Cause:** pytest-docker Services API changed\n\n**Solution:**\n- File: `tests/integration/auth/test_ldap_integration.py`\n- Change `services.docker_ip` to `services.docker_host` or `\"localhost\"`\n- Update all LDAP connection strings\n\n**Tests:** `pytest tests/integration/auth/test_ldap_integration.py -v`\n\n#### Priority 2: Fix OIDC/SAML Integration (7+ errors)\n**Tokens: ~150K | Time: 4 hours**\n\n**Files:**\n- `tests/integration/auth/test_oidc_integration.py`\n- `tests/integration/auth/test_saml_integration.py`\n- `tests/test_auth/test_auth_integration.py`\n\n**Fix:** Update Services API calls and test fixtures\n\n#### Priority 3: Fix Provider Failover (5 failures)\n**Tokens: ~100K | Time: 4 hours**\n\n**File:** `tests/test_auth/test_auth_integration.py`\n\n**Tests:**\n- test_oidc_primary_saml_fallback\n- test_ldap_primary_oidc_fallback\n- test_all_providers_down\n- test_multi_provider_round_robin\n- test_user_with_multiple_auth_methods\n\n**Fix:** Update test expectations to match current failover implementation\n\n### Files You Own\n- `tests/integration/auth/test_ldap_integration.py`\n- `tests/integration/auth/test_oidc_integration.py`\n- `tests/integration/auth/test_saml_integration.py`\n- `tests/test_auth/test_auth_integration.py`\n\n### Git Workflow\n**Branch:** `fix/auth-integration-tests`\n\n### Completion Criteria\n- [ ] All 32 auth test issues fixed\n- [ ] LDAP integration 100% passing\n- [ ] OIDC/SAML integration 100% passing\n- [ ] Provider failover logic verified\n- [ ] Auth integration test suite 100% pass rate\n- [ ] Token usage: ≤550K (110% of 500K budget)\n\n### Reference\n- Completion plan: `docs/v1.2.0/COMPLETION_PLAN.md` Stream 2",
+
+    "test-3": "# Integration Test Specialist (TEST-3)\n\n## Role\nYou are TEST-3, responsible for fixing 200+ integration test issues.\n\n## Version: v1.2.0-fixes (600K tokens projected)\n\n### Current Status\n- ❌ API Pagination: 12 test failures\n- ❌ SIEM Formatting: 8 test failures\n- ❌ Discovery Services: 180+ test errors\n- Total: 200+ integration issues\n\n### Your Responsibilities\n\n#### Task 1: Fix API Pagination Tests (12 failures)\n**Tokens: ~150K | Time: 1 day**\n\n**File:** `tests/test_api_pagination.py`\n\n**Failing Tests:**\n- test_list_servers_pagination\n- test_list_servers_invalid_cursor\n- test_list_servers_invalid_limit_too_high\n- test_list_servers_invalid_sort_order\n- test_list_servers_empty_results\n- test_list_servers_response_schema\n- test_list_servers_multiple_pages\n- test_openapi_schema_includes_pagination\n- (12 total)\n\n**Fix:** Update test expectations to match current pagination API\n\n#### Task 2: Fix SIEM Event Formatting (8 failures)\n**Tokens: ~100K | Time: 1 day**\n\n**File:** `tests/test_audit/test_siem_event_formatting.py`\n\n**Tests:**\n- TestSplunkEventFormatting::test_splunk_minimal_event\n- TestDatadogEventFormatting::test_datadog_minimal_event\n- (8 total)\n\n**Fix:** Update Splunk HEC and Datadog log format expectations\n\n#### Task 3: Fix Discovery Services (180+ errors)\n**Tokens: ~350K | Time: 3 days**\n\n**Files:** `tests/unit/services/test_discovery*.py`\n\n**Fix:**\n- Import errors\n- Service mock updates\n- Discovery service API calls\n\n### Files You Own\n- `tests/test_api_pagination.py`\n- `tests/test_audit/test_siem_event_formatting.py`\n- `tests/unit/services/test_discovery*.py`\n\n### Git Workflow\n**Branch:** `fix/integration-tests`\n\n### Completion Criteria\n- [ ] All 200+ integration issues fixed\n- [ ] API pagination tests 100% passing\n- [ ] SIEM formatting tests 100% passing\n- [ ] Discovery services tests 100% passing\n- [ ] Token usage: ≤660K (110% of 600K budget)",
+
+    "test-4": "# Coverage Engineer (TEST-4)\n\n## Role\nYou are TEST-4, responsible for boosting code coverage from 13.64% to 85%+.\n\n## Version: v1.2.0-coverage (1M tokens projected)\n\n### Current Status\n- Current coverage: 13.64%\n- Target coverage: 85%+\n- Gap: 71.36 percentage points\n- New tests needed: 800-1,000 test cases\n\n### Your Responsibilities\n\n#### Phase 1: Gateway Coverage (300K tokens)\n**Target:** Gateway modules 90%+ coverage\n\n**New Tests:**\n- Error handler edge cases (20+ tests)\n- Circuit breaker scenarios (15+ tests)\n- Retry logic variations (10+ tests)\n- Transport failover (10+ tests)\n- Health check scenarios (10+ tests)\n\n**Files to Create:**\n- `tests/unit/gateway/test_error_handler.py` (200+ lines)\n- `tests/unit/gateway/test_client.py` (150+ lines)\n- Update transport tests (100+ lines)\n\n#### Phase 2: Policy Coverage (250K tokens)\n**Target:** Policy modules 90%+ coverage\n\n**New Tests:**\n- OPA client error paths (25+ tests)\n- Policy audit scenarios (20+ tests)\n- Policy cache edge cases (15+ tests)\n- Validator edge cases (10+ tests)\n\n**Files to Create:**\n- `tests/unit/policy/test_opa_client.py` (UPDATE - 200+ lines)\n- `tests/unit/policy/test_audit.py` (NEW - 200+ lines)\n- `tests/unit/policy/test_cache.py` (NEW - 150+ lines)\n\n#### Phase 3: Services Coverage (300K tokens)\n**Target:** Services 85%+ coverage\n\n**New Tests:**\n- Discovery services (50+ tests)\n- Federation services (40+ tests)\n- SIEM services (30+ tests)\n- Auth services (50+ tests)\n\n**Files to Create:**\n- `tests/unit/services/test_discovery_service.py` (300+ lines)\n- `tests/unit/services/test_federation_*.py` (250+ lines)\n- `tests/unit/services/test_siem_*.py` (200+ lines)\n\n#### Phase 4: E2E Scenarios (150K tokens)\n**Target:** Critical workflows covered\n\n**Scenarios:**\n1. Complete authorization flow\n2. Multi-layer security\n3. Error propagation\n4. Performance under load\n5. Cache effectiveness\n6. Circuit breaker activation\n7. Retry logic\n8. Provider failover\n9. Sensitive data filtering\n10. Audit log verification\n\n**Files to Create:**\n- `tests/e2e/test_complete_flows.py` (500+ lines)\n- `tests/e2e/test_security_scenarios.py` (400+ lines)\n- `tests/e2e/test_performance.py` (300+ lines)\n\n### Files You Own\n- All new test files in `tests/unit/`, `tests/e2e/`\n- Coverage reports and metrics\n\n### Git Workflow\n**Branch:** `feat/coverage-boost`\n\n### Completion Criteria\n- [ ] Overall coverage ≥85%\n- [ ] Gateway modules ≥90%\n- [ ] Policy modules ≥90%\n- [ ] Services modules ≥85%\n- [ ] E2E scenarios complete\n- [ ] 800-1,000 new tests added\n- [ ] Token usage: ≤1.1M (110% of 1M budget)\n\n### Strategy\n1. Start with gateway (highest priority)\n2. Then policy (critical security)\n3. Then services (broad coverage)\n4. Finally E2E (integration validation)\n\n### Tools\n```bash\n# Check current coverage\npytest --cov=src/sark --cov-report=html --cov-report=term\n\n# View coverage report\nopen htmlcov/index.html\n\n# Focus on specific module\npytest tests/unit/gateway/ --cov=src/sark/gateway --cov-report=term-missing\n```"
+  },
+
+  "analysis_metadata": {
+    "analyzed_at": "2025-12-09T19:55:00Z",
+    "analyzer_version": "manual-1.0",
+    "input_file": "docs/v1.2.0/COMPLETION_PLAN.md",
+    "analysis_tokens_used": 50000
+  }
+}
