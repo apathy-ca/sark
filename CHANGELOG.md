@@ -1,238 +1,57 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to SARK will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+---
+
+## [Unreleased] - v1.2.0-dev
+
+### In Progress
+- Gateway HTTP transport implementation
+- Gateway SSE transport implementation  
+- Gateway stdio transport implementation
+- Policy validation framework
+- Fix 154 failing auth provider tests
+- Achieve 85%+ code coverage
+
+**Target Release:** 8 weeks from project start
+**See:** `docs/v1.2.0/IMPLEMENTATION_PLAN.md`
+
+---
+
+## [1.1.0] - 2025-11-28
 
 ### Added
-- Nothing yet
+- Gateway infrastructure (models, tests, docs)
+- Gateway authorization API endpoints
+- Gateway client SDK (stubbed implementation)
+- Complete test infrastructure
+- Comprehensive documentation
+- Production monitoring and observability
+- Advanced OPA policies for Gateway/A2A authorization
 
-## [1.1.0] - 2025-XX-XX
+### Known Issues
+- Gateway client methods return stubbed responses
+- No actual MCP server communication
+- 154 auth provider tests failing (LDAP, SAML, OIDC)
 
-### Added
+**Note:** This release provides infrastructure foundation but requires v1.2.0 for functional Gateway.
 
-**MCP Gateway Integration (Opt-in Feature)**:
-- Gateway client for connecting to MCP Gateway Registry
-- Gateway authorization endpoints (`/api/v1/gateway/*`)
-- Agent-to-Agent (A2A) authorization support
-- OPA policies for Gateway and A2A authorization
-- Gateway audit logging and SIEM integration
-- Prometheus metrics for Gateway operations
-- Grafana dashboard for Gateway monitoring
+---
 
-**New API Endpoints**:
-- `POST /api/v1/gateway/authorize` - Authorize Gateway requests
-- `POST /api/v1/gateway/authorize-a2a` - Authorize A2A communication
-- `GET /api/v1/gateway/servers` - List authorized servers
-- `GET /api/v1/gateway/tools` - List authorized tools
-- `POST /api/v1/gateway/audit` - Log Gateway events
-- `GET /api/v1/version` - Get version and feature status
+## Version Numbering Change - 2025-12-09
 
-**Configuration**:
-- `GATEWAY_ENABLED` - Enable Gateway integration (default: `false`)
-- `GATEWAY_URL` - Gateway API endpoint
-- `GATEWAY_API_KEY` - Gateway authentication
-- `A2A_ENABLED` - Enable A2A authorization (default: `false`)
-- `GATEWAY_TIMEOUT_SECONDS` - Request timeout (default: `30`)
-- `GATEWAY_RETRY_ATTEMPTS` - Retry attempts (default: `3`)
+**Major Change:** Adopted honest, incremental versioning strategy.
 
-**Database**:
-- New table: `gateway_audit_events` (additive, optional)
-- New table: `gateway_api_keys` (additive, optional)
-- Reversible migrations for safe rollback
+**New Plan:**
+- v1.1.0 (Current): Gateway infrastructure merged but stubbed
+- v1.2.0 (Next): Gateway working + policy validation + tests passing
+- v1.3.0: Advanced security features
+- v1.4.0: Rust optimization foundation
+- v1.5.0: Rust detection algorithms
+- v2.0.0: Production-ready (after external security audit)
 
-**Documentation**:
-- Complete Gateway integration guide (docs/gateway-integration/)
-- API reference for Gateway endpoints
-- Authentication guide (JWT, API keys, Agent tokens)
-- Deployment guides (Quick Start, Kubernetes, Production)
-- Configuration guides (Gateway, Policies, A2A)
-- Operational runbooks (Troubleshooting, Incident Response, Maintenance)
-- Architecture documentation (Integration, Security)
-- Migration guide (v1.0.0 → v1.1.0)
-- Feature flags documentation
-- Release notes
-- Docker Compose example with full stack
-- OPA policy examples (gateway.rego, a2a.rego)
-- Kubernetes manifest examples
-
-**Examples**:
-- Complete docker-compose setup with Gateway integration
-- OPA policy examples for Gateway and A2A authorization
-- Helper scripts for setup and testing
-
-### Changed
-- None (fully backwards compatible)
-
-### Deprecated
-- None
-
-### Removed
-- None
-
-### Fixed
-- None (new feature release)
-
-### Security
-- Gateway integration includes parameter filtering to prevent injection attacks
-- A2A authorization enforces trust levels and capabilities
-- All Gateway operations audited
-- JWT token validation for Gateway API keys
-- Rate limiting per token type
-
-### Performance
-- Zero performance impact when Gateway integration disabled
-- Gateway authorization: P95 <50ms (when enabled)
-- Throughput: 5000+ req/s (when enabled)
-- Minimal memory overhead (<15% when enabled)
-
-### Testing
-- Test coverage: 91% (up from 87% in v1.0.0)
-- Backwards compatibility tests (v1.0.0 behavior verified)
-- Migration tests (upgrade/downgrade)
-- Feature flag tests
-- Gateway integration tests
-- A2A authorization tests
-
-### Migration
-- Upgrade: `docker pull sark:1.1.0 && alembic upgrade head`
-- Downgrade: `alembic downgrade -1 && docker pull sark:1.0.0`
-- Zero-downtime upgrade supported
-- Rollback supported
-- See docs/gateway-integration/MIGRATION_GUIDE.md for detailed instructions
-
-### Compatibility
-- 100% backwards compatible with v1.0.0
-- Gateway features disabled by default
-- No breaking changes to existing APIs
-- Safe to upgrade without enabling Gateway features
-
-## [0.2.0] - 2025-11-23
-
-### Added
-
-**Authentication**:
-- OIDC authentication provider (Google OAuth, Azure AD, Okta)
-- LDAP/Active Directory integration with connection pooling
-- SAML 2.0 SP implementation (Azure AD, Okta)
-- API Key management with scoped permissions and rotation
-- Session management with Redis backend
-- Multi-factor authentication (MFA) support with TOTP
-- Rate limiting per API key and per user
-
-**Authorization**:
-- Open Policy Agent (OPA) integration
-- Default RBAC, team-based, and sensitivity-level policies
-- Policy caching with Redis (95%+ hit rate)
-- Environment-based policy templates (dev/staging/prod)
-- Policy versioning and rollback mechanism
-- Time-based access controls
-- IP allowlist/blocklist policies
-
-**SIEM Integration**:
-- Splunk HEC integration with custom indexes
-- Datadog Logs API integration with tagging
-- Kafka background worker for async event forwarding
-- SIEM adapter framework for extensibility
-- Dead letter queue for failed events
-- Circuit breaker pattern for graceful degradation
-- 10,000+ events/min throughput capacity
-
-**API Enhancements**:
-- Cursor-based pagination for all list endpoints
-- Search and filtering (status, team, sensitivity, tags)
-- Full-text search on server name/description
-- Bulk operations (register, update, delete)
-- Comprehensive OpenAPI documentation
-
-**Database Optimizations**:
-- TimescaleDB for audit logging (90%+ compression)
-- 50+ strategic indexes (B-Tree, GIN, partial)
-- Connection pooling with PgBouncer (200 max connections)
-- Query optimization with EXPLAIN ANALYZE
-- Continuous aggregates for dashboards
-
-**Redis Optimizations**:
-- Connection pooling (20 connections per instance)
-- Tiered TTL caching strategy (5min-1hour)
-- I/O threading for high concurrency (4 threads)
-- Redis Sentinel HA (3 nodes)
-- 95%+ cache hit rate
-
-**Security**:
-- All 7 critical HTTP security headers implemented
-- Argon2id password hashing (OWASP recommended)
-- TLS 1.3 only (no older protocols)
-- Input validation with Pydantic models
-- SSRF protection (blocked internal IPs)
-- Container security hardening (non-root, read-only filesystem)
-- Kubernetes Pod Security Standards (restricted mode)
-- Network policies for pod-to-pod traffic restriction
-
-**Documentation** (17 guides, 32,000+ lines):
-- QUICK_START.md - 15-minute getting started guide
-- API_REFERENCE.md - Complete API documentation
-- ARCHITECTURE.md - Enhanced with 7 Mermaid diagrams
-- TROUBLESHOOTING.md - Master troubleshooting guide
-- PERFORMANCE_TESTING.md - Performance testing methodology
-- SECURITY_BEST_PRACTICES.md - Security development practices
-- INCIDENT_RESPONSE.md - 6 incident response playbooks
-- DATABASE_OPTIMIZATION.md - Complete database optimization guide
-- REDIS_OPTIMIZATION.md - Complete Redis optimization guide
-- SECURITY_HARDENING.md - Security hardening checklist (60+ items)
-- PRODUCTION_DEPLOYMENT.md - Production deployment procedures
-- DISASTER_RECOVERY.md - Complete DR plan (RTO < 4h, RPO < 15min)
-- OPERATIONS_RUNBOOK.md - Day-to-day operational procedures
-- KNOWN_ISSUES.md - Known issues and limitations
-- PRODUCTION_HANDOFF.md - Production deployment handoff (75-item checklist)
-- PHASE2_COMPLETION_REPORT.md - Phase 2 summary
-- DEVELOPMENT_LOG.md - Complete development history
-
-**Testing**:
-- 87% test coverage (target: 85%+)
-- Comprehensive integration tests for large-scale operations
-- SIEM load testing (10,000+ events/min validated)
-- Performance benchmarks for all critical paths
-- Negative testing for unauthorized access and invalid input
-
-### Changed
-- Updated README.md with Phase 2 completion status
-- Enhanced CONTRIBUTING.md with documentation guidelines
-- Improved error handling across all modules
-
-### Fixed
-- N/A (initial Phase 2 release)
-
-### Performance
-- API response time (p95): 85ms (target: <100ms) ✅
-- API response time (p99): 150ms (target: <200ms) ✅
-- Policy evaluation (p95): <50ms ✅
-- Database query (p95): 40ms ✅
-- Redis GET latency (p95): 0.8ms ✅
-- Throughput: 1,200 req/s (target: >1,000) ✅
-
-### Security
-- 0 P0/P1 security vulnerabilities
-- All OWASP Top 10 protections implemented
-- Security scan results: Clean (Bandit, Trivy, Safety, OWASP ZAP)
-
-## [0.1.0] - 2025-11-22
-
-### Added
-- Initial project structure setup
-- CI/CD pipeline with GitHub Actions
-- Python 3.11 development environment
-- Docker and Docker Compose configuration
-- Code quality tools (Black, Ruff, MyPy)
-- Pre-commit hooks
-- Comprehensive testing framework (pytest)
-- Contributing guidelines and coding standards
-- Development tooling (Makefile, setup scripts)
-
-[Unreleased]: https://github.com/username/sark/compare/v1.1.0...HEAD
-[1.1.0]: https://github.com/username/sark/compare/v0.2.0...v1.1.0
-[0.2.0]: https://github.com/username/sark/releases/tag/v0.2.0
-[0.1.0]: https://github.com/username/sark/releases/tag/v0.1.0
+**See:** `VERSION_RENUMBERING.md` for complete explanation.
