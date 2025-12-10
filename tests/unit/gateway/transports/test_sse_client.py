@@ -181,7 +181,7 @@ class TestGatewaySSEClient:
         result = client._parse_sse_line("invalid line", event)
         assert result is None
 
-    async def DISABLED_test_stream_events_basic(self, client):
+    async def test_stream_events_basic(self, client):
         """Test basic event streaming."""
         # Create mock async iterator for SSE stream
         async def mock_aiter_lines():
@@ -198,18 +198,16 @@ class TestGatewaySSEClient:
         mock_response.raise_for_status = MagicMock()
         mock_response.aiter_lines = mock_aiter_lines
 
-        class MockAsyncContext:
-            def __init__(self, response):
-                self.response = response
-
-            async def __aenter__(self):
-                return self.response
-
-            async def __aexit__(self, *args):
-                pass
-
         async def mock_stream(*args, **kwargs):
-            return MockAsyncContext(mock_response)
+            # Return async context manager
+            class MockAsyncContext:
+                async def __aenter__(self):
+                    return mock_response
+
+                async def __aexit__(self, *args):
+                    pass
+
+            return MockAsyncContext()
 
         client.client.stream = mock_stream
 
@@ -228,7 +226,7 @@ class TestGatewaySSEClient:
         assert events[1].data == "second event"
         await client.close()
 
-    async def DISABLED_test_stream_events_with_filter(self, client):
+    async def test_stream_events_with_filter(self, client):
         """Test streaming events with type filter."""
         async def mock_aiter_lines():
             yield "event: tool_invoked"
@@ -248,16 +246,13 @@ class TestGatewaySSEClient:
 
         async def mock_stream(*args, **kwargs):
             class MockAsyncContext:
-                def __init__(self, response):
-                    self.response = response
-
                 async def __aenter__(self):
-                    return self.response
+                    return mock_response
 
                 async def __aexit__(self, *args):
                     pass
 
-            return MockAsyncContext(mock_response)
+            return MockAsyncContext()
 
         client.client.stream = mock_stream
 
@@ -277,7 +272,7 @@ class TestGatewaySSEClient:
         assert all(e.event_type == "tool_invoked" for e in events)
         await client.close()
 
-    async def DISABLED_test_stream_audit_events(self, client):
+    async def test_stream_audit_events(self, client):
         """Test streaming audit events."""
         async def mock_aiter_lines():
             yield "event: authorization_denied"
@@ -291,16 +286,13 @@ class TestGatewaySSEClient:
 
         async def mock_stream(*args, **kwargs):
             class MockAsyncContext:
-                def __init__(self, response):
-                    self.response = response
-
                 async def __aenter__(self):
-                    return self.response
+                    return mock_response
 
                 async def __aexit__(self, *args):
                     pass
 
-            return MockAsyncContext(mock_response)
+            return MockAsyncContext()
 
         client.client.stream = mock_stream
 
@@ -312,7 +304,7 @@ class TestGatewaySSEClient:
         assert len(events) == 1
         await client.close()
 
-    async def DISABLED_test_stream_server_events(self, client):
+    async def test_stream_server_events(self, client):
         """Test streaming server-specific events."""
         async def mock_aiter_lines():
             yield "event: server_health"
@@ -326,16 +318,13 @@ class TestGatewaySSEClient:
 
         async def mock_stream(*args, **kwargs):
             class MockAsyncContext:
-                def __init__(self, response):
-                    self.response = response
-
                 async def __aenter__(self):
-                    return self.response
+                    return mock_response
 
                 async def __aexit__(self, *args):
                     pass
 
-            return MockAsyncContext(mock_response)
+            return MockAsyncContext()
 
         client.client.stream = mock_stream
 
@@ -368,16 +357,13 @@ class TestGatewaySSEClient:
 
         async def mock_stream(*args, **kwargs):
             class MockAsyncContext:
-                def __init__(self, response):
-                    self.response = response
-
                 async def __aenter__(self):
-                    return self.response
+                    return mock_response
 
                 async def __aexit__(self, *args):
                     pass
 
-            return MockAsyncContext(mock_response)
+            return MockAsyncContext()
 
         client.client.stream = mock_stream
 
@@ -387,7 +373,7 @@ class TestGatewaySSEClient:
 
         await client.close()
 
-    async def DISABLED_test_reconnection_on_error(self, client):
+    async def test_reconnection_on_error(self, client):
         """Test automatic reconnection on connection error."""
         call_count = 0
 
@@ -427,7 +413,7 @@ class TestGatewaySSEClient:
         assert call_count >= 2  # Should have reconnected
         await client.close()
 
-    async def DISABLED_test_no_reconnection_when_disabled(self, client_no_reconnect):
+    async def test_no_reconnection_when_disabled(self, client_no_reconnect):
         """Test that reconnection doesn't happen when disabled."""
         async def mock_aiter_lines():
             raise httpx.RequestError("Connection lost")
@@ -454,7 +440,7 @@ class TestGatewaySSEClient:
 
         await client_no_reconnect.close()
 
-    async def DISABLED_test_max_retries_exceeded(self, client):
+    async def test_max_retries_exceeded(self, client):
         """Test max retries exceeded."""
         async def mock_aiter_lines():
             raise httpx.RequestError("Persistent error")
@@ -483,7 +469,7 @@ class TestGatewaySSEClient:
 
         await client.close()
 
-    async def DISABLED_test_no_retry_on_client_error(self, client):
+    async def test_no_retry_on_client_error(self, client):
         """Test no retry on 4xx client errors."""
         async def mock_stream(*args, **kwargs):
             class MockAsyncContext:
@@ -556,14 +542,13 @@ class TestGatewaySSEClient:
         ) as client:
             assert client.base_url == "http://test:8080"
 
-    async def DISABLED_test_connection_pooling_limits(self):
+    async def test_connection_pooling_limits(self):
         """Test connection pooling configuration."""
         async with GatewaySSEClient(
             base_url="http://test:8080",
             max_connections=100,
         ) as client:
-            # Check that limits were configured
-            assert hasattr(client.client, '_limits')
+            assert client.client.limits.max_connections == 100
             assert client._max_streams == 100
 
     async def test_timeout_configuration(self):
