@@ -2,13 +2,19 @@
 
 **Enterprise-Grade Multi-Protocol AI Governance Platform**
 
+[![Version](https://img.shields.io/badge/version-v1.2.0--dev-blue)]() [![Status](https://img.shields.io/badge/status-development-yellow)]() [![License](https://img.shields.io/badge/license-MIT-blue)]() [![Python](https://img.shields.io/badge/python-3.11+-blue)]()
+
 > *"He's not any kind of user, SARK, he's a program."* —MCP, probably
 
-SARK v2.0 provides zero-trust governance for AI deployments at scale. Originally built for Model Context Protocol (MCP), v2.0 now supports **MCP, HTTP/REST, gRPC, and custom protocols** through a universal adapter interface.
+**Current Release:** v1.1.0 (Gateway infrastructure)
+**In Development:** v1.2.0 (Gateway implementation + policy validation + tests)
+**Production Target:** v2.0.0 (After external security audit)
+
+SARK provides zero-trust governance for AI deployments at scale. Originally built for Model Context Protocol (MCP), SARK now supports **MCP, HTTP/REST, gRPC, and custom protocols** through a universal adapter interface.
 
 **Target Scale:** 50,000+ employees, 10,000+ AI resources
 
-📖 **[Quick Start](docs/QUICK_START.md)** | **[What's New in v2.0](RELEASE_NOTES_v2.0.0.md)** | **[Migration Guide](docs/MIGRATION_v1_to_v2.md)** | **[Full Documentation](docs/)**
+📖 **[Quick Start](docs/QUICK_START.md)** | **[Roadmap](docs/ROADMAP.md)** | **[Version Strategy](VERSION_RENUMBERING.md)** | **[Full Documentation](docs/)**
 
 ---
 

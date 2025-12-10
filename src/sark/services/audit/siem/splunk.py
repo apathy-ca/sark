@@ -334,8 +334,22 @@ class SplunkSIEM(BaseSIEM):
         # Add host if configured
         if self.splunk_config.host:
             hec_event["host"] = self.splunk_config.host
+        else:
+            # Default to server_id if available
+            hec_event["host"] = str(event.server_id) if event.server_id else "sark"
 
         return hec_event
+
+    def _format_splunk_event(self, event: AuditEvent) -> dict[str, Any]:
+        """Alias for _format_hec_event for backward compatibility with tests.
+
+        Args:
+            event: Audit event to format
+
+        Returns:
+            Event formatted for HEC
+        """
+        return self._format_hec_event(event)
 
     async def close(self) -> None:
         """Close the HTTP client and clean up resources."""
