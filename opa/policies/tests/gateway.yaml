@@ -1,0 +1,206 @@
+suite_name: "Gateway Authorization Policy Tests"
+description: "Test suite for MCP gateway authorization policy"
+policy: "../examples/gateway.rego"
+
+tests:
+  # =========================================================================
+  # Admin Access Tests
+  # =========================================================================
+  - name: "Admin can invoke any tool"
+    description: "Administrators should have full access to all tools"
+    input:
+      user:
+        roles: ["admin"]
+        email: "admin@example.com"
+      action: "gateway:tool:invoke"
+      server_name: "postgres-mcp"
+      tool_name: "execute_query"
+      parameters:
+        query: "DROP TABLE users"
+    expected:
+      allow: true
+
+  - name: "Admin can access any server"
+    description: "Administrators should have full access to all servers"
+    input:
+      user:
+        roles: ["admin"]
+        email: "admin@example.com"
+      action: "gateway:server:access"
+      server_name: "github-mcp"
+    expected:
+      allow: true
+
+  # =========================================================================
+  # Analyst Access Tests
+  # =========================================================================
+  - name: "Analyst can execute SELECT queries"
+    description: "Analysts should be able to run read-only queries"
+    input:
+      user:
+        roles: ["analyst"]
+        email: "analyst@example.com"
+      action: "gateway:tool:invoke"
+      server_name: "postgres-mcp"
+      tool_name: "execute_query"
+      parameters:
+        query: "SELECT * FROM users WHERE id = 1"
+    expected:
+      allow: true
+
+  - name: "Analyst cannot execute DROP queries"
+    description: "Analysts should not be able to run destructive queries"
+    input:
+      user:
+        roles: ["analyst"]
+        email: "analyst@example.com"
+      action: "gateway:tool:invoke"
+      server_name: "postgres-mcp"
+      tool_name: "execute_query"
+      parameters:
+        query: "DROP TABLE users"
+    expected:
+      allow: false
+
+  - name: "Analyst can list tables"
+    description: "Analysts should be able to list database tables"
+    input:
+      user:
+        roles: ["analyst"]
+        email: "analyst@example.com"
+      action: "gateway:tool:invoke"
+      server_name: "postgres-mcp"
+      tool_name: "list_tables"
+    expected:
+      allow: true
+
+  - name: "Analyst can describe table schema"
+    description: "Analysts should be able to view table schemas"
+    input:
+      user:
+        roles: ["analyst"]
+        email: "analyst@example.com"
+      action: "gateway:tool:invoke"
+      server_name: "postgres-mcp"
+      tool_name: "describe_table"
+      parameters:
+        table_name: "users"
+    expected:
+      allow: true
+
+  - name: "Analyst cannot execute mutations"
+    description: "Analysts should not be able to modify data"
+    input:
+      user:
+        roles: ["analyst"]
+        email: "analyst@example.com"
+      action: "gateway:tool:invoke"
+      server_name: "postgres-mcp"
+      tool_name: "execute_mutation"
+      parameters:
+        query: "UPDATE users SET role = 'admin'"
+    expected:
+      allow: false
+
+  # =========================================================================
+  # Developer Access Tests
+  # =========================================================================
+  - name: "Developer can access GitHub repositories"
+    description: "Developers should be able to view GitHub repos"
+    input:
+      user:
+        roles: ["developer"]
+        email: "dev@example.com"
+      action: "gateway:tool:invoke"
+      server_name: "github-mcp"
+      tool_name: "get_repo"
+      parameters:
+        owner: "myorg"
+        repo: "myrepo"
+    expected:
+      allow: true
+
+  - name: "Developer can list issues"
+    description: "Developers should be able to view issues"
+    input:
+      user:
+        roles: ["developer"]
+        email: "dev@example.com"
+      action: "gateway:tool:invoke"
+      server_name: "github-mcp"
+      tool_name: "list_issues"
+      parameters:
+        owner: "myorg"
+        repo: "myrepo"
+    expected:
+      allow: true
+
+  - name: "Developer can create issues"
+    description: "Developers should be able to create new issues"
+    input:
+      user:
+        roles: ["developer"]
+        email: "dev@example.com"
+      action: "gateway:tool:invoke"
+      server_name: "github-mcp"
+      tool_name: "create_issue"
+      parameters:
+        title: "Bug report"
+        body: "Found a bug"
+    expected:
+      allow: true
+
+  - name: "Developer cannot close issues"
+    description: "Only admins should be able to close issues"
+    input:
+      user:
+        roles: ["developer"]
+        email: "dev@example.com"
+      action: "gateway:tool:invoke"
+      server_name: "github-mcp"
+      tool_name: "close_issue"
+      parameters:
+        issue_number: 123
+    expected:
+      allow: false
+
+  - name: "Developer cannot delete issues"
+    description: "Only admins should be able to delete issues"
+    input:
+      user:
+        roles: ["developer"]
+        email: "dev@example.com"
+      action: "gateway:tool:invoke"
+      server_name: "github-mcp"
+      tool_name: "delete_issue"
+      parameters:
+        issue_number: 123
+    expected:
+      allow: false
+
+  # =========================================================================
+  # Default Deny Tests
+  # =========================================================================
+  - name: "Unknown user role is denied"
+    description: "Users without recognized roles should be denied"
+    input:
+      user:
+        roles: ["guest"]
+        email: "guest@example.com"
+      action: "gateway:tool:invoke"
+      server_name: "postgres-mcp"
+      tool_name: "list_tables"
+    expected:
+      allow: false
+
+  - name: "No role is denied"
+    description: "Users without any roles should be denied"
+    input:
+      user:
+        roles: []
+        email: "norole@example.com"
+      action: "gateway:tool:invoke"
+      server_name: "postgres-mcp"
+      tool_name: "list_tables"
+    expected:
+      allow: false
