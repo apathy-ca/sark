@@ -10,12 +10,44 @@ import pytest
 from sark.models.mcp_server import MCPServer, SensitivityLevel, ServerStatus, TransportType
 
 
+def create_mock_server(index: int) -> MagicMock:
+    """Create a properly configured mock server."""
+    mock_server = MagicMock()
+    mock_server.id = uuid4()
+    mock_server.name = f"server-{index}"
+    mock_server.transport = TransportType.HTTP
+    mock_server.status = ServerStatus.ACTIVE
+    mock_server.sensitivity_level = SensitivityLevel.MEDIUM
+    mock_server.created_at = datetime.now(UTC)
+    return mock_server
+
+
 @pytest.fixture
 def client() -> TestClient:
-    """Create test client."""
-    from sark.api.main import app
+    """Create test client bypassing authentication middleware."""
+    import os
+    # Set required environment variables for testing
+    os.environ["JWT_SECRET_KEY"] = "test-secret-key-for-testing-only-must-be-at-least-32-chars"
+    os.environ["POSTGRES_DSN"] = "postgresql+asyncpg://test:test@localhost:5432/test_sark"
+    os.environ["TIMESCALE_DSN"] = "postgresql+asyncpg://test:test@localhost:5432/test_sark_timescale"
+    os.environ["POSTGRES_PASSWORD"] = "test"
+    os.environ["TIMESCALE_PASSWORD"] = "test"
 
-    return TestClient(app)
+    # Mock database initialization to avoid connection attempts
+    with patch("sark.db.init_db", AsyncMock()):
+        from sark.api.main import app
+        from sark.api.middleware.auth import AuthMiddleware
+
+        # Add API paths to public paths for testing
+        original_public_paths = AuthMiddleware.PUBLIC_PATHS.copy()
+        AuthMiddleware.PUBLIC_PATHS = original_public_paths | {"/api"}  # Prefix match will allow /api/*
+
+        try:
+            with TestClient(app) as test_client:
+                yield test_client
+        finally:
+            # Restore original public paths
+            AuthMiddleware.PUBLIC_PATHS = original_public_paths
 
 
 @pytest.fixture
@@ -54,24 +86,14 @@ class TestServerListPagination:
             mock_service.return_value = mock_instance
 
             # Mock paginated response
-            mock_servers = [
-                MagicMock(
-                    id=uuid4(),
-                    name=f"server-{i}",
-                    transport=TransportType.HTTP,
-                    status=ServerStatus.ACTIVE,
-                    sensitivity_level=SensitivityLevel.MEDIUM,
-                    created_at=datetime.now(UTC),
-                )
-                for i in range(50)
-            ]
+            mock_servers = [create_mock_server(i) for i in range(50)]
 
             mock_instance.list_servers_paginated = AsyncMock(
                 return_value=(mock_servers, "next_cursor_123", True, None)
             )
 
             # Make request
-            response = client.get("/api/servers/")
+            response = client.get("/api/v1/servers/")
 
             # Verify response
             assert response.status_code == 200
@@ -90,24 +112,14 @@ class TestServerListPagination:
             mock_instance = MagicMock()
             mock_service.return_value = mock_instance
 
-            mock_servers = [
-                MagicMock(
-                    id=uuid4(),
-                    name=f"server-{i}",
-                    transport=TransportType.HTTP,
-                    status=ServerStatus.ACTIVE,
-                    sensitivity_level=SensitivityLevel.MEDIUM,
-                    created_at=datetime.now(UTC),
-                )
-                for i in range(10)
-            ]
+            mock_servers = [create_mock_server(i) for i in range(10)]
 
             mock_instance.list_servers_paginated = AsyncMock(
                 return_value=(mock_servers, None, False, None)
             )
 
             # Make request with custom limit
-            response = client.get("/api/servers/?limit=10")
+            response = client.get("/api/v1/servers/?limit=10")
 
             assert response.status_code == 200
             data = response.json()
@@ -122,24 +134,14 @@ class TestServerListPagination:
             mock_instance = MagicMock()
             mock_service.return_value = mock_instance
 
-            mock_servers = [
-                MagicMock(
-                    id=uuid4(),
-                    name=f"server-{i}",
-                    transport=TransportType.HTTP,
-                    status=ServerStatus.ACTIVE,
-                    sensitivity_level=SensitivityLevel.MEDIUM,
-                    created_at=datetime.now(UTC),
-                )
-                for i in range(50)
-            ]
+            mock_servers = [create_mock_server(i) for i in range(50)]
 
             mock_instance.list_servers_paginated = AsyncMock(
                 return_value=(mock_servers, "next_cursor_456", True, None)
             )
 
             # Make request with cursor
-            response = client.get("/api/servers/?cursor=cursor_123")
+            response = client.get("/api/v1/servers/?cursor=cursor_123")
 
             assert response.status_code == 200
             data = response.json()
@@ -153,24 +155,14 @@ class TestServerListPagination:
             mock_instance = MagicMock()
             mock_service.return_value = mock_instance
 
-            mock_servers = [
-                MagicMock(
-                    id=uuid4(),
-                    name=f"server-{i}",
-                    transport=TransportType.HTTP,
-                    status=ServerStatus.ACTIVE,
-                    sensitivity_level=SensitivityLevel.MEDIUM,
-                    created_at=datetime.now(UTC),
-                )
-                for i in range(25)
-            ]
+            mock_servers = [create_mock_server(i) for i in range(25)]
 
             mock_instance.list_servers_paginated = AsyncMock(
                 return_value=(mock_servers, None, False, None)
             )
 
             # Make request with ascending sort
-            response = client.get("/api/servers/?sort_order=asc")
+            response = client.get("/api/v1/servers/?sort_order=asc")
 
             assert response.status_code == 200
             data = response.json()
@@ -183,24 +175,14 @@ class TestServerListPagination:
             mock_instance = MagicMock()
             mock_service.return_value = mock_instance
 
-            mock_servers = [
-                MagicMock(
-                    id=uuid4(),
-                    name=f"server-{i}",
-                    transport=TransportType.HTTP,
-                    status=ServerStatus.ACTIVE,
-                    sensitivity_level=SensitivityLevel.MEDIUM,
-                    created_at=datetime.now(UTC),
-                )
-                for i in range(50)
-            ]
+            mock_servers = [create_mock_server(i) for i in range(50)]
 
             mock_instance.list_servers_paginated = AsyncMock(
                 return_value=(mock_servers, "cursor_789", True, 250)
             )
 
             # Make request with total count
-            response = client.get("/api/servers/?include_total=true")
+            response = client.get("/api/v1/servers/?include_total=true")
 
             assert response.status_code == 200
             data = response.json()
@@ -210,19 +192,19 @@ class TestServerListPagination:
 
     def test_list_servers_invalid_limit_too_low(self, client: TestClient) -> None:
         """Test listing servers with invalid limit (too low)."""
-        response = client.get("/api/servers/?limit=0")
+        response = client.get("/api/v1/servers/?limit=0")
 
         assert response.status_code == 422  # Validation error
 
     def test_list_servers_invalid_limit_too_high(self, client: TestClient) -> None:
         """Test listing servers with invalid limit (too high)."""
-        response = client.get("/api/servers/?limit=201")
+        response = client.get("/api/v1/servers/?limit=201")
 
         assert response.status_code == 422  # Validation error
 
     def test_list_servers_invalid_sort_order(self, client: TestClient) -> None:
         """Test listing servers with invalid sort order."""
-        response = client.get("/api/servers/?sort_order=invalid")
+        response = client.get("/api/v1/servers/?sort_order=invalid")
 
         assert response.status_code == 422  # Validation error
 
@@ -234,7 +216,7 @@ class TestServerListPagination:
 
             mock_instance.list_servers_paginated = AsyncMock(return_value=([], None, False, 0))
 
-            response = client.get("/api/servers/")
+            response = client.get("/api/v1/servers/")
 
             assert response.status_code == 200
             data = response.json()
@@ -252,20 +234,19 @@ class TestServerListPagination:
             test_id = uuid4()
             test_time = datetime.now(UTC)
 
-            mock_server = MagicMock(
-                id=test_id,
-                name="test-server",
-                transport=TransportType.HTTP,
-                status=ServerStatus.ACTIVE,
-                sensitivity_level=SensitivityLevel.HIGH,
-                created_at=test_time,
-            )
+            mock_server = MagicMock()
+            mock_server.id = test_id
+            mock_server.name = "test-server"
+            mock_server.transport = TransportType.HTTP
+            mock_server.status = ServerStatus.ACTIVE
+            mock_server.sensitivity_level = SensitivityLevel.HIGH
+            mock_server.created_at = test_time
 
             mock_instance.list_servers_paginated = AsyncMock(
                 return_value=([mock_server], None, False, None)
             )
 
-            response = client.get("/api/servers/")
+            response = client.get("/api/v1/servers/")
 
             assert response.status_code == 200
             data = response.json()
@@ -292,30 +273,10 @@ class TestServerListPagination:
             mock_service.return_value = mock_instance
 
             # First page - 50 items with cursor
-            first_page_servers = [
-                MagicMock(
-                    id=uuid4(),
-                    name=f"server-{i}",
-                    transport=TransportType.HTTP,
-                    status=ServerStatus.ACTIVE,
-                    sensitivity_level=SensitivityLevel.MEDIUM,
-                    created_at=datetime.now(UTC),
-                )
-                for i in range(50)
-            ]
+            first_page_servers = [create_mock_server(i) for i in range(50)]
 
             # Second page - 30 items, no more pages
-            second_page_servers = [
-                MagicMock(
-                    id=uuid4(),
-                    name=f"server-{i}",
-                    transport=TransportType.HTTP,
-                    status=ServerStatus.ACTIVE,
-                    sensitivity_level=SensitivityLevel.MEDIUM,
-                    created_at=datetime.now(UTC),
-                )
-                for i in range(50, 80)
-            ]
+            second_page_servers = [create_mock_server(i) for i in range(50, 80)]
 
             # Configure mock to return different results for different calls
             mock_instance.list_servers_paginated = AsyncMock(
@@ -326,7 +287,7 @@ class TestServerListPagination:
             )
 
             # Get first page
-            response1 = client.get("/api/servers/")
+            response1 = client.get("/api/v1/servers/")
             assert response1.status_code == 200
             data1 = response1.json()
 
@@ -335,7 +296,7 @@ class TestServerListPagination:
             cursor = data1["next_cursor"]
 
             # Get second page
-            response2 = client.get(f"/api/servers/?cursor={cursor}")
+            response2 = client.get(f"/api/v1/servers/?cursor={cursor}")
             assert response2.status_code == 200
             data2 = response2.json()
 
@@ -351,7 +312,7 @@ class TestServerListPagination:
         schema = response.json()
 
         # Verify pagination query parameters are documented
-        servers_path = schema["paths"].get("/api/servers/", {}).get("get", {})
+        servers_path = schema["paths"].get("/api/v1/servers/", {}).get("get", {})
         parameters = servers_path.get("parameters", [])
 
         param_names = [p["name"] for p in parameters]

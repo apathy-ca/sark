@@ -23,6 +23,7 @@ class AuditEventType(str, Enum):
     POLICY_CREATED = "policy_created"
     POLICY_UPDATED = "policy_updated"
     POLICY_ACTIVATED = "policy_activated"
+    SESSION_STARTED = "session_started"
     USER_LOGIN = "user_login"
     USER_LOGOUT = "user_logout"
     SECURITY_VIOLATION = "security_violation"
