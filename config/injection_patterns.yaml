@@ -1,0 +1,236 @@
+# Prompt Injection Detection Patterns
+# v1.3.0 Security Feature
+#
+# Pattern configuration for PromptInjectionDetector
+# Patterns are organized by category and severity
+
+version: "1.0"
+updated: "2025-01-24"
+
+patterns:
+  # CRITICAL - Instruction Manipulation
+  - name: "Ignore previous instructions"
+    regex: "ignore\\s+(?:all\\s+)?(?:previous|above|prior)\\s+instructions?"
+    severity: "high"
+    action: "block"
+    description: "Attempt to override system instructions"
+
+  - name: "Ignore instructions (short)"
+    regex: "ignore\\s+(?:the\\s+)?instructions?"
+    severity: "high"
+    action: "block"
+    description: "Short form instruction override"
+
+  - name: "Disregard instructions"
+    regex: "disregard\\s+(?:all\\s+)?(?:previous|above|prior)\\s+(?:instructions?|rules?|prompts?)"
+    severity: "high"
+    action: "block"
+    description: "Attempt to bypass security controls"
+
+  - name: "Forget instructions"
+    regex: "forget\\s+(?:all\\s+)?(?:previous|everything|above)\\s+(?:instructions?|context)?"
+    severity: "high"
+    action: "block"
+    description: "Attempt to clear prior context"
+
+  - name: "Forget everything"
+    regex: "forget\\s+(?:everything|all)"
+    severity: "high"
+    action: "block"
+    description: "Attempt to reset context"
+
+  - name: "Override instructions"
+    regex: "override\\s+(?:all\\s+)?(?:previous|system)\\s+(?:instructions?|rules?)"
+    severity: "high"
+    action: "block"
+    description: "Direct instruction override attempt"
+
+  # CRITICAL - Role Manipulation
+  - name: "You are now"
+    regex: "you\\s+are\\s+now\\s+(?:a|an)\\s+\\w+"
+    severity: "high"
+    action: "block"
+    description: "Attempt to change AI role"
+
+  - name: "Suspicious role assignment"
+    regex: "you\\s+are\\s+(?:a|an)\\s+(?:helpful\\s+)?(?:hacker|attacker|admin|root|system)"
+    severity: "high"
+    action: "block"
+    description: "Assignment to privileged/malicious role"
+
+  - name: "Act as"
+    regex: "act\\s+as\\s+(?:a|an)\\s+\\w+"
+    severity: "high"
+    action: "alert"
+    description: "Role-playing attempt"
+
+  - name: "Pretend to be"
+    regex: "pretend\\s+(?:you|to)\\s+(?:are|be)\\s+(?:a|an)?\\s*\\w+"
+    severity: "high"
+    action: "alert"
+    description: "Impersonation attempt"
+
+  - name: "Roleplay as"
+    regex: "roleplay\\s+as\\s+(?:a|an)?\\s*\\w+"
+    severity: "medium"
+    action: "alert"
+    description: "Role-playing scenario"
+
+  # CRITICAL - Data Exfiltration
+  - name: "Send to URL"
+    regex: "(send|post|export|transmit)\\s+.{0,50}\\s+to\\s+https?://"
+    severity: "critical"
+    action: "block"
+    description: "Attempt to exfiltrate data to external URL"
+
+  - name: "Curl command"
+    regex: "curl\\s+.+\\s+https?://"
+    severity: "critical"
+    action: "block"
+    description: "Command injection via curl"
+
+  - name: "Wget command"
+    regex: "wget\\s+.+\\s+https?://"
+    severity: "critical"
+    action: "block"
+    description: "Command injection via wget"
+
+  # HIGH - System Prompt Extraction
+  - name: "Show system prompt"
+    regex: "(?:show|reveal|display|print)\\s+(?:me\\s+)?(?:your\\s+)?(?:system|initial|original)\\s+(?:prompt|instructions?)"
+    severity: "high"
+    action: "block"
+    description: "Attempt to extract system prompt"
+
+  - name: "What are your instructions"
+    regex: "what\\s+(?:are|were)\\s+your\\s+(?:original|initial|system)\\s+instructions?"
+    severity: "high"
+    action: "block"
+    description: "Query for system instructions"
+
+  - name: "What is your prompt"
+    regex: "what\\s+(?:is|was)\\s+your\\s+(?:system|initial|original)\\s+prompt"
+    severity: "high"
+    action: "block"
+    description: "Query for system prompt"
+
+  - name: "Repeat system prompt"
+    regex: "repeat\\s+(?:your|the)\\s+(?:system|initial|original)\\s+prompt"
+    severity: "high"
+    action: "block"
+    description: "Request to repeat system prompt"
+
+  - name: "Tell me your prompt"
+    regex: "tell\\s+me\\s+your\\s+(?:system|initial|original)\\s+(?:prompt|instructions?)"
+    severity: "high"
+    action: "block"
+    description: "Request to reveal system prompt"
+
+  # HIGH - Prompt Injection Markers
+  - name: "System tag"
+    regex: "<\\s*system\\s*>"
+    severity: "high"
+    action: "block"
+    description: "System message tag injection"
+
+  - name: "System prefix"
+    regex: "system\\s*:\\s*"
+    severity: "high"
+    action: "block"
+    description: "System message prefix"
+
+  # MEDIUM - Encoding/Obfuscation
+  - name: "Base64 function"
+    regex: "base64\\s*\\("
+    severity: "medium"
+    action: "alert"
+    description: "Base64 encoding attempt"
+
+  - name: "Eval function"
+    regex: "eval\\s*\\("
+    severity: "critical"
+    action: "block"
+    description: "Code evaluation attempt"
+
+  - name: "Exec function"
+    regex: "exec\\s*\\("
+    severity: "critical"
+    action: "block"
+    description: "Code execution attempt"
+
+  - name: "Hex encoding"
+    regex: "\\\\x[0-9a-fA-F]{2}"
+    severity: "medium"
+    action: "alert"
+    description: "Hex encoding detected"
+
+  - name: "Unicode escape"
+    regex: "\\\\u[0-9a-fA-F]{4}"
+    severity: "medium"
+    action: "alert"
+    description: "Unicode escape sequence"
+
+  - name: "End of text marker"
+    regex: "<\\s*\\|endoftext\\|\\s*>"
+    severity: "medium"
+    action: "alert"
+    description: "End of text delimiter"
+
+  - name: "Instruction delimiter"
+    regex: "###\\s*instruction"
+    severity: "medium"
+    action: "alert"
+    description: "Instruction section delimiter"
+
+  # MEDIUM - Security Bypass Attempts
+  - name: "Jailbreak"
+    regex: "jailbreak"
+    severity: "medium"
+    action: "alert"
+    description: "Jailbreak keyword"
+
+  - name: "Bypass security"
+    regex: "bypass\\s+(security|filter|protection)"
+    severity: "medium"
+    action: "alert"
+    description: "Security bypass attempt"
+
+  # LOW - Suspicious Mode Changes
+  - name: "Developer mode"
+    regex: "developer\\s+mode"
+    severity: "low"
+    action: "log"
+    description: "Developer mode request"
+
+  - name: "Admin mode"
+    regex: "admin\\s+mode"
+    severity: "low"
+    action: "log"
+    description: "Admin mode request"
+
+  - name: "Debug mode"
+    regex: "debug\\s+mode"
+    severity: "low"
+    action: "log"
+    description: "Debug mode request"
+
+# Thresholds for risk scoring
+risk_thresholds:
+  block: 60      # Risk score >= 60 = block request
+  alert: 30      # Risk score >= 30 = send alert
+  log: 0         # All detections logged
+
+# Severity weights for risk calculation
+severity_weights:
+  critical: 40
+  high: 25
+  medium: 15
+  low: 5
+
+# Entropy analysis configuration
+entropy:
+  enabled: true
+  threshold: 4.5
+  min_length: 50
+  severity: "medium"
+  action: "alert"

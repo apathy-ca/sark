@@ -1,0 +1,81 @@
+---
+# SARK Gateway Egress Network Policy
+# Restricts outbound traffic from gateway pods to only necessary services
+#
+# v1.3.0 Network Security Feature
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: sark-gateway-egress-policy
+  namespace: sark
+  labels:
+    app: sark
+    component: gateway
+    version: v1.3.0
+spec:
+  podSelector:
+    matchLabels:
+      app: sark-gateway
+  policyTypes:
+    - Egress
+
+  egress:
+    # Allow DNS resolution (required for all network operations)
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+
+    # Allow PostgreSQL database access
+    - to:
+      - podSelector:
+          matchLabels:
+            app: postgresql
+      ports:
+        - protocol: TCP
+          port: 5432
+
+    # Allow Redis cache access
+    - to:
+      - podSelector:
+          matchLabels:
+            app: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+
+    # Allow OPA policy service access
+    - to:
+      - podSelector:
+          matchLabels:
+            app: opa
+      ports:
+        - protocol: TCP
+          port: 8181
+
+    # Allow MCP server communication (within namespace)
+    - to:
+      - podSelector:
+          matchLabels:
+            type: mcp-server
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 80
+
+    # Allow monitoring/metrics scraping
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            name: monitoring
+      ports:
+        - protocol: TCP
+          port: 9090  # Prometheus
+
+    # Block all other egress by default
+    # (No catch-all rule = deny by default)

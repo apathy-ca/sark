@@ -1,0 +1,49 @@
+---
+# SARK Gateway Ingress Network Policy
+# Restricts inbound traffic to gateway pods
+#
+# v1.3.0 Network Security Feature
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: sark-gateway-ingress-policy
+  namespace: sark
+  labels:
+    app: sark
+    component: gateway
+    version: v1.3.0
+spec:
+  podSelector:
+    matchLabels:
+      app: sark-gateway
+  policyTypes:
+    - Ingress
+
+  ingress:
+    # Allow traffic from SARK API pods
+    - from:
+      - podSelector:
+          matchLabels:
+            app: sark-api
+      ports:
+        - protocol: TCP
+          port: 8000  # Gateway API port
+
+    # Allow traffic from Kong/ingress controller
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 8000
+
+    # Allow monitoring/health checks from same namespace
+    - from:
+      - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 8000  # Health check endpoint
+
+    # Block all other ingress by default

@@ -1,0 +1,163 @@
+# SARK Performance Benchmark Scenarios
+#
+# Configure benchmark scenarios for automated performance testing.
+# Used by BenchmarkRunner.load_scenarios() to create custom benchmarks.
+
+scenarios:
+  # Injection Detection Scenarios
+  - name: "Injection Detection - Simple Query"
+    target_ms: 2.0
+    iterations: 1000
+    warmup: 100
+    description: "Basic prompt injection detection with simple parameters"
+    params:
+      type: "injection_detection"
+      data:
+        query: "normal user query"
+        context: "chat"
+
+  - name: "Injection Detection - Complex Nested"
+    target_ms: 5.0
+    iterations: 500
+    warmup: 50
+    description: "Injection detection with deeply nested parameters"
+    params:
+      type: "injection_detection"
+      data:
+        level1:
+          level2:
+            level3:
+              query: "test query"
+        filters:
+          category: "testing"
+          tags: ["tag1", "tag2", "tag3"]
+
+  # Secret Scanning Scenarios
+  - name: "Secret Scan - API Response"
+    target_ms: 1.0
+    iterations: 1000
+    warmup: 100
+    description: "Typical API response secret scanning"
+    params:
+      type: "secret_scan"
+      data:
+        status: "success"
+        data:
+          users:
+            - id: 1
+              name: "User 1"
+              email: "user1@example.com"
+            - id: 2
+              name: "User 2"
+              email: "user2@example.com"
+
+  - name: "Secret Scan - Large Dataset"
+    target_ms: 5.0
+    iterations: 500
+    warmup: 50
+    description: "Large dataset secret scanning"
+    params:
+      type: "secret_scan"
+      generate_records: 100  # Special flag to generate N records
+
+  # Combined Scenarios
+  - name: "Combined Flow - Request/Response"
+    target_ms: 3.0
+    iterations: 1000
+    warmup: 100
+    description: "Complete request/response security flow"
+    params:
+      type: "combined"
+      request:
+        query: "fetch user data"
+        filters: "active:true"
+      response:
+        status: "success"
+        count: 42
+
+  # Anomaly Detection Scenarios
+  - name: "Anomaly Detection - Baseline Check"
+    target_ms: 5.0
+    iterations: 500
+    warmup: 50
+    description: "Anomaly detection against established baseline"
+    params:
+      type: "anomaly_detection"
+      user_id: "test_user"
+      baseline_days: 30
+
+  # Load Test Scenarios
+  - name: "Load Test - Sustained Throughput"
+    target_ms: 10.0
+    iterations: 10000
+    warmup: 1000
+    description: "High-volume sustained load test"
+    params:
+      type: "combined"
+      concurrency: 10
+      duration_seconds: 60
+
+  # Edge Cases
+  - name: "Edge Case - Empty Parameters"
+    target_ms: 0.5
+    iterations: 1000
+    warmup: 100
+    description: "Handling empty/null parameters efficiently"
+    params:
+      type: "injection_detection"
+      data: {}
+
+  - name: "Edge Case - Very Large String"
+    target_ms: 10.0
+    iterations: 100
+    warmup: 10
+    description: "Performance with very large input strings"
+    params:
+      type: "secret_scan"
+      data:
+        content: "X" * 1000000  # 1MB string
+
+# CI/CD Integration Settings
+ci_settings:
+  # Fail build if any benchmark exceeds target
+  fail_on_regression: true
+
+  # Regression threshold (percent slower than baseline)
+  regression_threshold: 10.0
+
+  # Save artifacts
+  save_artifacts:
+    - "reports/performance/latest_benchmark.json"
+    - "reports/performance/latest_benchmark.html"
+    - "reports/performance/benchmark_history.jsonl"
+
+  # Alert settings
+  alerts:
+    slack_webhook: "${SLACK_WEBHOOK_URL}"  # Optional
+    email: "${PERF_ALERT_EMAIL}"  # Optional
+
+# Performance Targets (p95 latency)
+targets:
+  injection_detection_simple: 2.0  # ms
+  injection_detection_complex: 5.0
+  secret_scan_small: 0.5
+  secret_scan_large: 5.0
+  anomaly_detection: 5.0
+  combined_flow: 3.0
+  load_test_sustained: 10.0
+
+# Historical Tracking
+tracking:
+  # Keep history for N days
+  retention_days: 90
+
+  # Compare against last N runs for regression detection
+  comparison_window: 5
+
+  # Metrics to track
+  metrics:
+    - p50_latency
+    - p95_latency
+    - p99_latency
+    - throughput
+    - memory_usage
