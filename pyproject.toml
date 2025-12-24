@@ -1,6 +1,6 @@
 [project]
 name = "sark"
-version = "2.0.0"
+version = "1.1.0"
 description = "SARK - Security Audit and Resource Kontroler for MCP Governance"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -232,7 +232,7 @@ markers = [
     "user_flow: marks tests as user flow tests",
     "admin_flow: marks tests as admin flow tests",
     "bulk_operations: marks tests as bulk operation tests",
-    "v2: marks tests for SARK v2.0 features",
+    "v2: marks tests for future SARK v2.0 features (not yet released)",
     "federation: marks tests for federation features",
     "chaos: marks tests for chaos engineering",
 ]

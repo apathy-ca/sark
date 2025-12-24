@@ -1,0 +1,67 @@
+{
+  "sark": {
+    "allowlist": {
+      "servers": [
+        "approved-server-1",
+        "approved-server-2",
+        "approved-server-3",
+        "test-server",
+        "dev-server"
+      ],
+      "tools": [
+        "query_database",
+        "search_records",
+        "export_report",
+        "view_logs"
+      ]
+    },
+    "teams": {
+      "engineering": {
+        "members": ["user-001", "user-002", "user-003"],
+        "servers": ["eng-server-1", "eng-server-2"],
+        "quota": 20
+      },
+      "data": {
+        "members": ["user-010", "user-011"],
+        "servers": ["data-server-1"],
+        "quota": 10
+      },
+      "security": {
+        "members": ["user-020"],
+        "servers": ["security-server-1", "audit-server"],
+        "quota": 30
+      }
+    },
+    "users": {
+      "user-001": {
+        "role": "developer",
+        "team": "engineering",
+        "clearance_level": "medium",
+        "server_count": 5
+      },
+      "user-002": {
+        "role": "admin",
+        "team": "engineering",
+        "clearance_level": "high",
+        "server_count": 15
+      },
+      "user-010": {
+        "role": "data_analyst",
+        "team": "data",
+        "clearance_level": "medium",
+        "server_count": 3
+      },
+      "user-020": {
+        "role": "security_admin",
+        "team": "security",
+        "clearance_level": "high",
+        "server_count": 8
+      }
+    },
+    "sensitivity_matrix": {
+      "low": ["user", "developer", "data_analyst", "admin"],
+      "medium": ["developer", "team_lead", "admin"],
+      "high": ["admin", "security_admin"]
+    }
+  }
+}

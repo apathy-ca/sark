@@ -23,8 +23,8 @@ async def v2_status():
     """
     return {
         "status": "preview",
-        "message": "SARK v2 API is in development. Full implementation coming in v2.0.",
-        "version": "2.0.0-preview",
+        "message": "SARK v2 API is in development. Full implementation coming in future v2.0.",
+        "version": "future-v2.0-preview",
         "features": {
             "protocol_adapters": "planned",
             "federation": "planned",

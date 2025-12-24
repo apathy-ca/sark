@@ -1,6 +1,6 @@
 # SARK Migration Guide: Phase 1 to Phase 2
 
-**Version:** 2.0.0
+**Applies to:** v1.x releases
 **Date:** 2025-11-23
 **Migration Type:** Phase 1 (Basic Setup) → Phase 2 (SIEM Integration)
 **Downtime Required:** Zero (with proper execution)

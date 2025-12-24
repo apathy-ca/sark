@@ -1,0 +1,123 @@
+version: '3.8'
+
+# ============================================================================
+# SARK Integration Test Infrastructure
+# ============================================================================
+# This Docker Compose file provides all services needed for integration testing:
+# - PostgreSQL (main database)
+# - TimescaleDB (audit logs)
+# - Redis (caching)
+# - OPA (policy engine)
+# - gRPC mock server (for gRPC tests)
+#
+# Usage:
+#   docker-compose -f tests/fixtures/docker-compose.integration.yml up -d
+#   pytest tests/integration/ -v
+#   docker-compose -f tests/fixtures/docker-compose.integration.yml down
+# ============================================================================
+
+services:
+  # ==========================================================================
+  # PostgreSQL - Main Database
+  # ==========================================================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: sark_test_postgres
+    environment:
+      - POSTGRES_USER=sark_test
+      - POSTGRES_PASSWORD=sark_test
+      - POSTGRES_DB=sark_test
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8
+    ports:
+      - "5433:5432"  # Use different port to avoid conflicts
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sark_test"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    tmpfs:
+      - /var/lib/postgresql/data  # Use tmpfs for faster tests
+
+  # ==========================================================================
+  # TimescaleDB - Audit Log Database
+  # ==========================================================================
+  timescaledb:
+    image: timescale/timescaledb:latest-pg15
+    container_name: sark_test_timescale
+    environment:
+      - POSTGRES_USER=sark_test
+      - POSTGRES_PASSWORD=sark_test
+      - POSTGRES_DB=sark_audit_test
+    ports:
+      - "5434:5432"  # Use different port
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sark_test"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    tmpfs:
+      - /var/lib/postgresql/data
+
+  # ==========================================================================
+  # Redis - Cache
+  # ==========================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: sark_test_redis
+    command: redis-server --appendonly no --save ""  # Disable persistence for tests
+    ports:
+      - "6380:6379"  # Use different port
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 2s
+      retries: 10
+      start_period: 3s
+
+  # ==========================================================================
+  # OPA - Policy Engine
+  # ==========================================================================
+  opa:
+    image: openpolicyagent/opa:latest
+    container_name: sark_test_opa
+    command:
+      - "run"
+      - "--server"
+      - "--addr=0.0.0.0:8181"
+      - "--log-level=info"
+      - "/policies"
+    volumes:
+      - ../../opa/policies:/policies:ro  # Mount policy files
+    ports:
+      - "8181:8181"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--quiet", "http://localhost:8181/health"]
+      interval: 3s
+      timeout: 2s
+      retries: 10
+      start_period: 5s
+
+  # ==========================================================================
+  # gRPC Mock Server (for gRPC adapter tests)
+  # ==========================================================================
+  grpc-mock:
+    image: tkpd/gripmock:latest
+    container_name: sark_test_grpc_mock
+    ports:
+      - "50051:4770"   # gRPC server
+      - "4771:4771"    # Admin API for stubs
+    environment:
+      - GRIPMOCK_PORT=4770
+      - GRIPMOCK_ADMIN_PORT=4771
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "4770"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+networks:
+  default:
+    name: sark_test_network

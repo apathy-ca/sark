@@ -1,6 +1,6 @@
 # SARK Rollback Procedures
 
-**Version:** 2.0.0
+**Applies to:** v1.x releases
 **Date:** 2025-11-23
 **Purpose:** Emergency rollback procedures for Phase 2 deployment
 **Recovery Time Objective (RTO):** < 15 minutes

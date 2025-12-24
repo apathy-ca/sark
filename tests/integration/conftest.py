@@ -7,6 +7,9 @@ Provides common test fixtures including:
 - Test users and servers
 - OPA client configuration
 - SIEM mocks
+
+Note: For Docker-based integration tests with real services, use:
+    pytest_plugins = ["tests.fixtures.integration_docker"]
 """
 
 from datetime import UTC, datetime
@@ -20,6 +23,20 @@ from sark.models.user import User
 from sark.services.auth.api_key import APIKeyService
 from sark.services.auth.jwt import JWTHandler
 from sark.services.policy.opa_client import OPAClient
+
+# ============================================================================
+# Docker Services (Optional)
+# ============================================================================
+# To use real Docker services instead of mocks, add this to your test file:
+#   pytest_plugins = ["tests.fixtures.integration_docker"]
+#
+# This provides fixtures like:
+# - postgres_service, postgres_connection
+# - redis_service, redis_connection
+# - opa_service, opa_client
+# - timescaledb_service, timescaledb_connection
+# - grpc_mock_service
+# ============================================================================
 
 # ============================================================================
 # Database Fixtures

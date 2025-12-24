@@ -4,11 +4,11 @@
 
 > *"He's not any kind of user, SARK, he's a program."* —MCP, probably
 
-SARK v2.0 provides zero-trust governance for AI deployments at scale. Originally built for Model Context Protocol (MCP), v2.0 now supports **MCP, HTTP/REST, gRPC, and custom protocols** through a universal adapter interface.
+SARK provides zero-trust governance for AI deployments at scale. Built for Model Context Protocol (MCP), with support for **MCP, HTTP/REST, gRPC, and custom protocols** through a universal adapter interface.
 
 **Target Scale:** 50,000+ employees, 10,000+ AI resources
 
-📖 **[Quick Start](docs/QUICK_START.md)** | **[What's New in v2.0](RELEASE_NOTES_v2.0.0.md)** | **[Migration Guide](docs/MIGRATION_v1_to_v2.md)** | **[Full Documentation](docs/)**
+📖 **[Quick Start](docs/QUICK_START.md)** | **[Changelog](CHANGELOG.md)** | **[Full Documentation](docs/)**
 
 ---
 
@@ -148,21 +148,25 @@ kubectl apply -f k8s/
 
 ## Project Status
 
-🎉 **v2.0.0-rc1 - Release Candidate** (Pre-release validation in progress)
+🚀 **v1.1.0 - Current Release** (Working toward v1.2.0)
 
-**Completed:**
-- ✅ Multi-protocol architecture (MCP, HTTP, gRPC)
+**Completed (v1.1.0):**
 - ✅ Enterprise authentication (OIDC, LDAP, SAML, API Keys)
 - ✅ Policy-based authorization (OPA)
-- ✅ Federation support with mTLS
-- ✅ Cost attribution and budgets
+- ✅ MCP Gateway integration (opt-in)
 - ✅ SIEM integration (Splunk, Datadog)
 - ✅ Comprehensive documentation (100+ pages)
 - ✅ Production deployment guides
 
-**Roadmap:**
-- **Q1 2026** - v2.1: Enhanced federation, additional protocol adapters
-- **Q2 2026** - v2.2: Advanced cost models, policy marketplace
+**In Progress (v1.2.0):**
+- ⏳ Gateway client (HTTP, SSE, stdio transports)
+- ⏳ Policy validation framework
+- ⏳ Test coverage improvements (targeting 85%+)
+
+**Future Roadmap:**
+- **v1.3.0** - Advanced security features
+- **v1.4.0** - Rust core optimization
+- **v2.0.0** - Production-ready after security audit
 
 📖 **[Roadmap](docs/ROADMAP.md)** | **[Changelog](CHANGELOG.md)**
 
@@ -187,7 +191,7 @@ SARK is the **reference implementation of GRID Protocol Specification v0.1**.
 
 **GRID** (Governed Resource Interaction Definition) is a universal governance protocol for machine-to-machine interactions—protocol-agnostic, federated, zero-trust, policy-first.
 
-**SARK v2.0-rc1 Compliance:** 85% of GRID v0.1 specification
+**SARK v1.1.0 Compliance:** 85% of GRID v0.1 specification
 
 📖 **[Gap Analysis](docs/specifications/GRID_GAP_ANALYSIS_AND_IMPLEMENTATION_NOTES.md)** - Detailed compliance matrix
 
