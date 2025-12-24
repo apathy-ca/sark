@@ -32,13 +32,13 @@ def saml_service(docker_services: Services) -> Generator[dict, None, None]:
         timeout=90.0,
         pause=1.0,
         check=lambda: is_saml_responsive(
-            docker_services.docker_ip,
+            "localhost",
             docker_services.port_for("saml-idp", 8080)
         ),
     )
 
     # Get connection details
-    host = docker_services.docker_ip
+    host = "localhost"
     port = docker_services.port_for("saml-idp", 8080)
     https_port = docker_services.port_for("saml-idp", 8443)
 

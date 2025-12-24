@@ -101,7 +101,7 @@ download_spec() {
         fi
     else
         print_error "Failed to download OpenAPI spec"
-        print_info "Make sure SARK API is running: docker-compose up -d"
+        print_info "Make sure SARK API is running: docker compose up -d"
         exit 1
     fi
 }

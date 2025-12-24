@@ -49,7 +49,7 @@ if curl -sf "${SARK_API_URL}/health" > /dev/null; then
     print_success "API is reachable"
 else
     print_error "Cannot reach API at ${SARK_API_URL}"
-    print_info "Start SARK: docker-compose up -d"
+    print_info "Start SARK: docker compose up -d"
     exit 1
 fi
 

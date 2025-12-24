@@ -30,7 +30,7 @@ check_docker() {
 # Function to cleanup containers
 cleanup() {
     echo -e "${YELLOW}Cleaning up test containers...${NC}"
-    docker-compose -f tests/fixtures/docker-compose.integration.yml down -v 2>/dev/null || true
+    docker compose -f tests/fixtures/docker-compose.integration.yml down -v 2>/dev/null || true
     echo -e "${GREEN}✓ Cleanup complete${NC}"
     echo
 }
@@ -45,7 +45,7 @@ start_services() {
     echo "  - gRPC Mock (port 50051)"
     echo
 
-    docker-compose -f tests/fixtures/docker-compose.integration.yml up -d
+    docker compose -f tests/fixtures/docker-compose.integration.yml up -d
 
     if [ $? -ne 0 ]; then
         echo -e "${RED}Failed to start services${NC}"
@@ -120,7 +120,7 @@ wait_for_services() {
 # Function to show service status
 show_status() {
     echo -e "${BLUE}Service Status:${NC}"
-    docker-compose -f tests/fixtures/docker-compose.integration.yml ps
+    docker compose -f tests/fixtures/docker-compose.integration.yml ps
     echo
 }
 
@@ -130,10 +130,10 @@ show_logs() {
 
     if [ -z "$service" ]; then
         echo -e "${BLUE}All Service Logs:${NC}"
-        docker-compose -f tests/fixtures/docker-compose.integration.yml logs --tail=50
+        docker compose -f tests/fixtures/docker-compose.integration.yml logs --tail=50
     else
         echo -e "${BLUE}Logs for ${service}:${NC}"
-        docker-compose -f tests/fixtures/docker-compose.integration.yml logs --tail=100 "$service"
+        docker compose -f tests/fixtures/docker-compose.integration.yml logs --tail=100 "$service"
     fi
 }
 

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   oidc-mock:
     image: ghcr.io/navikt/mock-oauth2-server:0.5.8

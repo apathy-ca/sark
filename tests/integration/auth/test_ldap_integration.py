@@ -309,7 +309,7 @@ class TestLDAPIntegrationEdgeCases:
     """LDAP edge case integration tests."""
 
     @pytest.mark.asyncio
-    async def test_special_characters_in_password(self, ldap_provider_config, ldap_service):
+    async def test_special_characters_in_password(self, ldap_provider):
         """Test authentication with special characters in password."""
         # This test would require adding a user with special chars in password
         # For now, test with existing users
@@ -317,14 +317,16 @@ class TestLDAPIntegrationEdgeCases:
         assert result[0] is not None
 
     @pytest.mark.asyncio
-    async def test_case_sensitive_username(self, ldap_provider):
-        """Test that username is case-sensitive."""
+    async def test_case_insensitive_username(self, ldap_provider):
+        """Test that username is case-insensitive (LDAP default behavior)."""
         result1 = await ldap_provider.authenticate("testuser", "testpass")
         result2 = await ldap_provider.authenticate("TESTUSER", "testpass")
 
         assert result1.success is True
-        # TESTUSER should fail (case sensitive)
-        assert result2.success is False
+        # LDAP is case-insensitive by default, so both should succeed
+        assert result2.success is True
+        # Both should return the same user_id
+        assert result1.user_id == result2.user_id
 
     @pytest.mark.asyncio
     async def test_validate_token_not_supported(self, ldap_provider):

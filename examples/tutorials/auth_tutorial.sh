@@ -70,7 +70,7 @@ test_connectivity() {
         print_info "Version: ${VERSION}, Environment: ${ENVIRONMENT}"
     else
         print_error "Cannot reach SARK API at ${SARK_API_URL}"
-        print_info "Make sure SARK is running: docker-compose up -d"
+        print_info "Make sure SARK is running: docker compose up -d"
         exit 1
     fi
 }

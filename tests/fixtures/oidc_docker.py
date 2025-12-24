@@ -32,13 +32,13 @@ def oidc_service(docker_services: Services) -> Generator[dict, None, None]:
         timeout=60.0,
         pause=0.5,
         check=lambda: is_oidc_responsive(
-            docker_services.docker_ip,
+            "localhost",
             docker_services.port_for("oidc-mock", 8080)
         ),
     )
 
     # Get connection details
-    host = docker_services.docker_ip
+    host = "localhost"
     port = docker_services.port_for("oidc-mock", 8080)
 
     oidc_config = {

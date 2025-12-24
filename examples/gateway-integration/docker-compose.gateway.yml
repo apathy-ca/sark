@@ -1,5 +1,3 @@
-version: '3.8'
-
 # SARK v1.1.0 - Gateway Integration Example
 # This docker-compose file demonstrates a complete SARK + MCP Gateway setup
 

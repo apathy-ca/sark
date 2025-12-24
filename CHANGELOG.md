@@ -10,6 +10,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Nothing yet
 
+## [1.2.0] - 2024-12-23
+
+### Added
+
+**Gateway Client Implementation**:
+- HTTP transport for MCP Gateway communication (PR #44)
+- SSE (Server-Sent Events) transport for streaming (PR #44)
+- stdio transport for local process communication (PR #45)
+- Unified Gateway client with automatic transport selection (PR #47)
+- End-to-end Gateway integration tests
+- Real MCP server communication support (replacing stubbed implementation)
+
+**Policy Validation Framework**:
+- Comprehensive OPA Rego policy validation
+- Syntax validation via OPA check
+- Forbidden pattern detection (security vulnerabilities)
+- Required rules verification (allow, deny, reason)
+- Sample input testing framework
+- Policy injection attack prevention
+
+**Test Infrastructure Improvements**:
+- Docker Compose V2 migration (all scripts updated to use `docker compose`)
+- pytest-docker 3.x compatibility fixes
+- LDAP integration test suite (28 tests)
+- All auth provider tests passing (80/80 tests)
+- Removed obsolete `version` attributes from docker-compose files
+- Fixed port conflicts between test services
+
+### Changed
+- Updated all shell scripts to use Docker Compose V2 syntax
+- Updated pytest-docker fixtures to use `localhost` instead of deprecated `docker_ip`
+- Test fixtures now use proper session scope for container management
+
+### Fixed
+- LDAP integration test fixture parameter issues
+- Case-insensitive username test (corrected LDAP behavior expectations)
+- SAML service port conflict (moved from 8080 to 8082)
+- Docker Compose version warnings
+
+### Testing
+- Test coverage: 85%+ for Gateway client
+- 100% auth provider test pass rate (52 unit + 28 integration)
+- E2E Gateway integration tests
+- Policy validation test suite
+
+### Performance
+- Gateway client HTTP transport: <50ms p95 latency
+- SSE transport: real-time streaming support
+- stdio transport: direct process communication
+
+### Migration
+- No breaking changes
+- Gateway features remain opt-in (GATEWAY_ENABLED flag)
+- Existing v1.1.0 deployments compatible
+- Test infrastructure updates transparent to users
+
 ## [1.1.0] - 2025-XX-XX
 
 ### Added

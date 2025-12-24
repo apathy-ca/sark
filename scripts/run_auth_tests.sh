@@ -41,15 +41,15 @@ start_services() {
 
     # Start LDAP
     echo "Starting LDAP..."
-    docker-compose -f tests/fixtures/docker-compose.ldap.yml up -d
+    docker compose -f tests/fixtures/docker-compose.ldap.yml up -d
 
     # Start OIDC
     echo "Starting OIDC..."
-    docker-compose -f tests/fixtures/docker-compose.oidc.yml up -d
+    docker compose -f tests/fixtures/docker-compose.oidc.yml up -d
 
     # Start SAML
     echo "Starting SAML..."
-    docker-compose -f tests/fixtures/docker-compose.saml.yml up -d
+    docker compose -f tests/fixtures/docker-compose.saml.yml up -d
 
     echo -e "${GREEN}✓ Services started${NC}"
     echo
@@ -88,7 +88,7 @@ wait_for_services() {
     # Wait for SAML
     echo -n "Waiting for SAML... "
     timeout=30
-    while ! curl -s http://localhost:8080/simplesaml/ > /dev/null; do
+    while ! curl -s http://localhost:8082/simplesaml/ > /dev/null; do
         sleep 1
         timeout=$((timeout - 1))
         if [ $timeout -le 0 ]; then

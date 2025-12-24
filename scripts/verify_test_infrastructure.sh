@@ -220,7 +220,7 @@ if [ "$1" == "--skip-docker" ]; then
     warn "Skipping Docker service tests (--skip-docker flag)"
 else
     echo "Starting integration test services..."
-    if docker-compose -f tests/fixtures/docker-compose.integration.yml up -d 2>&1 | grep -q "Error"; then
+    if docker compose -f tests/fixtures/docker-compose.integration.yml up -d 2>&1 | grep -q "Error"; then
         fail "Failed to start Docker services"
     else
         pass "Docker services started successfully"
@@ -253,7 +253,7 @@ else
         # Cleanup
         echo
         echo "Cleaning up test services..."
-        docker-compose -f tests/fixtures/docker-compose.integration.yml down -v &>/dev/null
+        docker compose -f tests/fixtures/docker-compose.integration.yml down -v &>/dev/null
         pass "Services cleaned up successfully"
     fi
 fi

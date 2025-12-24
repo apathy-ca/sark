@@ -94,21 +94,21 @@ goto usage
     echo Starting test services...
 
     echo Starting LDAP...
-    docker-compose -f tests\fixtures\docker-compose.ldap.yml up -d
+    docker compose -f tests\fixtures\docker-compose.ldap.yml up -d
     if errorlevel 1 (
         echo [ERROR] Failed to start LDAP service
         exit /b 1
     )
 
     echo Starting OIDC...
-    docker-compose -f tests\fixtures\docker-compose.oidc.yml up -d
+    docker compose -f tests\fixtures\docker-compose.oidc.yml up -d
     if errorlevel 1 (
         echo [ERROR] Failed to start OIDC service
         exit /b 1
     )
 
     echo Starting SAML...
-    docker-compose -f tests\fixtures\docker-compose.saml.yml up -d
+    docker compose -f tests\fixtures\docker-compose.saml.yml up -d
     if errorlevel 1 (
         echo [ERROR] Failed to start SAML service
         exit /b 1
@@ -153,7 +153,7 @@ goto usage
     echo Waiting for SAML...
     set timeout=30
     :wait_saml
-    curl -s http://localhost:8080/simplesaml/ >nul 2>&1
+    curl -s http://localhost:8082/simplesaml/ >nul 2>&1
     if not errorlevel 1 goto saml_ready
     timeout /t 1 /nobreak >nul
     set /a timeout-=1
