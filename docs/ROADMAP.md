@@ -192,8 +192,9 @@ Stubbed  Working   Security   Core      Fast    Audit
 
 **Shelved Until Post-Production:**
 - CI/CD improvements (defer until core development complete)
-- Advanced Lethal Trifecta mitigations (P5 - distant future)
 - Web UI enhancements (already functional)
+
+**Note:** Advanced Lethal Trifecta security mitigations (v1.3.0) are part of the recommended Path 2 and will proceed after v1.2.0 completion.
 
 ---
 

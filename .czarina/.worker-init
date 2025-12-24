@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+# Czarina Worker Initialization Script
+# Usage: ./.czarina/.worker-init <worker-id>
+
+set -e
+
+WORKER_ID="$1"
+CZARINA_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$CZARINA_DIR/.." && pwd)"
+
+if [ -z "$WORKER_ID" ]; then
+    echo "Usage: $0 <worker-id>"
+    echo ""
+    echo "Available workers:"
+    echo "  security-1  - Prompt Injection Detection (Weeks 1-2)"
+    echo "  security-2  - Anomaly Detection System (Weeks 3-4)"
+    echo "  devops      - Network Controls (Week 5)"
+    echo "  security-3  - Secret Scanning (Week 6)"
+    echo "  security-4  - MFA System (Week 7)"
+    echo "  qa          - Integration & Testing (Week 8)"
+    exit 1
+fi
+
+WORKER_FILE="$CZARINA_DIR/workers/${WORKER_ID}.md"
+
+if [ ! -f "$WORKER_FILE" ]; then
+    echo "Error: Worker '$WORKER_ID' not found"
+    echo "Worker file does not exist: $WORKER_FILE"
+    exit 1
+fi
+
+echo "========================================="
+echo "Czarina Worker Initialization"
+echo "========================================="
+echo ""
+echo "Project: SARK v1.3.0"
+echo "Worker: $WORKER_ID"
+echo "Location: $PROJECT_ROOT"
+echo ""
+
+# Load worker config from JSON
+WORKER_NAME=$(jq -r ".workers[\"$WORKER_ID\"].name" "$CZARINA_DIR/config.json")
+WORKER_BRANCH=$(jq -r ".workers[\"$WORKER_ID\"].branch" "$CZARINA_DIR/config.json")
+WORKER_AGENT=$(jq -r ".workers[\"$WORKER_ID\"].agent" "$CZARINA_DIR/config.json")
+
+if [ "$WORKER_NAME" == "null" ]; then
+    echo "Error: Worker '$WORKER_ID' not found in config.json"
+    exit 1
+fi
+
+echo "Worker Name: $WORKER_NAME"
+echo "Branch: $WORKER_BRANCH"
+echo "Recommended Agent: $WORKER_AGENT"
+echo ""
+echo "========================================="
+echo ""
+
+# Show worker instructions
+cat "$WORKER_FILE"
+
+echo ""
+echo "========================================="
+echo "Ready to Start"
+echo "========================================="
+echo ""
+echo "Next steps:"
+echo "  1. Review the worker instructions above"
+echo "  2. Create branch: git checkout -b $WORKER_BRANCH"
+echo "  3. Begin implementation following the task list"
+echo ""
+echo "Good luck!"
