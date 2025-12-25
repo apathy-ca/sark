@@ -186,8 +186,8 @@ async def list_authorized_servers(
 
 @router.get("/tools", response_model=list[GatewayToolInfo])
 async def list_authorized_tools(
-    server_name: str | None = None,
     user: Annotated[UserContext, Depends(get_current_user)],
+    server_name: str | None = None,
 ) -> list[GatewayToolInfo]:
     """
     List tools available via Gateway, filtered by authorization.

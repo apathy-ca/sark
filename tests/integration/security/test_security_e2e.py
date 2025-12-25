@@ -18,7 +18,8 @@ from datetime import datetime
 from unittest.mock import Mock, AsyncMock, MagicMock, patch
 
 from src.sark.security.injection_detector import PromptInjectionDetector
-from src.sark.security.injection_response import InjectionResponseHandler, InjectionPolicy
+from src.sark.security.injection_response import InjectionResponseHandler
+from src.sark.security.config import InjectionDetectionConfig
 from src.sark.security.behavioral_analyzer import BehavioralAnalyzer, AuditEvent
 from src.sark.security.anomaly_alerts import AnomalyAlertManager, AlertConfig
 from src.sark.security.secret_scanner import SecretScanner
@@ -50,7 +51,7 @@ class TestSecurityE2E:
         response_handler = InjectionResponseHandler(
             audit_logger=audit_logger,
             alert_manager=alert_manager,
-            default_policy=InjectionPolicy(block_threshold=60)
+            default_policy=InjectionDetectionConfig(block_threshold=60)
         )
 
         # Simulate malicious request
