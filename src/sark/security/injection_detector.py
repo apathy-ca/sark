@@ -1,325 +1,537 @@
-"""
-Prompt Injection Detection System
+"""Prompt injection detection system.
 
-Detects potential prompt injection attacks using:
-- Pattern-based detection (20+ known injection patterns)
-- Entropy analysis (detect encoded payloads)
-- Risk scoring (0-100 scale)
+Detects malicious attempts to manipulate AI tool parameters through:
+- Pattern-based detection (20+ known injection techniques)
+- Entropy analysis for encoded/obfuscated payloads
+- Risk scoring system (0-100)
 """
 
 import re
 import math
-from typing import Dict, Any, List, Optional
-from dataclasses import dataclass
+import structlog
+from typing import Any
 from enum import Enum
+from dataclasses import dataclass, field
+from functools import lru_cache
+
+logger = structlog.get_logger()
 
 
 class Severity(str, Enum):
-    """Severity levels for injection findings"""
+    """Finding severity levels."""
+
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
-    CRITICAL = "critical"
 
 
 @dataclass
 class InjectionFinding:
-    """Represents a single injection detection finding"""
-    severity: Severity
+    """Single injection detection finding."""
+
     pattern_name: str
+    severity: Severity
     matched_text: str
     location: str
-    recommendation: str
+    description: str
 
 
 @dataclass
 class InjectionDetectionResult:
-    """Result of injection detection scan"""
-    detected: bool
-    risk_score: int
-    findings: List[InjectionFinding]
+    """Complete injection detection result."""
 
-    def __bool__(self):
-        return self.detected
+    findings: list[InjectionFinding] = field(default_factory=list)
+    risk_score: int = 0
+    detected: bool = False
+    total_patterns_checked: int = 0
+    high_entropy_strings: list[tuple[str, float]] = field(default_factory=list)
+
+    @property
+    def has_high_severity(self) -> bool:
+        """Check if any high severity findings exist."""
+        return any(f.severity == Severity.HIGH for f in self.findings)
+
+    @property
+    def has_medium_severity(self) -> bool:
+        """Check if any medium severity findings exist."""
+        return any(f.severity == Severity.MEDIUM for f in self.findings)
 
 
 class PromptInjectionDetector:
-    """Detects prompt injection patterns in tool parameters"""
+    """Detects prompt injection attempts in tool parameters."""
 
-    # High-severity patterns - instruction manipulation
-    INSTRUCTION_PATTERNS = [
-        (r"ignore\s+(?:all\s+)?(?:previous|above|prior)\s+instructions?", "Ignore instructions", Severity.HIGH),
-        (r"ignore\s+(?:the\s+)?instructions?", "Ignore instructions (short form)", Severity.HIGH),
-        (r"disregard\s+(?:all\s+)?(?:previous|above|prior)\s+(?:instructions?|rules?|prompts?)", "Disregard instructions", Severity.HIGH),
-        (r"disregard\s+(?:the\s+)?(?:instructions?|rules?|prompts?)", "Disregard instructions (short form)", Severity.HIGH),
-        (r"forget\s+(?:all\s+)?(?:previous|everything|above)\s+(?:instructions?|context)?", "Forget instructions", Severity.HIGH),
-        (r"forget\s+(?:everything|all)", "Forget everything", Severity.HIGH),
-        (r"override\s+(?:all\s+)?(?:previous|system)\s+(?:instructions?|rules?)", "Override instructions", Severity.HIGH),
-    ]
-
-    # High-severity patterns - role manipulation
-    ROLE_PATTERNS = [
-        (r"you\s+are\s+now\s+(?:a|an)\s+\w+", "Role change", Severity.HIGH),
-        (r"you\s+are\s+(?:a|an)\s+(?:helpful\s+)?(?:hacker|attacker|admin|root|system)", "Suspicious role assignment", Severity.HIGH),
-        (r"act\s+as\s+(?:a|an)\s+\w+", "Act as another role", Severity.HIGH),
-        (r"pretend\s+(?:you|to)\s+(?:are|be)\s+(?:a|an)?\s*\w+", "Pretend to be", Severity.HIGH),
-        (r"roleplay\s+as\s+(?:a|an)?\s*\w+", "Roleplay as", Severity.HIGH),
-    ]
-
-    # Critical patterns - data exfiltration
-    EXFILTRATION_PATTERNS = [
-        (r"(?:send|post|export|transmit)\s+.{0,50}\s+to\s+https?://", "Data exfiltration attempt", Severity.CRITICAL),
-        (r"curl\s+.*?https?://", "Command injection via curl", Severity.CRITICAL),
-        (r"wget\s+.*?https?://", "Command injection via wget", Severity.CRITICAL),
-    ]
-
-    # High-severity patterns - system prompt leakage
-    SYSTEM_PATTERNS = [
-        (r"(?:show|reveal|display|print)\s+(?:me\s+)?(?:your\s+)?(?:system|initial|original)\s+(?:prompt|instructions?)", "System prompt extraction", Severity.HIGH),
-        (r"what\s+(?:are|were)\s+your\s+(?:original|initial|system)\s+instructions?", "System prompt query", Severity.HIGH),
-        (r"what\s+(?:is|was)\s+your\s+(?:system|initial|original)\s+prompt", "System prompt query (alt)", Severity.HIGH),
-        (r"repeat\s+(?:your|the)\s+(?:system|initial|original)\s+prompt", "System prompt repeat", Severity.HIGH),
-        (r"tell\s+me\s+your\s+(?:system|initial|original)\s+(?:prompt|instructions?)", "System prompt tell", Severity.HIGH),
-    ]
-
-    # Medium-severity patterns - encoding/obfuscation
-    ENCODING_PATTERNS = [
-        (r"base64\s*\(", "Base64 encoding", Severity.MEDIUM),
-        (r"eval\s*\(", "Eval execution", Severity.CRITICAL),
-        (r"exec\s*\(", "Exec execution", Severity.CRITICAL),
-        (r"\\x[0-9a-fA-F]{2}", "Hex encoding", Severity.MEDIUM),
-        (r"\\u[0-9a-fA-F]{4}", "Unicode escape", Severity.MEDIUM),
-    ]
-
-    # Medium-severity patterns - prompt injection markers
-    INJECTION_MARKERS = [
-        (r"<\s*system\s*>", "System tag", Severity.HIGH),
-        (r"system\s*:\s*", "System prefix", Severity.HIGH),
-        (r"<\s*\|endoftext\|\s*>", "End of text marker", Severity.MEDIUM),
-        (r"###\s*instruction", "Instruction delimiter", Severity.MEDIUM),
-    ]
-
-    # Low-severity patterns - suspicious keywords
-    SUSPICIOUS_PATTERNS = [
-        (r"jailbreak", "Jailbreak keyword", Severity.MEDIUM),
-        (r"bypass\s+(security|filter|protection)", "Bypass attempt", Severity.MEDIUM),
-        (r"developer\s+mode", "Developer mode", Severity.LOW),
-        (r"admin\s+mode", "Admin mode", Severity.LOW),
-    ]
-
-    # Entropy threshold for detecting encoded payloads
-    ENTROPY_THRESHOLD = 4.5
-    ENTROPY_MIN_LENGTH = 50
-
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
+    def __init__(self, config: "InjectionDetectionConfig | None" = None):
         """
-        Initialize prompt injection detector
+        Initialize detector with compiled regex patterns.
 
         Args:
-            config: Optional configuration dict with custom patterns or thresholds
+            config: Optional configuration. If not provided, loads from environment.
         """
-        self.config = config or {}
-        self._compile_patterns()
+        if config is None:
+            from sark.security.config import get_injection_config
+            config = get_injection_config()
 
-    def _compile_patterns(self):
-        """Compile all regex patterns for performance"""
-        self.compiled_patterns = []
+        self.config = config
+        self._patterns = self._compile_patterns()
 
-        for pattern_list in [
-            self.INSTRUCTION_PATTERNS,
-            self.ROLE_PATTERNS,
-            self.EXFILTRATION_PATTERNS,
-            self.SYSTEM_PATTERNS,
-            self.ENCODING_PATTERNS,
-            self.INJECTION_MARKERS,
-            self.SUSPICIOUS_PATTERNS,
-        ]:
-            for pattern, name, severity in pattern_list:
-                self.compiled_patterns.append(
-                    (re.compile(pattern, re.IGNORECASE), name, severity)
-                )
+        # Set severity weights from config
+        self.SEVERITY_WEIGHTS = {
+            Severity.HIGH: config.severity_weight_high,
+            Severity.MEDIUM: config.severity_weight_medium,
+            Severity.LOW: config.severity_weight_low,
+        }
 
-    def detect(self, params: Dict[str, Any]) -> InjectionDetectionResult:
+    @staticmethod
+    @lru_cache(maxsize=1)
+    def _compile_patterns() -> list[tuple[str, Severity, str, re.Pattern]]:
         """
-        Detect prompt injection attempts in tool parameters
+        Compile regex patterns for injection detection.
+
+        Returns:
+            List of tuples: (pattern_name, severity, description, compiled_regex)
+        """
+        patterns = [
+            # Instruction override patterns (HIGH severity)
+            (
+                "ignore_instructions",
+                Severity.HIGH,
+                "Attempt to ignore previous instructions",
+                re.compile(
+                    r"ignore\s+(all\s+)?((previous|prior|above|system)\s+)?instructions?",
+                    re.IGNORECASE,
+                ),
+            ),
+            (
+                "disregard_instructions",
+                Severity.HIGH,
+                "Attempt to disregard instructions",
+                re.compile(
+                    r"disregard\s+(all\s+)?(previous|prior|above|system)\s+(instructions?|rules?|context)",
+                    re.IGNORECASE,
+                ),
+            ),
+            (
+                "forget_instructions",
+                Severity.HIGH,
+                "Attempt to forget previous instructions",
+                re.compile(
+                    r"forget\s+(all\s+)?(previous|prior|above|system)\s+(instructions?|rules?|context)",
+                    re.IGNORECASE,
+                ),
+            ),
+            # Role manipulation patterns (HIGH severity)
+            (
+                "role_override",
+                Severity.HIGH,
+                "Attempt to override AI role",
+                re.compile(
+                    r"(you\s+are\s+now|act\s+as|pretend\s+to\s+be|behave\s+like)\s+(a\s+)?(assistant|developer|admin|root|system)",
+                    re.IGNORECASE,
+                ),
+            ),
+            (
+                "new_instructions",
+                Severity.HIGH,
+                "Attempt to inject new instructions",
+                re.compile(
+                    r"(new\s+instructions?|new\s+role|new\s+task|new\s+system\s+prompt)",
+                    re.IGNORECASE,
+                ),
+            ),
+            (
+                "system_message",
+                Severity.HIGH,
+                "Attempt to inject system message",
+                re.compile(
+                    r"<\s*system\s*>|system\s*:|system\s+message\s*:",
+                    re.IGNORECASE,
+                ),
+            ),
+            # Data exfiltration patterns (HIGH severity)
+            (
+                "url_exfiltration",
+                Severity.HIGH,
+                "Attempt to exfiltrate data via URL",
+                re.compile(
+                    r"(send|post|transmit|forward|export)\s+.*?\s+to\s+https?://",
+                    re.IGNORECASE,
+                ),
+            ),
+            (
+                "webhook_injection",
+                Severity.HIGH,
+                "Suspicious webhook URL injection",
+                re.compile(
+                    r"webhook\s*=\s*['\"]https?://|callback_url\s*=\s*['\"]https?://",
+                    re.IGNORECASE,
+                ),
+            ),
+            # Code execution patterns (HIGH severity)
+            (
+                "eval_exec",
+                Severity.HIGH,
+                "Code execution attempt (eval/exec)",
+                re.compile(
+                    r"\b(eval|exec|__import__|compile)\s*\(",
+                    re.IGNORECASE,
+                ),
+            ),
+            (
+                "subprocess_shell",
+                Severity.HIGH,
+                "Shell command execution attempt",
+                re.compile(
+                    r"\b(subprocess|os\.system|popen|shell=True|cmd\s*/c)",
+                    re.IGNORECASE,
+                ),
+            ),
+            (
+                "code_injection",
+                Severity.HIGH,
+                "Potential code injection",
+                re.compile(
+                    r"`;|&&\s*|;\s*rm\s+-rf|;\s*cat\s+/etc/passwd|drop\s+table",
+                    re.IGNORECASE,
+                ),
+            ),
+            # Encoding/obfuscation patterns (MEDIUM severity)
+            (
+                "base64_decode",
+                Severity.MEDIUM,
+                "Base64 decode attempt",
+                re.compile(
+                    r"(base64\.b64decode|atob|decode\(.*base64)",
+                    re.IGNORECASE,
+                ),
+            ),
+            (
+                "hex_decode",
+                Severity.MEDIUM,
+                "Hex decode attempt",
+                re.compile(
+                    r"(bytes\.fromhex|hex\.decode|\\x[0-9a-f]{2}.*\\x[0-9a-f]{2})",
+                    re.IGNORECASE,
+                ),
+            ),
+            (
+                "unicode_escape",
+                Severity.MEDIUM,
+                "Unicode escape sequence",
+                re.compile(
+                    r"\\u[0-9a-f]{4}.*\\u[0-9a-f]{4}|\\U[0-9a-f]{8}",
+                    re.IGNORECASE,
+                ),
+            ),
+            # Prompt delimiter patterns (MEDIUM severity)
+            (
+                "delimiter_injection",
+                Severity.MEDIUM,
+                "Prompt delimiter injection",
+                re.compile(
+                    r"(---\s*END\s+SYSTEM|===\s*USER\s+INPUT|<<<\s*INSTRUCTION|>>>)",
+                    re.IGNORECASE,
+                ),
+            ),
+            (
+                "xml_tag_injection",
+                Severity.MEDIUM,
+                "XML/HTML tag injection",
+                re.compile(
+                    r"<\s*(user|assistant|human|ai|bot)\s*>",
+                    re.IGNORECASE,
+                ),
+            ),
+            # Context manipulation (MEDIUM severity)
+            (
+                "context_override",
+                Severity.MEDIUM,
+                "Attempt to override context",
+                re.compile(
+                    r"(override|replace|change)\s+(the\s+)?(context|system\s+prompt|guidelines)",
+                    re.IGNORECASE,
+                ),
+            ),
+            (
+                "parameter_injection",
+                Severity.MEDIUM,
+                "Parameter injection attempt",
+                re.compile(
+                    r"temperature\s*[:=]\s*[2-9]|max_tokens\s*[:=]\s*[0-9]{5,}",
+                    re.IGNORECASE,
+                ),
+            ),
+            # Jailbreak patterns (MEDIUM severity)
+            (
+                "jailbreak_prefix",
+                Severity.MEDIUM,
+                "Jailbreak attempt prefix",
+                re.compile(
+                    r"(DAN|developer\s+mode|unrestricted\s+mode|god\s+mode)",
+                    re.IGNORECASE,
+                ),
+            ),
+            # Information disclosure (LOW severity)
+            (
+                "reveal_system",
+                Severity.LOW,
+                "Attempt to reveal system prompt",
+                re.compile(
+                    r"(show|reveal|display|print|output)\s+(your\s+)?(system\s+prompt|instructions?|rules?)",
+                    re.IGNORECASE,
+                ),
+            ),
+            (
+                "repeat_prompt",
+                Severity.LOW,
+                "Attempt to make AI repeat prompt",
+                re.compile(
+                    r"repeat\s+(your\s+)?(instructions?|prompt|system\s+message)",
+                    re.IGNORECASE,
+                ),
+            ),
+            # SQL injection patterns (MEDIUM severity)
+            (
+                "sql_injection",
+                Severity.MEDIUM,
+                "SQL injection attempt",
+                re.compile(
+                    r"('\s*OR\s+'1'\s*=\s*'1|;\s*DROP\s+TABLE|UNION\s+SELECT|--\s*$)",
+                    re.IGNORECASE,
+                ),
+            ),
+            # Path traversal (MEDIUM severity)
+            (
+                "path_traversal",
+                Severity.MEDIUM,
+                "Path traversal attempt",
+                re.compile(
+                    r"\.\./\.\./|\.\.\\\.\.\\|/etc/passwd|/proc/self",
+                    re.IGNORECASE,
+                ),
+            ),
+            # Credential extraction (HIGH severity)
+            (
+                "credential_request",
+                Severity.HIGH,
+                "Request for credentials or secrets",
+                re.compile(
+                    r"(give|show|tell)\s+me\s+(your\s+|the\s+)?(api\s+key|password|secret|token|credentials?)",
+                    re.IGNORECASE,
+                ),
+            ),
+        ]
+
+        return patterns
+
+    def detect(self, parameters: dict[str, Any], context: dict[str, Any] | None = None) -> InjectionDetectionResult:
+        """
+        Detect prompt injection attempts in parameters.
 
         Args:
-            params: Dictionary of tool parameters to scan
+            parameters: Dictionary of tool parameters to check
+            context: Optional additional context to check
 
         Returns:
             InjectionDetectionResult with findings and risk score
         """
-        findings = []
+        result = InjectionDetectionResult()
+        result.total_patterns_checked = len(self._patterns)
 
-        # Scan all string values in params
-        for key, value in self._flatten_params(params).items():
+        # Flatten nested parameters
+        flattened_params = self._flatten_dict(parameters)
+        if context:
+            flattened_context = self._flatten_dict(context, prefix="context")
+            flattened_params.update(flattened_context)
+
+        # Run pattern detection
+        for location, value in flattened_params.items():
             if not isinstance(value, str):
                 continue
 
-            # Pattern matching
-            findings.extend(self._scan_patterns(value, key))
+            # Apply text normalization to detect obfuscated attacks
+            from sark.security.text_normalizer import get_normalizer
+            normalizer = get_normalizer()
 
-            # Entropy analysis
-            entropy_finding = self._check_entropy(value, key)
-            if entropy_finding:
-                findings.append(entropy_finding)
+            # Detect obfuscation techniques
+            obfuscation_info = normalizer.detect_obfuscation(value)
+
+            # Normalize text for better detection
+            normalized_value = normalizer.normalize(value, aggressive=False)
+
+            # Check against all patterns on BOTH original and normalized text
+            for pattern_name, severity, description, regex in self._patterns:
+                # Check original text first
+                match = regex.search(value)
+                if match:
+                    finding = InjectionFinding(
+                        pattern_name=pattern_name,
+                        severity=severity,
+                        matched_text=match.group(0)[:100],  # Truncate to 100 chars
+                        location=location,
+                        description=description,
+                    )
+                    result.findings.append(finding)
+                    logger.warning(
+                        "injection_pattern_detected",
+                        pattern=pattern_name,
+                        severity=severity.value,
+                        location=location,
+                    )
+                # If not found in original, check normalized text
+                elif normalized_value != value:
+                    match_normalized = regex.search(normalized_value)
+                    if match_normalized:
+                        # Add additional note about obfuscation
+                        obf_note = " (detected after normalization - "
+                        if obfuscation_info.get('has_homoglyphs'):
+                            obf_note += "homoglyphs, "
+                        if obfuscation_info.get('has_zero_width'):
+                            obf_note += "zero-width chars, "
+                        if obfuscation_info.get('has_fullwidth'):
+                            obf_note += "fullwidth chars, "
+                        if obfuscation_info.get('has_combining_marks'):
+                            obf_note += "combining marks, "
+                        obf_note = obf_note.rstrip(', ') + ")"
+
+                        finding = InjectionFinding(
+                            pattern_name=pattern_name,
+                            severity=severity,
+                            matched_text=normalized_value[:100],
+                            location=location,
+                            description=description + obf_note,
+                        )
+                        result.findings.append(finding)
+                        logger.warning(
+                            "injection_pattern_detected_normalized",
+                            pattern=pattern_name,
+                            severity=severity.value,
+                            location=location,
+                            obfuscation=obfuscation_info,
+                        )
+
+            # Check entropy for potential encoded payloads
+            if len(value) >= self.config.entropy_min_length:
+                entropy = self._calculate_entropy(value)
+                if entropy > self.config.entropy_threshold:
+                    result.high_entropy_strings.append((location, entropy))
+                    finding = InjectionFinding(
+                        pattern_name="high_entropy",
+                        severity=Severity.MEDIUM,
+                        matched_text=value[:100],
+                        location=location,
+                        description=f"High entropy string detected (entropy={entropy:.2f})",
+                    )
+                    result.findings.append(finding)
+                    logger.warning(
+                        "high_entropy_detected",
+                        location=location,
+                        entropy=entropy,
+                        length=len(value),
+                    )
 
         # Calculate risk score
-        risk_score = self._calculate_risk_score(findings)
+        result.risk_score = self._calculate_risk_score(result.findings)
+        result.detected = len(result.findings) > 0
 
-        return InjectionDetectionResult(
-            detected=len(findings) > 0,
-            risk_score=risk_score,
-            findings=findings
-        )
-
-    def _flatten_params(self, params: Dict[str, Any], prefix: str = "") -> Dict[str, Any]:
-        """
-        Flatten nested dictionary to extract all string values
-
-        Args:
-            params: Dictionary to flatten
-            prefix: Current key prefix for nested values
-
-        Returns:
-            Flattened dictionary with dotted keys
-        """
-        flat = {}
-
-        for key, value in params.items():
-            full_key = f"{prefix}.{key}" if prefix else key
-
-            if isinstance(value, dict):
-                flat.update(self._flatten_params(value, full_key))
-            elif isinstance(value, list):
-                for i, item in enumerate(value):
-                    if isinstance(item, dict):
-                        flat.update(self._flatten_params(item, f"{full_key}[{i}]"))
-                    else:
-                        flat[f"{full_key}[{i}]"] = item
-            else:
-                flat[full_key] = value
-
-        return flat
-
-    def _scan_patterns(self, text: str, location: str) -> List[InjectionFinding]:
-        """
-        Scan text for known injection patterns
-
-        Args:
-            text: Text to scan
-            location: Parameter location/key
-
-        Returns:
-            List of findings
-        """
-        findings = []
-
-        for pattern, name, severity in self.compiled_patterns:
-            matches = pattern.finditer(text)
-            for match in matches:
-                matched_text = match.group(0)
-                findings.append(InjectionFinding(
-                    severity=severity,
-                    pattern_name=name,
-                    matched_text=matched_text[:100],  # Truncate long matches
-                    location=location,
-                    recommendation=self._get_recommendation(severity, name)
-                ))
-
-        return findings
-
-    def _check_entropy(self, text: str, location: str) -> Optional[InjectionFinding]:
-        """
-        Check if text has suspiciously high entropy (potential encoded payload)
-
-        Args:
-            text: Text to analyze
-            location: Parameter location/key
-
-        Returns:
-            InjectionFinding if high entropy detected, None otherwise
-        """
-        if len(text) < self.ENTROPY_MIN_LENGTH:
-            return None
-
-        entropy = self._calculate_entropy(text)
-
-        if entropy > self.ENTROPY_THRESHOLD:
-            return InjectionFinding(
-                severity=Severity.MEDIUM,
-                pattern_name="High entropy",
-                matched_text=text[:50] + "...",
-                location=location,
-                recommendation="Potential encoded payload detected. Verify content is legitimate."
+        if result.detected:
+            logger.info(
+                "injection_detection_complete",
+                findings_count=len(result.findings),
+                risk_score=result.risk_score,
+                high_severity=result.has_high_severity,
             )
 
-        return None
+        return result
 
-    def _calculate_entropy(self, text: str) -> float:
+    def _flatten_dict(
+        self, d: dict[str, Any], parent_key: str = "", prefix: str = ""
+    ) -> dict[str, Any]:
         """
-        Calculate Shannon entropy of text
+        Flatten nested dictionary for comprehensive parameter checking.
 
         Args:
-            text: Text to analyze
+            d: Dictionary to flatten
+            parent_key: Parent key for nested items
+            prefix: Prefix for all keys
 
         Returns:
-            Entropy value (higher = more random/encoded)
+            Flattened dictionary with dot-notation keys
+        """
+        items = []
+        for k, v in d.items():
+            # Build key without leading dots
+            if parent_key and prefix:
+                new_key = f"{prefix}.{parent_key}.{k}"
+            elif parent_key:
+                new_key = f"{parent_key}.{k}"
+            elif prefix:
+                new_key = f"{prefix}.{k}"
+            else:
+                new_key = k
+
+            if isinstance(v, dict):
+                # Pass new_key as parent to accumulate path
+                items.extend(self._flatten_dict(v, new_key, "").items())
+            elif isinstance(v, list):
+                for i, item in enumerate(v):
+                    list_key = f"{new_key}[{i}]"
+                    if isinstance(item, dict):
+                        items.extend(self._flatten_dict(item, list_key, "").items())
+                    else:
+                        items.append((list_key, item))
+            else:
+                items.append((new_key, v))
+        return dict(items)
+
+    @staticmethod
+    def _calculate_entropy(text: str) -> float:
+        """
+        Calculate Shannon entropy of a string.
+
+        High entropy (>4.5) suggests encoded/obfuscated content.
+
+        Args:
+            text: String to analyze
+
+        Returns:
+            Shannon entropy value
         """
         if not text:
             return 0.0
 
         # Count character frequencies
-        char_counts: Dict[str, int] = {}
+        char_counts = {}
         for char in text:
             char_counts[char] = char_counts.get(char, 0) + 1
 
         # Calculate entropy
+        length = len(text)
         entropy = 0.0
-        text_len = len(text)
-
         for count in char_counts.values():
-            probability = count / text_len
+            probability = count / length
             entropy -= probability * math.log2(probability)
 
         return entropy
 
-    def _calculate_risk_score(self, findings: List[InjectionFinding]) -> int:
+    def _calculate_risk_score(self, findings: list[InjectionFinding]) -> int:
         """
-        Calculate overall risk score (0-100)
+        Calculate risk score (0-100) based on findings.
+
+        Scoring:
+        - High severity: 30 points each
+        - Medium severity: 15 points each
+        - Low severity: 5 points each
+        - Maximum: 100
 
         Args:
-            findings: List of detected findings
+            findings: List of injection findings
 
         Returns:
-            Risk score from 0 (safe) to 100 (critical)
+            Risk score capped at 100
         """
-        if not findings:
-            return 0
-
         score = 0
-
-        # Score based on severity
-        severity_weights = {
-            Severity.CRITICAL: 40,
-            Severity.HIGH: 25,
-            Severity.MEDIUM: 15,
-            Severity.LOW: 5,
-        }
-
         for finding in findings:
-            score += severity_weights.get(finding.severity, 0)
+            score += self.SEVERITY_WEIGHTS.get(finding.severity, 0)
 
         # Cap at 100
         return min(score, 100)
-
-    def _get_recommendation(self, severity: Severity, pattern_name: str) -> str:
-        """Get recommendation text for a finding"""
-        if severity == Severity.CRITICAL:
-            return f"BLOCK REQUEST: {pattern_name} detected. This indicates a likely attack."
-        elif severity == Severity.HIGH:
-            return f"Alert security team: {pattern_name} detected. Review request carefully."
-        elif severity == Severity.MEDIUM:
-            return f"Warning: {pattern_name} detected. May be legitimate but requires review."
-        else:
-            return f"Low risk: {pattern_name} detected. Log for monitoring."
