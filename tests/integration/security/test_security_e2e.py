@@ -46,13 +46,8 @@ class TestSecurityE2E:
         """
         # Setup
         detector = PromptInjectionDetector()
-        audit_logger = AsyncMock()
-        alert_manager = AsyncMock()
-        response_handler = InjectionResponseHandler(
-            audit_logger=audit_logger,
-            alert_manager=alert_manager,
-            default_policy=InjectionDetectionConfig(block_threshold=60)
-        )
+        config = InjectionDetectionConfig(block_threshold=60)
+        response_handler = InjectionResponseHandler(config=config)
 
         # Simulate malicious request
         malicious_params = {
@@ -305,10 +300,7 @@ class TestSecurityE2E:
         """
         # Setup all security components
         injection_detector = PromptInjectionDetector()
-        injection_handler = InjectionResponseHandler(
-            audit_logger=AsyncMock(),
-            alert_manager=AsyncMock()
-        )
+        injection_handler = InjectionResponseHandler()
         secret_scanner = SecretScanner()
         behavioral_analyzer = BehavioralAnalyzer()
 
