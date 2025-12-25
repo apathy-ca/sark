@@ -81,6 +81,9 @@ class PromptInjectionDetector:
             Severity.LOW: config.severity_weight_low,
         }
 
+        # Cache normalizer for performance
+        self._normalizer = None
+
     @staticmethod
     @lru_cache(maxsize=1)
     def _compile_patterns() -> list[tuple[str, Severity, str, re.Pattern]]:
@@ -343,20 +346,21 @@ class PromptInjectionDetector:
             flattened_context = self._flatten_dict(context, prefix="context")
             flattened_params.update(flattened_context)
 
+        # Get cached normalizer
+        if self._normalizer is None:
+            from sark.security.text_normalizer import get_normalizer
+            self._normalizer = get_normalizer()
+
         # Run pattern detection
         for location, value in flattened_params.items():
             if not isinstance(value, str):
                 continue
 
-            # Apply text normalization to detect obfuscated attacks
-            from sark.security.text_normalizer import get_normalizer
-            normalizer = get_normalizer()
-
             # Detect obfuscation techniques
-            obfuscation_info = normalizer.detect_obfuscation(value)
+            obfuscation_info = self._normalizer.detect_obfuscation(value)
 
             # Normalize text for better detection
-            normalized_value = normalizer.normalize(value, aggressive=False)
+            normalized_value = self._normalizer.normalize(value, aggressive=False)
 
             # Check against all patterns on BOTH original and normalized text
             for pattern_name, severity, description, regex in self._patterns:
@@ -443,6 +447,41 @@ class PromptInjectionDetector:
 
         return result
 
+    def _flatten_dict_generator(
+        self, data: Any, prefix: str = "", depth: int = 0
+    ):
+        """
+        Generator that yields (location, value) pairs from nested data structures.
+        More efficient than building intermediate dictionaries.
+
+        Args:
+            data: Data to flatten (dict, list, or scalar)
+            prefix: Current key prefix
+            depth: Current recursion depth (prevents stack overflow)
+
+        Yields:
+            Tuples of (location, value)
+        """
+        # Prevent infinite recursion using configured max depth
+        max_depth = getattr(self.config, 'max_parameter_depth', 10)
+        if depth > max_depth:
+            return
+
+        if isinstance(data, dict):
+            for key, value in data.items():
+                full_key = f"{prefix}.{key}" if prefix else key
+                yield from self._flatten_dict_generator(value, full_key, depth + 1)
+
+        elif isinstance(data, list):
+            for i, item in enumerate(data):
+                full_key = f"{prefix}[{i}]"
+                yield from self._flatten_dict_generator(item, full_key, depth + 1)
+
+        else:
+            # Scalar value - yield it
+            if prefix:  # Only yield if we have a key
+                yield (prefix, data)
+
     def _flatten_dict(
         self, d: dict[str, Any], parent_key: str = "", prefix: str = ""
     ) -> dict[str, Any]:
@@ -457,31 +496,9 @@ class PromptInjectionDetector:
         Returns:
             Flattened dictionary with dot-notation keys
         """
-        items = []
-        for k, v in d.items():
-            # Build key without leading dots
-            if parent_key and prefix:
-                new_key = f"{prefix}.{parent_key}.{k}"
-            elif parent_key:
-                new_key = f"{parent_key}.{k}"
-            elif prefix:
-                new_key = f"{prefix}.{k}"
-            else:
-                new_key = k
-
-            if isinstance(v, dict):
-                # Pass new_key as parent to accumulate path
-                items.extend(self._flatten_dict(v, new_key, "").items())
-            elif isinstance(v, list):
-                for i, item in enumerate(v):
-                    list_key = f"{new_key}[{i}]"
-                    if isinstance(item, dict):
-                        items.extend(self._flatten_dict(item, list_key, "").items())
-                    else:
-                        items.append((list_key, item))
-            else:
-                items.append((new_key, v))
-        return dict(items)
+        # Use generator and convert to dict
+        combined_prefix = f"{prefix}.{parent_key}" if prefix and parent_key else (prefix or parent_key)
+        return dict(self._flatten_dict_generator(d, combined_prefix))
 
     @staticmethod
     def _calculate_entropy(text: str) -> float:

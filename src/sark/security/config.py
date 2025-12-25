@@ -24,8 +24,8 @@ class InjectionDetectionConfig:
     entropy_min_length: int = 50
 
     # Pattern weights for risk scoring
-    severity_weight_high: int = 50
-    severity_weight_medium: int = 45
+    severity_weight_high: int = 30
+    severity_weight_medium: int = 15
     severity_weight_low: int = 5
 
     # Performance settings
@@ -134,8 +134,8 @@ class InjectionDetectionConfig:
         - INJECTION_ALERT_THRESHOLD: Risk threshold for alerts (default: 40)
         - INJECTION_ENTROPY_THRESHOLD: Entropy threshold for encoded payloads (default: 4.5)
         - INJECTION_ENTROPY_MIN_LENGTH: Minimum string length for entropy check (default: 50)
-        - INJECTION_SEVERITY_WEIGHT_HIGH: Points for high severity findings (default: 50)
-        - INJECTION_SEVERITY_WEIGHT_MEDIUM: Points for medium severity findings (default: 45)
+        - INJECTION_SEVERITY_WEIGHT_HIGH: Points for high severity findings (default: 30)
+        - INJECTION_SEVERITY_WEIGHT_MEDIUM: Points for medium severity findings (default: 15)
         - INJECTION_SEVERITY_WEIGHT_LOW: Points for low severity findings (default: 5)
         - INJECTION_MAX_PARAMETER_DEPTH: Maximum nesting depth for scanning (default: 10)
 
@@ -148,8 +148,8 @@ class InjectionDetectionConfig:
             alert_threshold=int(os.getenv("INJECTION_ALERT_THRESHOLD", "40")),
             entropy_threshold=float(os.getenv("INJECTION_ENTROPY_THRESHOLD", "4.5")),
             entropy_min_length=int(os.getenv("INJECTION_ENTROPY_MIN_LENGTH", "50")),
-            severity_weight_high=int(os.getenv("INJECTION_SEVERITY_WEIGHT_HIGH", "50")),
-            severity_weight_medium=int(os.getenv("INJECTION_SEVERITY_WEIGHT_MEDIUM", "45")),
+            severity_weight_high=int(os.getenv("INJECTION_SEVERITY_WEIGHT_HIGH", "30")),
+            severity_weight_medium=int(os.getenv("INJECTION_SEVERITY_WEIGHT_MEDIUM", "15")),
             severity_weight_low=int(os.getenv("INJECTION_SEVERITY_WEIGHT_LOW", "5")),
             max_parameter_depth=int(os.getenv("INJECTION_MAX_PARAMETER_DEPTH", "10")),
         )

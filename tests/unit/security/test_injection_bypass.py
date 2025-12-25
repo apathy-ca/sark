@@ -13,7 +13,7 @@ pattern-based detection, including:
 """
 
 import pytest
-from sark.security.injection_detector import PromptInjectionDetector
+from src.sark.security.injection_detector import PromptInjectionDetector
 
 
 class TestUnicodeNormalizationBypass:
