@@ -26,6 +26,7 @@ class SecretFinding:
     matched_value: str  # Truncated for security
     confidence: float  # 0.0 to 1.0
     should_redact: bool = True
+    _full_match: str = ""  # Full secret for redaction (internal use)
 
 
 class SecretScanner:
@@ -34,10 +35,10 @@ class SecretScanner:
     # Secret detection patterns (pattern, name, confidence)
     SECRET_PATTERNS: List[Tuple[str, str, float]] = [
         # API Keys
-        (r"sk-[a-zA-Z0-9]{48}", "OpenAI API Key", 1.0),
-        (r"sk-proj-[a-zA-Z0-9\-_]{40,}", "OpenAI Project API Key", 1.0),
-        (r"ghp_[a-zA-Z0-9]{36}", "GitHub Personal Access Token", 1.0),
-        (r"gho_[a-zA-Z0-9]{36}", "GitHub OAuth Token", 1.0),
+        (r"sk-[a-zA-Z0-9]{20,}", "OpenAI API Key", 1.0),
+        (r"sk-proj-[a-zA-Z0-9\-_]{20,}", "OpenAI Project API Key", 1.0),
+        (r"ghp_[a-zA-Z0-9]{20,}", "GitHub Personal Access Token", 1.0),
+        (r"gho_[a-zA-Z0-9]{20,}", "GitHub OAuth Token", 1.0),
         (r"github_pat_[a-zA-Z0-9_]{82}", "GitHub Fine-Grained PAT", 1.0),
         (r"ghs_[a-zA-Z0-9]{36}", "GitHub App Token", 1.0),
         (r"glpat-[a-zA-Z0-9\-_]{20,}", "GitLab Personal Access Token", 1.0),
@@ -71,16 +72,14 @@ class SecretScanner:
         (r"SK[0-9a-fA-F]{32}", "Twilio API Key", 0.85),
 
         # Anthropic
-        (r"sk-ant-[a-zA-Z0-9\-_]{90,}", "Anthropic API Key", 1.0),
+        (r"sk-ant-[a-zA-Z0-9\-_]{70,}", "Anthropic API Key", 1.0),
 
-        # Potential base64 encoded secrets (long base64 strings)
-        (r"(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?(?=\s|$){64,}", "Potential Base64 Secret", 0.5),
+        # Potential base64 encoded secrets (long base64 strings - minimum 64 chars)
+        (r"(?:[A-Za-z0-9+/]{4}){16,}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?", "Potential Base64 Secret", 0.5),
     ]
 
     # Patterns that should never be redacted (false positive reduction)
     FALSE_POSITIVE_PATTERNS = [
-        r"example\.com",
-        r"localhost",
         r"127\.0\.0\.1",
         r"0\.0\.0\.0",
         r"test@test\.com",
@@ -163,7 +162,7 @@ class SecretScanner:
         # Redact each finding
         for finding in findings:
             if finding.should_redact:
-                redacted = self._redact_location(redacted, finding.location, finding.matched_value)
+                redacted = self._redact_location(redacted, finding.location, finding._full_match)
 
         return redacted
 
@@ -184,9 +183,10 @@ class SecretScanner:
                 findings.append(SecretFinding(
                     secret_type=secret_type,
                     location=location,
-                    matched_value=self._truncate_secret(matched_text),
+                    matched_value=self._truncate_secret(matched_text),  # Truncated for display
                     confidence=confidence,
-                    should_redact=confidence >= 0.7  # Only redact high-confidence findings
+                    should_redact=confidence >= 0.7,  # Only redact high-confidence findings
+                    _full_match=matched_text  # Full value for redaction
                 ))
 
         return findings
