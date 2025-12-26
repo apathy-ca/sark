@@ -13,8 +13,13 @@ from uuid import UUID
 
 import structlog
 
-from sark.models.audit import AuditEventType, SeverityLevel
-from sark.security.injection_detector import InjectionDetectionResult
+# Handle both installed package (sark) and test environment (src.sark) imports
+try:
+    from sark.models.audit import AuditEventType, SeverityLevel
+    from sark.security.injection_detector import InjectionDetectionResult
+except ModuleNotFoundError:
+    from src.sark.models.audit import AuditEventType, SeverityLevel  # type: ignore
+    from src.sark.security.injection_detector import InjectionDetectionResult  # type: ignore
 
 if TYPE_CHECKING:
     from sark.security.config import InjectionDetectionConfig
