@@ -50,7 +50,7 @@ if result.risk_score >= 60:
 - ✅ < 5% false positive rate
 - ✅ < 3ms detection latency
 
-**Documentation**: [Injection Detection Guide](../security/INJECTION_DETECTION.md)
+**Documentation**: [Injection Detection Guide](../security/README.md#1-prompt-injection-detection)
 
 ---
 
@@ -96,7 +96,7 @@ if len([a for a in anomalies if a.severity == "high"]) >= 2:
 - ✅ < 10% false positive rate
 - ✅ < 5ms analysis latency
 
-**Documentation**: [Anomaly Detection Guide](../security/ANOMALY_DETECTION.md)
+**Documentation**: [Anomaly Detection Guide](../security/README.md#2-behavioral-anomaly-detection)
 
 ---
 
@@ -127,7 +127,7 @@ kubectl apply -f k8s/network-policies/egress-allowlist.yaml  # Requires Calico
 - ✅ Unauthorized egress blocked
 - ✅ Zero impact on legitimate traffic
 
-**Documentation**: [Network Policies README](../../k8s/network-policies/README.md)
+**Documentation**: [Network Policies Guide](../security/README.md#network-level-controls)
 
 ---
 
@@ -170,7 +170,7 @@ if findings:
 - ✅ < 1ms scanning latency
 - ✅ Zero false negatives on critical secrets
 
-**Documentation**: [Secret Scanning Guide](../security/SECRET_SCANNING.md)
+**Documentation**: [Secret Scanning Guide](../security/README.md#3-secret-scanning--redaction)
 
 ---
 
@@ -213,7 +213,7 @@ if not passed:
 - ✅ 95%+ MFA success rate
 - ✅ 120s timeout enforced
 
-**Documentation**: [MFA Setup Guide](../security/MFA_SETUP.md)
+**Documentation**: [MFA Setup Guide](../security/README.md#4-multi-factor-authentication)
 
 ---
 
@@ -381,11 +381,11 @@ This release addresses security concerns identified in the Lethal Trifecta Analy
 ## 📚 Documentation
 
 - [Security Overview](../security/README.md)
-- [Injection Detection Guide](../security/INJECTION_DETECTION.md)
-- [Anomaly Detection Guide](../security/ANOMALY_DETECTION.md)
-- [Network Security Guide](../deployment/NETWORK_SECURITY.md)
-- [Secret Scanning Guide](../security/SECRET_SCANNING.md)
-- [MFA Setup Guide](../security/MFA_SETUP.md)
+- [Injection Detection Guide](../security/README.md#1-prompt-injection-detection)
+- [Anomaly Detection Guide](../security/README.md#2-behavioral-anomaly-detection)
+- [Network Security Guide](../security/README.md#5-network-security-controls)
+- [Secret Scanning Guide](../security/README.md#3-secret-scanning--redaction)
+- [MFA Setup Guide](../security/README.md#4-multi-factor-authentication)
 - [Implementation Plan](IMPLEMENTATION_PLAN.md)
 
 ---

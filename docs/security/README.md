@@ -214,7 +214,7 @@ destination:
 
 ### Documentation
 
-- [Network Policies Guide](k8s/network-policies/README.md)
+- [Network Policies Guide](#network-level-controls)
 - [Deployment Guide](../deployment/NETWORK_SECURITY.md)
 
 ---
