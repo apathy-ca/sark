@@ -19,7 +19,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from src.sark.security.injection_detector import PromptInjectionDetector
 from src.sark.security.secret_scanner import SecretScanner
-from src.sark.security.behavioral_analyzer import BehavioralAnalyzer, AuditEvent
+from src.sark.security.behavioral_analyzer import BehavioralAnalyzer, BehavioralAuditEvent
 from datetime import datetime
 
 
@@ -151,7 +151,7 @@ class TestSecurityOverhead:
 
         # Build baseline
         baseline_events = [
-            AuditEvent(
+            BehavioralAuditEvent(
                 user_id="user123",
                 timestamp=datetime(2025, 1, 15 + i, 10, 0),
                 tool_name="analytics",
@@ -164,7 +164,7 @@ class TestSecurityOverhead:
         baseline = await analyzer.build_baseline("user123", events=baseline_events)
 
         # Test event
-        event = AuditEvent(
+        event = BehavioralAuditEvent(
             user_id="user123",
             timestamp=datetime.now(),
             tool_name="analytics",

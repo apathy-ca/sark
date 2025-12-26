@@ -19,7 +19,7 @@ from typing import List
 
 from src.sark.security.injection_detector import PromptInjectionDetector
 from src.sark.security.secret_scanner import SecretScanner
-from src.sark.security.behavioral_analyzer import BehavioralAnalyzer, AuditEvent
+from src.sark.security.behavioral_analyzer import BehavioralAnalyzer, BehavioralAuditEvent
 
 from .benchmark_report import BenchmarkReporter, BenchmarkSuite, get_git_commit
 
@@ -258,7 +258,7 @@ class TestComprehensiveSecurityBenchmarks:
         """Benchmark: Anomaly detection"""
         # Build baseline
         baseline_events = [
-            AuditEvent(
+            BehavioralAuditEvent(
                 user_id="user123",
                 timestamp=datetime(2025, 1, 15 + i, 10, 0),
                 tool_name="analytics",
@@ -271,7 +271,7 @@ class TestComprehensiveSecurityBenchmarks:
         baseline = await behavioral_analyzer.build_baseline("user123", events=baseline_events)
 
         # Test event
-        event = AuditEvent(
+        event = BehavioralAuditEvent(
             user_id="user123",
             timestamp=datetime.now(),
             tool_name="analytics",

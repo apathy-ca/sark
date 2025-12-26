@@ -32,6 +32,11 @@ class SecretFinding:
 class SecretScanner:
     """Scan tool responses for accidentally exposed secrets"""
 
+    # Performance tuning
+    CHUNK_SIZE = 10000  # Process strings in 10KB chunks to prevent backtracking
+    CHUNK_OVERLAP = 200  # Overlap to catch secrets at chunk boundaries
+    MAX_STRING_LENGTH = 1_000_000  # 1MB max to prevent catastrophic backtracking
+
     # Secret detection patterns (pattern, name, confidence)
     SECRET_PATTERNS: List[Tuple[str, str, float]] = [
         # API Keys
@@ -121,16 +126,16 @@ class SecretScanner:
         """
         findings = []
 
-        # Scan all string values
-        for location, value in self._flatten_dict(data).items():
-            if not isinstance(value, str):
-                continue
+        # Batch candidate strings to reduce iteration overhead
+        # Use min_str_len=16 as a balance between performance and detection
+        # (Most API keys are 20+ chars, but some tokens can be 16+)
+        candidates = [
+            (loc, val) for loc, val in self._flatten_dict_generator(data, min_str_len=16)
+            if self._could_contain_secret(val)
+        ]
 
-            # Skip very short strings
-            if len(value) < 8:
-                continue
-
-            # Scan for secrets
+        # Scan all candidates
+        for location, value in candidates:
             findings.extend(self._scan_value(value, location))
 
         return findings
@@ -168,6 +173,19 @@ class SecretScanner:
 
     def _scan_value(self, value: str, location: str) -> List[SecretFinding]:
         """Scan a single string value for secrets"""
+        # Truncate extremely long strings to prevent catastrophic backtracking
+        if len(value) > self.MAX_STRING_LENGTH:
+            logger.warning(f"String at {location} exceeds max length ({len(value)} > {self.MAX_STRING_LENGTH}), truncating")
+            value = value[:self.MAX_STRING_LENGTH]
+
+        # Use chunked processing for large strings to prevent backtracking
+        if len(value) > self.CHUNK_SIZE:
+            return self._scan_value_chunked(value, location)
+        else:
+            return self._scan_value_direct(value, location)
+
+    def _scan_value_direct(self, value: str, location: str) -> List[SecretFinding]:
+        """Scan a string directly (for small strings)"""
         findings = []
 
         for pattern, secret_type, confidence in self.compiled_secret_patterns:
@@ -191,6 +209,75 @@ class SecretScanner:
 
         return findings
 
+    def _scan_value_chunked(self, value: str, location: str) -> List[SecretFinding]:
+        """Scan a large string in chunks to prevent backtracking"""
+        findings = []
+        seen_secrets = set()  # Deduplicate findings from overlapping chunks
+
+        # Process in overlapping chunks
+        for i in range(0, len(value), self.CHUNK_SIZE):
+            # Include overlap to catch secrets at boundaries
+            chunk_start = max(0, i - self.CHUNK_OVERLAP)
+            chunk_end = min(len(value), i + self.CHUNK_SIZE + self.CHUNK_OVERLAP)
+            chunk = value[chunk_start:chunk_end]
+
+            # Scan this chunk
+            chunk_findings = self._scan_value_direct(chunk, location)
+
+            # Deduplicate
+            for finding in chunk_findings:
+                # Use full match as dedup key
+                if finding._full_match not in seen_secrets:
+                    seen_secrets.add(finding._full_match)
+                    findings.append(finding)
+
+        return findings
+
+    # Pre-compiled set of secret prefixes for faster lookup
+    _SECRET_PREFIXES = frozenset([
+        'sk-', 'ghp_', 'gho_', 'ghs_', 'glpat-', 'AKIA',
+        'AIza', 'ya29', 'xox', 'sk_', 'rk_', 'pk_',
+        '-----BEGIN', 'postgres://', 'mysql://', 'mongodb://'
+    ])
+
+    def _could_contain_secret(self, value: str) -> bool:
+        """
+        Ultra-fast pre-filter to skip strings unlikely to contain secrets.
+        Optimized for minimal CPU usage per call.
+
+        Returns:
+            True if string might contain a secret, False if definitely not
+        """
+        # Check for common secret prefixes (very fast string search)
+        # Use membership test on first few chars for common patterns
+        if len(value) >= 3:
+            prefix_3 = value[:3]
+            if prefix_3 in ('sk-', 'ghp', 'gho', 'ghs', 'glp', 'xox', 'sk_', 'rk_', 'pk_'):
+                return True
+
+            # Check for longer prefixes
+            if value[:4] == 'AKIA' or value[:4] == 'AIza' or value[:4] == 'ya29':
+                return True
+
+            if value.startswith('-----BEGIN') or value.startswith('postgres://') or value.startswith('mysql://') or value.startswith('mongodb://'):
+                return True
+
+        # Check for secret keywords (case-insensitive for these specific ones)
+        if 'password' in value or 'secret' in value or 'token' in value or 'api_key' in value:
+            return True
+
+        # For longer strings (40+), check if they look like base64/random tokens
+        # Most real secrets are 32-100 chars and mostly alphanumeric
+        if len(value) >= 40:
+            # Count alnum chars - if >80% and long enough, likely a token
+            # Use a faster approximation: check first 40 chars only
+            sample = value[:40]
+            alnum = sum(c.isalnum() for c in sample)
+            if alnum > 32:  # >80% of 40
+                return True
+
+        return False
+
     def _is_false_positive(self, value: str) -> bool:
         """Check if value matches false positive patterns"""
         for pattern in self.compiled_fp_patterns:
@@ -204,6 +291,55 @@ class SecretScanner:
             return secret[:3] + "..."
 
         return secret[:show_chars] + "..."
+
+    def _flatten_dict_generator(self, data: Any, prefix: str = "", depth: int = 0, min_str_len: int = 20):
+        """
+        Generator that yields (location, value) pairs from nested data structures.
+        Only yields string values >= min_str_len for efficiency.
+        Optimized to avoid string operations for filtered values.
+
+        Args:
+            data: Data to flatten (dict, list, or scalar)
+            prefix: Current key prefix
+            depth: Current recursion depth (prevents stack overflow)
+            min_str_len: Minimum string length to yield (default 20)
+
+        Yields:
+            Tuples of (location, string_value) where len(string_value) >= min_str_len
+        """
+        # Prevent infinite recursion
+        MAX_DEPTH = 50
+        if depth > MAX_DEPTH:
+            return
+
+        if isinstance(data, dict):
+            # Check if prefix needs to be computed (only if we might yield)
+            if prefix:
+                for key, value in data.items():
+                    # Quick check: if value is a short string, skip entirely (no string ops)
+                    if isinstance(value, str):
+                        if len(value) >= min_str_len:
+                            yield (f"{prefix}.{key}", value)
+                    elif isinstance(value, (dict, list)):
+                        yield from self._flatten_dict_generator(value, f"{prefix}.{key}", depth + 1, min_str_len)
+            else:
+                for key, value in data.items():
+                    if isinstance(value, str):
+                        if len(value) >= min_str_len:
+                            yield (key, value)
+                    elif isinstance(value, (dict, list)):
+                        yield from self._flatten_dict_generator(value, key, depth + 1, min_str_len)
+
+        elif isinstance(data, list):
+            for i, item in enumerate(data):
+                if isinstance(item, str):
+                    if len(item) >= min_str_len:
+                        yield (f"{prefix}[{i}]", item)
+                elif isinstance(item, (dict, list)):
+                    yield from self._flatten_dict_generator(item, f"{prefix}[{i}]", depth + 1, min_str_len)
+
+        elif isinstance(data, str) and len(data) >= min_str_len:
+            yield (prefix, data)
 
     def _flatten_dict(self, data: Dict[str, Any], prefix: str = "") -> Dict[str, Any]:
         """

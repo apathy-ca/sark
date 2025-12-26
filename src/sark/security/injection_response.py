@@ -13,8 +13,8 @@ from enum import Enum
 from dataclasses import dataclass
 from uuid import UUID
 
-from sark.security.injection_detector import InjectionDetectionResult, Severity
-from sark.models.audit import AuditEventType, SeverityLevel
+from src.sark.security.injection_detector import InjectionDetectionResult, Severity
+from src.sark.models.audit import AuditEventType, SeverityLevel
 
 logger = structlog.get_logger()
 

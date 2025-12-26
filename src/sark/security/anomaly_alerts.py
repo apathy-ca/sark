@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from datetime import datetime
 import logging
 
-from .behavioral_analyzer import Anomaly, AnomalySeverity, AuditEvent
+from .behavioral_analyzer import Anomaly, AnomalySeverity, BehavioralAuditEvent
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +60,7 @@ class AnomalyAlertManager:
     async def process_anomalies(
         self,
         anomalies: List[Anomaly],
-        event: AuditEvent,
+        event: BehavioralAuditEvent,
         metadata: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """
@@ -153,7 +153,7 @@ class AnomalyAlertManager:
     async def _log_anomalies(
         self,
         anomalies: List[Anomaly],
-        event: AuditEvent,
+        event: BehavioralAuditEvent,
         alert_level: str,
         metadata: Optional[Dict[str, Any]]
     ):
@@ -189,7 +189,7 @@ class AnomalyAlertManager:
     async def _handle_critical_alert(
         self,
         anomalies: List[Anomaly],
-        event: AuditEvent,
+        event: BehavioralAuditEvent,
         metadata: Optional[Dict[str, Any]]
     ):
         """Send critical severity alert"""
@@ -237,7 +237,7 @@ class AnomalyAlertManager:
     async def _handle_warning_alert(
         self,
         anomalies: List[Anomaly],
-        event: AuditEvent,
+        event: BehavioralAuditEvent,
         metadata: Optional[Dict[str, Any]]
     ):
         """Send warning severity alert"""
@@ -285,7 +285,7 @@ class AnomalyAlertManager:
         self,
         user_id: str,
         anomalies: List[Anomaly],
-        event: AuditEvent
+        event: BehavioralAuditEvent
     ):
         """Suspend user account due to critical anomalies"""
         if not self.user_management:

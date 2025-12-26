@@ -78,8 +78,12 @@ class BehavioralBaseline:
 
 
 @dataclass
-class AuditEvent:
-    """Simplified audit event for anomaly detection"""
+class BehavioralAuditEvent:
+    """Simplified audit event for behavioral anomaly detection
+
+    Note: This is distinct from models.audit.AuditEvent which is the
+    SQLAlchemy model for storing audit logs in the database.
+    """
     user_id: str
     timestamp: datetime
     tool_name: str
@@ -112,7 +116,7 @@ class BehavioralAnalyzer:
         self,
         user_id: str,
         lookback_days: int = 30,
-        events: Optional[List[AuditEvent]] = None
+        events: Optional[List[BehavioralAuditEvent]] = None
     ) -> BehavioralBaseline:
         """
         Build normal behavior profile for a user
@@ -182,9 +186,9 @@ class BehavioralAnalyzer:
 
     async def detect_anomalies(
         self,
-        event: AuditEvent,
+        event: BehavioralAuditEvent,
         baseline: Optional[BehavioralBaseline] = None,
-        recent_events: Optional[List[AuditEvent]] = None
+        recent_events: Optional[List[BehavioralAuditEvent]] = None
     ) -> List[Anomaly]:
         """
         Detect anomalies in an event
@@ -301,12 +305,12 @@ class BehavioralAnalyzer:
 
         return anomalies
 
-    def _get_common_tools(self, events: List[AuditEvent], top_n: int = 10) -> List[str]:
+    def _get_common_tools(self, events: List[BehavioralAuditEvent], top_n: int = 10) -> List[str]:
         """Get most commonly used tools"""
         tool_counts = Counter(e.tool_name for e in events)
         return [tool for tool, _ in tool_counts.most_common(top_n)]
 
-    def _get_max_calls_per_day(self, events: List[AuditEvent]) -> int:
+    def _get_max_calls_per_day(self, events: List[BehavioralAuditEvent]) -> int:
         """Get maximum calls in a single day"""
         if not events:
             return 0
@@ -318,7 +322,7 @@ class BehavioralAnalyzer:
 
         return max(daily_counts.values()) if daily_counts else 0
 
-    def _get_typical_hours(self, events: List[AuditEvent], threshold: float = 0.1) -> Set[int]:
+    def _get_typical_hours(self, events: List[BehavioralAuditEvent], threshold: float = 0.1) -> Set[int]:
         """Get typical hours of activity"""
         if not events:
             return set()
@@ -332,7 +336,7 @@ class BehavioralAnalyzer:
             if count / total >= threshold
         }
 
-    def _get_typical_days(self, events: List[AuditEvent], threshold: float = 0.1) -> Set[int]:
+    def _get_typical_days(self, events: List[BehavioralAuditEvent], threshold: float = 0.1) -> Set[int]:
         """Get typical days of week"""
         if not events:
             return set()
@@ -346,12 +350,12 @@ class BehavioralAnalyzer:
             if count / total >= threshold
         }
 
-    def _get_avg_result_size(self, events: List[AuditEvent]) -> float:
+    def _get_avg_result_size(self, events: List[BehavioralAuditEvent]) -> float:
         """Get average result size"""
         sizes = [e.result_size for e in events if e.result_size > 0]
         return mean(sizes) if sizes else 0.0
 
-    def _get_max_sensitivity(self, events: List[AuditEvent]) -> str:
+    def _get_max_sensitivity(self, events: List[BehavioralAuditEvent]) -> str:
         """Get maximum sensitivity level seen"""
         sensitivity_order = ["none", "low", "medium", "high", "critical"]
         max_level = "none"
@@ -365,7 +369,7 @@ class BehavioralAnalyzer:
 
         return max_level
 
-    def _get_typical_sensitivity(self, events: List[AuditEvent]) -> str:
+    def _get_typical_sensitivity(self, events: List[BehavioralAuditEvent]) -> str:
         """Get most common sensitivity level"""
         sensitivities = [e.sensitivity for e in events if e.sensitivity]
         try:
@@ -375,7 +379,7 @@ class BehavioralAnalyzer:
             counts = Counter(sensitivities)
             return counts.most_common(1)[0][0] if counts else "none"
 
-    def _get_typical_locations(self, events: List[AuditEvent]) -> Set[str]:
+    def _get_typical_locations(self, events: List[BehavioralAuditEvent]) -> Set[str]:
         """Get typical access locations"""
         locations = {e.location for e in events if e.location}
         return locations
