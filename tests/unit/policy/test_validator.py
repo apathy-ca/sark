@@ -1,6 +1,5 @@
 """Unit tests for policy validator."""
 
-import tempfile
 from pathlib import Path
 
 import pytest
@@ -82,9 +81,7 @@ allow if {
         result = validator.validate(policy)
 
         assert result.valid is False
-        assert any(
-            issue.code == "MISSING_PACKAGE" for issue in result.issues
-        )
+        assert any(issue.code == "MISSING_PACKAGE" for issue in result.issues)
 
     def test_syntax_error_detection(self, validator):
         """Test that syntax errors are detected."""
@@ -100,9 +97,7 @@ allow if {
         result = validator.validate(policy)
 
         assert result.valid is False
-        assert any(
-            issue.code == "SYNTAX_ERROR" for issue in result.issues
-        )
+        assert any(issue.code == "SYNTAX_ERROR" for issue in result.issues)
 
     def test_missing_allow_deny(self, validator):
         """Test that missing allow/deny rules are detected."""
@@ -119,9 +114,7 @@ reason := "some reason" if {
         result = validator.validate(policy)
 
         assert result.valid is False
-        assert any(
-            issue.code == "MISSING_ALLOW_DENY" for issue in result.issues
-        )
+        assert any(issue.code == "MISSING_ALLOW_DENY" for issue in result.issues)
 
     def test_missing_reason(self, validator):
         """Test that missing reason rule is detected."""
@@ -142,9 +135,7 @@ allow if {
 
         # Missing reason is HIGH severity, should fail in strict mode
         assert result.valid is False
-        assert any(
-            issue.code == "MISSING_REASON" for issue in result.issues
-        )
+        assert any(issue.code == "MISSING_REASON" for issue in result.issues)
 
     def test_missing_default_deny(self, validator):
         """Test that missing default deny is detected."""
@@ -165,9 +156,7 @@ reason := "test" if { true }
 
         # Missing default deny is HIGH severity
         assert result.valid is False
-        assert any(
-            issue.code == "MISSING_DEFAULT_DENY" for issue in result.issues
-        )
+        assert any(issue.code == "MISSING_DEFAULT_DENY" for issue in result.issues)
 
     def test_blanket_allow_detection(self, validator):
         """Test that blanket allow is detected."""
@@ -515,9 +504,7 @@ reason := "test" if { true }
         result = validator.validate_file(Path("/nonexistent/policy.rego"))
 
         assert result.valid is False
-        assert any(
-            issue.code == "FILE_READ_ERROR" for issue in result.issues
-        )
+        assert any(issue.code == "FILE_READ_ERROR" for issue in result.issues)
 
     def test_all_forbidden_patterns_have_required_fields(self):
         """Test that all forbidden patterns have required fields."""

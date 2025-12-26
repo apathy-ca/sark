@@ -1,18 +1,19 @@
 """Gateway integration API endpoints."""
 
-from fastapi import APIRouter, Depends, HTTPException, Header, status
 from typing import Annotated
+
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 import structlog
 
-from sark.services.auth import UserContext, get_current_user
 from sark.models.gateway import (
+    A2AAuthorizationRequest,
+    GatewayAuditEvent,
     GatewayAuthorizationRequest,
     GatewayAuthorizationResponse,
-    A2AAuthorizationRequest,
     GatewayServerInfo,
     GatewayToolInfo,
-    GatewayAuditEvent,
 )
+from sark.services.auth import UserContext, get_current_user
 
 logger = structlog.get_logger()
 router = APIRouter(prefix="/gateway", tags=["Gateway Integration"])
@@ -69,7 +70,7 @@ async def authorize_gateway_operation(
         logger.error("gateway_authorization_failed", error=str(e), user_id=str(user.user_id))
         return GatewayAuthorizationResponse(
             allow=False,
-            reason=f"Authorization error: {str(e)}",
+            reason=f"Authorization error: {e!s}",
             cache_ttl=0,
         )
 
@@ -135,7 +136,7 @@ async def authorize_a2a_communication(
         logger.error("a2a_authorization_failed", error=str(e))
         return GatewayAuthorizationResponse(
             allow=False,
-            reason=f"A2A authorization error: {str(e)}",
+            reason=f"A2A authorization error: {e!s}",
             cache_ttl=0,
         )
 
@@ -156,8 +157,8 @@ async def list_authorized_servers(
         List of servers user can access
     """
     try:
-        from sark.services.gateway.client import get_gateway_client
         from sark.services.gateway.authorization import filter_servers_by_permission
+        from sark.services.gateway.client import get_gateway_client
 
         gateway_client = await get_gateway_client()
         all_servers = await gateway_client.list_servers()
@@ -180,7 +181,7 @@ async def list_authorized_servers(
         logger.error("gateway_list_servers_failed", error=str(e), user_id=str(user.user_id))
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to list servers: {str(e)}",
+            detail=f"Failed to list servers: {e!s}",
         )
 
 
@@ -199,8 +200,8 @@ async def list_authorized_tools(
         List of tools user can invoke
     """
     try:
-        from sark.services.gateway.client import get_gateway_client
         from sark.services.gateway.authorization import filter_tools_by_permission
+        from sark.services.gateway.client import get_gateway_client
 
         gateway_client = await get_gateway_client()
         all_tools = await gateway_client.list_tools(server_name=server_name)
@@ -224,7 +225,7 @@ async def list_authorized_tools(
         logger.error("gateway_list_tools_failed", error=str(e), user_id=str(user.user_id))
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to list tools: {str(e)}",
+            detail=f"Failed to list tools: {e!s}",
         )
 
 
@@ -284,5 +285,5 @@ async def log_gateway_audit_event(
         logger.error("gateway_audit_failed", error=str(e))
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to log audit event: {str(e)}",
+            detail=f"Failed to log audit event: {e!s}",
         )

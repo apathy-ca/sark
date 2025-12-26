@@ -4,10 +4,10 @@ Tests for cost attribution service.
 Tests budget tracking, cost recording, and reporting.
 """
 
-import pytest
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from datetime import datetime, UTC, timedelta
 
+import pytest
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -15,10 +15,7 @@ from sark.db.base import Base
 from sark.models.base import CostTracking, PrincipalBudget
 from sark.models.cost_attribution import (
     CostAttributionService,
-    BudgetStatus,
-    CostSummary,
 )
-
 
 # Test database URL (use in-memory SQLite for tests)
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
@@ -37,9 +34,7 @@ async def db_engine():
 @pytest.fixture
 async def db_session(db_engine):
     """Create test database session."""
-    async_session_maker = sessionmaker(
-        db_engine, class_=AsyncSession, expire_on_commit=False
-    )
+    async_session_maker = sessionmaker(db_engine, class_=AsyncSession, expire_on_commit=False)
     async with async_session_maker() as session:
         yield session
 

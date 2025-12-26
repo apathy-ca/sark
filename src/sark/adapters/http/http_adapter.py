@@ -16,27 +16,32 @@ Version: 2.0.0
 Engineer: ENGINEER-2
 """
 
-from typing import Any, AsyncIterator, Dict, List, Optional
-from datetime import datetime, timedelta
-import time
 import asyncio
-import structlog
-import httpx
+from collections.abc import AsyncIterator
+from datetime import datetime
+import time
+from typing import Any
 from urllib.parse import urljoin
 
+import httpx
+import structlog
+
 from sark.adapters.base import ProtocolAdapter
-from sark.models.base import ResourceSchema, CapabilitySchema, InvocationRequest, InvocationResult
 from sark.adapters.exceptions import (
-    ValidationError,
-    InvocationError,
     ConnectionError as AdapterConnectionError,
-    TimeoutError as AdapterTimeoutError,
-    ProtocolError,
+)
+from sark.adapters.exceptions import (
     DiscoveryError,
+    InvocationError,
     StreamingError,
+    ValidationError,
+)
+from sark.adapters.exceptions import (
+    TimeoutError as AdapterTimeoutError,
 )
 from sark.adapters.http.authentication import AuthStrategy, create_auth_strategy
 from sark.adapters.http.discovery import OpenAPIDiscovery
+from sark.models.base import CapabilitySchema, InvocationRequest, InvocationResult, ResourceSchema
 
 logger = structlog.get_logger(__name__)
 
@@ -70,7 +75,7 @@ class CircuitBreaker:
         self.expected_exception = expected_exception
 
         self.failure_count = 0
-        self.last_failure_time: Optional[float] = None
+        self.last_failure_time: float | None = None
         self.state = "CLOSED"  # CLOSED, OPEN, HALF_OPEN
 
     async def call(self, func, *args, **kwargs):
@@ -99,14 +104,14 @@ class CircuitBreaker:
                         "state": self.state,
                         "failure_count": self.failure_count,
                         "last_failure": self.last_failure_time,
-                    }
+                    },
                 )
 
         try:
             result = await func(*args, **kwargs)
             self._on_success()
             return result
-        except self.expected_exception as e:
+        except self.expected_exception:
             self._on_failure()
             raise
 
@@ -133,7 +138,7 @@ class CircuitBreaker:
             logger.warning(
                 "Circuit breaker OPEN",
                 failure_count=self.failure_count,
-                threshold=self.failure_threshold
+                threshold=self.failure_threshold,
             )
 
 
@@ -144,7 +149,7 @@ class RateLimiter:
     Limits requests per second with burst capacity.
     """
 
-    def __init__(self, rate: float, burst: Optional[int] = None):
+    def __init__(self, rate: float, burst: int | None = None):
         """
         Initialize rate limiter.
 
@@ -192,8 +197,8 @@ class HTTPAdapter(ProtocolAdapter):
     def __init__(
         self,
         base_url: str,
-        auth_config: Optional[Dict[str, Any]] = None,
-        rate_limit: Optional[float] = None,
+        auth_config: dict[str, Any] | None = None,
+        rate_limit: float | None = None,
         circuit_breaker_threshold: int = 5,
         timeout: float = 30.0,
         max_retries: int = 3,
@@ -215,13 +220,13 @@ class HTTPAdapter(ProtocolAdapter):
 
         # Initialize authentication
         self.auth_strategy: AuthStrategy = (
-            create_auth_strategy(auth_config) if auth_config else create_auth_strategy({"type": "none"})
+            create_auth_strategy(auth_config)
+            if auth_config
+            else create_auth_strategy({"type": "none"})
         )
 
         # Initialize rate limiter
-        self.rate_limiter: Optional[RateLimiter] = (
-            RateLimiter(rate=rate_limit) if rate_limit else None
-        )
+        self.rate_limiter: RateLimiter | None = RateLimiter(rate=rate_limit) if rate_limit else None
 
         # Initialize circuit breaker
         self.circuit_breaker = CircuitBreaker(
@@ -231,10 +236,10 @@ class HTTPAdapter(ProtocolAdapter):
         )
 
         # HTTP client (created lazily)
-        self._client: Optional[httpx.AsyncClient] = None
+        self._client: httpx.AsyncClient | None = None
 
         # Discovery helper
-        self._discovery: Optional[OpenAPIDiscovery] = None
+        self._discovery: OpenAPIDiscovery | None = None
 
     @property
     def protocol_name(self) -> str:
@@ -256,7 +261,7 @@ class HTTPAdapter(ProtocolAdapter):
             )
         return self._client
 
-    async def discover_resources(self, discovery_config: Dict[str, Any]) -> List[ResourceSchema]:
+    async def discover_resources(self, discovery_config: dict[str, Any]) -> list[ResourceSchema]:
         """
         Discover HTTP API as a resource.
 
@@ -285,7 +290,9 @@ class HTTPAdapter(ProtocolAdapter):
             server_info = await discovery.get_server_info(spec)
 
             # Create resource
-            resource_id = f"http:{base_url.replace('https://', '').replace('http://', '').replace('/', '_')}"
+            resource_id = (
+                f"http:{base_url.replace('https://', '').replace('http://', '').replace('/', '_')}"
+            )
 
             resource = ResourceSchema(
                 id=resource_id,
@@ -308,18 +315,18 @@ class HTTPAdapter(ProtocolAdapter):
                 "Discovered HTTP API resource",
                 resource_id=resource.id,
                 api_title=server_info["title"],
-                api_version=server_info["version"]
+                api_version=server_info["version"],
             )
 
             return [resource]
 
         except Exception as e:
             raise DiscoveryError(
-                f"Failed to discover HTTP API: {str(e)}",
-                details={"base_url": base_url, "spec_url": spec_url}
+                f"Failed to discover HTTP API: {e!s}",
+                details={"base_url": base_url, "spec_url": spec_url},
             )
 
-    async def get_capabilities(self, resource: ResourceSchema) -> List[CapabilitySchema]:
+    async def get_capabilities(self, resource: ResourceSchema) -> list[CapabilitySchema]:
         """
         Get capabilities from OpenAPI spec.
 
@@ -334,29 +341,23 @@ class HTTPAdapter(ProtocolAdapter):
         if not spec_url and not resource.endpoint:
             raise DiscoveryError(
                 "No OpenAPI spec URL or endpoint found in resource metadata",
-                resource_id=resource.id
+                resource_id=resource.id,
             )
 
         # Initialize discovery
-        discovery = OpenAPIDiscovery(
-            base_url=resource.endpoint,
-            spec_url=spec_url
-        )
+        discovery = OpenAPIDiscovery(base_url=resource.endpoint, spec_url=spec_url)
 
         try:
             capabilities = await discovery.discover_capabilities(resource)
             logger.info(
                 "Discovered capabilities for HTTP resource",
                 resource_id=resource.id,
-                count=len(capabilities)
+                count=len(capabilities),
             )
             return capabilities
 
         except Exception as e:
-            raise DiscoveryError(
-                f"Failed to discover capabilities: {str(e)}",
-                resource_id=resource.id
-            )
+            raise DiscoveryError(f"Failed to discover capabilities: {e!s}", resource_id=resource.id)
 
     async def validate_request(self, request: InvocationRequest) -> bool:
         """
@@ -374,21 +375,19 @@ class HTTPAdapter(ProtocolAdapter):
         # Check required fields
         if not request.capability_id:
             raise ValidationError(
-                "capability_id is required",
-                validation_errors=["Missing capability_id"]
+                "capability_id is required", validation_errors=["Missing capability_id"]
             )
 
         if not request.principal_id:
             raise ValidationError(
-                "principal_id is required",
-                validation_errors=["Missing principal_id"]
+                "principal_id is required", validation_errors=["Missing principal_id"]
             )
 
         # Arguments must be a dict
         if not isinstance(request.arguments, dict):
             raise ValidationError(
                 "arguments must be a dictionary",
-                validation_errors=[f"Invalid arguments type: {type(request.arguments)}"]
+                validation_errors=[f"Invalid arguments type: {type(request.arguments)}"],
             )
 
         return True
@@ -414,10 +413,7 @@ class HTTPAdapter(ProtocolAdapter):
                 await self.rate_limiter.acquire()
 
             # Execute with circuit breaker
-            result = await self.circuit_breaker.call(
-                self._execute_http_request,
-                request
-            )
+            result = await self.circuit_breaker.call(self._execute_http_request, request)
 
             duration_ms = (time.time() - start_time) * 1000
 
@@ -428,7 +424,7 @@ class HTTPAdapter(ProtocolAdapter):
                     "capability_id": request.capability_id,
                     "protocol": "http",
                 },
-                duration_ms=duration_ms
+                duration_ms=duration_ms,
             )
 
         except ValidationError as e:
@@ -437,7 +433,7 @@ class HTTPAdapter(ProtocolAdapter):
                 success=False,
                 error=str(e),
                 metadata={"error_type": "ValidationError"},
-                duration_ms=duration_ms
+                duration_ms=duration_ms,
             )
 
         except Exception as e:
@@ -446,13 +442,13 @@ class HTTPAdapter(ProtocolAdapter):
                 "HTTP invocation failed",
                 capability_id=request.capability_id,
                 error=str(e),
-                duration_ms=duration_ms
+                duration_ms=duration_ms,
             )
             return InvocationResult(
                 success=False,
                 error=str(e),
                 metadata={"error_type": type(e).__name__},
-                duration_ms=duration_ms
+                duration_ms=duration_ms,
             )
 
     async def _execute_http_request(self, request: InvocationRequest) -> Any:
@@ -478,9 +474,15 @@ class HTTPAdapter(ProtocolAdapter):
         arguments = request.arguments
 
         # Extract components from arguments
-        path_params = {k: v for k, v in arguments.items() if not k.startswith(("query_", "header_", "body"))}
-        query_params = {k.replace("query_", ""): v for k, v in arguments.items() if k.startswith("query_")}
-        headers = {k.replace("header_", ""): v for k, v in arguments.items() if k.startswith("header_")}
+        path_params = {
+            k: v for k, v in arguments.items() if not k.startswith(("query_", "header_", "body"))
+        }
+        query_params = {
+            k.replace("query_", ""): v for k, v in arguments.items() if k.startswith("query_")
+        }
+        headers = {
+            k.replace("header_", ""): v for k, v in arguments.items() if k.startswith("header_")
+        }
         body = arguments.get("body")
 
         # Replace path parameters
@@ -505,10 +507,7 @@ class HTTPAdapter(ProtocolAdapter):
         for attempt in range(self.max_retries):
             try:
                 logger.debug(
-                    "Sending HTTP request",
-                    method=http_method,
-                    url=url,
-                    attempt=attempt + 1
+                    "Sending HTTP request", method=http_method, url=url, attempt=attempt + 1
                 )
 
                 response = await client.send(http_request)
@@ -522,11 +521,11 @@ class HTTPAdapter(ProtocolAdapter):
 
                 return result
 
-            except httpx.TimeoutException as e:
+            except httpx.TimeoutException:
                 last_exception = AdapterTimeoutError(
                     f"HTTP request timed out after {self.timeout}s",
                     timeout_seconds=self.timeout,
-                    details={"url": url, "method": http_method}
+                    details={"url": url, "method": http_method},
                 )
                 logger.warning("HTTP request timeout", attempt=attempt + 1, url=url)
 
@@ -536,27 +535,36 @@ class HTTPAdapter(ProtocolAdapter):
                     raise InvocationError(
                         f"HTTP {e.response.status_code}: {e.response.text}",
                         protocol_error=f"{e.response.status_code}",
-                        details={"url": url, "method": http_method, "status_code": e.response.status_code}
+                        details={
+                            "url": url,
+                            "method": http_method,
+                            "status_code": e.response.status_code,
+                        },
                     )
 
                 # Retry server errors (5xx)
                 last_exception = InvocationError(
                     f"HTTP {e.response.status_code}: {e.response.text}",
                     protocol_error=f"{e.response.status_code}",
-                    details={"url": url, "method": http_method, "status_code": e.response.status_code}
+                    details={
+                        "url": url,
+                        "method": http_method,
+                        "status_code": e.response.status_code,
+                    },
                 )
-                logger.warning("HTTP server error", attempt=attempt + 1, status=e.response.status_code)
+                logger.warning(
+                    "HTTP server error", attempt=attempt + 1, status=e.response.status_code
+                )
 
             except httpx.RequestError as e:
                 last_exception = AdapterConnectionError(
-                    f"HTTP request failed: {str(e)}",
-                    details={"url": url, "method": http_method}
+                    f"HTTP request failed: {e!s}", details={"url": url, "method": http_method}
                 )
                 logger.warning("HTTP request error", attempt=attempt + 1, error=str(e))
 
             # Exponential backoff
             if attempt < self.max_retries - 1:
-                wait_time = 2 ** attempt
+                wait_time = 2**attempt
                 await asyncio.sleep(wait_time)
 
         # All retries failed
@@ -584,10 +592,7 @@ class HTTPAdapter(ProtocolAdapter):
         """Initialize resources when registered."""
         # Initialize discovery helper
         spec_url = resource.metadata.get("openapi_spec_url")
-        self._discovery = OpenAPIDiscovery(
-            base_url=resource.endpoint,
-            spec_url=spec_url
-        )
+        self._discovery = OpenAPIDiscovery(base_url=resource.endpoint, spec_url=spec_url)
 
         # Refresh auth tokens if needed
         try:
@@ -645,9 +650,9 @@ class HTTPAdapter(ProtocolAdapter):
 
         except Exception as e:
             raise StreamingError(
-                f"Streaming failed: {str(e)}",
+                f"Streaming failed: {e!s}",
                 chunks_received=chunks_received,
-                details={"url": url, "method": http_method}
+                details={"url": url, "method": http_method},
             )
 
     def __repr__(self) -> str:
@@ -655,4 +660,4 @@ class HTTPAdapter(ProtocolAdapter):
         return f"<HTTPAdapter base_url={self.base_url}>"
 
 
-__all__ = ["HTTPAdapter", "CircuitBreaker", "RateLimiter"]
+__all__ = ["CircuitBreaker", "HTTPAdapter", "RateLimiter"]

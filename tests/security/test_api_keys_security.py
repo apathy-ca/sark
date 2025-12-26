@@ -10,10 +10,9 @@ Critical security validations:
 Priority: P0 (Blocking v2.0.0 release)
 """
 
+from unittest.mock import MagicMock
+
 import pytest
-from fastapi.testclient import TestClient
-from unittest.mock import MagicMock, AsyncMock
-from datetime import datetime, UTC
 
 
 @pytest.fixture
@@ -45,8 +44,6 @@ class TestAPIKeysAuthentication:
         SECURITY: Unauthenticated users must not be able to create API keys.
         Expected: 401 Unauthorized
         """
-        from fastapi import FastAPI
-        from starlette.testclient import TestClient
 
         # This test validates that the endpoint has authentication dependency
         # In actual implementation, this would test against the real API

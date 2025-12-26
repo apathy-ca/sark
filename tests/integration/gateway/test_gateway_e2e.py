@@ -20,20 +20,18 @@ Test Categories:
 """
 
 import asyncio
-import json
 import time
-from typing import Any
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import httpx
 import pytest
 from pytest_httpx import HTTPXMock
 
 from sark.gateway import (
-    GatewayClient,
     CircuitBreaker,
     CircuitBreakerError,
     CircuitState,
+    GatewayClient,
     GatewayErrorHandler,
     RetryConfig,
     RetryExhaustedError,
@@ -42,9 +40,7 @@ from sark.gateway import (
     with_retry,
     with_timeout,
 )
-from sark.gateway.transports.http_client import GatewayHTTPClient
-from sark.gateway.transports.sse_client import GatewaySSEClient, SSEEvent, ConnectionState
-from sark.gateway.transports.stdio_client import StdioTransport
+from sark.gateway.transports.sse_client import ConnectionState, GatewaySSEClient, SSEEvent
 from sark.models.gateway import (
     GatewayServerInfo,
     GatewayToolInfo,
@@ -52,10 +48,8 @@ from sark.models.gateway import (
 )
 from sark.services.policy.opa_client import (
     AuthorizationDecision,
-    AuthorizationInput,
     OPAClient,
 )
-
 
 # =============================================================================
 # Test Fixtures
@@ -155,9 +149,7 @@ class TestHTTPTransportE2E:
             assert servers[1].server_name == "redis-mcp"
 
     @pytest.mark.asyncio
-    async def test_list_all_servers_pagination_e2e(
-        self, sample_servers, httpx_mock: HTTPXMock
-    ):
+    async def test_list_all_servers_pagination_e2e(self, sample_servers, httpx_mock: HTTPXMock):
         """E2E: List all servers with pagination."""
         # Page 1: Full page
         httpx_mock.add_response(
@@ -210,9 +202,7 @@ class TestHTTPTransportE2E:
             assert tools[0].tool_name == "execute_query"
 
     @pytest.mark.asyncio
-    async def test_list_tools_filtered_by_server_e2e(
-        self, sample_tools, httpx_mock: HTTPXMock
-    ):
+    async def test_list_tools_filtered_by_server_e2e(self, sample_tools, httpx_mock: HTTPXMock):
         """E2E: List tools filtered by server."""
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/tools?server=postgres-mcp&offset=0&limit=100",
@@ -317,9 +307,7 @@ class TestHTTPTransportE2E:
             transport_mode=TransportMode.HTTP_ONLY,
         ) as client:
             # Make 10 concurrent requests
-            tasks = [
-                client.get_server_info(f"server-{i}") for i in range(10)
-            ]
+            tasks = [client.get_server_info(f"server-{i}") for i in range(10)]
             results = await asyncio.gather(*tasks)
 
             assert len(results) == 10
@@ -397,6 +385,7 @@ class TestHTTPTransportE2E:
     @pytest.mark.asyncio
     async def test_http_timeout_e2e(self):
         """E2E: HTTP request timeout."""
+
         async def slow_request(*args, **kwargs):
             await asyncio.sleep(5)  # Simulate slow response
             return []
@@ -406,9 +395,7 @@ class TestHTTPTransportE2E:
             transport_mode=TransportMode.HTTP_ONLY,
             timeout=1.0,  # 1 second timeout
         ) as client:
-            with patch.object(
-                client._get_http_client(), "list_servers", side_effect=slow_request
-            ):
+            with patch.object(client._get_http_client(), "list_servers", side_effect=slow_request):
                 with pytest.raises(TimeoutError):
                     await client.list_servers()
 
@@ -449,8 +436,8 @@ class TestSSETransportE2E:
         """E2E: Stream events via SSE transport."""
         # Mock SSE response
         sse_data = [
-            "event: tool_invoked\ndata: {\"tool\": \"execute_query\"}\n\n",
-            "event: server_registered\ndata: {\"server\": \"new-server\"}\n\n",
+            'event: tool_invoked\ndata: {"tool": "execute_query"}\n\n',
+            'event: server_registered\ndata: {"server": "new-server"}\n\n',
         ]
 
         async def mock_stream_events(*args, **kwargs):
@@ -465,9 +452,7 @@ class TestSSETransportE2E:
             gateway_url="http://gateway:8080",
             transport_mode=TransportMode.SSE_ONLY,
         ) as client:
-            with patch.object(
-                GatewaySSEClient, "stream_events", side_effect=mock_stream_events
-            ):
+            with patch.object(GatewaySSEClient, "stream_events", side_effect=mock_stream_events):
                 events = []
                 async for event in client.stream_events():
                     events.append(event)
@@ -496,9 +481,7 @@ class TestSSETransportE2E:
             gateway_url="http://gateway:8080",
             transport_mode=TransportMode.SSE_ONLY,
         ) as client:
-            with patch.object(
-                GatewaySSEClient, "stream_events", side_effect=mock_stream_events
-            ):
+            with patch.object(GatewaySSEClient, "stream_events", side_effect=mock_stream_events):
                 events = []
                 async for event in client.stream_events(event_types=["tool_invoked"]):
                     events.append(event)
@@ -568,9 +551,7 @@ class TestSSETransportE2E:
             gateway_url="http://gateway:8080",
             transport_mode=TransportMode.SSE_ONLY,
         ) as client:
-            with patch.object(
-                GatewaySSEClient, "stream_events", side_effect=mock_stream
-            ):
+            with patch.object(GatewaySSEClient, "stream_events", side_effect=mock_stream):
                 received_ids = []
                 async for event in client.stream_events():
                     received_ids.append(event.event_id)
@@ -596,6 +577,7 @@ class TestSSETransportE2E:
     @pytest.mark.asyncio
     async def test_sse_concurrent_streams_e2e(self):
         """E2E: Multiple concurrent SSE streams."""
+
         async def mock_stream(*args, **kwargs):
             for i in range(3):
                 yield SSEEvent(event_type="test", data=str(i))
@@ -605,9 +587,7 @@ class TestSSETransportE2E:
             transport_mode=TransportMode.SSE_ONLY,
             max_connections=50,
         ) as client:
-            with patch.object(
-                GatewaySSEClient, "stream_events", side_effect=mock_stream
-            ):
+            with patch.object(GatewaySSEClient, "stream_events", side_effect=mock_stream):
                 # Create 3 concurrent streams
                 async def collect_stream():
                     events = []
@@ -629,6 +609,7 @@ class TestSSETransportE2E:
     @pytest.mark.asyncio
     async def test_sse_error_handling_e2e(self):
         """E2E: SSE error handling and recovery."""
+
         async def mock_stream_with_error(*args, **kwargs):
             yield SSEEvent(event_type="test", data="before_error")
             raise httpx.ReadTimeout("Stream timeout")
@@ -647,6 +628,7 @@ class TestSSETransportE2E:
     @pytest.mark.asyncio
     async def test_sse_graceful_shutdown_e2e(self):
         """E2E: SSE graceful shutdown during streaming."""
+
         async def mock_stream(*args, **kwargs):
             for i in range(100):
                 yield SSEEvent(event_type="test", data=str(i))
@@ -656,13 +638,9 @@ class TestSSETransportE2E:
             gateway_url="http://gateway:8080",
             transport_mode=TransportMode.SSE_ONLY,
         ) as client:
-            with patch.object(
-                GatewaySSEClient, "stream_events", side_effect=mock_stream
-            ):
+            with patch.object(GatewaySSEClient, "stream_events", side_effect=mock_stream):
                 # Start streaming
-                stream_task = asyncio.create_task(
-                    self._collect_events(client)
-                )
+                stream_task = asyncio.create_task(self._collect_events(client))
 
                 # Let it run briefly
                 await asyncio.sleep(0.1)
@@ -681,6 +659,7 @@ class TestSSETransportE2E:
     @pytest.mark.asyncio
     async def test_sse_with_authentication_e2e(self):
         """E2E: SSE streaming with JWT authentication."""
+
         async def mock_stream(*args, user_token=None, **kwargs):
             # Verify token is passed
             assert user_token == "jwt-token-123"
@@ -690,9 +669,7 @@ class TestSSETransportE2E:
             gateway_url="http://gateway:8080",
             transport_mode=TransportMode.SSE_ONLY,
         ) as client:
-            with patch.object(
-                GatewaySSEClient, "stream_events", side_effect=mock_stream
-            ):
+            with patch.object(GatewaySSEClient, "stream_events", side_effect=mock_stream):
                 events = []
                 async for event in client.stream_events(user_token="jwt-token-123"):
                     events.append(event)
@@ -886,9 +863,7 @@ class TestStdioTransportE2E:
                     )
 
                     # Send notification (should not wait for response)
-                    await local_server.send_notification(
-                        "notifications/progress", {"percent": 50}
-                    )
+                    await local_server.send_notification("notifications/progress", {"percent": 50})
 
                     # Verify data was written to stdin
                     assert mock_stdin.write.called
@@ -914,7 +889,10 @@ class TestStdioTransportE2E:
                     local_server.transport._process.returncode = 1
 
                     # Process should be detected as not running
-                    assert not local_server.is_running or local_server.transport._process.returncode is not None
+                    assert (
+                        not local_server.is_running
+                        or local_server.transport._process.returncode is not None
+                    )
 
     @pytest.mark.asyncio
     async def test_stdio_resource_cleanup_e2e(self):
@@ -978,9 +956,7 @@ class TestUnifiedClientE2E:
     """End-to-end tests for unified Gateway client."""
 
     @pytest.mark.asyncio
-    async def test_auto_transport_selection_http_e2e(
-        self, sample_servers, httpx_mock: HTTPXMock
-    ):
+    async def test_auto_transport_selection_http_e2e(self, sample_servers, httpx_mock: HTTPXMock):
         """E2E: Auto transport selection uses HTTP for server listing."""
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers?offset=0&limit=100",
@@ -1171,9 +1147,7 @@ class TestUnifiedClientE2E:
     @pytest.mark.asyncio
     async def test_client_without_gateway_url_e2e(self):
         """E2E: Client initialization without gateway URL (stdio only)."""
-        async with GatewayClient(
-            transport_mode=TransportMode.STDIO_ONLY
-        ) as client:
+        async with GatewayClient(transport_mode=TransportMode.STDIO_ONLY) as client:
             # Should work for stdio operations
             from sark.gateway import GatewayClientError
 
@@ -1234,9 +1208,7 @@ class TestErrorHandlingE2E:
     @pytest.mark.asyncio
     async def test_circuit_breaker_closes_after_success_e2e(self):
         """E2E: Circuit breaker closes after successful calls in half-open."""
-        breaker = CircuitBreaker(
-            failure_threshold=2, timeout_seconds=0.1, success_threshold=2
-        )
+        breaker = CircuitBreaker(failure_threshold=2, timeout_seconds=0.1, success_threshold=2)
 
         call_count = 0
 
@@ -1278,9 +1250,7 @@ class TestErrorHandlingE2E:
             return "success"
 
         config = RetryConfig(max_attempts=3, initial_delay=0.1)
-        result = await with_retry(
-            failing_then_succeeding, config=config
-        )
+        result = await with_retry(failing_then_succeeding, config=config)
 
         assert result == "success"
         assert len(attempt_times) == 3
@@ -1312,6 +1282,7 @@ class TestErrorHandlingE2E:
     @pytest.mark.asyncio
     async def test_timeout_enforcement_e2e(self):
         """E2E: Timeout enforcement."""
+
         async def slow_operation():
             await asyncio.sleep(2)
             return "completed"
@@ -1322,6 +1293,7 @@ class TestErrorHandlingE2E:
     @pytest.mark.asyncio
     async def test_timeout_success_within_limit_e2e(self):
         """E2E: Operation completes within timeout."""
+
         async def fast_operation():
             await asyncio.sleep(0.1)
             return "completed"
@@ -1373,9 +1345,7 @@ class TestErrorHandlingE2E:
     @pytest.mark.asyncio
     async def test_error_handler_reset_e2e(self):
         """E2E: Error handler circuit breaker reset."""
-        error_handler = GatewayErrorHandler(
-            circuit_breaker_config={"failure_threshold": 2}
-        )
+        error_handler = GatewayErrorHandler(circuit_breaker_config={"failure_threshold": 2})
 
         async def failing():
             raise Exception("Failed")

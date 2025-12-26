@@ -7,9 +7,10 @@ This module provides a high-level client for MCP Gateway communication that:
 - Supports connection pooling and resource management
 """
 
-import asyncio
-from typing import Any, AsyncGenerator
+from collections.abc import AsyncGenerator
 from enum import Enum
+from typing import Any
+
 import structlog
 
 from sark.gateway.error_handler import GatewayErrorHandler
@@ -19,8 +20,6 @@ from sark.gateway.transports.stdio_client import StdioTransport
 from sark.models.gateway import (
     GatewayServerInfo,
     GatewayToolInfo,
-    GatewayAuthorizationRequest,
-    GatewayAuthorizationResponse,
 )
 from sark.services.policy.opa_client import OPAClient
 
@@ -223,9 +222,7 @@ class GatewayClient:
                 f"Transport {transport} not available in STDIO_ONLY mode"
             )
 
-    async def _execute_with_error_handling(
-        self, func: Any, *args: Any, **kwargs: Any
-    ) -> Any:
+    async def _execute_with_error_handling(self, func: Any, *args: Any, **kwargs: Any) -> Any:
         """Execute function with error handling if enabled."""
         if self.error_handler:
             return await self.error_handler.execute(func, *args, **kwargs)
@@ -236,9 +233,7 @@ class GatewayClient:
     # Server Discovery Operations (HTTP Transport)
     # =========================================================================
 
-    async def list_servers(
-        self, page: int = 1, page_size: int = 100
-    ) -> list[GatewayServerInfo]:
+    async def list_servers(self, page: int = 1, page_size: int = 100) -> list[GatewayServerInfo]:
         """
         List all MCP servers registered with Gateway.
 
@@ -335,9 +330,7 @@ class GatewayClient:
             page_size=page_size,
         )
 
-    async def list_all_tools(
-        self, server_name: str | None = None
-    ) -> list[GatewayToolInfo]:
+    async def list_all_tools(self, server_name: str | None = None) -> list[GatewayToolInfo]:
         """
         List ALL tools with automatic pagination.
 
@@ -496,9 +489,7 @@ class GatewayClient:
         if server_id is None:
             import hashlib
 
-            server_id = hashlib.md5(
-                "".join(command).encode()
-            ).hexdigest()[:8]
+            server_id = hashlib.md5("".join(command).encode()).hexdigest()[:8]
 
         # Create stdio transport
         stdio_transport = StdioTransport(command=command, cwd=cwd, env=env)
@@ -515,9 +506,7 @@ class GatewayClient:
             command=command,
         )
 
-        return LocalServerClient(
-            transport=stdio_transport, server_id=server_id, parent=self
-        )
+        return LocalServerClient(transport=stdio_transport, server_id=server_id, parent=self)
 
     async def disconnect_local_server(self, server_id: str) -> None:
         """
@@ -670,9 +659,7 @@ class LocalServerClient:
     connected via stdio transport.
     """
 
-    def __init__(
-        self, transport: StdioTransport, server_id: str, parent: GatewayClient
-    ) -> None:
+    def __init__(self, transport: StdioTransport, server_id: str, parent: GatewayClient) -> None:
         """
         Initialize local server client.
 

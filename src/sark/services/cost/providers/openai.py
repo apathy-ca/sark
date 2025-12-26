@@ -6,11 +6,12 @@ Pricing data as of December 2024.
 """
 
 from decimal import Decimal
-from typing import Any, Dict, Optional
+from typing import Any
+
 import structlog
 
 from sark.models.base import InvocationRequest, InvocationResult
-from sark.services.cost.estimator import CostEstimator, CostEstimate, CostEstimationError
+from sark.services.cost.estimator import CostEstimate, CostEstimationError, CostEstimator
 
 logger = structlog.get_logger(__name__)
 
@@ -23,28 +24,23 @@ OPENAI_PRICING = {
     "gpt-4-turbo-preview": (Decimal("10.00"), Decimal("30.00")),
     "gpt-4-0125-preview": (Decimal("10.00"), Decimal("30.00")),
     "gpt-4-1106-preview": (Decimal("10.00"), Decimal("30.00")),
-
     # GPT-4
     "gpt-4": (Decimal("30.00"), Decimal("60.00")),
     "gpt-4-0613": (Decimal("30.00"), Decimal("60.00")),
     "gpt-4-32k": (Decimal("60.00"), Decimal("120.00")),
     "gpt-4-32k-0613": (Decimal("60.00"), Decimal("120.00")),
-
     # GPT-3.5 Turbo
     "gpt-3.5-turbo": (Decimal("0.50"), Decimal("1.50")),
     "gpt-3.5-turbo-0125": (Decimal("0.50"), Decimal("1.50")),
     "gpt-3.5-turbo-1106": (Decimal("1.00"), Decimal("2.00")),
     "gpt-3.5-turbo-16k": (Decimal("3.00"), Decimal("4.00")),
-
     # o1 models
     "o1-preview": (Decimal("15.00"), Decimal("60.00")),
     "o1-mini": (Decimal("3.00"), Decimal("12.00")),
-
     # Embeddings
     "text-embedding-3-small": (Decimal("0.02"), Decimal("0.00")),
     "text-embedding-3-large": (Decimal("0.13"), Decimal("0.00")),
     "text-embedding-ada-002": (Decimal("0.10"), Decimal("0.00")),
-
     # Default fallback
     "default": (Decimal("10.00"), Decimal("30.00")),
 }
@@ -85,11 +81,7 @@ class OpenAICostEstimator(CostEstimator):
                 return pricing
 
         # Default pricing
-        logger.warning(
-            "openai_pricing_not_found",
-            model=model,
-            using_default=True
-        )
+        logger.warning("openai_pricing_not_found", model=model, using_default=True)
         return OPENAI_PRICING["default"]
 
     def _estimate_tokens(self, text: str) -> int:
@@ -108,9 +100,7 @@ class OpenAICostEstimator(CostEstimator):
         return max(1, len(text) // 4)
 
     async def estimate_cost(
-        self,
-        request: InvocationRequest,
-        resource_metadata: Dict[str, Any]
+        self, request: InvocationRequest, resource_metadata: dict[str, Any]
     ) -> CostEstimate:
         """
         Estimate OpenAI API call cost.
@@ -136,10 +126,7 @@ class OpenAICostEstimator(CostEstimator):
         # Extract model
         model = resource_metadata.get("model")
         if not model:
-            raise CostEstimationError(
-                "Missing 'model' in resource metadata",
-                provider="openai"
-            )
+            raise CostEstimationError("Missing 'model' in resource metadata", provider="openai")
 
         # Get pricing
         input_price, output_price = self._get_pricing(model)
@@ -167,7 +154,7 @@ class OpenAICostEstimator(CostEstimator):
             # No recognizable input
             raise CostEstimationError(
                 "Cannot estimate tokens: no 'messages', 'prompt', or 'input' in arguments",
-                provider="openai"
+                provider="openai",
             )
 
         # Estimate output tokens (use max_tokens if specified, else estimate 50% of input)
@@ -202,8 +189,8 @@ class OpenAICostEstimator(CostEstimator):
         self,
         request: InvocationRequest,
         result: InvocationResult,
-        resource_metadata: Dict[str, Any]
-    ) -> Optional[CostEstimate]:
+        resource_metadata: dict[str, Any],
+    ) -> CostEstimate | None:
         """
         Extract actual cost from OpenAI API response.
 
@@ -266,4 +253,4 @@ class OpenAICostEstimator(CostEstimator):
         )
 
 
-__all__ = ["OpenAICostEstimator", "OPENAI_PRICING"]
+__all__ = ["OPENAI_PRICING", "OpenAICostEstimator"]

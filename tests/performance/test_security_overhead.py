@@ -11,16 +11,15 @@ Measures overhead from each security feature:
 Load test: 1000 req/s sustained
 """
 
-import pytest
-import time
-import asyncio
-import statistics
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
+import statistics
+import time
 
+import pytest
+from src.sark.security.behavioral_analyzer import BehavioralAnalyzer, BehavioralAuditEvent
 from src.sark.security.injection_detector import PromptInjectionDetector
 from src.sark.security.secret_scanner import SecretScanner
-from src.sark.security.behavioral_analyzer import BehavioralAnalyzer, BehavioralAuditEvent
-from datetime import datetime
 
 
 @pytest.mark.performance
@@ -44,7 +43,7 @@ class TestSecurityOverhead:
         p95 = statistics.quantiles(latencies, n=20)[18]  # 95th percentile
         p99 = statistics.quantiles(latencies, n=100)[98]  # 99th percentile
 
-        print(f"\nInjection Detection Latency:")
+        print("\nInjection Detection Latency:")
         print(f"  p50: {p50:.2f}ms")
         print(f"  p95: {p95:.2f}ms")
         print(f"  p99: {p99:.2f}ms")
@@ -59,10 +58,7 @@ class TestSecurityOverhead:
         # Complex nested structure
         params = {
             f"level1_{i}": {
-                f"level2_{j}": {
-                    f"level3_{k}": f"value_{i}_{j}_{k}"
-                    for k in range(5)
-                }
+                f"level2_{j}": {f"level3_{k}": f"value_{i}_{j}_{k}" for k in range(5)}
                 for j in range(5)
             }
             for i in range(5)
@@ -90,10 +86,13 @@ class TestSecurityOverhead:
         data = {
             "status": "success",
             "data": {
-                "users": [{"id": i, "name": f"User {i}", "email": f"user{i}@example.com"} for i in range(10)],
+                "users": [
+                    {"id": i, "name": f"User {i}", "email": f"user{i}@example.com"}
+                    for i in range(10)
+                ],
                 "total": 10,
-                "page": 1
-            }
+                "page": 1,
+            },
         }
 
         latencies = []
@@ -107,7 +106,7 @@ class TestSecurityOverhead:
         p95 = statistics.quantiles(latencies, n=20)[18]
         p99 = statistics.quantiles(latencies, n=100)[98]
 
-        print(f"\nSecret Scanning Latency:")
+        print("\nSecret Scanning Latency:")
         print(f"  p50: {p50:.2f}ms")
         print(f"  p95: {p95:.2f}ms")
         print(f"  p99: {p99:.2f}ms")
@@ -124,7 +123,7 @@ class TestSecurityOverhead:
                 {
                     "id": i,
                     "data": "x" * 100,  # 100 chars per record
-                    "metadata": {"field1": "value1", "field2": "value2"}
+                    "metadata": {"field1": "value1", "field2": "value2"},
                 }
                 for i in range(100)  # 100 records
             ]
@@ -156,7 +155,7 @@ class TestSecurityOverhead:
                 timestamp=datetime(2025, 1, 15 + i, 10, 0),
                 tool_name="analytics",
                 sensitivity="medium",
-                result_size=100
+                result_size=100,
             )
             for i in range(30)
         ]
@@ -169,7 +168,7 @@ class TestSecurityOverhead:
             timestamp=datetime.now(),
             tool_name="analytics",
             sensitivity="medium",
-            result_size=120
+            result_size=120,
         )
 
         latencies = []
@@ -182,7 +181,7 @@ class TestSecurityOverhead:
         p50 = statistics.median(latencies)
         p95 = statistics.quantiles(latencies, n=20)[18]
 
-        print(f"\nAnomaly Detection Latency:")
+        print("\nAnomaly Detection Latency:")
         print(f"  p50: {p50:.2f}ms")
         print(f"  p95: {p95:.2f}ms")
 
@@ -197,10 +196,7 @@ class TestSecurityOverhead:
         secret_scanner = SecretScanner()
 
         params = {"query": "get analytics data", "timeframe": "30d"}
-        response = {
-            "status": "success",
-            "data": {"count": 1500, "average": 75.5}
-        }
+        response = {"status": "success", "data": {"count": 1500, "average": 75.5}}
 
         latencies = []
 
@@ -221,7 +217,7 @@ class TestSecurityOverhead:
         p95 = statistics.quantiles(latencies, n=20)[18]
         p99 = statistics.quantiles(latencies, n=100)[98]
 
-        print(f"\nCombined Security Overhead:")
+        print("\nCombined Security Overhead:")
         print(f"  p50: {p50:.2f}ms")
         print(f"  p95: {p95:.2f}ms")
         print(f"  p99: {p99:.2f}ms")
@@ -260,12 +256,14 @@ class TestSecurityOverhead:
         elapsed = time.time() - start
         actual_rps = total_requests / elapsed
 
-        print(f"\nThroughput Test:")
+        print("\nThroughput Test:")
         print(f"  Target: {target_rps} req/s")
         print(f"  Actual: {actual_rps:.0f} req/s")
         print(f"  Duration: {elapsed:.2f}s")
 
-        assert actual_rps >= target_rps * 0.9, f"Throughput {actual_rps:.0f} < 90% of target {target_rps}"
+        assert (
+            actual_rps >= target_rps * 0.9
+        ), f"Throughput {actual_rps:.0f} < 90% of target {target_rps}"
 
     # Memory Profiling
     def test_memory_usage(self):
@@ -292,11 +290,11 @@ class TestSecurityOverhead:
         snapshot2 = tracemalloc.take_snapshot()
 
         # Calculate memory diff
-        top_stats = snapshot2.compare_to(snapshot1, 'lineno')
+        top_stats = snapshot2.compare_to(snapshot1, "lineno")
 
         total_diff_kb = sum(stat.size_diff for stat in top_stats) / 1024
 
-        print(f"\nMemory Usage After 10K Requests:")
+        print("\nMemory Usage After 10K Requests:")
         print(f"  Diff: {total_diff_kb:.2f} KB")
 
         tracemalloc.stop()

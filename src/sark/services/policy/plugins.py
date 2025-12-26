@@ -5,14 +5,15 @@ Allows custom policy logic to be implemented in Python instead of (or in additio
 Plugins run in a controlled environment with resource limits and security constraints.
 """
 
-import asyncio
-import inspect
-import importlib.util
 from abc import ABC, abstractmethod
+import asyncio
 from dataclasses import dataclass
-from datetime import datetime, UTC
+from datetime import UTC, datetime
+import importlib.util
+import inspect
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
+
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -25,12 +26,13 @@ class PolicyContext:
 
     Contains all information needed to make authorization decisions.
     """
+
     principal_id: str
     resource_id: str
     capability_id: str
     action: str
-    arguments: Dict[str, Any]
-    environment: Dict[str, Any]
+    arguments: dict[str, Any]
+    environment: dict[str, Any]
     timestamp: datetime = None
 
     def __post_init__(self):
@@ -49,9 +51,10 @@ class PolicyDecision:
         metadata: Additional metadata (e.g., conditions, obligations)
         plugin_name: Name of plugin that made the decision
     """
+
     allowed: bool
     reason: str
-    metadata: Dict[str, Any] = None
+    metadata: dict[str, Any] = None
     plugin_name: str = None
 
     def __post_init__(self):
@@ -141,7 +144,7 @@ class PolicyPlugin(ABC):
         """
         pass
 
-    def get_metadata(self) -> Dict[str, Any]:
+    def get_metadata(self) -> dict[str, Any]:
         """
         Get plugin metadata.
 
@@ -167,14 +170,10 @@ class PolicyPluginManager:
 
     def __init__(self):
         """Initialize plugin manager."""
-        self._plugins: Dict[str, PolicyPlugin] = {}
-        self._enabled_plugins: Set[str] = set()
+        self._plugins: dict[str, PolicyPlugin] = {}
+        self._enabled_plugins: set[str] = set()
 
-    async def register_plugin(
-        self,
-        plugin: PolicyPlugin,
-        enabled: bool = True
-    ) -> None:
+    async def register_plugin(self, plugin: PolicyPlugin, enabled: bool = True) -> None:
         """
         Register a policy plugin.
 
@@ -200,14 +199,10 @@ class PolicyPluginManager:
                 "policy_plugin_registered",
                 plugin_name=plugin.name,
                 version=plugin.version,
-                enabled=enabled
+                enabled=enabled,
             )
         except Exception as e:
-            logger.error(
-                "policy_plugin_load_failed",
-                plugin_name=plugin.name,
-                error=str(e)
-            )
+            logger.error("policy_plugin_load_failed", plugin_name=plugin.name, error=str(e))
             # Remove from enabled set if load failed
             self._enabled_plugins.discard(plugin.name)
             raise
@@ -227,20 +222,13 @@ class PolicyPluginManager:
         try:
             await plugin.on_unload()
         except Exception as e:
-            logger.error(
-                "policy_plugin_unload_failed",
-                plugin_name=plugin_name,
-                error=str(e)
-            )
+            logger.error("policy_plugin_unload_failed", plugin_name=plugin_name, error=str(e))
 
         # Remove from registry
         del self._plugins[plugin_name]
         self._enabled_plugins.discard(plugin_name)
 
-        logger.info(
-            "policy_plugin_unregistered",
-            plugin_name=plugin_name
-        )
+        logger.info("policy_plugin_unregistered", plugin_name=plugin_name)
 
     def enable_plugin(self, plugin_name: str) -> None:
         """
@@ -268,7 +256,7 @@ class PolicyPluginManager:
         self._enabled_plugins.discard(plugin_name)
         logger.info("policy_plugin_disabled", plugin_name=plugin_name)
 
-    def get_plugin(self, plugin_name: str) -> Optional[PolicyPlugin]:
+    def get_plugin(self, plugin_name: str) -> PolicyPlugin | None:
         """
         Get a registered plugin.
 
@@ -280,7 +268,7 @@ class PolicyPluginManager:
         """
         return self._plugins.get(plugin_name)
 
-    def list_plugins(self, enabled_only: bool = False) -> List[Dict[str, Any]]:
+    def list_plugins(self, enabled_only: bool = False) -> list[dict[str, Any]]:
         """
         List registered plugins.
 
@@ -302,10 +290,8 @@ class PolicyPluginManager:
         return sorted(plugins, key=lambda p: p["priority"])
 
     async def evaluate_all(
-        self,
-        context: PolicyContext,
-        timeout: float = 5.0
-    ) -> List[PolicyDecision]:
+        self, context: PolicyContext, timeout: float = 5.0
+    ) -> list[PolicyDecision]:
         """
         Evaluate all enabled plugins for a context.
 
@@ -320,9 +306,7 @@ class PolicyPluginManager:
         """
         # Get enabled plugins sorted by priority
         enabled_plugins = [
-            self._plugins[name]
-            for name in self._enabled_plugins
-            if name in self._plugins
+            self._plugins[name] for name in self._enabled_plugins if name in self._plugins
         ]
         enabled_plugins.sort(key=lambda p: p.priority)
 
@@ -331,10 +315,7 @@ class PolicyPluginManager:
         for plugin in enabled_plugins:
             try:
                 # Evaluate with timeout
-                decision = await asyncio.wait_for(
-                    plugin.evaluate(context),
-                    timeout=timeout
-                )
+                decision = await asyncio.wait_for(plugin.evaluate(context), timeout=timeout)
                 decision.plugin_name = plugin.name
                 decisions.append(decision)
 
@@ -342,7 +323,7 @@ class PolicyPluginManager:
                     "policy_plugin_evaluated",
                     plugin_name=plugin.name,
                     allowed=decision.allowed,
-                    reason=decision.reason
+                    reason=decision.reason,
                 )
 
                 # Early termination if any plugin denies
@@ -352,45 +333,39 @@ class PolicyPluginManager:
                         plugin_name=plugin.name,
                         reason=decision.reason,
                         principal_id=context.principal_id,
-                        capability_id=context.capability_id
+                        capability_id=context.capability_id,
                     )
                     break
 
-            except asyncio.TimeoutError:
-                logger.error(
-                    "policy_plugin_timeout",
-                    plugin_name=plugin.name,
-                    timeout=timeout
+            except TimeoutError:
+                logger.error("policy_plugin_timeout", plugin_name=plugin.name, timeout=timeout)
+                decisions.append(
+                    PolicyDecision(
+                        allowed=False,
+                        reason=f"Plugin '{plugin.name}' evaluation timed out",
+                        plugin_name=plugin.name,
+                        metadata={"timeout": True},
+                    )
                 )
-                decisions.append(PolicyDecision(
-                    allowed=False,
-                    reason=f"Plugin '{plugin.name}' evaluation timed out",
-                    plugin_name=plugin.name,
-                    metadata={"timeout": True}
-                ))
                 break
 
             except Exception as e:
                 logger.error(
-                    "policy_plugin_evaluation_error",
-                    plugin_name=plugin.name,
-                    error=str(e)
+                    "policy_plugin_evaluation_error", plugin_name=plugin.name, error=str(e)
                 )
-                decisions.append(PolicyDecision(
-                    allowed=False,
-                    reason=f"Plugin '{plugin.name}' evaluation failed: {str(e)}",
-                    plugin_name=plugin.name,
-                    metadata={"error": str(e)}
-                ))
+                decisions.append(
+                    PolicyDecision(
+                        allowed=False,
+                        reason=f"Plugin '{plugin.name}' evaluation failed: {e!s}",
+                        plugin_name=plugin.name,
+                        metadata={"error": str(e)},
+                    )
+                )
                 break
 
         return decisions
 
-    async def load_from_file(
-        self,
-        file_path: Path,
-        enabled: bool = True
-    ) -> None:
+    async def load_from_file(self, file_path: Path, enabled: bool = True) -> None:
         """
         Load a plugin from a Python file.
 
@@ -405,8 +380,7 @@ class PolicyPluginManager:
         """
         # Load module from file
         spec = importlib.util.spec_from_file_location(
-            f"sark.policy.plugin.{file_path.stem}",
-            file_path
+            f"sark.policy.plugin.{file_path.stem}", file_path
         )
         if not spec or not spec.loader:
             raise ValueError(f"Cannot load module from {file_path}")
@@ -417,9 +391,11 @@ class PolicyPluginManager:
         # Find PolicyPlugin subclass
         plugin_class = None
         for name, obj in inspect.getmembers(module, inspect.isclass):
-            if (issubclass(obj, PolicyPlugin) and
-                obj is not PolicyPlugin and
-                obj.__module__ == module.__name__):
+            if (
+                issubclass(obj, PolicyPlugin)
+                and obj is not PolicyPlugin
+                and obj.__module__ == module.__name__
+            ):
                 plugin_class = obj
                 break
 
@@ -434,7 +410,7 @@ class PolicyPluginManager:
             "policy_plugin_loaded_from_file",
             file_path=str(file_path),
             plugin_name=plugin.name,
-            plugin_class=plugin_class.__name__
+            plugin_class=plugin_class.__name__,
         )
 
 
@@ -448,9 +424,9 @@ class PolicyEvaluationError(Exception):
 
 
 __all__ = [
-    "PolicyPlugin",
     "PolicyContext",
     "PolicyDecision",
-    "PolicyPluginManager",
     "PolicyEvaluationError",
+    "PolicyPlugin",
+    "PolicyPluginManager",
 ]

@@ -10,11 +10,11 @@ Version: 2.0.0
 Engineer: ENGINEER-3
 """
 
-from typing import Any, Callable, Dict, Optional
+from collections.abc import Callable
+from typing import Any
 
 import grpc
 from grpc import aio
-
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -139,7 +139,7 @@ class MetadataInjectorInterceptor(aio.UnaryUnaryClientInterceptor):
         >>> channel = grpc.intercept_channel(channel, interceptor)
     """
 
-    def __init__(self, metadata: Dict[str, str]):
+    def __init__(self, metadata: dict[str, str]):
         """
         Initialize metadata injector.
 
@@ -209,9 +209,7 @@ class AuthenticationHelper:
         Returns:
             Configured TokenAuthInterceptor
         """
-        return TokenAuthInterceptor(
-            token=token, scheme="bearer", header_name="authorization"
-        )
+        return TokenAuthInterceptor(token=token, scheme="bearer", header_name="authorization")
 
     @staticmethod
     def create_api_key_interceptor(
@@ -227,9 +225,7 @@ class AuthenticationHelper:
         Returns:
             Configured TokenAuthInterceptor
         """
-        return TokenAuthInterceptor(
-            token=api_key, scheme="apikey", header_name=header_name
-        )
+        return TokenAuthInterceptor(token=api_key, scheme="apikey", header_name=header_name)
 
     @staticmethod
     def create_custom_header_interceptor(
@@ -245,14 +241,10 @@ class AuthenticationHelper:
         Returns:
             Configured TokenAuthInterceptor
         """
-        return TokenAuthInterceptor(
-            token=header_value, scheme="custom", header_name=header_name
-        )
+        return TokenAuthInterceptor(token=header_value, scheme="custom", header_name=header_name)
 
     @staticmethod
-    def apply_interceptors(
-        channel: aio.Channel, interceptors: list
-    ) -> aio.Channel:
+    def apply_interceptors(channel: aio.Channel, interceptors: list) -> aio.Channel:
         """
         Apply multiple interceptors to a channel.
 
@@ -266,9 +258,7 @@ class AuthenticationHelper:
         intercepted_channel = channel
 
         for interceptor in interceptors:
-            intercepted_channel = grpc.intercept_channel(
-                intercepted_channel, interceptor
-            )
+            intercepted_channel = grpc.intercept_channel(intercepted_channel, interceptor)
 
         logger.info("interceptors_applied", count=len(interceptors))
 
@@ -277,10 +267,10 @@ class AuthenticationHelper:
 
 def create_authenticated_channel(
     endpoint: str,
-    auth_config: Dict[str, Any],
+    auth_config: dict[str, Any],
     use_tls: bool = False,
-    tls_credentials: Optional[grpc.ChannelCredentials] = None,
-    channel_options: Optional[list] = None,
+    tls_credentials: grpc.ChannelCredentials | None = None,
+    channel_options: list | None = None,
 ) -> aio.Channel:
     """
     Create an authenticated gRPC channel.
@@ -309,9 +299,7 @@ def create_authenticated_channel(
     # Create base channel
     if use_tls:
         if tls_credentials:
-            channel = aio.secure_channel(
-                endpoint, tls_credentials, options=channel_options
-            )
+            channel = aio.secure_channel(endpoint, tls_credentials, options=channel_options)
         else:
             channel = aio.secure_channel(
                 endpoint,
@@ -341,9 +329,7 @@ def create_authenticated_channel(
         api_key = auth_config.get("token")
         header_name = auth_config.get("header_name", "x-api-key")
         if api_key:
-            interceptor = AuthenticationHelper.create_api_key_interceptor(
-                api_key, header_name
-            )
+            interceptor = AuthenticationHelper.create_api_key_interceptor(api_key, header_name)
             interceptors.append(interceptor)
 
     elif auth_type == "custom":
@@ -380,8 +366,8 @@ def create_authenticated_channel(
 
 
 __all__ = [
-    "TokenAuthInterceptor",
-    "MetadataInjectorInterceptor",
     "AuthenticationHelper",
+    "MetadataInjectorInterceptor",
+    "TokenAuthInterceptor",
     "create_authenticated_channel",
 ]

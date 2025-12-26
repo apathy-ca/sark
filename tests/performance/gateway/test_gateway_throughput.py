@@ -1,8 +1,9 @@
 """Gateway Throughput Testing."""
 
-import pytest
 import asyncio
 import time
+
+import pytest
 
 pytestmark = pytest.mark.performance
 
@@ -69,9 +70,7 @@ async def _test_concurrent_connections(app_client, token, concurrent):
     responses = await asyncio.gather(*tasks, return_exceptions=True)
     duration = time.perf_counter() - start
 
-    successful = sum(
-        1 for r in responses if not isinstance(r, Exception) and r.status_code == 200
-    )
+    successful = sum(1 for r in responses if not isinstance(r, Exception) and r.status_code == 200)
 
     print(f"\nConcurrent: {concurrent}")
     print(f"Successful: {successful}")

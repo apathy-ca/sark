@@ -11,10 +11,9 @@ communication with MCP Gateway servers, including:
 """
 
 import asyncio
-import time
 from collections.abc import AsyncGenerator
-from typing import Any
 from enum import Enum
+from typing import Any
 
 import httpx
 import structlog
@@ -396,9 +395,7 @@ class GatewaySSEClient:
                         endpoint=endpoint,
                         max_retries=self.reconnect_max_retries,
                     )
-                    raise RuntimeError(
-                        f"SSE max retries exceeded: {self.reconnect_max_retries}"
-                    )
+                    raise RuntimeError(f"SSE max retries exceeded: {self.reconnect_max_retries}")
 
                 # Exponential backoff
                 await asyncio.sleep(backoff_delay)

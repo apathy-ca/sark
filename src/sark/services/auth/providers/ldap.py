@@ -4,8 +4,8 @@ import asyncio
 from typing import Any
 from uuid import UUID, uuid5
 
-from ldap3 import Server, Connection, ALL, NTLM, SIMPLE
-from ldap3.core.exceptions import LDAPException, LDAPBindError
+from ldap3 import ALL, SIMPLE, Connection, Server
+from ldap3.core.exceptions import LDAPBindError, LDAPException
 from pydantic import Field
 
 from sark.services.auth.providers.base import (
@@ -201,7 +201,7 @@ class LDAPProvider(AuthProvider):
                 for attr in self.config.attributes:
                     if hasattr(entry, attr):
                         attr_value = getattr(entry, attr)
-                        if hasattr(attr_value, 'value'):
+                        if hasattr(attr_value, "value"):
                             user_attrs[attr] = attr_value.value
                         else:
                             user_attrs[attr] = str(attr_value)

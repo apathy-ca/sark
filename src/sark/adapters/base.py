@@ -9,19 +9,19 @@ Status: Frozen for Week 1 (foundation phase)
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, AsyncIterator, Dict, List, Optional
+from collections.abc import AsyncIterator
+from typing import Any
+
 import structlog
 
+from sark.adapters.exceptions import (
+    UnsupportedOperationError,
+)
 from sark.models.base import (
-    ResourceSchema,
     CapabilitySchema,
     InvocationRequest,
     InvocationResult,
-)
-from sark.adapters.exceptions import (
-    ValidationError,
-    InvocationError,
-    UnsupportedOperationError,
+    ResourceSchema,
 )
 
 logger = structlog.get_logger(__name__)
@@ -30,41 +30,38 @@ logger = structlog.get_logger(__name__)
 class ProtocolAdapter(ABC):
     """
     Abstract base class for all protocol adapters.
-    
+
     Each adapter translates protocol-specific concepts into GRID's
     universal abstractions (Resource, Capability, Action).
-    
+
     This is the v2.0 interface. In v1.x, this serves as a specification
     for future implementation.
     """
-    
+
     @property
     @abstractmethod
     def protocol_name(self) -> str:
         """
         Return the protocol identifier (e.g., 'mcp', 'http', 'grpc').
-        
+
         Returns:
             str: Protocol name in lowercase
         """
         pass
-    
+
     @property
     @abstractmethod
     def protocol_version(self) -> str:
         """
         Return the protocol version this adapter supports.
-        
+
         Returns:
             str: Protocol version string
         """
         pass
-    
+
     @abstractmethod
-    async def discover_resources(
-        self,
-        discovery_config: Dict[str, Any]
-    ) -> List[ResourceSchema]:
+    async def discover_resources(self, discovery_config: dict[str, Any]) -> list[ResourceSchema]:
         """
         Discover available resources for this protocol.
 
@@ -123,12 +120,9 @@ class ProtocolAdapter(ABC):
             ```
         """
         pass
-    
+
     @abstractmethod
-    async def get_capabilities(
-        self,
-        resource: ResourceSchema
-    ) -> List[CapabilitySchema]:
+    async def get_capabilities(self, resource: ResourceSchema) -> list[CapabilitySchema]:
         """
         Get all capabilities for a resource.
 
@@ -166,31 +160,25 @@ class ProtocolAdapter(ABC):
             ```
         """
         pass
-    
+
     @abstractmethod
-    async def validate_request(
-        self,
-        request: InvocationRequest
-    ) -> bool:
+    async def validate_request(self, request: InvocationRequest) -> bool:
         """
         Validate an invocation request before execution.
-        
+
         Args:
             request: The invocation request to validate
-            
+
         Returns:
             True if valid, False otherwise
-            
+
         Raises:
             ValidationError: If request is invalid with details
         """
         pass
-    
+
     @abstractmethod
-    async def invoke(
-        self,
-        request: InvocationRequest
-    ) -> InvocationResult:
+    async def invoke(self, request: InvocationRequest) -> InvocationResult:
         """
         Invoke a capability on a resource.
 
@@ -240,29 +228,23 @@ class ProtocolAdapter(ABC):
             ```
         """
         pass
-    
+
     @abstractmethod
-    async def health_check(
-        self,
-        resource: ResourceSchema
-    ) -> bool:
+    async def health_check(self, resource: ResourceSchema) -> bool:
         """
         Check if a resource is healthy and reachable.
-        
+
         Args:
             resource: The resource to check
-            
+
         Returns:
             True if healthy and reachable, False otherwise
         """
         pass
-    
+
     # Optional lifecycle hooks with default implementations
-    
-    async def on_resource_registered(
-        self,
-        resource: ResourceSchema
-    ) -> None:
+
+    async def on_resource_registered(self, resource: ResourceSchema) -> None:
         """
         Lifecycle hook called when a resource is registered with SARK.
 
@@ -295,10 +277,7 @@ class ProtocolAdapter(ABC):
         """
         pass
 
-    async def on_resource_unregistered(
-        self,
-        resource: ResourceSchema
-    ) -> None:
+    async def on_resource_unregistered(self, resource: ResourceSchema) -> None:
         """
         Lifecycle hook called when a resource is unregistered from SARK.
 
@@ -333,10 +312,7 @@ class ProtocolAdapter(ABC):
 
     # Enhanced methods for v2.0
 
-    async def invoke_streaming(
-        self,
-        request: InvocationRequest
-    ) -> AsyncIterator[Any]:
+    async def invoke_streaming(self, request: InvocationRequest) -> AsyncIterator[Any]:
         """
         Invoke a capability with streaming response support.
 
@@ -386,15 +362,12 @@ class ProtocolAdapter(ABC):
         raise UnsupportedOperationError(
             f"Streaming is not supported by {self.protocol_name} adapter",
             operation="invoke_streaming",
-            adapter_name=self.protocol_name
+            adapter_name=self.protocol_name,
         )
         # Make this unreachable code to satisfy the async generator requirement
         yield  # pragma: no cover
 
-    async def invoke_batch(
-        self,
-        requests: List[InvocationRequest]
-    ) -> List[InvocationResult]:
+    async def invoke_batch(self, requests: list[InvocationRequest]) -> list[InvocationResult]:
         """
         Invoke multiple capabilities in a batch operation.
 
@@ -446,18 +419,17 @@ class ProtocolAdapter(ABC):
                 results.append(result)
             except Exception as e:
                 # If one fails, still try the rest
-                results.append(InvocationResult(
-                    success=False,
-                    error=str(e),
-                    metadata={"batch_index": len(results)},
-                    duration_ms=0.0
-                ))
+                results.append(
+                    InvocationResult(
+                        success=False,
+                        error=str(e),
+                        metadata={"batch_index": len(results)},
+                        duration_ms=0.0,
+                    )
+                )
         return results
 
-    async def refresh_capabilities(
-        self,
-        resource: ResourceSchema
-    ) -> List[CapabilitySchema]:
+    async def refresh_capabilities(self, resource: ResourceSchema) -> list[CapabilitySchema]:
         """
         Refresh the capabilities list for a resource.
 
@@ -481,10 +453,8 @@ class ProtocolAdapter(ABC):
         return await self.get_capabilities(resource)
 
     async def authenticate(
-        self,
-        resource: ResourceSchema,
-        credentials: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, resource: ResourceSchema, credentials: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Authenticate to a resource using provided credentials.
 
@@ -522,7 +492,7 @@ class ProtocolAdapter(ABC):
         raise UnsupportedOperationError(
             f"Authentication is handled externally for {self.protocol_name} adapter",
             operation="authenticate",
-            adapter_name=self.protocol_name
+            adapter_name=self.protocol_name,
         )
 
     def supports_streaming(self) -> bool:
@@ -533,10 +503,7 @@ class ProtocolAdapter(ABC):
             True if invoke_streaming() is implemented, False otherwise
         """
         # Check if invoke_streaming was overridden from the base implementation
-        return (
-            self.__class__.invoke_streaming
-            != ProtocolAdapter.invoke_streaming
-        )
+        return self.__class__.invoke_streaming != ProtocolAdapter.invoke_streaming
 
     def supports_batch(self) -> bool:
         """
@@ -546,12 +513,9 @@ class ProtocolAdapter(ABC):
             True if invoke_batch() is optimized, False if it uses default sequential impl
         """
         # Check if invoke_batch was overridden from the base implementation
-        return (
-            self.__class__.invoke_batch
-            != ProtocolAdapter.invoke_batch
-        )
+        return self.__class__.invoke_batch != ProtocolAdapter.invoke_batch
 
-    def get_adapter_info(self) -> Dict[str, Any]:
+    def get_adapter_info(self) -> dict[str, Any]:
         """
         Get adapter metadata and capabilities.
 
@@ -595,7 +559,7 @@ class ProtocolAdapter(ABC):
 
         return info
 
-    def get_adapter_metadata(self) -> Dict[str, Any]:
+    def get_adapter_metadata(self) -> dict[str, Any]:
         """
         Get adapter-specific metadata beyond the standard interface.
 

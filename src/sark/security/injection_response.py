@@ -6,15 +6,14 @@ Handles responses to detected prompt injection attempts:
 - Log: All detections logged to audit
 """
 
-import os
-import structlog
-from typing import Any
-from enum import Enum
 from dataclasses import dataclass
+from enum import Enum
+from typing import Any
 from uuid import UUID
 
-from src.sark.security.injection_detector import InjectionDetectionResult, Severity
 from src.sark.models.audit import AuditEventType, SeverityLevel
+from src.sark.security.injection_detector import InjectionDetectionResult
+import structlog
 
 logger = structlog.get_logger()
 
@@ -59,11 +58,16 @@ class InjectionResponseHandler:
         # Load config if not provided
         if config is None:
             from sark.security.config import get_injection_config
+
             config = get_injection_config()
 
         # Use explicit parameters if provided, otherwise use config
-        self.block_threshold = block_threshold if block_threshold is not None else config.block_threshold
-        self.alert_threshold = alert_threshold if alert_threshold is not None else config.alert_threshold
+        self.block_threshold = (
+            block_threshold if block_threshold is not None else config.block_threshold
+        )
+        self.alert_threshold = (
+            alert_threshold if alert_threshold is not None else config.alert_threshold
+        )
         self.config = config
 
         logger.info(
@@ -336,4 +340,5 @@ def is_injection_detection_enabled() -> bool:
         True if enabled, False otherwise
     """
     from sark.security.config import get_injection_config
+
     return get_injection_config().enabled

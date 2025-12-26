@@ -7,7 +7,18 @@ import structlog
 
 from sark.api.middleware import AuthMiddleware
 from sark.api.middleware.security_headers import add_security_middleware
-from sark.api.routers import auth, bulk, export, gateway, health, metrics, policy, servers, tools, websocket
+from sark.api.routers import (
+    auth,
+    bulk,
+    export,
+    gateway,
+    health,
+    metrics,
+    policy,
+    servers,
+    tools,
+    websocket,
+)
 from sark.config import get_settings
 from sark.db import init_db
 

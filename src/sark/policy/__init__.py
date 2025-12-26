@@ -5,8 +5,8 @@ injection attacks and ensure policy quality.
 """
 
 from sark.policy.loader import (
-    PolicyLoadError,
     PolicyLoader,
+    PolicyLoadError,
     load_and_validate_policy,
     validate_policy_file,
 )

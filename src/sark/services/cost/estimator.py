@@ -8,9 +8,9 @@ across different AI/API providers.
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from datetime import datetime, UTC
 from decimal import Decimal
-from typing import Any, Dict, Optional
+from typing import Any
+
 import structlog
 
 from sark.models.base import InvocationRequest, InvocationResult
@@ -31,12 +31,13 @@ class CostEstimate:
         breakdown: Detailed cost breakdown (e.g., input tokens, output tokens)
         metadata: Additional provider-specific metadata
     """
+
     estimated_cost: Decimal
     currency: str = "USD"
-    provider: Optional[str] = None
-    model: Optional[str] = None
-    breakdown: Dict[str, Any] = None
-    metadata: Dict[str, Any] = None
+    provider: str | None = None
+    model: str | None = None
+    breakdown: dict[str, Any] = None
+    metadata: dict[str, Any] = None
 
     def __post_init__(self):
         if self.breakdown is None:
@@ -66,9 +67,7 @@ class CostEstimator(ABC):
 
     @abstractmethod
     async def estimate_cost(
-        self,
-        request: InvocationRequest,
-        resource_metadata: Dict[str, Any]
+        self, request: InvocationRequest, resource_metadata: dict[str, Any]
     ) -> CostEstimate:
         """
         Estimate the cost of an invocation request.
@@ -89,8 +88,8 @@ class CostEstimator(ABC):
         self,
         request: InvocationRequest,
         result: InvocationResult,
-        resource_metadata: Dict[str, Any]
-    ) -> Optional[CostEstimate]:
+        resource_metadata: dict[str, Any],
+    ) -> CostEstimate | None:
         """
         Record actual cost from invocation result.
 
@@ -118,12 +117,9 @@ class CostEstimator(ABC):
         Returns:
             True if record_actual_cost is implemented, False otherwise
         """
-        return (
-            self.__class__.record_actual_cost
-            != CostEstimator.record_actual_cost
-        )
+        return self.__class__.record_actual_cost != CostEstimator.record_actual_cost
 
-    def get_estimator_info(self) -> Dict[str, Any]:
+    def get_estimator_info(self) -> dict[str, Any]:
         """
         Get estimator metadata and capabilities.
 
@@ -151,9 +147,7 @@ class NoCostEstimator(CostEstimator):
         return "free"
 
     async def estimate_cost(
-        self,
-        request: InvocationRequest,
-        resource_metadata: Dict[str, Any]
+        self, request: InvocationRequest, resource_metadata: dict[str, Any]
     ) -> CostEstimate:
         """Return zero cost estimate."""
         return CostEstimate(
@@ -187,9 +181,7 @@ class FixedCostEstimator(CostEstimator):
         return self._provider
 
     async def estimate_cost(
-        self,
-        request: InvocationRequest,
-        resource_metadata: Dict[str, Any]
+        self, request: InvocationRequest, resource_metadata: dict[str, Any]
     ) -> CostEstimate:
         """Return fixed cost estimate."""
         return CostEstimate(
@@ -213,9 +205,9 @@ class CostEstimationError(Exception):
 
 
 __all__ = [
-    "CostEstimator",
     "CostEstimate",
-    "NoCostEstimator",
-    "FixedCostEstimator",
     "CostEstimationError",
+    "CostEstimator",
+    "FixedCostEstimator",
+    "NoCostEstimator",
 ]

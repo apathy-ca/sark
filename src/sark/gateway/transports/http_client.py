@@ -15,17 +15,15 @@ import time
 from typing import Any
 from urllib.parse import urlencode
 
+from cachetools import TTLCache
 import httpx
 import structlog
-from cachetools import TTLCache
 
 from sark.models.gateway import (
-    GatewayAuthorizationRequest,
-    GatewayAuthorizationResponse,
     GatewayServerInfo,
     GatewayToolInfo,
 )
-from sark.services.policy.opa_client import AuthorizationInput, OPAClient
+from sark.services.policy.opa_client import OPAClient
 
 logger = structlog.get_logger()
 
@@ -576,9 +574,7 @@ class GatewayHTTPClient:
                         tool_name=tool_name,
                         reason=auth_decision.reason,
                     )
-                    raise PermissionError(
-                        f"Tool invocation denied: {auth_decision.reason}"
-                    )
+                    raise PermissionError(f"Tool invocation denied: {auth_decision.reason}")
 
                 # Use filtered parameters if provided by OPA
                 if auth_decision.filtered_parameters:
@@ -681,9 +677,7 @@ class GatewayHTTPClient:
             0.87  # 87% hit rate
         """
         total_requests = self._cache_hits + self._cache_misses
-        hit_rate = (
-            self._cache_hits / total_requests if total_requests > 0 else 0.0
-        )
+        hit_rate = self._cache_hits / total_requests if total_requests > 0 else 0.0
 
         return {
             "cache_enabled": self.cache_enabled,

@@ -6,13 +6,14 @@ Detects malicious attempts to manipulate AI tool parameters through:
 - Risk scoring system (0-100)
 """
 
-import re
-import math
-import structlog
-from typing import Any
-from enum import Enum
 from dataclasses import dataclass, field
+from enum import Enum
 from functools import lru_cache
+import math
+import re
+from typing import Any
+
+import structlog
 
 logger = structlog.get_logger()
 
@@ -69,6 +70,7 @@ class PromptInjectionDetector:
         """
         if config is None:
             from sark.security.config import get_injection_config
+
             config = get_injection_config()
 
         self.config = config
@@ -326,7 +328,9 @@ class PromptInjectionDetector:
 
         return patterns
 
-    def detect(self, parameters: dict[str, Any], context: dict[str, Any] | None = None) -> InjectionDetectionResult:
+    def detect(
+        self, parameters: dict[str, Any], context: dict[str, Any] | None = None
+    ) -> InjectionDetectionResult:
         """
         Detect prompt injection attempts in parameters.
 
@@ -349,6 +353,7 @@ class PromptInjectionDetector:
         # Get cached normalizer
         if self._normalizer is None:
             from sark.security.text_normalizer import get_normalizer
+
             self._normalizer = get_normalizer()
 
         # Run pattern detection
@@ -387,15 +392,15 @@ class PromptInjectionDetector:
                     if match_normalized:
                         # Add additional note about obfuscation
                         obf_note = " (detected after normalization - "
-                        if obfuscation_info.get('has_homoglyphs'):
+                        if obfuscation_info.get("has_homoglyphs"):
                             obf_note += "homoglyphs, "
-                        if obfuscation_info.get('has_zero_width'):
+                        if obfuscation_info.get("has_zero_width"):
                             obf_note += "zero-width chars, "
-                        if obfuscation_info.get('has_fullwidth'):
+                        if obfuscation_info.get("has_fullwidth"):
                             obf_note += "fullwidth chars, "
-                        if obfuscation_info.get('has_combining_marks'):
+                        if obfuscation_info.get("has_combining_marks"):
                             obf_note += "combining marks, "
-                        obf_note = obf_note.rstrip(', ') + ")"
+                        obf_note = obf_note.rstrip(", ") + ")"
 
                         finding = InjectionFinding(
                             pattern_name=pattern_name,
@@ -447,9 +452,7 @@ class PromptInjectionDetector:
 
         return result
 
-    def _flatten_dict_generator(
-        self, data: Any, prefix: str = "", depth: int = 0
-    ):
+    def _flatten_dict_generator(self, data: Any, prefix: str = "", depth: int = 0):
         """
         Generator that yields (location, value) pairs from nested data structures.
         More efficient than building intermediate dictionaries.
@@ -463,7 +466,7 @@ class PromptInjectionDetector:
             Tuples of (location, value)
         """
         # Prevent infinite recursion using configured max depth
-        max_depth = getattr(self.config, 'max_parameter_depth', 10)
+        max_depth = getattr(self.config, "max_parameter_depth", 10)
         if depth > max_depth:
             return
 
@@ -497,7 +500,9 @@ class PromptInjectionDetector:
             Flattened dictionary with dot-notation keys
         """
         # Use generator and convert to dict
-        combined_prefix = f"{prefix}.{parent_key}" if prefix and parent_key else (prefix or parent_key)
+        combined_prefix = (
+            f"{prefix}.{parent_key}" if prefix and parent_key else (prefix or parent_key)
+        )
         return dict(self._flatten_dict_generator(d, combined_prefix))
 
     @staticmethod

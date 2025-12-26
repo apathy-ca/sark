@@ -8,25 +8,25 @@ Advanced security features for v1.3.0:
 - MFA for critical actions
 """
 
-from .injection_detector import PromptInjectionDetector, InjectionDetectionResult, InjectionFinding
-from .injection_response import InjectionResponseHandler, InjectionResponse
-from .behavioral_analyzer import BehavioralAnalyzer, Anomaly
 from .anomaly_alerts import AnomalyAlertManager
-from .secret_scanner import SecretScanner, SecretFinding
-from .mfa import MFAChallengeSystem, MFAMethod, MFAChallenge
+from .behavioral_analyzer import Anomaly, BehavioralAnalyzer
+from .injection_detector import InjectionDetectionResult, InjectionFinding, PromptInjectionDetector
+from .injection_response import InjectionResponse, InjectionResponseHandler
+from .mfa import MFAChallenge, MFAChallengeSystem, MFAMethod
+from .secret_scanner import SecretFinding, SecretScanner
 
 __all__ = [
-    "PromptInjectionDetector",
-    "InjectionDetectionResult",
-    "InjectionFinding",
-    "InjectionResponseHandler",
-    "InjectionResponse",
-    "BehavioralAnalyzer",
     "Anomaly",
     "AnomalyAlertManager",
-    "SecretScanner",
-    "SecretFinding",
+    "BehavioralAnalyzer",
+    "InjectionDetectionResult",
+    "InjectionFinding",
+    "InjectionResponse",
+    "InjectionResponseHandler",
+    "MFAChallenge",
     "MFAChallengeSystem",
     "MFAMethod",
-    "MFAChallenge",
+    "PromptInjectionDetector",
+    "SecretFinding",
+    "SecretScanner",
 ]

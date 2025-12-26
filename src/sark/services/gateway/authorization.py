@@ -6,17 +6,18 @@ Handles authorization decisions for Gateway operations including:
 - Server and tool filtering by permissions
 """
 
-import structlog
 from typing import Any
 
+import structlog
+
 from sark.models.gateway import (
+    A2AAuthorizationRequest,
+    AgentContext,
     GatewayAuthorizationRequest,
     GatewayAuthorizationResponse,
-    A2AAuthorizationRequest,
     GatewayServerInfo,
     GatewayToolInfo,
     SensitivityLevel,
-    AgentContext,
 )
 from sark.services.auth import UserContext
 
@@ -107,7 +108,7 @@ async def authorize_gateway_request(
         # Fail closed - deny on error
         return GatewayAuthorizationResponse(
             allow=False,
-            reason=f"Authorization error: {str(e)}",
+            reason=f"Authorization error: {e!s}",
             cache_ttl=0,
         )
 
@@ -199,7 +200,7 @@ async def authorize_a2a_request(
         # Fail closed - deny on error
         return GatewayAuthorizationResponse(
             allow=False,
-            reason=f"A2A authorization error: {str(e)}",
+            reason=f"A2A authorization error: {e!s}",
             cache_ttl=0,
         )
 

@@ -19,17 +19,19 @@ Usage:
     results = runner.run_all()
 """
 
-import time
-import asyncio
-import statistics
 from abc import ABC, abstractmethod
+import asyncio
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import List, Dict, Any, Optional, Callable
-from pathlib import Path
-import yaml
 import json
+from pathlib import Path
+import statistics
+import time
+from typing import Any
 
-from .benchmark_report import BenchmarkReporter, BenchmarkSuite, BenchmarkResult
+import yaml
+
+from .benchmark_report import BenchmarkReporter, BenchmarkResult, BenchmarkSuite
 
 
 class Benchmark(ABC):
@@ -49,10 +51,10 @@ class Benchmark(ABC):
     def __init__(
         self,
         name: str,
-        target_ms: Optional[float] = None,
+        target_ms: float | None = None,
         iterations: int = 1000,
         warmup: int = 100,
-        description: str = ""
+        description: str = "",
     ):
         """
         Args:
@@ -67,7 +69,7 @@ class Benchmark(ABC):
         self.iterations = iterations
         self.warmup = warmup
         self.description = description
-        self._latencies: List[float] = []
+        self._latencies: list[float] = []
 
     def setup(self):
         """Override to set up benchmark (called once before warmup)"""
@@ -82,7 +84,7 @@ class Benchmark(ABC):
         """Override with code to benchmark (called for each iteration)"""
         pass
 
-    def execute(self) -> List[float]:
+    def execute(self) -> list[float]:
         """Execute benchmark and return latencies in milliseconds"""
         self.setup()
 
@@ -108,17 +110,17 @@ class AsyncBenchmark(ABC):
     def __init__(
         self,
         name: str,
-        target_ms: Optional[float] = None,
+        target_ms: float | None = None,
         iterations: int = 1000,
         warmup: int = 100,
-        description: str = ""
+        description: str = "",
     ):
         self.name = name
         self.target_ms = target_ms
         self.iterations = iterations
         self.warmup = warmup
         self.description = description
-        self._latencies: List[float] = []
+        self._latencies: list[float] = []
 
     async def setup(self):
         """Override to set up benchmark"""
@@ -133,7 +135,7 @@ class AsyncBenchmark(ABC):
         """Override with async code to benchmark"""
         pass
 
-    async def execute(self) -> List[float]:
+    async def execute(self) -> list[float]:
         """Execute async benchmark and return latencies"""
         await self.setup()
 
@@ -156,12 +158,13 @@ class AsyncBenchmark(ABC):
 @dataclass
 class BenchmarkScenario:
     """Benchmark scenario loaded from configuration"""
+
     name: str
     target_ms: float
     iterations: int = 1000
     warmup: int = 100
     description: str = ""
-    params: Dict[str, Any] = None
+    params: dict[str, Any] = None
 
     def __post_init__(self):
         if self.params is None:
@@ -180,9 +183,7 @@ class BenchmarkRunner:
     """
 
     def __init__(
-        self,
-        reporter: Optional[BenchmarkReporter] = None,
-        suite_name: str = "Performance Benchmarks"
+        self, reporter: BenchmarkReporter | None = None, suite_name: str = "Performance Benchmarks"
     ):
         """
         Args:
@@ -191,8 +192,8 @@ class BenchmarkRunner:
         """
         self.reporter = reporter or BenchmarkReporter()
         self.suite_name = suite_name
-        self.benchmarks: List[Benchmark] = []
-        self.async_benchmarks: List[AsyncBenchmark] = []
+        self.benchmarks: list[Benchmark] = []
+        self.async_benchmarks: list[AsyncBenchmark] = []
 
     def add_benchmark(self, benchmark: Benchmark):
         """Add a synchronous benchmark"""
@@ -213,6 +214,7 @@ class BenchmarkRunner:
             BenchmarkSuite with all results
         """
         from datetime import datetime
+
         from .benchmark_report import get_git_commit
 
         results = []
@@ -224,15 +226,15 @@ class BenchmarkRunner:
 
             latencies = benchmark.execute()
             result = self.reporter.create_result(
-                name=benchmark.name,
-                latencies_ms=latencies,
-                target_ms=benchmark.target_ms
+                name=benchmark.name, latencies_ms=latencies, target_ms=benchmark.target_ms
             )
             results.append(result)
 
             if verbose:
                 status = "✅ PASS" if result.passed else "❌ FAIL"
-                print(f"  → P95: {result.p95_ms:.2f}ms | Target: {benchmark.target_ms:.1f}ms | {status}")
+                print(
+                    f"  → P95: {result.p95_ms:.2f}ms | Target: {benchmark.target_ms:.1f}ms | {status}"
+                )
 
         # Run async benchmarks
         if self.async_benchmarks:
@@ -247,15 +249,15 @@ class BenchmarkRunner:
 
                     latencies = await benchmark.execute()
                     result = self.reporter.create_result(
-                        name=benchmark.name,
-                        latencies_ms=latencies,
-                        target_ms=benchmark.target_ms
+                        name=benchmark.name, latencies_ms=latencies, target_ms=benchmark.target_ms
                     )
                     async_results.append(result)
 
                     if verbose:
                         status = "✅ PASS" if result.passed else "❌ FAIL"
-                        print(f"  → P95: {result.p95_ms:.2f}ms | Target: {benchmark.target_ms:.1f}ms | {status}")
+                        print(
+                            f"  → P95: {result.p95_ms:.2f}ms | Target: {benchmark.target_ms:.1f}ms | {status}"
+                        )
 
                 return async_results
 
@@ -267,7 +269,7 @@ class BenchmarkRunner:
             suite_name=self.suite_name,
             results=results,
             timestamp=datetime.now().isoformat(),
-            git_commit=get_git_commit()
+            git_commit=get_git_commit(),
         )
 
         return suite
@@ -277,8 +279,8 @@ class BenchmarkRunner:
         suite: BenchmarkSuite,
         console: bool = True,
         html: bool = True,
-        json_output: bool = True
-    ) -> Dict[str, str]:
+        json_output: bool = True,
+    ) -> dict[str, str]:
         """
         Generate reports in multiple formats
 
@@ -295,7 +297,7 @@ class BenchmarkRunner:
 
         # Save to history
         self.reporter.save_suite(suite)
-        paths['json'] = str(self.reporter.output_dir / "latest_benchmark.json")
+        paths["json"] = str(self.reporter.output_dir / "latest_benchmark.json")
 
         # Console report
         if console:
@@ -304,11 +306,11 @@ class BenchmarkRunner:
         # HTML report
         if html:
             html_path = self.reporter.generate_html_report(suite)
-            paths['html'] = html_path
+            paths["html"] = html_path
 
         return paths
 
-    def load_scenarios(self, config_path: str) -> List[BenchmarkScenario]:
+    def load_scenarios(self, config_path: str) -> list[BenchmarkScenario]:
         """
         Load benchmark scenarios from YAML/JSON configuration
 
@@ -320,14 +322,14 @@ class BenchmarkRunner:
         """
         path = Path(config_path)
 
-        with open(path, 'r') as f:
-            if path.suffix in ['.yaml', '.yml']:
+        with open(path) as f:
+            if path.suffix in [".yaml", ".yml"]:
                 data = yaml.safe_load(f)
             else:
                 data = json.load(f)
 
         scenarios = []
-        for scenario_data in data.get('scenarios', []):
+        for scenario_data in data.get("scenarios", []):
             scenarios.append(BenchmarkScenario(**scenario_data))
 
         return scenarios
@@ -352,11 +354,11 @@ class FunctionBenchmark(Benchmark):
         self,
         name: str,
         func: Callable,
-        target_ms: Optional[float] = None,
+        target_ms: float | None = None,
         iterations: int = 1000,
         warmup: int = 100,
-        setup_func: Optional[Callable] = None,
-        teardown_func: Optional[Callable] = None
+        setup_func: Callable | None = None,
+        teardown_func: Callable | None = None,
     ):
         super().__init__(name, target_ms, iterations, warmup)
         self.func = func
@@ -390,13 +392,13 @@ class ComparisonBenchmark:
         self.name = name
         self.iterations = iterations
         self.warmup = warmup
-        self.implementations: List[tuple[str, Callable]] = []
+        self.implementations: list[tuple[str, Callable]] = []
 
     def add_implementation(self, name: str, func: Callable):
         """Add an implementation to compare"""
         self.implementations.append((name, func))
 
-    def run(self, runner: BenchmarkRunner) -> List[BenchmarkResult]:
+    def run(self, runner: BenchmarkRunner) -> list[BenchmarkResult]:
         """Run all implementations and return results"""
         results = []
 
@@ -405,7 +407,7 @@ class ComparisonBenchmark:
                 name=f"{self.name} - {impl_name}",
                 func=func,
                 iterations=self.iterations,
-                warmup=self.warmup
+                warmup=self.warmup,
             )
             runner.add_benchmark(benchmark)
 
@@ -414,12 +416,13 @@ class ComparisonBenchmark:
 
 # Utility functions for common benchmark patterns
 
+
 def benchmark_function(
     func: Callable,
     name: str,
-    target_ms: Optional[float] = None,
+    target_ms: float | None = None,
     iterations: int = 1000,
-    warmup: int = 100
+    warmup: int = 100,
 ) -> BenchmarkResult:
     """
     Quick benchmark a single function
@@ -441,7 +444,7 @@ def benchmark_function(
     return reporter.create_result(name, latencies, target_ms)
 
 
-def quick_benchmark(func: Callable, iterations: int = 100) -> Dict[str, float]:
+def quick_benchmark(func: Callable, iterations: int = 100) -> dict[str, float]:
     """
     Quick and dirty benchmark - returns simple stats
 
@@ -468,8 +471,8 @@ def quick_benchmark(func: Callable, iterations: int = 100) -> Dict[str, float]:
     n = len(sorted_latencies)
 
     return {
-        'p50': sorted_latencies[int(n * 0.5)],
-        'p95': sorted_latencies[int(n * 0.95)],
-        'p99': sorted_latencies[int(n * 0.99)],
-        'mean': statistics.mean(sorted_latencies)
+        "p50": sorted_latencies[int(n * 0.5)],
+        "p95": sorted_latencies[int(n * 0.95)],
+        "p99": sorted_latencies[int(n * 0.99)],
+        "mean": statistics.mean(sorted_latencies),
     }

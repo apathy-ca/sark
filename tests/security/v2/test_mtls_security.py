@@ -8,13 +8,10 @@ Engineer: QA-2
 Deliverable: tests/security/v2/test_mtls_security.py
 """
 
-import pytest
+from datetime import datetime
 import ssl
-import asyncio
-from pathlib import Path
-from datetime import datetime, timedelta
-from typing import Dict, Any
-from unittest.mock import Mock, patch, AsyncMock
+
+import pytest
 
 
 class TestMTLSCertificateValidation:
@@ -92,9 +89,9 @@ class TestMTLSConnectionSecurity:
         min_tls_version = ssl.TLSVersion.TLSv1_2
 
         # In production config, verify TLS version enforcement
-        assert min_tls_version >= ssl.TLSVersion.TLSv1_2, (
-            "Minimum TLS version must be 1.2 or higher"
-        )
+        assert (
+            min_tls_version >= ssl.TLSVersion.TLSv1_2
+        ), "Minimum TLS version must be 1.2 or higher"
 
     @pytest.mark.asyncio
     async def test_cipher_suite_security(self):
@@ -176,9 +173,7 @@ class TestMTLSKeyManagement:
         # Mock private key file
         key_file_permissions = "0600"  # Owner read/write only
 
-        assert key_file_permissions == "0600", (
-            "Private key files must have 600 permissions"
-        )
+        assert key_file_permissions == "0600", "Private key files must have 600 permissions"
         # TODO: Implement actual key file permission checks
 
     @pytest.mark.asyncio
@@ -241,9 +236,7 @@ class TestMTLSAuditAndLogging:
         ]
 
         for pattern in sensitive_patterns:
-            assert pattern not in log_entry, (
-                f"Sensitive pattern '{pattern}' found in logs"
-            )
+            assert pattern not in log_entry, f"Sensitive pattern '{pattern}' found in logs"
 
 
 class TestMTLSErrorHandling:

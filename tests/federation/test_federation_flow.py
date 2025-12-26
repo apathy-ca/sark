@@ -9,35 +9,30 @@ Tests the complete federation flow:
 5. Circuit breaking and failover
 """
 
-import pytest
 import asyncio
 from datetime import datetime, timedelta
-from pathlib import Path
-from unittest.mock import Mock, AsyncMock, patch, MagicMock
 
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.x509.oid import NameOID, ExtendedKeyUsageOID
-
+from cryptography.x509.oid import ExtendedKeyUsageOID, NameOID
+import pytest
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from sark.models.base import Base, FederationNode, Resource, Capability
+from sark.models.base import Base, FederationNode, Resource
 from sark.models.federation import (
+    AuditCorrelationQuery,
     DiscoveryMethod,
     DiscoveryQuery,
-    TrustLevel,
-    TrustEstablishmentRequest,
-    TrustVerificationRequest,
-    RouteQuery,
     FederatedResourceRequest,
-    AuditCorrelationQuery,
-    NodeStatus,
+    RouteQuery,
+    TrustEstablishmentRequest,
+    TrustLevel,
+    TrustVerificationRequest,
 )
-from sark.services.federation import DiscoveryService, TrustService, RoutingService
-
+from sark.services.federation import DiscoveryService, RoutingService, TrustService
 
 # ============================================================================
 # Test Fixtures
@@ -48,19 +43,12 @@ from sark.services.federation import DiscoveryService, TrustService, RoutingServ
 async def db_session():
     """Create test database session."""
     # Use in-memory SQLite for tests
-    engine = create_async_engine(
-        "sqlite+aiosqlite:///:memory:",
-        echo=False
-    )
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-    async_session = sessionmaker(
-        engine,
-        class_=AsyncSession,
-        expire_on_commit=False
-    )
+    async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
     async with async_session() as session:
         yield session
@@ -73,61 +61,58 @@ def test_certificate():
     """Generate test X.509 certificate."""
     # Generate private key
     private_key = rsa.generate_private_key(
-        public_exponent=65537,
-        key_size=2048,
-        backend=default_backend()
+        public_exponent=65537, key_size=2048, backend=default_backend()
     )
 
     # Generate certificate
-    subject = issuer = x509.Name([
-        x509.NameAttribute(NameOID.COUNTRY_NAME, "US"),
-        x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "California"),
-        x509.NameAttribute(NameOID.LOCALITY_NAME, "San Francisco"),
-        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "SARK Test"),
-        x509.NameAttribute(NameOID.COMMON_NAME, "test.sark.local"),
-    ])
+    subject = issuer = x509.Name(
+        [
+            x509.NameAttribute(NameOID.COUNTRY_NAME, "US"),
+            x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "California"),
+            x509.NameAttribute(NameOID.LOCALITY_NAME, "San Francisco"),
+            x509.NameAttribute(NameOID.ORGANIZATION_NAME, "SARK Test"),
+            x509.NameAttribute(NameOID.COMMON_NAME, "test.sark.local"),
+        ]
+    )
 
-    cert = x509.CertificateBuilder().subject_name(
-        subject
-    ).issuer_name(
-        issuer
-    ).public_key(
-        private_key.public_key()
-    ).serial_number(
-        x509.random_serial_number()
-    ).not_valid_before(
-        datetime.utcnow()
-    ).not_valid_after(
-        datetime.utcnow() + timedelta(days=365)
-    ).add_extension(
-        x509.KeyUsage(
-            digital_signature=True,
-            key_encipherment=True,
-            content_commitment=False,
-            data_encipherment=False,
-            key_agreement=False,
-            key_cert_sign=False,
-            crl_sign=False,
-            encipher_only=False,
-            decipher_only=False,
-        ),
-        critical=True,
-    ).add_extension(
-        x509.ExtendedKeyUsage([
-            ExtendedKeyUsageOID.SERVER_AUTH,
-            ExtendedKeyUsageOID.CLIENT_AUTH,
-        ]),
-        critical=True,
-    ).sign(private_key, hashes.SHA256(), default_backend())
+    cert = (
+        x509.CertificateBuilder()
+        .subject_name(subject)
+        .issuer_name(issuer)
+        .public_key(private_key.public_key())
+        .serial_number(x509.random_serial_number())
+        .not_valid_before(datetime.utcnow())
+        .not_valid_after(datetime.utcnow() + timedelta(days=365))
+        .add_extension(
+            x509.KeyUsage(
+                digital_signature=True,
+                key_encipherment=True,
+                content_commitment=False,
+                data_encipherment=False,
+                key_agreement=False,
+                key_cert_sign=False,
+                crl_sign=False,
+                encipher_only=False,
+                decipher_only=False,
+            ),
+            critical=True,
+        )
+        .add_extension(
+            x509.ExtendedKeyUsage(
+                [
+                    ExtendedKeyUsageOID.SERVER_AUTH,
+                    ExtendedKeyUsageOID.CLIENT_AUTH,
+                ]
+            ),
+            critical=True,
+        )
+        .sign(private_key, hashes.SHA256(), default_backend())
+    )
 
     # Convert to PEM
-    cert_pem = cert.public_bytes(serialization.Encoding.PEM).decode('utf-8')
+    cert_pem = cert.public_bytes(serialization.Encoding.PEM).decode("utf-8")
 
-    return {
-        'certificate': cert,
-        'pem': cert_pem,
-        'private_key': private_key
-    }
+    return {"certificate": cert, "pem": cert_pem, "private_key": private_key}
 
 
 @pytest.fixture
@@ -162,9 +147,7 @@ class TestDiscoveryService:
     async def test_dns_sd_discovery(self, discovery_service):
         """Test DNS-SD service discovery."""
         query = DiscoveryQuery(
-            method=DiscoveryMethod.DNS_SD,
-            service_type="_sark._tcp.local.",
-            timeout_seconds=2
+            method=DiscoveryMethod.DNS_SD, service_type="_sark._tcp.local.", timeout_seconds=2
         )
 
         response = await discovery_service.discover(query)
@@ -177,9 +160,7 @@ class TestDiscoveryService:
     async def test_mdns_discovery(self, discovery_service):
         """Test mDNS service discovery."""
         query = DiscoveryQuery(
-            method=DiscoveryMethod.MDNS,
-            service_type="_sark._tcp.local.",
-            timeout_seconds=2
+            method=DiscoveryMethod.MDNS, service_type="_sark._tcp.local.", timeout_seconds=2
         )
 
         response = await discovery_service.discover(query)
@@ -191,9 +172,7 @@ class TestDiscoveryService:
     async def test_consul_discovery(self, discovery_service):
         """Test Consul service discovery."""
         query = DiscoveryQuery(
-            method=DiscoveryMethod.CONSUL,
-            service_type="sark",
-            timeout_seconds=2
+            method=DiscoveryMethod.CONSUL, service_type="sark", timeout_seconds=2
         )
 
         response = await discovery_service.discover(query)
@@ -205,8 +184,7 @@ class TestDiscoveryService:
     async def test_discover_all_methods(self, discovery_service):
         """Test discovery using all methods."""
         results = await discovery_service.discover_all(
-            service_type="_sark._tcp.local.",
-            timeout_seconds=2
+            service_type="_sark._tcp.local.", timeout_seconds=2
         )
 
         assert DiscoveryMethod.DNS_SD in results
@@ -217,9 +195,7 @@ class TestDiscoveryService:
     async def test_discovery_caching(self, discovery_service):
         """Test discovery result caching."""
         query = DiscoveryQuery(
-            method=DiscoveryMethod.MDNS,
-            service_type="_sark._tcp.local.",
-            timeout_seconds=1
+            method=DiscoveryMethod.MDNS, service_type="_sark._tcp.local.", timeout_seconds=1
         )
 
         # First call
@@ -244,16 +220,10 @@ class TestTrustService:
     """Tests for mTLS trust establishment."""
 
     @pytest.mark.asyncio
-    async def test_establish_trust_success(
-        self,
-        trust_service,
-        test_certificate,
-        db_session
-    ):
+    async def test_establish_trust_success(self, trust_service, test_certificate, db_session):
         """Test successful trust establishment."""
         request = TrustEstablishmentRequest(
-            node_id="test-node-2",
-            client_cert=test_certificate['pem']
+            node_id="test-node-2", client_cert=test_certificate["pem"]
         )
 
         response = await trust_service.establish_trust(request, db_session)
@@ -265,19 +235,14 @@ class TestTrustService:
 
     @pytest.mark.asyncio
     async def test_establish_trust_with_challenge(
-        self,
-        trust_service,
-        test_certificate,
-        db_session
+        self, trust_service, test_certificate, db_session
     ):
         """Test trust establishment with challenge-response."""
         # Generate challenge
         challenge = trust_service.generate_challenge("test-node-2")
 
         request = TrustEstablishmentRequest(
-            node_id="test-node-2",
-            client_cert=test_certificate['pem'],
-            challenge=challenge
+            node_id="test-node-2", client_cert=test_certificate["pem"], challenge=challenge
         )
 
         response = await trust_service.establish_trust(request, db_session)
@@ -286,24 +251,18 @@ class TestTrustService:
         assert response.challenge_response is not None
 
     @pytest.mark.asyncio
-    async def test_verify_trust_success(
-        self,
-        trust_service,
-        test_certificate,
-        db_session
-    ):
+    async def test_verify_trust_success(self, trust_service, test_certificate, db_session):
         """Test trust verification."""
         # First establish trust
         establish_req = TrustEstablishmentRequest(
-            node_id="test-node-3",
-            client_cert=test_certificate['pem']
+            node_id="test-node-3", client_cert=test_certificate["pem"]
         )
         establish_resp = await trust_service.establish_trust(establish_req, db_session)
 
         # Now verify trust
         verify_req = TrustVerificationRequest(
             node_id="test-node-3",
-            certificate_fingerprint=establish_resp.certificate_info.fingerprint_sha256
+            certificate_fingerprint=establish_resp.certificate_info.fingerprint_sha256,
         )
 
         verify_resp = await trust_service.verify_trust(verify_req, db_session)
@@ -313,23 +272,18 @@ class TestTrustService:
 
     @pytest.mark.asyncio
     async def test_verify_trust_fingerprint_mismatch(
-        self,
-        trust_service,
-        test_certificate,
-        db_session
+        self, trust_service, test_certificate, db_session
     ):
         """Test trust verification with wrong fingerprint."""
         # Establish trust first
         establish_req = TrustEstablishmentRequest(
-            node_id="test-node-4",
-            client_cert=test_certificate['pem']
+            node_id="test-node-4", client_cert=test_certificate["pem"]
         )
         await trust_service.establish_trust(establish_req, db_session)
 
         # Verify with wrong fingerprint
         verify_req = TrustVerificationRequest(
-            node_id="test-node-4",
-            certificate_fingerprint="wrong_fingerprint"
+            node_id="test-node-4", certificate_fingerprint="wrong_fingerprint"
         )
 
         verify_resp = await trust_service.verify_trust(verify_req, db_session)
@@ -338,17 +292,11 @@ class TestTrustService:
         assert verify_resp.error is not None
 
     @pytest.mark.asyncio
-    async def test_revoke_trust(
-        self,
-        trust_service,
-        test_certificate,
-        db_session
-    ):
+    async def test_revoke_trust(self, trust_service, test_certificate, db_session):
         """Test trust revocation."""
         # Establish trust
         establish_req = TrustEstablishmentRequest(
-            node_id="test-node-5",
-            client_cert=test_certificate['pem']
+            node_id="test-node-5", client_cert=test_certificate["pem"]
         )
         await trust_service.establish_trust(establish_req, db_session)
 
@@ -358,8 +306,7 @@ class TestTrustService:
 
         # Verify trust is revoked
         verify_req = TrustVerificationRequest(
-            node_id="test-node-5",
-            certificate_fingerprint="dummy"
+            node_id="test-node-5", certificate_fingerprint="dummy"
         )
         verify_resp = await trust_service.verify_trust(verify_req, db_session)
 
@@ -383,7 +330,7 @@ class TestRoutingService:
             name="Test Resource",
             protocol="mcp",
             endpoint="stdio",
-            sensitivity_level="medium"
+            sensitivity_level="medium",
         )
         db_session.add(resource)
         await db_session.commit()
@@ -452,17 +399,13 @@ class TestRoutingService:
         assert cb.get_state(node_id) == "closed"
 
     @pytest.mark.asyncio
-    async def test_invoke_federated_node_not_found(
-        self,
-        routing_service,
-        db_session
-    ):
+    async def test_invoke_federated_node_not_found(self, routing_service, db_session):
         """Test federated invocation with non-existent node."""
         request = FederatedResourceRequest(
             target_node_id="non-existent-node",
             resource_id="test-resource",
             principal_id="test-principal",
-            arguments={}
+            arguments={},
         )
 
         response = await routing_service.invoke_federated(request, db_session)
@@ -473,9 +416,7 @@ class TestRoutingService:
     @pytest.mark.asyncio
     async def test_audit_correlation(self, routing_service, db_session):
         """Test audit event correlation."""
-        query = AuditCorrelationQuery(
-            principal_id="test-principal"
-        )
+        query = AuditCorrelationQuery(principal_id="test-principal")
 
         response = await routing_service.correlate_audit_events(query, db_session)
 
@@ -492,7 +433,7 @@ class TestRoutingService:
             name="Test Resource 2",
             protocol="mcp",
             endpoint="stdio",
-            sensitivity_level="medium"
+            sensitivity_level="medium",
         )
         db_session.add(resource)
         await db_session.commit()
@@ -521,28 +462,20 @@ class TestFederationFlow:
 
     @pytest.mark.asyncio
     async def test_complete_federation_flow(
-        self,
-        discovery_service,
-        trust_service,
-        routing_service,
-        test_certificate,
-        db_session
+        self, discovery_service, trust_service, routing_service, test_certificate, db_session
     ):
         """Test complete federation flow from discovery to invocation."""
 
         # Step 1: Discover nodes
         query = DiscoveryQuery(
-            method=DiscoveryMethod.MDNS,
-            service_type="_sark._tcp.local.",
-            timeout_seconds=1
+            method=DiscoveryMethod.MDNS, service_type="_sark._tcp.local.", timeout_seconds=1
         )
         discovery_response = await discovery_service.discover(query)
         assert isinstance(discovery_response.records, list)
 
         # Step 2: Establish trust with a node
         trust_request = TrustEstablishmentRequest(
-            node_id="test-federated-node",
-            client_cert=test_certificate['pem']
+            node_id="test-federated-node", client_cert=test_certificate["pem"]
         )
         trust_response = await trust_service.establish_trust(trust_request, db_session)
         assert trust_response.success == True
@@ -553,7 +486,7 @@ class TestFederationFlow:
             name="Test Flow Resource",
             protocol="mcp",
             endpoint="stdio",
-            sensitivity_level="medium"
+            sensitivity_level="medium",
         )
         db_session.add(resource)
         await db_session.commit()
@@ -565,19 +498,11 @@ class TestFederationFlow:
 
         # Step 5: Correlate audit events
         audit_query = AuditCorrelationQuery()
-        audit_response = await routing_service.correlate_audit_events(
-            audit_query,
-            db_session
-        )
+        audit_response = await routing_service.correlate_audit_events(audit_query, db_session)
         assert isinstance(audit_response.events, list)
 
     @pytest.mark.asyncio
-    async def test_federation_failover(
-        self,
-        routing_service,
-        test_certificate,
-        db_session
-    ):
+    async def test_federation_failover(self, routing_service, test_certificate, db_session):
         """Test federation failover when primary node fails."""
 
         # Create multiple federation nodes
@@ -586,8 +511,8 @@ class TestFederationFlow:
                 node_id=f"test-node-{i}",
                 name=f"Test Node {i}",
                 endpoint=f"https://node{i}.example.com",
-                trust_anchor_cert=test_certificate['pem'],
-                enabled=True
+                trust_anchor_cert=test_certificate["pem"],
+                enabled=True,
             )
             for i in range(3)
         ]

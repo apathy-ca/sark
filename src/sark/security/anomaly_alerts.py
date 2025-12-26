@@ -5,12 +5,12 @@ Processes detected anomalies and sends alerts based on severity and count.
 Supports auto-suspend for critical anomalies.
 """
 
-from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 from datetime import datetime
 import logging
+from typing import Any
 
-from .behavioral_analyzer import Anomaly, AnomalySeverity, BehavioralAuditEvent
+from .behavioral_analyzer import Anomaly, BehavioralAuditEvent
 
 logger = logging.getLogger(__name__)
 
@@ -18,9 +18,10 @@ logger = logging.getLogger(__name__)
 @dataclass
 class AlertConfig:
     """Configuration for anomaly alerting"""
+
     # Alert thresholds
     critical_high_count: int = 2  # >= 2 HIGH anomalies = critical alert
-    warning_high_count: int = 1   # >= 1 HIGH anomaly = warning alert
+    warning_high_count: int = 1  # >= 1 HIGH anomaly = warning alert
     warning_medium_count: int = 3  # >= 3 MEDIUM anomalies = warning alert
 
     # Auto-suspend configuration
@@ -38,10 +39,10 @@ class AnomalyAlertManager:
 
     def __init__(
         self,
-        audit_logger: Optional[Any] = None,
-        alert_service: Optional[Any] = None,
-        user_management: Optional[Any] = None,
-        config: Optional[AlertConfig] = None
+        audit_logger: Any | None = None,
+        alert_service: Any | None = None,
+        user_management: Any | None = None,
+        config: AlertConfig | None = None,
     ):
         """
         Initialize anomaly alert manager
@@ -59,10 +60,10 @@ class AnomalyAlertManager:
 
     async def process_anomalies(
         self,
-        anomalies: List[Anomaly],
+        anomalies: list[Anomaly],
         event: BehavioralAuditEvent,
-        metadata: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
+        metadata: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """
         Process detected anomalies and take appropriate actions
 
@@ -97,7 +98,7 @@ class AnomalyAlertManager:
                     "action": "suspended",
                     "alert_level": "critical",
                     "anomaly_count": len(anomalies),
-                    "severity_counts": severity_counts
+                    "severity_counts": severity_counts,
                 }
 
         elif alert_level == "warning":
@@ -107,17 +108,12 @@ class AnomalyAlertManager:
             "action": "alerted" if alert_level != "none" else "logged",
             "alert_level": alert_level,
             "anomaly_count": len(anomalies),
-            "severity_counts": severity_counts
+            "severity_counts": severity_counts,
         }
 
-    def _count_by_severity(self, anomalies: List[Anomaly]) -> Dict[str, int]:
+    def _count_by_severity(self, anomalies: list[Anomaly]) -> dict[str, int]:
         """Count anomalies by severity"""
-        counts = {
-            "critical": 0,
-            "high": 0,
-            "medium": 0,
-            "low": 0
-        }
+        counts = {"critical": 0, "high": 0, "medium": 0, "low": 0}
 
         for anomaly in anomalies:
             severity = anomaly.severity.value
@@ -126,7 +122,7 @@ class AnomalyAlertManager:
 
         return counts
 
-    def _determine_alert_level(self, severity_counts: Dict[str, int]) -> str:
+    def _determine_alert_level(self, severity_counts: dict[str, int]) -> str:
         """
         Determine alert level based on severity counts
 
@@ -152,10 +148,10 @@ class AnomalyAlertManager:
 
     async def _log_anomalies(
         self,
-        anomalies: List[Anomaly],
+        anomalies: list[Anomaly],
         event: BehavioralAuditEvent,
         alert_level: str,
-        metadata: Optional[Dict[str, Any]]
+        metadata: dict[str, Any] | None,
     ):
         """Log anomalies to audit system"""
         if not self.audit_logger:
@@ -181,16 +177,13 @@ class AnomalyAlertManager:
                     for a in anomalies
                 ],
                 request_id=event.request_id,
-                metadata=metadata or {}
+                metadata=metadata or {},
             )
         except Exception as e:
             logger.error(f"Failed to log anomalies: {e}")
 
     async def _handle_critical_alert(
-        self,
-        anomalies: List[Anomaly],
-        event: BehavioralAuditEvent,
-        metadata: Optional[Dict[str, Any]]
+        self, anomalies: list[Anomaly], event: BehavioralAuditEvent, metadata: dict[str, Any] | None
     ):
         """Send critical severity alert"""
         if not self.alert_service:
@@ -219,7 +212,7 @@ class AnomalyAlertManager:
                     channel="pagerduty",
                     severity="critical",
                     title=f"CRITICAL: Multiple behavioral anomalies detected - {event.user_id}",
-                    details=alert_details
+                    details=alert_details,
                 )
 
             # Also send to Slack
@@ -227,18 +220,15 @@ class AnomalyAlertManager:
                 await self.alert_service.send_alert(
                     channel="slack",
                     severity="critical",
-                    title=f"🚨 CRITICAL: Behavioral anomalies detected",
-                    details=alert_details
+                    title="🚨 CRITICAL: Behavioral anomalies detected",
+                    details=alert_details,
                 )
 
         except Exception as e:
             logger.error(f"Failed to send critical alert: {e}")
 
     async def _handle_warning_alert(
-        self,
-        anomalies: List[Anomaly],
-        event: BehavioralAuditEvent,
-        metadata: Optional[Dict[str, Any]]
+        self, anomalies: list[Anomaly], event: BehavioralAuditEvent, metadata: dict[str, Any] | None
     ):
         """Send warning severity alert"""
         if not self.alert_service:
@@ -266,7 +256,7 @@ class AnomalyAlertManager:
                     channel="slack",
                     severity="warning",
                     title=f"⚠️  WARNING: Behavioral anomalies detected - {event.user_id}",
-                    details=alert_details
+                    details=alert_details,
                 )
 
             # Send email notification
@@ -275,17 +265,14 @@ class AnomalyAlertManager:
                     channel="email",
                     severity="warning",
                     title=f"Behavioral anomalies detected for user {event.user_id}",
-                    details=alert_details
+                    details=alert_details,
                 )
 
         except Exception as e:
             logger.error(f"Failed to send warning alert: {e}")
 
     async def _suspend_user(
-        self,
-        user_id: str,
-        anomalies: List[Anomaly],
-        event: BehavioralAuditEvent
+        self, user_id: str, anomalies: list[Anomaly], event: BehavioralAuditEvent
     ):
         """Suspend user account due to critical anomalies"""
         if not self.user_management:
@@ -303,7 +290,7 @@ class AnomalyAlertManager:
                     "anomaly_count": len(anomalies),
                     "anomaly_types": [a.type.value for a in anomalies],
                     "trigger_event": event.request_id,
-                }
+                },
             )
 
             logger.warning(f"User {user_id} auto-suspended due to anomalies")
@@ -315,22 +302,24 @@ class AnomalyAlertManager:
                     user_id=user_id,
                     reason=reason,
                     anomaly_count=len(anomalies),
-                    timestamp=datetime.now()
+                    timestamp=datetime.now(),
                 )
 
         except Exception as e:
             logger.error(f"Failed to suspend user {user_id}: {e}")
 
-    def _build_anomaly_summary(self, anomalies: List[Anomaly]) -> List[Dict[str, Any]]:
+    def _build_anomaly_summary(self, anomalies: list[Anomaly]) -> list[dict[str, Any]]:
         """Build human-readable summary of anomalies"""
         summary = []
 
         for anomaly in anomalies:
-            summary.append({
-                "type": anomaly.type.value,
-                "severity": anomaly.severity.value,
-                "description": anomaly.description,
-                "confidence": f"{anomaly.confidence * 100:.0f}%"
-            })
+            summary.append(
+                {
+                    "type": anomaly.type.value,
+                    "severity": anomaly.severity.value,
+                    "description": anomaly.description,
+                    "confidence": f"{anomaly.confidence * 100:.0f}%",
+                }
+            )
 
         return summary

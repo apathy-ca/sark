@@ -3,10 +3,11 @@
 Provides JWT authentication and context extraction for agent-to-agent communication.
 """
 
+from typing import Annotated
+
+from fastapi import Header, HTTPException, status
 import jwt
 import structlog
-from fastapi import Depends, HTTPException, Header, status
-from typing import Annotated
 
 from sark.models.gateway import AgentContext, AgentType, TrustLevel
 
@@ -110,7 +111,7 @@ def extract_agent_context(token: str) -> AgentContext:
         logger.warning("agent_token_invalid", error=str(e))
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Invalid agent token: {str(e)}",
+            detail=f"Invalid agent token: {e!s}",
         )
     except Exception as e:
         logger.error("agent_context_extraction_failed", error=str(e))

@@ -1,10 +1,11 @@
 """SIEM forwarding for Gateway events."""
 
 import asyncio
-import json
-import gzip
 from collections import deque
+import gzip
+import json
 from typing import Any
+
 import httpx
 import structlog
 
@@ -34,11 +35,13 @@ async def forward_gateway_event(event: GatewayAuditEvent, audit_id: str):
         event: Gateway audit event
         audit_id: Audit event ID from database
     """
-    gateway_event_queue.append({
-        "audit_id": audit_id,
-        "event": event.dict(),
-        "timestamp": event.timestamp,
-    })
+    gateway_event_queue.append(
+        {
+            "audit_id": audit_id,
+            "event": event.dict(),
+            "timestamp": event.timestamp,
+        }
+    )
 
     # Trigger batch if queue is full
     if len(gateway_event_queue) >= 100:
@@ -66,11 +69,11 @@ async def flush_gateway_events():
     gateway_event_queue.clear()
 
     # Send to Splunk if configured
-    if hasattr(settings, 'splunk_hec_url') and settings.splunk_hec_url:
+    if hasattr(settings, "splunk_hec_url") and settings.splunk_hec_url:
         await _forward_to_splunk(events)
 
     # Send to Datadog if configured
-    if hasattr(settings, 'datadog_api_key') and settings.datadog_api_key:
+    if hasattr(settings, "datadog_api_key") and settings.datadog_api_key:
         await _forward_to_datadog(events)
 
 

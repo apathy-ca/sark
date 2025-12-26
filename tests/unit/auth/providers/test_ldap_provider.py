@@ -225,8 +225,8 @@ class TestLDAPProvider:
     async def test_health_check_enabled(self, provider):
         """Test health check succeeds when enabled and configured."""
         # Mock the LDAP connection for unit test
-        from unittest.mock import AsyncMock, patch
         import asyncio
+        from unittest.mock import patch
 
         async def mock_health_check():
             return True

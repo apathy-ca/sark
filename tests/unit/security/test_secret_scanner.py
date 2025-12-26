@@ -6,7 +6,7 @@ Target: 100% detection on test set
 """
 
 import pytest
-from src.sark.security.secret_scanner import SecretScanner, SecretFinding
+from src.sark.security.secret_scanner import SecretScanner
 
 
 class TestSecretScanner:
@@ -180,7 +180,7 @@ MIIEpAIBAAKCAQEA0Z3VS5JJcds3xfn/ygWyF06bpk5u6rVl
         """Test redaction of multiple secrets"""
         data = {
             "openai_key": "sk-1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN",
-            "github_token": "ghp_1234567890abcdefghijklmnopqrstuvwx"
+            "github_token": "ghp_1234567890abcdefghijklmnopqrstuvwx",
         }
 
         redacted = scanner.redact_secrets(data)
@@ -192,9 +192,7 @@ MIIEpAIBAAKCAQEA0Z3VS5JJcds3xfn/ygWyF06bpk5u6rVl
         """Test redaction in nested structures"""
         data = {
             "user": {
-                "credentials": {
-                    "api_key": "sk-1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN"
-                }
+                "credentials": {"api_key": "sk-1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN"}
             }
         }
 
@@ -206,7 +204,7 @@ MIIEpAIBAAKCAQEA0Z3VS5JJcds3xfn/ygWyF06bpk5u6rVl
         """Test that redaction preserves data structure"""
         data = {
             "message": "Your API key is sk-1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN for authentication",
-            "other_field": "normal data"
+            "other_field": "normal data",
         }
 
         redacted = scanner.redact_secrets(data)
@@ -244,7 +242,9 @@ MIIEpAIBAAKCAQEA0Z3VS5JJcds3xfn/ygWyF06bpk5u6rVl
         # Might detect but shouldn't redact (low confidence)
         high_confidence = [f for f in findings if f.should_redact]
         # Some patterns might still match, but this tests false positive reduction
-        assert len(high_confidence) == 0 or all("Password" in f.secret_type for f in high_confidence)
+        assert len(high_confidence) == 0 or all(
+            "Password" in f.secret_type for f in high_confidence
+        )
 
     # Test edge cases
     def test_empty_data(self, scanner):
@@ -257,12 +257,7 @@ MIIEpAIBAAKCAQEA0Z3VS5JJcds3xfn/ygWyF06bpk5u6rVl
 
     def test_non_string_values(self, scanner):
         """Test that non-string values don't cause errors"""
-        data = {
-            "number": 12345,
-            "boolean": True,
-            "null": None,
-            "list": [1, 2, 3]
-        }
+        data = {"number": 12345, "boolean": True, "null": None, "list": [1, 2, 3]}
 
         findings = scanner.scan(data)
 
@@ -282,7 +277,7 @@ MIIEpAIBAAKCAQEA0Z3VS5JJcds3xfn/ygWyF06bpk5u6rVl
             "items": [
                 {"key": "safe_value"},
                 {"key": "sk-1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN"},
-                {"key": "another_safe_value"}
+                {"key": "another_safe_value"},
             ]
         }
 
@@ -325,10 +320,7 @@ MIIEpAIBAAKCAQEA0Z3VS5JJcds3xfn/ygWyF06bpk5u6rVl
         """Test that scanning completes quickly"""
         import time
 
-        data = {
-            f"field_{i}": f"normal value {i}"
-            for i in range(100)
-        }
+        data = {f"field_{i}": f"normal value {i}" for i in range(100)}
         data["field_50"] = "sk-1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN"
 
         start = time.time()

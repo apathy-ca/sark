@@ -5,12 +5,12 @@ from pathlib import Path
 import pytest
 
 from sark.policy.loader import (
-    PolicyLoadError,
     PolicyLoader,
+    PolicyLoadError,
     load_and_validate_policy,
     validate_policy_file,
 )
-from sark.policy.validator import PolicyValidator, Severity
+from sark.policy.validator import PolicyValidator
 
 
 class TestPolicyLoader:
@@ -139,9 +139,7 @@ reason := "test" if { true }
             {"user": {"role": "user"}},
         ]
 
-        content, validation = loader.load_policy(
-            policy_file, sample_inputs=sample_inputs
-        )
+        content, validation = loader.load_policy(policy_file, sample_inputs=sample_inputs)
 
         assert validation is not None
         assert validation.valid is True

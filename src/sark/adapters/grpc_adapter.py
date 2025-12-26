@@ -16,14 +16,14 @@ Engineer: ENGINEER-3 (gRPC Adapter Lead)
 """
 
 import asyncio
+import builtins
+from collections.abc import AsyncIterator
 import time
-from typing import Any, AsyncIterator, Dict, List, Optional
-from urllib.parse import urlparse
+from typing import Any
 
 import grpc
-import structlog
 from grpc import aio
-from grpc_reflection.v1alpha import reflection_pb2, reflection_pb2_grpc
+import structlog
 
 from sark.adapters.base import ProtocolAdapter
 from sark.adapters.exceptions import (
@@ -31,7 +31,6 @@ from sark.adapters.exceptions import (
     ConnectionError,
     DiscoveryError,
     InvocationError,
-    ProtocolError,
     StreamingError,
     TimeoutError,
     UnsupportedOperationError,
@@ -85,8 +84,8 @@ class GRPCAdapter(ProtocolAdapter):
         """
         self._default_timeout = default_timeout
         self._max_message_length = max_message_length
-        self._channels: Dict[str, aio.Channel] = {}
-        self._stubs: Dict[str, Any] = {}
+        self._channels: dict[str, aio.Channel] = {}
+        self._stubs: dict[str, Any] = {}
         logger.info(
             "grpc_adapter_initialized",
             timeout=default_timeout,
@@ -103,9 +102,7 @@ class GRPCAdapter(ProtocolAdapter):
         """Return gRPC version supported."""
         return "1.60.0"
 
-    async def discover_resources(
-        self, discovery_config: Dict[str, Any]
-    ) -> List[ResourceSchema]:
+    async def discover_resources(self, discovery_config: dict[str, Any]) -> list[ResourceSchema]:
         """
         Discover gRPC services using reflection.
 
@@ -151,9 +148,7 @@ class GRPCAdapter(ProtocolAdapter):
             from sark.adapters.grpc.reflection import GRPCReflectionClient
 
             reflection_client = GRPCReflectionClient(channel)
-            services = await asyncio.wait_for(
-                reflection_client.list_services(), timeout=timeout
-            )
+            services = await asyncio.wait_for(reflection_client.list_services(), timeout=timeout)
 
             resources = []
             for service_name in services:
@@ -162,9 +157,7 @@ class GRPCAdapter(ProtocolAdapter):
                     continue
 
                 # Get service descriptor
-                service_descriptor = await reflection_client.get_service_descriptor(
-                    service_name
-                )
+                service_descriptor = await reflection_client.get_service_descriptor(service_name)
 
                 # Extract capabilities (methods) from service
                 capabilities = []
@@ -229,7 +222,7 @@ class GRPCAdapter(ProtocolAdapter):
 
             return resources
 
-        except asyncio.TimeoutError as e:
+        except builtins.TimeoutError as e:
             raise TimeoutError(
                 f"Service discovery timed out after {timeout}s",
                 adapter_name=self.protocol_name,
@@ -245,12 +238,12 @@ class GRPCAdapter(ProtocolAdapter):
             ) from e
         except Exception as e:
             raise DiscoveryError(
-                f"Service discovery failed: {str(e)}",
+                f"Service discovery failed: {e!s}",
                 adapter_name=self.protocol_name,
                 resource_id=endpoint,
             ) from e
 
-    async def get_capabilities(self, resource: ResourceSchema) -> List[CapabilitySchema]:
+    async def get_capabilities(self, resource: ResourceSchema) -> list[CapabilitySchema]:
         """
         Get all capabilities (methods) for a gRPC service.
 
@@ -331,9 +324,7 @@ class GRPCAdapter(ProtocolAdapter):
             from sark.adapters.grpc.reflection import GRPCReflectionClient
 
             reflection_client = GRPCReflectionClient(channel)
-            service_descriptor = await reflection_client.get_service_descriptor(
-                service_name
-            )
+            service_descriptor = await reflection_client.get_service_descriptor(service_name)
 
             # Find method descriptor
             method_descriptor = None
@@ -412,7 +403,7 @@ class GRPCAdapter(ProtocolAdapter):
 
         except Exception as e:
             duration_ms = (time.time() - start_time) * 1000
-            error_msg = f"Invocation failed: {str(e)}"
+            error_msg = f"Invocation failed: {e!s}"
 
             logger.error(
                 "grpc_invocation_error",
@@ -426,9 +417,7 @@ class GRPCAdapter(ProtocolAdapter):
                 duration_ms=duration_ms,
             )
 
-    async def invoke_streaming(
-        self, request: InvocationRequest
-    ) -> AsyncIterator[Any]:
+    async def invoke_streaming(self, request: InvocationRequest) -> AsyncIterator[Any]:
         """
         Invoke a gRPC streaming method.
 
@@ -462,9 +451,7 @@ class GRPCAdapter(ProtocolAdapter):
             from sark.adapters.grpc.reflection import GRPCReflectionClient
 
             reflection_client = GRPCReflectionClient(channel)
-            service_descriptor = await reflection_client.get_service_descriptor(
-                service_name
-            )
+            service_descriptor = await reflection_client.get_service_descriptor(service_name)
 
             method_descriptor = None
             for method in service_descriptor.methods:
@@ -534,7 +521,7 @@ class GRPCAdapter(ProtocolAdapter):
             ) from e
         except Exception as e:
             raise StreamingError(
-                f"Streaming error: {str(e)}",
+                f"Streaming error: {e!s}",
                 adapter_name=self.protocol_name,
             ) from e
 
@@ -564,9 +551,7 @@ class GRPCAdapter(ProtocolAdapter):
                 health_request = health_pb2.HealthCheckRequest(
                     service=resource.metadata.get("service_name", "")
                 )
-                response = await asyncio.wait_for(
-                    health_stub.Check(health_request), timeout=5.0
-                )
+                response = await asyncio.wait_for(health_stub.Check(health_request), timeout=5.0)
                 is_healthy = response.status == health_pb2.HealthCheckResponse.SERVING
 
                 logger.info(
@@ -641,9 +626,7 @@ class GRPCAdapter(ProtocolAdapter):
 
     # Private helper methods
 
-    async def _create_channel(
-        self, endpoint: str, config: Dict[str, Any]
-    ) -> aio.Channel:
+    async def _create_channel(self, endpoint: str, config: dict[str, Any]) -> aio.Channel:
         """
         Create a gRPC channel with configuration.
 
@@ -684,7 +667,7 @@ class GRPCAdapter(ProtocolAdapter):
 
         return channel
 
-    async def _create_credentials(self, auth_config: Dict[str, Any]) -> grpc.ChannelCredentials:
+    async def _create_credentials(self, auth_config: dict[str, Any]) -> grpc.ChannelCredentials:
         """
         Create gRPC credentials from auth configuration.
 
@@ -742,18 +725,16 @@ class GRPCAdapter(ProtocolAdapter):
 
         except FileNotFoundError as e:
             raise AuthenticationError(
-                f"Credential file not found: {str(e)}",
+                f"Credential file not found: {e!s}",
                 adapter_name=self.protocol_name,
             ) from e
         except Exception as e:
             raise AuthenticationError(
-                f"Failed to create credentials: {str(e)}",
+                f"Failed to create credentials: {e!s}",
                 adapter_name=self.protocol_name,
             ) from e
 
-    async def _get_channel(
-        self, endpoint: str, context: Dict[str, Any]
-    ) -> aio.Channel:
+    async def _get_channel(self, endpoint: str, context: dict[str, Any]) -> aio.Channel:
         """
         Get or create a channel for an endpoint.
 
@@ -770,7 +751,7 @@ class GRPCAdapter(ProtocolAdapter):
         return self._channels[endpoint]
 
     async def _parse_capability_id(
-        self, capability_id: str, context: Dict[str, Any]
+        self, capability_id: str, context: dict[str, Any]
     ) -> tuple[str, str, str]:
         """
         Parse capability ID to extract service, method, and endpoint.

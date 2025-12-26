@@ -1,13 +1,14 @@
 """Gateway audit event logging."""
 
-import uuid
 import asyncio
 from datetime import datetime
-import structlog
-from sqlalchemy import text
+import uuid
 
-from sark.models.gateway import GatewayAuditEvent
+from sqlalchemy import text
+import structlog
+
 from sark.db.session import get_db
+from sark.models.gateway import GatewayAuditEvent
 
 logger = structlog.get_logger()
 
@@ -30,7 +31,8 @@ async def log_gateway_event(event: GatewayAuditEvent) -> str:
     try:
         async for session in get_db():
             await session.execute(
-                text("""
+                text(
+                    """
                     INSERT INTO gateway_audit_events (
                         id, event_type, user_id, agent_id, server_name, tool_name,
                         decision, reason, timestamp, gateway_request_id, metadata
@@ -38,7 +40,8 @@ async def log_gateway_event(event: GatewayAuditEvent) -> str:
                         :id, :event_type, :user_id, :agent_id, :server_name, :tool_name,
                         :decision, :reason, :timestamp, :gateway_request_id, :metadata
                     )
-                """),
+                """
+                ),
                 {
                     "id": audit_id,
                     "event_type": event.event_type,
@@ -51,7 +54,7 @@ async def log_gateway_event(event: GatewayAuditEvent) -> str:
                     "timestamp": datetime.fromtimestamp(event.timestamp),
                     "gateway_request_id": event.gateway_request_id,
                     "metadata": event.metadata,
-                }
+                },
             )
             await session.commit()
 
@@ -67,6 +70,7 @@ async def log_gateway_event(event: GatewayAuditEvent) -> str:
         # Forward to SIEM asynchronously (fire and forget)
         try:
             from sark.services.siem.gateway_forwarder import forward_gateway_event
+
             asyncio.create_task(forward_gateway_event(event, audit_id))
         except ImportError:
             # SIEM integration not available yet

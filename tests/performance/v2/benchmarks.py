@@ -9,16 +9,16 @@ Deliverable: tests/performance/v2/benchmarks.py
 """
 
 import asyncio
-import time
-import statistics
-import json
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, List, Optional, Callable
+from dataclasses import asdict, dataclass
 from datetime import datetime
+import json
 from pathlib import Path
+import statistics
+import time
+from typing import Any
 
 from sark.adapters.base import ProtocolAdapter
-from sark.models.base import InvocationRequest, InvocationResult, ResourceSchema
+from sark.models.base import InvocationRequest
 
 
 @dataclass
@@ -48,13 +48,13 @@ class BenchmarkResult:
     success_rate: float
 
     # Resource usage (if available)
-    cpu_percent: Optional[float] = None
-    memory_mb: Optional[float] = None
+    cpu_percent: float | None = None
+    memory_mb: float | None = None
 
     # Additional metadata
-    metadata: Dict[str, Any] = None
+    metadata: dict[str, Any] = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for serialization."""
         return asdict(self)
 
@@ -66,7 +66,7 @@ class BenchmarkResult:
 class BenchmarkRunner:
     """Runner for executing and collecting benchmark results."""
 
-    def __init__(self, output_dir: Optional[Path] = None):
+    def __init__(self, output_dir: Path | None = None):
         """
         Initialize benchmark runner.
 
@@ -75,7 +75,7 @@ class BenchmarkRunner:
         """
         self.output_dir = output_dir or Path("benchmark_results")
         self.output_dir.mkdir(parents=True, exist_ok=True)
-        self.results: List[BenchmarkResult] = []
+        self.results: list[BenchmarkResult] = []
 
     async def run_latency_benchmark(
         self,
@@ -139,7 +139,6 @@ class BenchmarkRunner:
             iterations=iterations,
             concurrency=1,  # Sequential test
             duration_sec=total_duration,
-
             latency_avg=statistics.mean(latencies),
             latency_median=statistics.median(latencies),
             latency_p95=latencies_sorted[int(n * 0.95)] if n > 0 else 0,
@@ -147,7 +146,6 @@ class BenchmarkRunner:
             latency_min=min(latencies) if latencies else 0,
             latency_max=max(latencies) if latencies else 0,
             latency_stddev=statistics.stdev(latencies) if len(latencies) > 1 else 0,
-
             throughput_rps=iterations / total_duration if total_duration > 0 else 0,
             successful_requests=successful,
             failed_requests=failed,
@@ -229,7 +227,6 @@ class BenchmarkRunner:
             iterations=total_requests,
             concurrency=concurrency,
             duration_sec=total_duration,
-
             latency_avg=statistics.mean(latencies) if latencies else 0,
             latency_median=statistics.median(latencies) if latencies else 0,
             latency_p95=latencies_sorted[int(n * 0.95)] if n > 0 else 0,
@@ -237,7 +234,6 @@ class BenchmarkRunner:
             latency_min=min(latencies) if latencies else 0,
             latency_max=max(latencies) if latencies else 0,
             latency_stddev=statistics.stdev(latencies) if len(latencies) > 1 else 0,
-
             throughput_rps=total_requests / total_duration if total_duration > 0 else 0,
             successful_requests=successful,
             failed_requests=failed,
@@ -251,10 +247,10 @@ class BenchmarkRunner:
         self,
         adapter: ProtocolAdapter,
         request: InvocationRequest,
-        concurrency_levels: List[int] = [1, 10, 50, 100, 200],
+        concurrency_levels: list[int] = [1, 10, 50, 100, 200],
         iterations_per_level: int = 100,
         benchmark_name: str = "scalability_test",
-    ) -> List[BenchmarkResult]:
+    ) -> list[BenchmarkResult]:
         """
         Run scalability benchmark across different concurrency levels.
 
@@ -284,10 +280,11 @@ class BenchmarkRunner:
 
             # Process in batches of 'concurrency' size
             for i in range(0, len(requests), concurrency):
-                batch = requests[i:i + concurrency]
+                batch = requests[i : i + concurrency]
                 tasks = []
 
                 for req in batch:
+
                     async def invoke_and_measure(r):
                         start = time.perf_counter()
                         try:
@@ -323,7 +320,6 @@ class BenchmarkRunner:
                 iterations=total_requests,
                 concurrency=concurrency,
                 duration_sec=total_duration,
-
                 latency_avg=statistics.mean(latencies) if latencies else 0,
                 latency_median=statistics.median(latencies) if latencies else 0,
                 latency_p95=latencies_sorted[int(n * 0.95)] if n > 0 else 0,
@@ -331,7 +327,6 @@ class BenchmarkRunner:
                 latency_min=min(latencies) if latencies else 0,
                 latency_max=max(latencies) if latencies else 0,
                 latency_stddev=statistics.stdev(latencies) if len(latencies) > 1 else 0,
-
                 throughput_rps=total_requests / total_duration if total_duration > 0 else 0,
                 successful_requests=successful,
                 failed_requests=failed,
@@ -343,7 +338,7 @@ class BenchmarkRunner:
 
         return results
 
-    def save_results(self, filename: Optional[str] = None) -> Path:
+    def save_results(self, filename: str | None = None) -> Path:
         """
         Save benchmark results to JSON file.
 
@@ -403,7 +398,7 @@ class BenchmarkRunner:
                 lines.append(f"    Iterations: {result.iterations}")
                 lines.append(f"    Concurrency: {result.concurrency}")
                 lines.append(f"    Duration: {result.duration_sec:.2f}s")
-                lines.append(f"\n  Latency:")
+                lines.append("\n  Latency:")
                 lines.append(f"    Average: {result.latency_avg:.2f}ms")
                 lines.append(f"    Median:  {result.latency_median:.2f}ms")
                 lines.append(f"    P95:     {result.latency_p95:.2f}ms")
@@ -411,7 +406,7 @@ class BenchmarkRunner:
                 lines.append(f"    Min:     {result.latency_min:.2f}ms")
                 lines.append(f"    Max:     {result.latency_max:.2f}ms")
                 lines.append(f"    StdDev:  {result.latency_stddev:.2f}ms")
-                lines.append(f"\n  Throughput:")
+                lines.append("\n  Throughput:")
                 lines.append(f"    RPS:     {result.throughput_rps:.2f}")
                 lines.append(f"    Success: {result.successful_requests}")
                 lines.append(f"    Failed:  {result.failed_requests}")
@@ -429,7 +424,7 @@ class BenchmarkRunner:
 async def run_comprehensive_benchmarks(
     adapter: ProtocolAdapter,
     sample_request: InvocationRequest,
-    output_dir: Optional[Path] = None,
+    output_dir: Path | None = None,
 ) -> BenchmarkRunner:
     """
     Run comprehensive benchmark suite for an adapter.

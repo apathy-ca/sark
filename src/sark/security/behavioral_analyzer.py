@@ -8,19 +8,20 @@ Builds behavioral baselines for users and detects anomalous activity:
 - Sensitivity escalation
 """
 
-from typing import Dict, Any, List, Optional, Set
+from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
-from statistics import mode, mean
-from collections import Counter
 import logging
+from statistics import mean, mode
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
 class AnomalyType(str, Enum):
     """Types of behavioral anomalies"""
+
     UNUSUAL_TOOL = "unusual_tool"
     UNUSUAL_TIME = "unusual_time"
     UNUSUAL_DAY = "unusual_day"
@@ -32,6 +33,7 @@ class AnomalyType(str, Enum):
 
 class AnomalySeverity(str, Enum):
     """Severity levels for anomalies"""
+
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
@@ -41,29 +43,31 @@ class AnomalySeverity(str, Enum):
 @dataclass
 class Anomaly:
     """Represents a detected behavioral anomaly"""
+
     type: AnomalyType
     severity: AnomalySeverity
     description: str
-    baseline_value: Optional[Any] = None
-    observed_value: Optional[Any] = None
+    baseline_value: Any | None = None
+    observed_value: Any | None = None
     confidence: float = 1.0  # 0.0 to 1.0
 
 
 @dataclass
 class BehavioralBaseline:
     """User's normal behavior profile"""
+
     user_id: str
     created_at: datetime
     lookback_days: int
 
     # Tool usage
-    common_tools: List[str]
+    common_tools: list[str]
     avg_calls_per_day: float
     max_calls_per_day: int
 
     # Timing patterns
-    typical_hours: Set[int]  # Hours of day (0-23)
-    typical_days: Set[int]   # Days of week (0-6, 0=Monday)
+    typical_hours: set[int]  # Hours of day (0-23)
+    typical_days: set[int]  # Days of week (0-6, 0=Monday)
 
     # Data volume
     avg_records_per_query: float
@@ -74,7 +78,7 @@ class BehavioralBaseline:
     typical_sensitivity: str
 
     # Geographic (optional)
-    typical_locations: Set[str]
+    typical_locations: set[str]
 
 
 @dataclass
@@ -84,13 +88,14 @@ class BehavioralAuditEvent:
     Note: This is distinct from models.audit.AuditEvent which is the
     SQLAlchemy model for storing audit logs in the database.
     """
+
     user_id: str
     timestamp: datetime
     tool_name: str
     sensitivity: str
     result_size: int = 0
-    location: Optional[str] = None
-    request_id: Optional[str] = None
+    location: str | None = None
+    request_id: str | None = None
 
 
 class BehavioralAnalyzer:
@@ -101,7 +106,7 @@ class BehavioralAnalyzer:
     DATA_MULTIPLIER_THRESHOLD = 3.0  # 3x normal data volume
     RAPID_REQUEST_THRESHOLD = 10  # 10 requests in 60 seconds
 
-    def __init__(self, baseline_storage: Optional[Any] = None, audit_storage: Optional[Any] = None):
+    def __init__(self, baseline_storage: Any | None = None, audit_storage: Any | None = None):
         """
         Initialize behavioral analyzer
 
@@ -116,7 +121,7 @@ class BehavioralAnalyzer:
         self,
         user_id: str,
         lookback_days: int = 30,
-        events: Optional[List[BehavioralAuditEvent]] = None
+        events: list[BehavioralAuditEvent] | None = None,
     ) -> BehavioralBaseline:
         """
         Build normal behavior profile for a user
@@ -133,10 +138,7 @@ class BehavioralAnalyzer:
         if events is None:
             if self.audit_storage:
                 start_date = datetime.now() - timedelta(days=lookback_days)
-                events = await self.audit_storage.query(
-                    user_id=user_id,
-                    start_date=start_date
-                )
+                events = await self.audit_storage.query(user_id=user_id, start_date=start_date)
             else:
                 events = []
 
@@ -155,7 +157,7 @@ class BehavioralAnalyzer:
                 max_records_per_query=0,
                 max_sensitivity_level="none",
                 typical_sensitivity="none",
-                typical_locations=set()
+                typical_locations=set(),
             )
 
         # Build baseline from events
@@ -172,7 +174,7 @@ class BehavioralAnalyzer:
             max_records_per_query=max((e.result_size for e in events), default=0),
             max_sensitivity_level=self._get_max_sensitivity(events),
             typical_sensitivity=self._get_typical_sensitivity(events),
-            typical_locations=self._get_typical_locations(events)
+            typical_locations=self._get_typical_locations(events),
         )
 
         # Store baseline
@@ -187,9 +189,9 @@ class BehavioralAnalyzer:
     async def detect_anomalies(
         self,
         event: BehavioralAuditEvent,
-        baseline: Optional[BehavioralBaseline] = None,
-        recent_events: Optional[List[BehavioralAuditEvent]] = None
-    ) -> List[Anomaly]:
+        baseline: BehavioralBaseline | None = None,
+        recent_events: list[BehavioralAuditEvent] | None = None,
+    ) -> list[Anomaly]:
         """
         Detect anomalies in an event
 
@@ -213,52 +215,68 @@ class BehavioralAnalyzer:
 
         # Check unusual tool
         if event.tool_name not in baseline.common_tools:
-            anomalies.append(Anomaly(
-                type=AnomalyType.UNUSUAL_TOOL,
-                severity=AnomalySeverity.LOW,
-                description=f"User accessed uncommon tool: {event.tool_name}",
-                baseline_value=baseline.common_tools[:3],
-                observed_value=event.tool_name,
-                confidence=0.7
-            ))
+            anomalies.append(
+                Anomaly(
+                    type=AnomalyType.UNUSUAL_TOOL,
+                    severity=AnomalySeverity.LOW,
+                    description=f"User accessed uncommon tool: {event.tool_name}",
+                    baseline_value=baseline.common_tools[:3],
+                    observed_value=event.tool_name,
+                    confidence=0.7,
+                )
+            )
 
         # Check unusual time
         event_hour = event.timestamp.hour
         if event_hour not in baseline.typical_hours and baseline.typical_hours:
-            anomalies.append(Anomaly(
-                type=AnomalyType.UNUSUAL_TIME,
-                severity=AnomalySeverity.MEDIUM,
-                description=f"Access at unusual hour: {event_hour}:00",
-                baseline_value=list(baseline.typical_hours),
-                observed_value=event_hour,
-                confidence=0.8
-            ))
+            anomalies.append(
+                Anomaly(
+                    type=AnomalyType.UNUSUAL_TIME,
+                    severity=AnomalySeverity.MEDIUM,
+                    description=f"Access at unusual hour: {event_hour}:00",
+                    baseline_value=list(baseline.typical_hours),
+                    observed_value=event_hour,
+                    confidence=0.8,
+                )
+            )
 
         # Check unusual day
         event_day = event.timestamp.weekday()
         if event_day not in baseline.typical_days and baseline.typical_days:
-            day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-            anomalies.append(Anomaly(
-                type=AnomalyType.UNUSUAL_DAY,
-                severity=AnomalySeverity.LOW,
-                description=f"Access on unusual day: {day_names[event_day]}",
-                baseline_value=[day_names[d] for d in baseline.typical_days],
-                observed_value=day_names[event_day],
-                confidence=0.6
-            ))
+            day_names = [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday",
+            ]
+            anomalies.append(
+                Anomaly(
+                    type=AnomalyType.UNUSUAL_DAY,
+                    severity=AnomalySeverity.LOW,
+                    description=f"Access on unusual day: {day_names[event_day]}",
+                    baseline_value=[day_names[d] for d in baseline.typical_days],
+                    observed_value=day_names[event_day],
+                    confidence=0.6,
+                )
+            )
 
         # Check excessive data access
         if baseline.max_records_per_query > 0:
             threshold = baseline.max_records_per_query * self.DATA_MULTIPLIER_THRESHOLD
             if event.result_size > threshold:
-                anomalies.append(Anomaly(
-                    type=AnomalyType.EXCESSIVE_DATA,
-                    severity=AnomalySeverity.HIGH,
-                    description=f"Excessive data access: {event.result_size} records (baseline max: {baseline.max_records_per_query})",
-                    baseline_value=baseline.max_records_per_query,
-                    observed_value=event.result_size,
-                    confidence=0.9
-                ))
+                anomalies.append(
+                    Anomaly(
+                        type=AnomalyType.EXCESSIVE_DATA,
+                        severity=AnomalySeverity.HIGH,
+                        description=f"Excessive data access: {event.result_size} records (baseline max: {baseline.max_records_per_query})",
+                        baseline_value=baseline.max_records_per_query,
+                        observed_value=event.result_size,
+                        confidence=0.9,
+                    )
+                )
 
         # Check sensitivity escalation
         sensitivity_levels = {"none": 0, "low": 1, "medium": 2, "high": 3, "critical": 4}
@@ -266,63 +284,70 @@ class BehavioralAnalyzer:
         event_level = sensitivity_levels.get(event.sensitivity, 0)
 
         if event_level > baseline_level:
-            anomalies.append(Anomaly(
-                type=AnomalyType.SENSITIVITY_ESCALATION,
-                severity=AnomalySeverity.HIGH,
-                description=f"Sensitivity escalation: {event.sensitivity} (baseline max: {baseline.max_sensitivity_level})",
-                baseline_value=baseline.max_sensitivity_level,
-                observed_value=event.sensitivity,
-                confidence=0.95
-            ))
+            anomalies.append(
+                Anomaly(
+                    type=AnomalyType.SENSITIVITY_ESCALATION,
+                    severity=AnomalySeverity.HIGH,
+                    description=f"Sensitivity escalation: {event.sensitivity} (baseline max: {baseline.max_sensitivity_level})",
+                    baseline_value=baseline.max_sensitivity_level,
+                    observed_value=event.sensitivity,
+                    confidence=0.95,
+                )
+            )
 
         # Check rapid requests
         if recent_events:
-            recent_count = len([
-                e for e in recent_events
-                if (event.timestamp - e.timestamp).total_seconds() < 60
-            ])
+            recent_count = len(
+                [e for e in recent_events if (event.timestamp - e.timestamp).total_seconds() < 60]
+            )
             if recent_count >= self.RAPID_REQUEST_THRESHOLD:
-                anomalies.append(Anomaly(
-                    type=AnomalyType.RAPID_REQUESTS,
-                    severity=AnomalySeverity.MEDIUM,
-                    description=f"Rapid requests: {recent_count} in 60 seconds",
-                    baseline_value=self.RAPID_REQUEST_THRESHOLD,
-                    observed_value=recent_count,
-                    confidence=0.85
-                ))
+                anomalies.append(
+                    Anomaly(
+                        type=AnomalyType.RAPID_REQUESTS,
+                        severity=AnomalySeverity.MEDIUM,
+                        description=f"Rapid requests: {recent_count} in 60 seconds",
+                        baseline_value=self.RAPID_REQUEST_THRESHOLD,
+                        observed_value=recent_count,
+                        confidence=0.85,
+                    )
+                )
 
         # Check geographic anomaly
         if event.location and baseline.typical_locations:
             if event.location not in baseline.typical_locations:
-                anomalies.append(Anomaly(
-                    type=AnomalyType.GEOGRAPHIC_ANOMALY,
-                    severity=AnomalySeverity.MEDIUM,
-                    description=f"Access from unusual location: {event.location}",
-                    baseline_value=list(baseline.typical_locations),
-                    observed_value=event.location,
-                    confidence=0.75
-                ))
+                anomalies.append(
+                    Anomaly(
+                        type=AnomalyType.GEOGRAPHIC_ANOMALY,
+                        severity=AnomalySeverity.MEDIUM,
+                        description=f"Access from unusual location: {event.location}",
+                        baseline_value=list(baseline.typical_locations),
+                        observed_value=event.location,
+                        confidence=0.75,
+                    )
+                )
 
         return anomalies
 
-    def _get_common_tools(self, events: List[BehavioralAuditEvent], top_n: int = 10) -> List[str]:
+    def _get_common_tools(self, events: list[BehavioralAuditEvent], top_n: int = 10) -> list[str]:
         """Get most commonly used tools"""
         tool_counts = Counter(e.tool_name for e in events)
         return [tool for tool, _ in tool_counts.most_common(top_n)]
 
-    def _get_max_calls_per_day(self, events: List[BehavioralAuditEvent]) -> int:
+    def _get_max_calls_per_day(self, events: list[BehavioralAuditEvent]) -> int:
         """Get maximum calls in a single day"""
         if not events:
             return 0
 
-        daily_counts: Dict[str, int] = {}
+        daily_counts: dict[str, int] = {}
         for event in events:
             day_key = event.timestamp.strftime("%Y-%m-%d")
             daily_counts[day_key] = daily_counts.get(day_key, 0) + 1
 
         return max(daily_counts.values()) if daily_counts else 0
 
-    def _get_typical_hours(self, events: List[BehavioralAuditEvent], threshold: float = 0.1) -> Set[int]:
+    def _get_typical_hours(
+        self, events: list[BehavioralAuditEvent], threshold: float = 0.1
+    ) -> set[int]:
         """Get typical hours of activity"""
         if not events:
             return set()
@@ -331,12 +356,11 @@ class BehavioralAnalyzer:
         total = len(events)
 
         # Include hours with at least threshold% of activity
-        return {
-            hour for hour, count in hour_counts.items()
-            if count / total >= threshold
-        }
+        return {hour for hour, count in hour_counts.items() if count / total >= threshold}
 
-    def _get_typical_days(self, events: List[BehavioralAuditEvent], threshold: float = 0.1) -> Set[int]:
+    def _get_typical_days(
+        self, events: list[BehavioralAuditEvent], threshold: float = 0.1
+    ) -> set[int]:
         """Get typical days of week"""
         if not events:
             return set()
@@ -345,17 +369,14 @@ class BehavioralAnalyzer:
         total = len(events)
 
         # Include days with at least threshold% of activity
-        return {
-            day for day, count in day_counts.items()
-            if count / total >= threshold
-        }
+        return {day for day, count in day_counts.items() if count / total >= threshold}
 
-    def _get_avg_result_size(self, events: List[BehavioralAuditEvent]) -> float:
+    def _get_avg_result_size(self, events: list[BehavioralAuditEvent]) -> float:
         """Get average result size"""
         sizes = [e.result_size for e in events if e.result_size > 0]
         return mean(sizes) if sizes else 0.0
 
-    def _get_max_sensitivity(self, events: List[BehavioralAuditEvent]) -> str:
+    def _get_max_sensitivity(self, events: list[BehavioralAuditEvent]) -> str:
         """Get maximum sensitivity level seen"""
         sensitivity_order = ["none", "low", "medium", "high", "critical"]
         max_level = "none"
@@ -369,7 +390,7 @@ class BehavioralAnalyzer:
 
         return max_level
 
-    def _get_typical_sensitivity(self, events: List[BehavioralAuditEvent]) -> str:
+    def _get_typical_sensitivity(self, events: list[BehavioralAuditEvent]) -> str:
         """Get most common sensitivity level"""
         sensitivities = [e.sensitivity for e in events if e.sensitivity]
         try:
@@ -379,7 +400,7 @@ class BehavioralAnalyzer:
             counts = Counter(sensitivities)
             return counts.most_common(1)[0][0] if counts else "none"
 
-    def _get_typical_locations(self, events: List[BehavioralAuditEvent]) -> Set[str]:
+    def _get_typical_locations(self, events: list[BehavioralAuditEvent]) -> set[str]:
         """Get typical access locations"""
         locations = {e.location for e in events if e.location}
         return locations

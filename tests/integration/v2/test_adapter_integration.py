@@ -12,12 +12,9 @@ Tests adapter functionality including:
 """
 
 import pytest
-from unittest.mock import AsyncMock
 
-from sark.adapters.base import ProtocolAdapter
-from sark.adapters.exceptions import ValidationError, UnsupportedOperationError
+from sark.adapters.exceptions import UnsupportedOperationError
 from sark.models.base import InvocationRequest
-
 
 # ============================================================================
 # Adapter Registry Tests
@@ -349,11 +346,7 @@ class TestCrossAdapterIntegration:
 
     @pytest.mark.asyncio
     async def test_all_adapters_health_check(
-        self,
-        populated_registry,
-        sample_mcp_resource,
-        sample_http_resource,
-        sample_grpc_resource
+        self, populated_registry, sample_mcp_resource, sample_http_resource, sample_grpc_resource
     ):
         """Test health checks across all adapters."""
         mcp_adapter = populated_registry.get("mcp")
@@ -370,11 +363,7 @@ class TestCrossAdapterIntegration:
 
     @pytest.mark.asyncio
     async def test_adapter_capability_discovery(
-        self,
-        populated_registry,
-        sample_mcp_resource,
-        sample_http_resource,
-        sample_grpc_resource
+        self, populated_registry, sample_mcp_resource, sample_http_resource, sample_grpc_resource
     ):
         """Test capability discovery across all adapters."""
         mcp_adapter = populated_registry.get("mcp")
@@ -479,7 +468,7 @@ class TestAdapterErrorHandling:
                 capability_id=f"cap-{i}",
                 principal_id="test-principal",
                 arguments={"index": i},
-                context={}
+                context={},
             )
             for i in range(3)
         ]
@@ -510,11 +499,7 @@ class TestAdapterSARKCoreIntegration:
     """Test adapter integration with SARK core components."""
 
     @pytest.mark.asyncio
-    async def test_adapter_discovery_to_registration(
-        self,
-        populated_registry,
-        mock_mcp_adapter
-    ):
+    async def test_adapter_discovery_to_registration(self, populated_registry, mock_mcp_adapter):
         """Test complete flow from discovery to registration."""
         # 1. Discover resources
         config = {

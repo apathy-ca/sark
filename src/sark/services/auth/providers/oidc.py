@@ -2,8 +2,8 @@
 
 import secrets
 from typing import Any
-from uuid import UUID
 from urllib.parse import urlencode
+from uuid import UUID
 
 import httpx
 from pydantic import Field

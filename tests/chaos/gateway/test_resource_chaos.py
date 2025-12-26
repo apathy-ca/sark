@@ -1,7 +1,8 @@
 """Resource Chaos Engineering Tests."""
 
-import pytest
 import asyncio
+
+import pytest
 
 pytestmark = pytest.mark.chaos
 
@@ -44,9 +45,7 @@ async def test_file_descriptor_exhaustion(app_client, mock_user_token):
     results = await asyncio.gather(*tasks, return_exceptions=True)
 
     # Most should succeed, some may fail gracefully
-    successful = sum(
-        1 for r in results if not isinstance(r, Exception) and r.status_code == 200
-    )
+    successful = sum(1 for r in results if not isinstance(r, Exception) and r.status_code == 200)
 
     # At least 80% should succeed
     assert successful >= len(tasks) * 0.80
@@ -103,8 +102,7 @@ async def test_memory_pressure_scenarios(app_client, mock_user_token):
 
     # Should handle or reject large payloads
     handled = sum(
-        1 for r in results
-        if not isinstance(r, Exception) and r.status_code in [200, 413, 422]
+        1 for r in results if not isinstance(r, Exception) and r.status_code in [200, 413, 422]
     )
 
     assert handled >= len(tasks) * 0.80

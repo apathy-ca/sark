@@ -4,12 +4,12 @@ This module provides a test framework for OPA policies using YAML test suites.
 Test suites define sample inputs and expected outputs to verify policy behavior.
 """
 
-import json
-import subprocess
-import tempfile
 from dataclasses import dataclass, field
 from enum import Enum
+import json
 from pathlib import Path
+import subprocess
+import tempfile
 from typing import Any
 
 import structlog
@@ -204,7 +204,7 @@ class PolicyTestRunner:
             return test_cases
 
         except yaml.YAMLError as e:
-            raise ValueError(f"Invalid YAML in test suite: {str(e)}") from e
+            raise ValueError(f"Invalid YAML in test suite: {e!s}") from e
         except FileNotFoundError as e:
             raise ValueError(f"Test suite file not found: {test_suite_path}") from e
 
@@ -239,9 +239,7 @@ class PolicyTestRunner:
                 policy_path = (test_suite_path.parent / policy_rel).resolve()
 
         if policy_path is None:
-            raise ValueError(
-                "Policy path must be specified in test suite or as argument"
-            )
+            raise ValueError("Policy path must be specified in test suite or as argument")
 
         if not policy_path.exists():
             raise ValueError(f"Policy file not found: {policy_path}")
@@ -306,9 +304,7 @@ class PolicyTestRunner:
 
         try:
             # Create temporary input file
-            with tempfile.NamedTemporaryFile(
-                mode="w", suffix=".json", delete=False
-            ) as input_file:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as input_file:
                 json.dump(test_case.input, input_file)
                 input_file.flush()
                 input_path = Path(input_file.name)
@@ -403,7 +399,7 @@ class PolicyTestRunner:
             return TestResult(
                 test_name=test_case.name,
                 status=TestStatus.ERROR,
-                error_message=f"Unexpected error: {str(e)}",
+                error_message=f"Unexpected error: {e!s}",
             )
 
     def _extract_package_from_policy(self, policy_path: Path) -> list[str]:
@@ -429,9 +425,7 @@ class PolicyTestRunner:
 
         return []
 
-    def _compare_results(
-        self, expected: dict[str, Any], actual: dict[str, Any]
-    ) -> bool:
+    def _compare_results(self, expected: dict[str, Any], actual: dict[str, Any]) -> bool:
         """
         Compare expected and actual results.
 
@@ -506,9 +500,7 @@ class PolicyTestRunner:
         results = []
 
         # Find all .yaml and .yml files
-        test_files = list(test_suite_dir.glob("*.yaml")) + list(
-            test_suite_dir.glob("*.yml")
-        )
+        test_files = list(test_suite_dir.glob("*.yaml")) + list(test_suite_dir.glob("*.yml"))
 
         for test_file in sorted(test_files):
             try:
@@ -531,9 +523,7 @@ class PolicyTestRunner:
                     error=str(e),
                 )
                 # Create error result
-                error_result = TestSuiteResult(
-                    suite_name=test_file.stem, policy_path=None
-                )
+                error_result = TestSuiteResult(suite_name=test_file.stem, policy_path=None)
                 error_result.total = 1
                 error_result.errors = 1
                 error_result.results.append(

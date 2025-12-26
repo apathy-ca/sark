@@ -9,15 +9,15 @@ Usage:
     python tests/performance/dashboard.py --days 30 --output reports/performance/dashboard.html
 """
 
-import json
 import argparse
-from pathlib import Path
-from datetime import datetime, timedelta
-from typing import List, Dict, Any
 from collections import defaultdict
+from datetime import datetime, timedelta
+import json
+from pathlib import Path
+from typing import Any
 
 
-def load_history(history_file: Path, days: int = 30) -> List[Dict[str, Any]]:
+def load_history(history_file: Path, days: int = 30) -> list[dict[str, Any]]:
     """Load benchmark history for the last N days"""
     if not history_file.exists():
         return []
@@ -25,10 +25,10 @@ def load_history(history_file: Path, days: int = 30) -> List[Dict[str, Any]]:
     cutoff = datetime.now() - timedelta(days=days)
     history = []
 
-    with open(history_file, 'r') as f:
+    with open(history_file) as f:
         for line in f:
             data = json.loads(line)
-            timestamp = datetime.fromisoformat(data['timestamp'])
+            timestamp = datetime.fromisoformat(data["timestamp"])
 
             if timestamp >= cutoff:
                 history.append(data)
@@ -36,41 +36,39 @@ def load_history(history_file: Path, days: int = 30) -> List[Dict[str, Any]]:
     return history
 
 
-def generate_dashboard_html(history: List[Dict[str, Any]], output_path: Path):
+def generate_dashboard_html(history: list[dict[str, Any]], output_path: Path):
     """Generate interactive performance dashboard"""
 
     # Organize data by benchmark name
     benchmark_data = defaultdict(list)
 
     for run in history:
-        timestamp = run['timestamp']
-        commit = run.get('git_commit', 'unknown')
+        timestamp = run["timestamp"]
+        commit = run.get("git_commit", "unknown")
 
-        for result in run.get('results', []):
-            benchmark_data[result['name']].append({
-                'timestamp': timestamp,
-                'commit': commit,
-                'p50': result['median_ms'],
-                'p95': result['p95_ms'],
-                'p99': result['p99_ms'],
-                'passed': result['passed']
-            })
+        for result in run.get("results", []):
+            benchmark_data[result["name"]].append(
+                {
+                    "timestamp": timestamp,
+                    "commit": commit,
+                    "p50": result["median_ms"],
+                    "p95": result["p95_ms"],
+                    "p99": result["p99_ms"],
+                    "passed": result["passed"],
+                }
+            )
 
     # Sort by timestamp
     for name in benchmark_data:
-        benchmark_data[name].sort(key=lambda x: x['timestamp'])
+        benchmark_data[name].sort(key=lambda x: x["timestamp"])
 
     # Prepare chart data
     chart_datasets = []
     for name, data in benchmark_data.items():
-        timestamps = [d['timestamp'] for d in data]
-        p95_values = [d['p95'] for d in data]
+        timestamps = [d["timestamp"] for d in data]
+        p95_values = [d["p95"] for d in data]
 
-        chart_datasets.append({
-            'name': name,
-            'timestamps': timestamps,
-            'values': p95_values
-        })
+        chart_datasets.append({"name": name, "timestamps": timestamps, "values": p95_values})
 
     html = f"""
 <!DOCTYPE html>
@@ -469,31 +467,28 @@ def generate_dashboard_html(history: List[Dict[str, Any]], output_path: Path):
 """
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(output_path, 'w') as f:
+    with open(output_path, "w") as f:
         f.write(html)
 
     print(f"✅ Dashboard generated: {output_path}")
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Generate performance dashboard')
+    parser = argparse.ArgumentParser(description="Generate performance dashboard")
     parser.add_argument(
-        '--days',
-        type=int,
-        default=30,
-        help='Number of days of history to include (default: 30)'
+        "--days", type=int, default=30, help="Number of days of history to include (default: 30)"
     )
     parser.add_argument(
-        '--output',
+        "--output",
         type=str,
-        default='reports/performance/dashboard.html',
-        help='Output HTML file path'
+        default="reports/performance/dashboard.html",
+        help="Output HTML file path",
     )
     parser.add_argument(
-        '--history',
+        "--history",
         type=str,
-        default='reports/performance/benchmark_history.jsonl',
-        help='Path to benchmark history file'
+        default="reports/performance/benchmark_history.jsonl",
+        help="Path to benchmark history file",
     )
     args = parser.parse_args()
 
@@ -513,13 +508,14 @@ def main():
         return 1
 
     print(f"Found {len(history)} benchmark runs")
-    print(f"Generating dashboard...")
+    print("Generating dashboard...")
 
     generate_dashboard_html(history, output_path)
 
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
+
     sys.exit(main())

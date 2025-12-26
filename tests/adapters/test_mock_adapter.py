@@ -4,24 +4,22 @@ Test suite for MockAdapter - validates that the adapter contract tests work.
 This also serves as a reference implementation for adapter developers.
 """
 
-import pytest
 from datetime import datetime
-from typing import Any, Dict, List, AsyncIterator
+from typing import Any
+
+import pytest
 
 from sark.adapters.base import ProtocolAdapter
+from sark.adapters.exceptions import (
+    DiscoveryError,
+)
 from sark.models.base import (
-    ResourceSchema,
     CapabilitySchema,
     InvocationRequest,
     InvocationResult,
-)
-from sark.adapters.exceptions import (
-    ValidationError,
-    DiscoveryError,
-    InvocationError,
+    ResourceSchema,
 )
 from tests.adapters.base_adapter_test import BaseAdapterTest
-
 
 # ============================================================================
 # Mock Adapter Implementation
@@ -43,15 +41,11 @@ class MockAdapter(ProtocolAdapter):
     def protocol_version(self) -> str:
         return "1.0.0"
 
-    async def discover_resources(
-        self,
-        discovery_config: Dict[str, Any]
-    ) -> List[ResourceSchema]:
+    async def discover_resources(self, discovery_config: dict[str, Any]) -> list[ResourceSchema]:
         """Discover mock resources."""
         if not discovery_config:
             raise DiscoveryError(
-                "Discovery config cannot be empty",
-                adapter_name=self.protocol_name
+                "Discovery config cannot be empty", adapter_name=self.protocol_name
             )
 
         endpoint = discovery_config.get("endpoint", "mock://localhost")
@@ -64,15 +58,12 @@ class MockAdapter(ProtocolAdapter):
             sensitivity_level="medium",
             metadata=discovery_config,
             created_at=datetime.now(),
-            updated_at=datetime.now()
+            updated_at=datetime.now(),
         )
 
         return [resource]
 
-    async def get_capabilities(
-        self,
-        resource: ResourceSchema
-    ) -> List[CapabilitySchema]:
+    async def get_capabilities(self, resource: ResourceSchema) -> list[CapabilitySchema]:
         """Get capabilities for a resource."""
         return [
             CapabilitySchema(
@@ -83,24 +74,19 @@ class MockAdapter(ProtocolAdapter):
                 input_schema={"type": "object", "properties": {"arg": {"type": "string"}}},
                 output_schema={"type": "object", "properties": {"result": {"type": "string"}}},
                 sensitivity_level="medium",
-                metadata={}
+                metadata={},
             )
         ]
 
-    async def validate_request(
-        self,
-        request: InvocationRequest
-    ) -> bool:
+    async def validate_request(self, request: InvocationRequest) -> bool:
         """Validate an invocation request."""
         # Simple validation: check if capability_id starts with "mock-"
         return request.capability_id.startswith("mock-")
 
-    async def invoke(
-        self,
-        request: InvocationRequest
-    ) -> InvocationResult:
+    async def invoke(self, request: InvocationRequest) -> InvocationResult:
         """Execute a capability invocation."""
         import time
+
         start = time.time()
 
         try:
@@ -109,27 +95,24 @@ class MockAdapter(ProtocolAdapter):
                 "capability_id": request.capability_id,
                 "principal_id": request.principal_id,
                 "arguments": request.arguments,
-                "status": "success"
+                "status": "success",
             }
 
             return InvocationResult(
                 success=True,
                 result=result_data,
                 metadata={"mock": True},
-                duration_ms=(time.time() - start) * 1000
+                duration_ms=(time.time() - start) * 1000,
             )
         except Exception as e:
             return InvocationResult(
                 success=False,
                 error=str(e),
                 metadata={"mock": True},
-                duration_ms=(time.time() - start) * 1000
+                duration_ms=(time.time() - start) * 1000,
             )
 
-    async def health_check(
-        self,
-        resource: ResourceSchema
-    ) -> bool:
+    async def health_check(self, resource: ResourceSchema) -> bool:
         """Check if resource is healthy."""
         # Mock resources are always healthy
         return True
@@ -149,12 +132,12 @@ class TestMockAdapter(BaseAdapterTest):
         return MockAdapter()
 
     @pytest.fixture
-    def discovery_config(self) -> Dict[str, Any]:
+    def discovery_config(self) -> dict[str, Any]:
         """Return valid discovery configuration."""
         return {
             "name": "test-resource",
             "endpoint": "mock://test",
-            "features": ["capability1", "capability2"]
+            "features": ["capability1", "capability2"],
         }
 
     @pytest.fixture
@@ -168,7 +151,7 @@ class TestMockAdapter(BaseAdapterTest):
             sensitivity_level="medium",
             metadata={},
             created_at=datetime.now(),
-            updated_at=datetime.now()
+            updated_at=datetime.now(),
         )
 
     @pytest.fixture
@@ -182,7 +165,7 @@ class TestMockAdapter(BaseAdapterTest):
             input_schema={},
             output_schema={},
             sensitivity_level="medium",
-            metadata={}
+            metadata={},
         )
 
     @pytest.fixture
@@ -191,7 +174,7 @@ class TestMockAdapter(BaseAdapterTest):
         return InvocationRequest(
             capability_id="mock-test-resource-capability-1",
             principal_id="test-user",
-            arguments={"arg": "value"}
+            arguments={"arg": "value"},
         )
 
     # All contract tests are inherited from BaseAdapterTest
@@ -220,16 +203,12 @@ class TestMockAdapterSpecific:
         adapter = MockAdapter()
 
         valid_request = InvocationRequest(
-            capability_id="mock-something",
-            principal_id="user",
-            arguments={}
+            capability_id="mock-something", principal_id="user", arguments={}
         )
         assert await adapter.validate_request(valid_request) is True
 
         invalid_request = InvocationRequest(
-            capability_id="other-something",
-            principal_id="user",
-            arguments={}
+            capability_id="other-something", principal_id="user", arguments={}
         )
         assert await adapter.validate_request(invalid_request) is False
 
@@ -239,9 +218,7 @@ class TestMockAdapterSpecific:
         adapter = MockAdapter()
 
         request = InvocationRequest(
-            capability_id="mock-test",
-            principal_id="user",
-            arguments={"key": "value"}
+            capability_id="mock-test", principal_id="user", arguments={"key": "value"}
         )
 
         result = await adapter.invoke(request)

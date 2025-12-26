@@ -155,7 +155,9 @@ class TestLDAPIntegrationSearch:
         assert user_dn is not None
         assert "testuser" in user_dn
         assert user_attrs is not None
-        assert user_attrs.get("uid") == "testuser" or user_attrs.get("mail") == "testuser@example.com"
+        assert (
+            user_attrs.get("uid") == "testuser" or user_attrs.get("mail") == "testuser@example.com"
+        )
 
     @pytest.mark.asyncio
     async def test_search_nonexistent_user(self, ldap_provider):
@@ -194,8 +196,7 @@ class TestLDAPIntegrationBind:
     async def test_bind_nonexistent_user(self, ldap_provider):
         """Test binding fails for nonexistent user."""
         result = await ldap_provider._bind_user(
-            "uid=nonexistent,ou=users,dc=example,dc=com",
-            "password"
+            "uid=nonexistent,ou=users,dc=example,dc=com", "password"
         )
         assert result is False
 
@@ -292,10 +293,10 @@ class TestLDAPIntegrationConcurrency:
             return await ldap_provider.authenticate(username, password)
 
         results = await asyncio.gather(
-            auth_user("testuser", "testpass"),      # Success
-            auth_user("testuser", "wrongpass"),     # Failure
-            auth_user("nonexistent", "password"),   # Failure
-            auth_user("admin", "adminpass"),        # Success
+            auth_user("testuser", "testpass"),  # Success
+            auth_user("testuser", "wrongpass"),  # Failure
+            auth_user("nonexistent", "password"),  # Failure
+            auth_user("admin", "adminpass"),  # Success
         )
 
         assert results[0].success is True

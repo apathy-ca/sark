@@ -5,12 +5,11 @@ This adapter implements the ProtocolAdapter interface for MCP servers,
 supporting stdio, SSE, and HTTP transports.
 """
 
-import asyncio
-import json
+from collections.abc import AsyncIterator
+from datetime import UTC, datetime
 import subprocess
 import time
-from datetime import datetime, UTC
-from typing import Any, AsyncIterator, Dict, List, Optional
+from typing import Any
 import uuid
 
 import httpx
@@ -19,14 +18,12 @@ import structlog
 from sark.adapters.base import ProtocolAdapter
 from sark.adapters.exceptions import (
     AdapterConfigurationError,
-    CapabilityNotFoundError,
-    ConnectionError as AdapterConnectionError,
     DiscoveryError,
     InvocationError,
     ProtocolError,
-    StreamingError,
-    TimeoutError as AdapterTimeoutError,
-    ValidationError,
+)
+from sark.adapters.exceptions import (
+    ConnectionError as AdapterConnectionError,
 )
 from sark.models.base import (
     CapabilitySchema,
@@ -85,8 +82,8 @@ class MCPAdapter(ProtocolAdapter):
     def __init__(self):
         """Initialize the MCP adapter."""
         self._http_client = httpx.AsyncClient(timeout=30.0)
-        self._processes: Dict[str, subprocess.Popen] = {}
-        self._capability_cache: Dict[str, List[CapabilitySchema]] = {}
+        self._processes: dict[str, subprocess.Popen] = {}
+        self._capability_cache: dict[str, list[CapabilitySchema]] = {}
 
     @property
     def protocol_name(self) -> str:
@@ -98,9 +95,7 @@ class MCPAdapter(ProtocolAdapter):
         """Return MCP protocol version."""
         return self.MCP_PROTOCOL_VERSION
 
-    async def discover_resources(
-        self, discovery_config: Dict[str, Any]
-    ) -> List[ResourceSchema]:
+    async def discover_resources(self, discovery_config: dict[str, Any]) -> list[ResourceSchema]:
         """
         Discover MCP server and its capabilities.
 
@@ -149,14 +144,12 @@ class MCPAdapter(ProtocolAdapter):
             if isinstance(e, (DiscoveryError, AdapterConfigurationError)):
                 raise
             raise DiscoveryError(
-                f"MCP discovery failed: {str(e)}",
+                f"MCP discovery failed: {e!s}",
                 adapter_name=self.protocol_name,
                 details={"error": str(e), "config": discovery_config},
             ) from e
 
-    async def _discover_stdio(
-        self, discovery_config: Dict[str, Any]
-    ) -> List[ResourceSchema]:
+    async def _discover_stdio(self, discovery_config: dict[str, Any]) -> list[ResourceSchema]:
         """
         Discover MCP server via stdio transport.
 
@@ -207,9 +200,7 @@ class MCPAdapter(ProtocolAdapter):
 
         return [resource]
 
-    async def _discover_sse(
-        self, discovery_config: Dict[str, Any]
-    ) -> List[ResourceSchema]:
+    async def _discover_sse(self, discovery_config: dict[str, Any]) -> list[ResourceSchema]:
         """
         Discover MCP server via SSE transport.
 
@@ -234,19 +225,19 @@ class MCPAdapter(ProtocolAdapter):
             response.raise_for_status()
         except httpx.HTTPError as e:
             raise AdapterConnectionError(
-                f"Failed to connect to SSE endpoint: {str(e)}",
+                f"Failed to connect to SSE endpoint: {e!s}",
                 adapter_name=self.protocol_name,
                 details={"endpoint": endpoint, "error": str(e)},
             ) from e
         except Exception as e:
             raise AdapterConnectionError(
-                f"Failed to connect to SSE endpoint: {str(e)}",
+                f"Failed to connect to SSE endpoint: {e!s}",
                 adapter_name=self.protocol_name,
                 details={"endpoint": endpoint, "error": str(e)},
             ) from e
 
         resource_id = f"mcp-sse-{uuid.uuid4().hex[:8]}"
-        resource_name = discovery_config.get("name", f"MCP Server (SSE)")
+        resource_name = discovery_config.get("name", "MCP Server (SSE)")
 
         resource = ResourceSchema(
             id=resource_id,
@@ -268,9 +259,7 @@ class MCPAdapter(ProtocolAdapter):
 
         return [resource]
 
-    async def _discover_http(
-        self, discovery_config: Dict[str, Any]
-    ) -> List[ResourceSchema]:
+    async def _discover_http(self, discovery_config: dict[str, Any]) -> list[ResourceSchema]:
         """
         Discover MCP server via HTTP transport.
 
@@ -295,13 +284,13 @@ class MCPAdapter(ProtocolAdapter):
             response.raise_for_status()
         except Exception as e:
             raise AdapterConnectionError(
-                f"Failed to connect to HTTP endpoint: {str(e)}",
+                f"Failed to connect to HTTP endpoint: {e!s}",
                 adapter_name=self.protocol_name,
                 details={"endpoint": endpoint, "error": str(e)},
             ) from e
 
         resource_id = f"mcp-http-{uuid.uuid4().hex[:8]}"
-        resource_name = discovery_config.get("name", f"MCP Server (HTTP)")
+        resource_name = discovery_config.get("name", "MCP Server (HTTP)")
 
         resource = ResourceSchema(
             id=resource_id,
@@ -323,9 +312,7 @@ class MCPAdapter(ProtocolAdapter):
 
         return [resource]
 
-    async def get_capabilities(
-        self, resource: ResourceSchema
-    ) -> List[CapabilitySchema]:
+    async def get_capabilities(self, resource: ResourceSchema) -> list[CapabilitySchema]:
         """
         Get all capabilities (tools) for an MCP server.
 
@@ -376,15 +363,13 @@ class MCPAdapter(ProtocolAdapter):
             if isinstance(e, ProtocolError):
                 raise
             raise ProtocolError(
-                f"Failed to get MCP capabilities: {str(e)}",
+                f"Failed to get MCP capabilities: {e!s}",
                 adapter_name=self.protocol_name,
                 protocol_name=self.protocol_name,
                 details={"error": str(e), "transport": transport},
             ) from e
 
-    async def _get_capabilities_stdio(
-        self, resource: ResourceSchema
-    ) -> List[CapabilitySchema]:
+    async def _get_capabilities_stdio(self, resource: ResourceSchema) -> list[CapabilitySchema]:
         """Get capabilities via stdio transport."""
         # For stdio, we simulate tool discovery
         # In a real implementation, we'd need to launch the process and query it
@@ -396,18 +381,14 @@ class MCPAdapter(ProtocolAdapter):
         )
         return []
 
-    async def _get_capabilities_sse(
-        self, resource: ResourceSchema
-    ) -> List[CapabilitySchema]:
+    async def _get_capabilities_sse(self, resource: ResourceSchema) -> list[CapabilitySchema]:
         """Get capabilities via SSE transport."""
         endpoint = resource.metadata.get("endpoint")
         headers = resource.metadata.get("headers", {})
 
         try:
             # Query the tools/list endpoint
-            response = await self._http_client.get(
-                f"{endpoint}/tools/list", headers=headers
-            )
+            response = await self._http_client.get(f"{endpoint}/tools/list", headers=headers)
             response.raise_for_status()
             tools_data = response.json()
 
@@ -415,15 +396,13 @@ class MCPAdapter(ProtocolAdapter):
 
         except Exception as e:
             raise ProtocolError(
-                f"SSE capability query failed: {str(e)}",
+                f"SSE capability query failed: {e!s}",
                 adapter_name=self.protocol_name,
                 protocol_name=self.protocol_name,
                 resource_id=resource.id,
             ) from e
 
-    async def _get_capabilities_http(
-        self, resource: ResourceSchema
-    ) -> List[CapabilitySchema]:
+    async def _get_capabilities_http(self, resource: ResourceSchema) -> list[CapabilitySchema]:
         """Get capabilities via HTTP transport."""
         endpoint = resource.metadata.get("endpoint")
         headers = resource.metadata.get("headers", {})
@@ -440,15 +419,15 @@ class MCPAdapter(ProtocolAdapter):
 
         except Exception as e:
             raise ProtocolError(
-                f"HTTP capability query failed: {str(e)}",
+                f"HTTP capability query failed: {e!s}",
                 adapter_name=self.protocol_name,
                 protocol_name=self.protocol_name,
                 resource_id=resource.id,
             ) from e
 
     def _parse_mcp_tools(
-        self, resource: ResourceSchema, tools: List[Dict[str, Any]]
-    ) -> List[CapabilitySchema]:
+        self, resource: ResourceSchema, tools: list[dict[str, Any]]
+    ) -> list[CapabilitySchema]:
         """
         Parse MCP tools into CapabilitySchema objects.
 
@@ -466,9 +445,7 @@ class MCPAdapter(ProtocolAdapter):
             capability_id = f"{resource.id}-{tool_name}"
 
             # Auto-detect sensitivity based on tool name/description
-            sensitivity = self._detect_tool_sensitivity(
-                tool_name, tool.get("description", "")
-            )
+            sensitivity = self._detect_tool_sensitivity(tool_name, tool.get("description", ""))
 
             capability = CapabilitySchema(
                 id=capability_id,
@@ -488,9 +465,7 @@ class MCPAdapter(ProtocolAdapter):
 
         return capabilities
 
-    def _detect_tool_sensitivity(
-        self, tool_name: str, tool_description: str
-    ) -> str:
+    def _detect_tool_sensitivity(self, tool_name: str, tool_description: str) -> str:
         """
         Auto-detect sensitivity level for an MCP tool.
 
@@ -646,7 +621,7 @@ class MCPAdapter(ProtocolAdapter):
         except Exception as e:
             duration_ms = (time.time() - start_time) * 1000
             raise InvocationError(
-                f"MCP tool invocation failed: {str(e)}",
+                f"MCP tool invocation failed: {e!s}",
                 adapter_name=self.protocol_name,
                 capability_id=request.capability_id,
                 protocol_error=str(e),
@@ -692,9 +667,7 @@ class MCPAdapter(ProtocolAdapter):
         except Exception:
             return False
 
-    async def invoke_streaming(
-        self, request: InvocationRequest
-    ) -> AsyncIterator[Any]:
+    async def invoke_streaming(self, request: InvocationRequest) -> AsyncIterator[Any]:
         """
         Invoke an MCP tool with streaming support (for SSE transport).
 
@@ -729,7 +702,7 @@ class MCPAdapter(ProtocolAdapter):
         }
         yield {"type": "end", "status": "complete"}
 
-    def get_adapter_metadata(self) -> Dict[str, Any]:
+    def get_adapter_metadata(self) -> dict[str, Any]:
         """Get MCP adapter-specific metadata."""
         return {
             "transport_types": ["stdio", "sse", "http"],

@@ -10,12 +10,12 @@ Tests complex scenarios involving multiple protocols:
 - Error handling in multi-protocol chains
 """
 
-import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
-from sark.models.base import InvocationRequest, InvocationResult
+import pytest
 
+from sark.models.base import InvocationRequest, InvocationResult
 
 # ============================================================================
 # Multi-Protocol Workflow Tests
@@ -30,10 +30,7 @@ class TestMultiProtocolWorkflows:
 
     @pytest.mark.asyncio
     async def test_mcp_to_http_workflow(
-        self,
-        populated_registry,
-        sample_mcp_resource,
-        sample_http_resource
+        self, populated_registry, sample_mcp_resource, sample_http_resource
     ):
         """
         Test MCP -> HTTP workflow.
@@ -48,7 +45,7 @@ class TestMultiProtocolWorkflows:
             capability_id=f"{sample_mcp_resource.id}-read_file",
             principal_id=str(uuid4()),
             arguments={"path": "/data/users.json"},
-            context={"workflow_id": "test-workflow-1"}
+            context={"workflow_id": "test-workflow-1"},
         )
         mcp_result = await mcp_adapter.invoke(mcp_request)
 
@@ -59,10 +56,7 @@ class TestMultiProtocolWorkflows:
             capability_id=f"{sample_http_resource.id}-POST-/users",
             principal_id=str(uuid4()),
             arguments={"name": "Test User", "email": "test@example.com"},
-            context={
-                "workflow_id": "test-workflow-1",
-                "previous_step": "mcp_read_file"
-            }
+            context={"workflow_id": "test-workflow-1", "previous_step": "mcp_read_file"},
         )
         http_result = await http_adapter.invoke(http_request)
 
@@ -71,10 +65,7 @@ class TestMultiProtocolWorkflows:
 
     @pytest.mark.asyncio
     async def test_http_to_grpc_workflow(
-        self,
-        populated_registry,
-        sample_http_resource,
-        sample_grpc_resource
+        self, populated_registry, sample_http_resource, sample_grpc_resource
     ):
         """
         Test HTTP -> gRPC workflow.
@@ -89,7 +80,7 @@ class TestMultiProtocolWorkflows:
             capability_id=f"{sample_http_resource.id}-GET-/users",
             principal_id=str(uuid4()),
             arguments={},
-            context={"workflow_id": "test-workflow-2"}
+            context={"workflow_id": "test-workflow-2"},
         )
         http_result = await http_adapter.invoke(http_request)
 
@@ -100,10 +91,7 @@ class TestMultiProtocolWorkflows:
             capability_id=f"{sample_grpc_resource.id}-UserService.GetUser",
             principal_id=str(uuid4()),
             arguments={"user_id": "123"},
-            context={
-                "workflow_id": "test-workflow-2",
-                "previous_step": "http_list_users"
-            }
+            context={"workflow_id": "test-workflow-2", "previous_step": "http_list_users"},
         )
         grpc_result = await grpc_adapter.invoke(grpc_request)
 
@@ -112,11 +100,7 @@ class TestMultiProtocolWorkflows:
 
     @pytest.mark.asyncio
     async def test_three_protocol_workflow(
-        self,
-        populated_registry,
-        sample_mcp_resource,
-        sample_http_resource,
-        sample_grpc_resource
+        self, populated_registry, sample_mcp_resource, sample_http_resource, sample_grpc_resource
     ):
         """
         Test MCP -> HTTP -> gRPC workflow.
@@ -131,46 +115,44 @@ class TestMultiProtocolWorkflows:
         principal_id = str(uuid4())
 
         # Step 1: Read config from MCP filesystem
-        step1_result = await mcp_adapter.invoke(InvocationRequest(
-            capability_id=f"{sample_mcp_resource.id}-read_file",
-            principal_id=principal_id,
-            arguments={"path": "/config/settings.json"},
-            context={"workflow_id": workflow_id, "step": 1}
-        ))
+        step1_result = await mcp_adapter.invoke(
+            InvocationRequest(
+                capability_id=f"{sample_mcp_resource.id}-read_file",
+                principal_id=principal_id,
+                arguments={"path": "/config/settings.json"},
+                context={"workflow_id": workflow_id, "step": 1},
+            )
+        )
         assert step1_result.success is True
 
         # Step 2: Create user via HTTP API
-        step2_result = await http_adapter.invoke(InvocationRequest(
-            capability_id=f"{sample_http_resource.id}-POST-/users",
-            principal_id=principal_id,
-            arguments={"name": "Multi Protocol User"},
-            context={"workflow_id": workflow_id, "step": 2}
-        ))
+        step2_result = await http_adapter.invoke(
+            InvocationRequest(
+                capability_id=f"{sample_http_resource.id}-POST-/users",
+                principal_id=principal_id,
+                arguments={"name": "Multi Protocol User"},
+                context={"workflow_id": workflow_id, "step": 2},
+            )
+        )
         assert step2_result.success is True
 
         # Step 3: Query user service via gRPC
-        step3_result = await grpc_adapter.invoke(InvocationRequest(
-            capability_id=f"{sample_grpc_resource.id}-UserService.GetUser",
-            principal_id=principal_id,
-            arguments={"user_id": "123"},
-            context={"workflow_id": workflow_id, "step": 3}
-        ))
+        step3_result = await grpc_adapter.invoke(
+            InvocationRequest(
+                capability_id=f"{sample_grpc_resource.id}-UserService.GetUser",
+                principal_id=principal_id,
+                arguments={"user_id": "123"},
+                context={"workflow_id": workflow_id, "step": 3},
+            )
+        )
         assert step3_result.success is True
 
         # Verify all steps succeeded
-        assert all([
-            step1_result.success,
-            step2_result.success,
-            step3_result.success
-        ])
+        assert all([step1_result.success, step2_result.success, step3_result.success])
 
     @pytest.mark.asyncio
     async def test_parallel_multi_protocol_invocations(
-        self,
-        populated_registry,
-        sample_mcp_resource,
-        sample_http_resource,
-        sample_grpc_resource
+        self, populated_registry, sample_mcp_resource, sample_http_resource, sample_grpc_resource
     ):
         """Test parallel invocations across different protocols."""
         import asyncio
@@ -183,24 +165,30 @@ class TestMultiProtocolWorkflows:
 
         # Execute all three in parallel
         results = await asyncio.gather(
-            mcp_adapter.invoke(InvocationRequest(
-                capability_id=f"{sample_mcp_resource.id}-list_files",
-                principal_id=principal_id,
-                arguments={"path": "/"},
-                context={}
-            )),
-            http_adapter.invoke(InvocationRequest(
-                capability_id=f"{sample_http_resource.id}-GET-/users",
-                principal_id=principal_id,
-                arguments={},
-                context={}
-            )),
-            grpc_adapter.invoke(InvocationRequest(
-                capability_id=f"{sample_grpc_resource.id}-UserService.ListUsers",
-                principal_id=principal_id,
-                arguments={},
-                context={}
-            ))
+            mcp_adapter.invoke(
+                InvocationRequest(
+                    capability_id=f"{sample_mcp_resource.id}-list_files",
+                    principal_id=principal_id,
+                    arguments={"path": "/"},
+                    context={},
+                )
+            ),
+            http_adapter.invoke(
+                InvocationRequest(
+                    capability_id=f"{sample_http_resource.id}-GET-/users",
+                    principal_id=principal_id,
+                    arguments={},
+                    context={},
+                )
+            ),
+            grpc_adapter.invoke(
+                InvocationRequest(
+                    capability_id=f"{sample_grpc_resource.id}-UserService.ListUsers",
+                    principal_id=principal_id,
+                    arguments={},
+                    context={},
+                )
+            ),
         )
 
         # All should succeed
@@ -220,11 +208,7 @@ class TestMultiProtocolPolicyEvaluation:
 
     @pytest.mark.asyncio
     async def test_policy_evaluation_per_protocol(
-        self,
-        populated_registry,
-        sample_mcp_resource,
-        sample_http_resource,
-        sample_grpc_resource
+        self, populated_registry, sample_mcp_resource, sample_http_resource, sample_grpc_resource
     ):
         """Test that policy evaluation works consistently across protocols."""
         # Mock policy service
@@ -238,35 +222,35 @@ class TestMultiProtocolPolicyEvaluation:
             capability_id=f"{sample_mcp_resource.id}-read_file",
             principal_id=principal_id,
             arguments={},
-            context={"protocol": "mcp"}
+            context={"protocol": "mcp"},
         )
 
         http_request = InvocationRequest(
             capability_id=f"{sample_http_resource.id}-GET-/users",
             principal_id=principal_id,
             arguments={},
-            context={"protocol": "http"}
+            context={"protocol": "http"},
         )
 
         grpc_request = InvocationRequest(
             capability_id=f"{sample_grpc_resource.id}-UserService.GetUser",
             principal_id=principal_id,
             arguments={},
-            context={"protocol": "grpc"}
+            context={"protocol": "grpc"},
         )
 
         # In a real scenario, each would be evaluated by policy service
         # Here we just verify the request structure is protocol-agnostic
-        assert all(hasattr(req, 'capability_id') for req in [mcp_request, http_request, grpc_request])
-        assert all(hasattr(req, 'principal_id') for req in [mcp_request, http_request, grpc_request])
+        assert all(
+            hasattr(req, "capability_id") for req in [mcp_request, http_request, grpc_request]
+        )
+        assert all(
+            hasattr(req, "principal_id") for req in [mcp_request, http_request, grpc_request]
+        )
 
     @pytest.mark.asyncio
     async def test_sensitivity_level_across_protocols(
-        self,
-        populated_registry,
-        sample_mcp_resource,
-        sample_http_resource,
-        sample_grpc_resource
+        self, populated_registry, sample_mcp_resource, sample_http_resource, sample_grpc_resource
     ):
         """Test that sensitivity levels are respected across all protocols."""
         mcp_adapter = populated_registry.get("mcp")
@@ -280,8 +264,10 @@ class TestMultiProtocolPolicyEvaluation:
 
         # All capabilities should have sensitivity levels
         all_caps = mcp_caps + http_caps + grpc_caps
-        assert all(hasattr(cap, 'sensitivity_level') for cap in all_caps)
-        assert all(cap.sensitivity_level in ['low', 'medium', 'high', 'critical'] for cap in all_caps)
+        assert all(hasattr(cap, "sensitivity_level") for cap in all_caps)
+        assert all(
+            cap.sensitivity_level in ["low", "medium", "high", "critical"] for cap in all_caps
+        )
 
 
 # ============================================================================
@@ -296,10 +282,7 @@ class TestMultiProtocolAuditCorrelation:
 
     @pytest.mark.asyncio
     async def test_workflow_audit_correlation(
-        self,
-        populated_registry,
-        sample_mcp_resource,
-        sample_http_resource
+        self, populated_registry, sample_mcp_resource, sample_http_resource
     ):
         """Test that workflow audit events can be correlated."""
         mcp_adapter = populated_registry.get("mcp")
@@ -309,19 +292,23 @@ class TestMultiProtocolAuditCorrelation:
         principal_id = str(uuid4())
 
         # Execute workflow with correlation ID
-        mcp_result = await mcp_adapter.invoke(InvocationRequest(
-            capability_id=f"{sample_mcp_resource.id}-read_file",
-            principal_id=principal_id,
-            arguments={},
-            context={"workflow_id": workflow_id, "step": 1}
-        ))
+        mcp_result = await mcp_adapter.invoke(
+            InvocationRequest(
+                capability_id=f"{sample_mcp_resource.id}-read_file",
+                principal_id=principal_id,
+                arguments={},
+                context={"workflow_id": workflow_id, "step": 1},
+            )
+        )
 
-        http_result = await http_adapter.invoke(InvocationRequest(
-            capability_id=f"{sample_http_resource.id}-POST-/users",
-            principal_id=principal_id,
-            arguments={},
-            context={"workflow_id": workflow_id, "step": 2}
-        ))
+        http_result = await http_adapter.invoke(
+            InvocationRequest(
+                capability_id=f"{sample_http_resource.id}-POST-/users",
+                principal_id=principal_id,
+                arguments={},
+                context={"workflow_id": workflow_id, "step": 2},
+            )
+        )
 
         # Verify both invocations succeeded
         assert mcp_result.success is True
@@ -332,11 +319,7 @@ class TestMultiProtocolAuditCorrelation:
 
     @pytest.mark.asyncio
     async def test_cross_protocol_audit_metadata(
-        self,
-        populated_registry,
-        sample_mcp_resource,
-        sample_http_resource,
-        sample_grpc_resource
+        self, populated_registry, sample_mcp_resource, sample_http_resource, sample_grpc_resource
     ):
         """Test that audit metadata is consistent across protocols."""
         mcp_adapter = populated_registry.get("mcp")
@@ -350,15 +333,17 @@ class TestMultiProtocolAuditCorrelation:
         for adapter, resource in [
             (mcp_adapter, sample_mcp_resource),
             (http_adapter, sample_http_resource),
-            (grpc_adapter, sample_grpc_resource)
+            (grpc_adapter, sample_grpc_resource),
         ]:
             capabilities = await adapter.get_capabilities(resource)
-            result = await adapter.invoke(InvocationRequest(
-                capability_id=capabilities[0].id,
-                principal_id=principal_id,
-                arguments={},
-                context={"audit_test": True}
-            ))
+            result = await adapter.invoke(
+                InvocationRequest(
+                    capability_id=capabilities[0].id,
+                    principal_id=principal_id,
+                    arguments={},
+                    context={"audit_test": True},
+                )
+            )
             results.append(result)
 
         # All results should have duration and metadata
@@ -379,10 +364,7 @@ class TestMultiProtocolErrorHandling:
 
     @pytest.mark.asyncio
     async def test_workflow_with_failed_step(
-        self,
-        populated_registry,
-        sample_mcp_resource,
-        sample_http_resource
+        self, populated_registry, sample_mcp_resource, sample_http_resource
     ):
         """Test handling of failures in multi-protocol workflow."""
         mcp_adapter = populated_registry.get("mcp")
@@ -390,32 +372,35 @@ class TestMultiProtocolErrorHandling:
 
         # Mock HTTP adapter to fail
         original_invoke = http_adapter.invoke
-        http_adapter.invoke = AsyncMock(return_value=InvocationResult(
-            success=False,
-            error="Simulated HTTP failure",
-            metadata={},
-            duration_ms=5.0
-        ))
+        http_adapter.invoke = AsyncMock(
+            return_value=InvocationResult(
+                success=False, error="Simulated HTTP failure", metadata={}, duration_ms=5.0
+            )
+        )
 
         workflow_id = str(uuid4())
         principal_id = str(uuid4())
 
         # Step 1 should succeed
-        step1_result = await mcp_adapter.invoke(InvocationRequest(
-            capability_id=f"{sample_mcp_resource.id}-read_file",
-            principal_id=principal_id,
-            arguments={},
-            context={"workflow_id": workflow_id}
-        ))
+        step1_result = await mcp_adapter.invoke(
+            InvocationRequest(
+                capability_id=f"{sample_mcp_resource.id}-read_file",
+                principal_id=principal_id,
+                arguments={},
+                context={"workflow_id": workflow_id},
+            )
+        )
         assert step1_result.success is True
 
         # Step 2 should fail
-        step2_result = await http_adapter.invoke(InvocationRequest(
-            capability_id=f"{sample_http_resource.id}-POST-/users",
-            principal_id=principal_id,
-            arguments={},
-            context={"workflow_id": workflow_id}
-        ))
+        step2_result = await http_adapter.invoke(
+            InvocationRequest(
+                capability_id=f"{sample_http_resource.id}-POST-/users",
+                principal_id=principal_id,
+                arguments={},
+                context={"workflow_id": workflow_id},
+            )
+        )
         assert step2_result.success is False
         assert "Simulated HTTP failure" in step2_result.error
 
@@ -424,11 +409,7 @@ class TestMultiProtocolErrorHandling:
 
     @pytest.mark.asyncio
     async def test_partial_workflow_rollback(
-        self,
-        populated_registry,
-        sample_mcp_resource,
-        sample_http_resource,
-        sample_grpc_resource
+        self, populated_registry, sample_mcp_resource, sample_http_resource, sample_grpc_resource
     ):
         """Test that workflow failures are properly tracked."""
         mcp_adapter = populated_registry.get("mcp")
@@ -442,36 +423,42 @@ class TestMultiProtocolErrorHandling:
 
         try:
             # Step 1: MCP
-            result1 = await mcp_adapter.invoke(InvocationRequest(
-                capability_id=f"{sample_mcp_resource.id}-read_file",
-                principal_id=principal_id,
-                arguments={},
-                context={"workflow_id": workflow_id}
-            ))
+            result1 = await mcp_adapter.invoke(
+                InvocationRequest(
+                    capability_id=f"{sample_mcp_resource.id}-read_file",
+                    principal_id=principal_id,
+                    arguments={},
+                    context={"workflow_id": workflow_id},
+                )
+            )
             if result1.success:
                 completed_steps.append("mcp")
 
             # Step 2: HTTP
-            result2 = await http_adapter.invoke(InvocationRequest(
-                capability_id=f"{sample_http_resource.id}-POST-/users",
-                principal_id=principal_id,
-                arguments={},
-                context={"workflow_id": workflow_id}
-            ))
+            result2 = await http_adapter.invoke(
+                InvocationRequest(
+                    capability_id=f"{sample_http_resource.id}-POST-/users",
+                    principal_id=principal_id,
+                    arguments={},
+                    context={"workflow_id": workflow_id},
+                )
+            )
             if result2.success:
                 completed_steps.append("http")
 
             # Step 3: gRPC
-            result3 = await grpc_adapter.invoke(InvocationRequest(
-                capability_id=f"{sample_grpc_resource.id}-UserService.GetUser",
-                principal_id=principal_id,
-                arguments={},
-                context={"workflow_id": workflow_id}
-            ))
+            result3 = await grpc_adapter.invoke(
+                InvocationRequest(
+                    capability_id=f"{sample_grpc_resource.id}-UserService.GetUser",
+                    principal_id=principal_id,
+                    arguments={},
+                    context={"workflow_id": workflow_id},
+                )
+            )
             if result3.success:
                 completed_steps.append("grpc")
 
-        except Exception as e:
+        except Exception:
             # Track which steps completed before failure
             pass
 
@@ -492,11 +479,7 @@ class TestMultiProtocolPerformance:
 
     @pytest.mark.asyncio
     async def test_concurrent_multi_protocol_throughput(
-        self,
-        populated_registry,
-        sample_mcp_resource,
-        sample_http_resource,
-        sample_grpc_resource
+        self, populated_registry, sample_mcp_resource, sample_http_resource, sample_grpc_resource
     ):
         """Test concurrent requests across multiple protocols."""
         import asyncio
@@ -524,12 +507,16 @@ class TestMultiProtocolPerformance:
                 resource = sample_grpc_resource
                 cap_id = f"{resource.id}-UserService.ListUsers"
 
-            tasks.append(adapter.invoke(InvocationRequest(
-                capability_id=cap_id,
-                principal_id=principal_id,
-                arguments={},
-                context={"request_index": i}
-            )))
+            tasks.append(
+                adapter.invoke(
+                    InvocationRequest(
+                        capability_id=cap_id,
+                        principal_id=principal_id,
+                        arguments={},
+                        context={"request_index": i},
+                    )
+                )
+            )
 
         # Execute all concurrently
         results = await asyncio.gather(*tasks)
@@ -546,11 +533,7 @@ class TestMultiProtocolPerformance:
 
     @pytest.mark.asyncio
     async def test_protocol_adapter_overhead(
-        self,
-        populated_registry,
-        sample_mcp_resource,
-        sample_http_resource,
-        sample_grpc_resource
+        self, populated_registry, sample_mcp_resource, sample_http_resource, sample_grpc_resource
     ):
         """Test that adapter overhead is minimal."""
         mcp_adapter = populated_registry.get("mcp")
@@ -564,15 +547,14 @@ class TestMultiProtocolPerformance:
         for adapter, resource, protocol in [
             (mcp_adapter, sample_mcp_resource, "mcp"),
             (http_adapter, sample_http_resource, "http"),
-            (grpc_adapter, sample_grpc_resource, "grpc")
+            (grpc_adapter, sample_grpc_resource, "grpc"),
         ]:
             caps = await adapter.get_capabilities(resource)
-            result = await adapter.invoke(InvocationRequest(
-                capability_id=caps[0].id,
-                principal_id=principal_id,
-                arguments={},
-                context={}
-            ))
+            result = await adapter.invoke(
+                InvocationRequest(
+                    capability_id=caps[0].id, principal_id=principal_id, arguments={}, context={}
+                )
+            )
             results[protocol] = result.duration_ms
 
         # All should complete in reasonable time (mock times)
@@ -620,11 +602,7 @@ class TestMultiProtocolResourceDiscovery:
 
     @pytest.mark.asyncio
     async def test_capability_aggregation_across_protocols(
-        self,
-        populated_registry,
-        sample_mcp_resource,
-        sample_http_resource,
-        sample_grpc_resource
+        self, populated_registry, sample_mcp_resource, sample_http_resource, sample_grpc_resource
     ):
         """Test aggregating capabilities from multiple protocol resources."""
         all_capabilities = []
@@ -638,5 +616,7 @@ class TestMultiProtocolResourceDiscovery:
         assert len(all_capabilities) >= 6  # 2 from each protocol
 
         # Verify capabilities maintain protocol context
-        protocols_in_caps = {cap.resource_id.split('-')[0] for cap in all_capabilities if '-' in cap.resource_id}
+        protocols_in_caps = {
+            cap.resource_id.split("-")[0] for cap in all_capabilities if "-" in cap.resource_id
+        }
         assert len(protocols_in_caps) >= 2

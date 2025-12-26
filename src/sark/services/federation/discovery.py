@@ -12,11 +12,10 @@ for federation, reducing manual configuration overhead.
 """
 
 import asyncio
+from datetime import datetime, timedelta
 import socket
 import struct
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Set
-from collections import defaultdict
+
 import structlog
 
 from sark.models.federation import (
@@ -37,7 +36,7 @@ class DNSSDClient:
     Follows RFC 6763 for DNS-based service discovery.
     """
 
-    def __init__(self, nameserver: Optional[str] = None):
+    def __init__(self, nameserver: str | None = None):
         """
         Initialize DNS-SD client.
 
@@ -48,11 +47,8 @@ class DNSSDClient:
         self.logger = logger.bind(component="dns-sd")
 
     async def discover_services(
-        self,
-        service_type: str,
-        timeout_seconds: int = 5,
-        max_results: int = 10
-    ) -> List[ServiceDiscoveryRecord]:
+        self, service_type: str, timeout_seconds: int = 5, max_results: int = 10
+    ) -> list[ServiceDiscoveryRecord]:
         """
         Discover services using DNS-SD.
 
@@ -65,9 +61,7 @@ class DNSSDClient:
             List of discovered service records
         """
         self.logger.info(
-            "starting_dns_sd_discovery",
-            service_type=service_type,
-            timeout=timeout_seconds
+            "starting_dns_sd_discovery", service_type=service_type, timeout=timeout_seconds
         )
 
         try:
@@ -79,26 +73,16 @@ class DNSSDClient:
             records = records[:max_results]
 
             self.logger.info(
-                "dns_sd_discovery_complete",
-                service_type=service_type,
-                found=len(records)
+                "dns_sd_discovery_complete", service_type=service_type, found=len(records)
             )
 
             return records
 
         except Exception as e:
-            self.logger.error(
-                "dns_sd_discovery_failed",
-                service_type=service_type,
-                error=str(e)
-            )
+            self.logger.error("dns_sd_discovery_failed", service_type=service_type, error=str(e))
             return []
 
-    async def _query_dns_srv(
-        self,
-        service_type: str,
-        timeout: int
-    ) -> List[ServiceDiscoveryRecord]:
+    async def _query_dns_srv(self, service_type: str, timeout: int) -> list[ServiceDiscoveryRecord]:
         """
         Query DNS SRV records for a service.
 
@@ -122,17 +106,10 @@ class DNSSDClient:
             # 3. Resolve hostnames to IP addresses
             # 4. Parse and return ServiceDiscoveryRecord objects
 
-            self.logger.debug(
-                "querying_dns_srv",
-                service_type=service_type
-            )
+            self.logger.debug("querying_dns_srv", service_type=service_type)
 
         except Exception as e:
-            self.logger.error(
-                "dns_srv_query_failed",
-                service_type=service_type,
-                error=str(e)
-            )
+            self.logger.error("dns_srv_query_failed", service_type=service_type, error=str(e))
 
         return records
 
@@ -157,15 +134,12 @@ class MDNSClient:
     def __init__(self):
         """Initialize mDNS client."""
         self.logger = logger.bind(component="mdns")
-        self._socket: Optional[socket.socket] = None
-        self._discovered_services: Dict[str, ServiceDiscoveryRecord] = {}
+        self._socket: socket.socket | None = None
+        self._discovered_services: dict[str, ServiceDiscoveryRecord] = {}
 
     async def discover_services(
-        self,
-        service_type: str,
-        timeout_seconds: int = 5,
-        max_results: int = 10
-    ) -> List[ServiceDiscoveryRecord]:
+        self, service_type: str, timeout_seconds: int = 5, max_results: int = 10
+    ) -> list[ServiceDiscoveryRecord]:
         """
         Discover services using mDNS.
 
@@ -178,9 +152,7 @@ class MDNSClient:
             List of discovered service records
         """
         self.logger.info(
-            "starting_mdns_discovery",
-            service_type=service_type,
-            timeout=timeout_seconds
+            "starting_mdns_discovery", service_type=service_type, timeout=timeout_seconds
         )
 
         try:
@@ -194,19 +166,13 @@ class MDNSClient:
             records = await self._listen_responses(timeout_seconds, max_results)
 
             self.logger.info(
-                "mdns_discovery_complete",
-                service_type=service_type,
-                found=len(records)
+                "mdns_discovery_complete", service_type=service_type, found=len(records)
             )
 
             return records
 
         except Exception as e:
-            self.logger.error(
-                "mdns_discovery_failed",
-                service_type=service_type,
-                error=str(e)
-            )
+            self.logger.error("mdns_discovery_failed", service_type=service_type, error=str(e))
             return []
 
         finally:
@@ -220,7 +186,7 @@ class MDNSClient:
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
             # Bind to mDNS port
-            sock.bind(('', self.MDNS_PORT))
+            sock.bind(("", self.MDNS_PORT))
 
             # Join multicast group
             mreq = struct.pack("4sl", socket.inet_aton(self.MDNS_ADDR), socket.INADDR_ANY)
@@ -290,31 +256,23 @@ class MDNSClient:
         additional = 0
 
         header = struct.pack(
-            '!HHHHHH',
-            transaction_id,
-            flags,
-            questions,
-            answers,
-            authority,
-            additional
+            "!HHHHHH", transaction_id, flags, questions, answers, authority, additional
         )
 
         # Question section: QNAME, QTYPE (PTR), QCLASS (IN)
         # Encode service_type as DNS name
-        qname = b''
-        for label in service_type.rstrip('.').split('.'):
-            qname += bytes([len(label)]) + label.encode('ascii')
-        qname += b'\x00'  # Null terminator
+        qname = b""
+        for label in service_type.rstrip(".").split("."):
+            qname += bytes([len(label)]) + label.encode("ascii")
+        qname += b"\x00"  # Null terminator
 
-        question = qname + struct.pack('!HH', self.DNS_TYPE_PTR, self.DNS_CLASS_IN)
+        question = qname + struct.pack("!HH", self.DNS_TYPE_PTR, self.DNS_CLASS_IN)
 
         return header + question
 
     async def _listen_responses(
-        self,
-        timeout_seconds: int,
-        max_results: int
-    ) -> List[ServiceDiscoveryRecord]:
+        self, timeout_seconds: int, max_results: int
+    ) -> list[ServiceDiscoveryRecord]:
         """
         Listen for mDNS responses.
 
@@ -356,11 +314,7 @@ class MDNSClient:
 
         return records
 
-    def _parse_dns_response(
-        self,
-        data: bytes,
-        addr: tuple
-    ) -> Optional[ServiceDiscoveryRecord]:
+    def _parse_dns_response(self, data: bytes, addr: tuple) -> ServiceDiscoveryRecord | None:
         """
         Parse DNS response packet.
 
@@ -384,14 +338,10 @@ class MDNSClient:
                 hostname=addr[0],
                 port=8000,  # Default SARK port
                 txt_records={},
-                discovered_at=datetime.utcnow()
+                discovered_at=datetime.utcnow(),
             )
 
-            self.logger.debug(
-                "mdns_response_parsed",
-                hostname=record.hostname,
-                port=record.port
-            )
+            self.logger.debug("mdns_response_parsed", hostname=record.hostname, port=record.port)
 
             return record
 
@@ -415,15 +365,12 @@ class ConsulDiscoveryClient:
         Args:
             consul_url: Consul agent URL
         """
-        self.consul_url = consul_url.rstrip('/')
+        self.consul_url = consul_url.rstrip("/")
         self.logger = logger.bind(component="consul-discovery")
 
     async def discover_services(
-        self,
-        service_name: str = "sark",
-        timeout_seconds: int = 5,
-        max_results: int = 10
-    ) -> List[ServiceDiscoveryRecord]:
+        self, service_name: str = "sark", timeout_seconds: int = 5, max_results: int = 10
+    ) -> list[ServiceDiscoveryRecord]:
         """
         Discover services via Consul.
 
@@ -435,10 +382,7 @@ class ConsulDiscoveryClient:
         Returns:
             List of discovered services
         """
-        self.logger.info(
-            "starting_consul_discovery",
-            service_name=service_name
-        )
+        self.logger.info("starting_consul_discovery", service_name=service_name)
 
         try:
             # In production, use python-consul or httpx to query Consul API
@@ -448,19 +392,13 @@ class ConsulDiscoveryClient:
             records = []
 
             self.logger.info(
-                "consul_discovery_complete",
-                service_name=service_name,
-                found=len(records)
+                "consul_discovery_complete", service_name=service_name, found=len(records)
             )
 
             return records
 
         except Exception as e:
-            self.logger.error(
-                "consul_discovery_failed",
-                service_name=service_name,
-                error=str(e)
-            )
+            self.logger.error("consul_discovery_failed", service_name=service_name, error=str(e))
             return []
 
 
@@ -472,11 +410,7 @@ class DiscoveryService:
     multiple discovery methods (DNS-SD, mDNS, Consul, manual).
     """
 
-    def __init__(
-        self,
-        dns_nameserver: Optional[str] = None,
-        consul_url: Optional[str] = None
-    ):
+    def __init__(self, dns_nameserver: str | None = None, consul_url: str | None = None):
         """
         Initialize discovery service.
 
@@ -492,8 +426,8 @@ class DiscoveryService:
         self.consul = ConsulDiscoveryClient(consul_url or "http://localhost:8500")
 
         # Cache of discovered services
-        self._cache: Dict[str, List[ServiceDiscoveryRecord]] = {}
-        self._cache_ttl: Dict[str, datetime] = {}
+        self._cache: dict[str, list[ServiceDiscoveryRecord]] = {}
+        self._cache_ttl: dict[str, datetime] = {}
 
     async def discover(self, query: DiscoveryQuery) -> DiscoveryResponse:
         """
@@ -505,11 +439,7 @@ class DiscoveryService:
         Returns:
             Discovery response with found services
         """
-        self.logger.info(
-            "starting_discovery",
-            method=query.method,
-            service_type=query.service_type
-        )
+        self.logger.info("starting_discovery", method=query.method, service_type=query.service_type)
 
         start_time = asyncio.get_event_loop().time()
 
@@ -519,31 +449,23 @@ class DiscoveryService:
             if self._is_cache_valid(cache_key):
                 records = self._cache[cache_key]
                 self.logger.info(
-                    "discovery_cache_hit",
-                    method=query.method,
-                    cached_records=len(records)
+                    "discovery_cache_hit", method=query.method, cached_records=len(records)
                 )
             else:
                 # Perform discovery based on method
                 if query.method == DiscoveryMethod.DNS_SD:
                     records = await self.dns_sd.discover_services(
-                        query.service_type,
-                        query.timeout_seconds,
-                        query.max_results
+                        query.service_type, query.timeout_seconds, query.max_results
                     )
                 elif query.method == DiscoveryMethod.MDNS:
                     records = await self.mdns.discover_services(
-                        query.service_type,
-                        query.timeout_seconds,
-                        query.max_results
+                        query.service_type, query.timeout_seconds, query.max_results
                     )
                 elif query.method == DiscoveryMethod.CONSUL:
                     # Extract service name from service_type
-                    service_name = query.service_type.split('.')[0].lstrip('_')
+                    service_name = query.service_type.split(".")[0].lstrip("_")
                     records = await self.consul.discover_services(
-                        service_name,
-                        query.timeout_seconds,
-                        query.max_results
+                        service_name, query.timeout_seconds, query.max_results
                     )
                 else:  # MANUAL
                     records = []
@@ -555,38 +477,26 @@ class DiscoveryService:
             duration_ms = (asyncio.get_event_loop().time() - start_time) * 1000
 
             response = DiscoveryResponse(
-                method=query.method,
-                records=records,
-                total_found=len(records)
+                method=query.method, records=records, total_found=len(records)
             )
 
             self.logger.info(
                 "discovery_complete",
                 method=query.method,
                 found=len(records),
-                duration_ms=duration_ms
+                duration_ms=duration_ms,
             )
 
             return response
 
         except Exception as e:
-            self.logger.error(
-                "discovery_failed",
-                method=query.method,
-                error=str(e)
-            )
+            self.logger.error("discovery_failed", method=query.method, error=str(e))
             # Return empty response on error
-            return DiscoveryResponse(
-                method=query.method,
-                records=[],
-                total_found=0
-            )
+            return DiscoveryResponse(method=query.method, records=[], total_found=0)
 
     async def discover_all(
-        self,
-        service_type: str = "_sark._tcp.local.",
-        timeout_seconds: int = 5
-    ) -> Dict[DiscoveryMethod, List[ServiceDiscoveryRecord]]:
+        self, service_type: str = "_sark._tcp.local.", timeout_seconds: int = 5
+    ) -> dict[DiscoveryMethod, list[ServiceDiscoveryRecord]]:
         """
         Discover using all available methods.
 
@@ -607,9 +517,7 @@ class DiscoveryService:
 
         for method in methods:
             query = DiscoveryQuery(
-                method=method,
-                service_type=service_type,
-                timeout_seconds=timeout_seconds
+                method=method, service_type=service_type, timeout_seconds=timeout_seconds
             )
             tasks.append(self.discover(query))
 
@@ -619,11 +527,7 @@ class DiscoveryService:
         # Collect results
         for method, response in zip(methods, responses):
             if isinstance(response, Exception):
-                self.logger.error(
-                    "discovery_method_failed",
-                    method=method,
-                    error=str(response)
-                )
+                self.logger.error("discovery_method_failed", method=method, error=str(response))
                 results[method] = []
             else:
                 results[method] = response.records
@@ -632,7 +536,7 @@ class DiscoveryService:
         self.logger.info(
             "discover_all_complete",
             total_found=total_found,
-            by_method={k.value: len(v) for k, v in results.items()}
+            by_method={k.value: len(v) for k, v in results.items()},
         )
 
         return results
@@ -652,11 +556,7 @@ class DiscoveryService:
 
         return datetime.utcnow() < self._cache_ttl[cache_key]
 
-    def _update_cache(
-        self,
-        cache_key: str,
-        records: List[ServiceDiscoveryRecord]
-    ):
+    def _update_cache(self, cache_key: str, records: list[ServiceDiscoveryRecord]):
         """
         Update cache with new records.
 
@@ -671,10 +571,7 @@ class DiscoveryService:
         self._cache_ttl[cache_key] = datetime.utcnow() + timedelta(seconds=min_ttl)
 
         self.logger.debug(
-            "cache_updated",
-            cache_key=cache_key,
-            records=len(records),
-            ttl_seconds=min_ttl
+            "cache_updated", cache_key=cache_key, records=len(records), ttl_seconds=min_ttl
         )
 
     def clear_cache(self):
@@ -684,4 +581,4 @@ class DiscoveryService:
         self.logger.info("cache_cleared")
 
 
-__all__ = ["DiscoveryService", "DNSSDClient", "MDNSClient", "ConsulDiscoveryClient"]
+__all__ = ["ConsulDiscoveryClient", "DNSSDClient", "DiscoveryService", "MDNSClient"]

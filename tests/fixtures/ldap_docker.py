@@ -1,10 +1,9 @@
 """Docker-based LDAP fixtures for integration testing."""
 
-import time
-from typing import Generator
+from collections.abc import Generator
 
+from ldap3 import ALL, Connection, Server
 import pytest
-from ldap3 import Connection, MODIFY_REPLACE, Server, ALL
 
 # Check if pytest-docker is available
 try:
@@ -31,10 +30,7 @@ def ldap_service(docker_services: Services) -> Generator[dict, None, None]:
     docker_services.wait_until_responsive(
         timeout=60.0,
         pause=0.5,
-        check=lambda: is_ldap_responsive(
-            "localhost",
-            docker_services.port_for("ldap", 389)
-        ),
+        check=lambda: is_ldap_responsive("localhost", docker_services.port_for("ldap", 389)),
     )
 
     # Get connection details
@@ -155,7 +151,7 @@ def populate_ldap_test_data(ldap_config: dict) -> None:
         for user in test_users:
             try:
                 conn.add(user["dn"], user["objectClass"], user["attributes"])
-            except Exception as e:
+            except Exception:
                 # User might already exist
                 pass
 
@@ -185,7 +181,7 @@ def populate_ldap_test_data(ldap_config: dict) -> None:
         for group in test_groups:
             try:
                 conn.add(group["dn"], group["objectClass"], group["attributes"])
-            except Exception as e:
+            except Exception:
                 # Group might already exist
                 pass
 

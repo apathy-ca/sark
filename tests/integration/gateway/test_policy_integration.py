@@ -3,9 +3,10 @@
 Tests for OPA policy enforcement, caching, performance, and dynamic updates.
 """
 
-import pytest
 import asyncio
 import time
+
+import pytest
 
 pytestmark = pytest.mark.asyncio
 

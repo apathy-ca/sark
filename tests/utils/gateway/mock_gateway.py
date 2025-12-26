@@ -13,7 +13,7 @@ MOCK_SERVERS = [
         "server_url": "http://test1:8080",
         "sensitivity_level": "medium",
         "health_status": "healthy",
-        "tools_count": 5
+        "tools_count": 5,
     },
     {
         "server_id": "srv_2",
@@ -21,8 +21,8 @@ MOCK_SERVERS = [
         "server_url": "http://test2:8080",
         "sensitivity_level": "high",
         "health_status": "healthy",
-        "tools_count": 10
-    }
+        "tools_count": 10,
+    },
 ]
 
 

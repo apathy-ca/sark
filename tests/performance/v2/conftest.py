@@ -7,16 +7,16 @@ load testing, and performance baseline measurements.
 
 import asyncio
 import time
-from typing import Any, Dict, List
-from unittest.mock import Mock, AsyncMock
+from typing import Any
 
 import pytest
+
 from sark.adapters.base import ProtocolAdapter
 from sark.models.base import (
-    ResourceSchema,
     CapabilitySchema,
     InvocationRequest,
     InvocationResult,
+    ResourceSchema,
 )
 
 
@@ -45,7 +45,9 @@ def mock_adapter():
         def protocol_version(self) -> str:
             return "1.0"
 
-        async def discover_resources(self, discovery_config: Dict[str, Any]) -> List[ResourceSchema]:
+        async def discover_resources(
+            self, discovery_config: dict[str, Any]
+        ) -> list[ResourceSchema]:
             await asyncio.sleep(0.001)  # Simulate network delay
             return [
                 ResourceSchema(
@@ -58,7 +60,7 @@ def mock_adapter():
                 )
             ]
 
-        async def get_capabilities(self, resource: ResourceSchema) -> List[CapabilitySchema]:
+        async def get_capabilities(self, resource: ResourceSchema) -> list[CapabilitySchema]:
             await asyncio.sleep(0.001)
             return [
                 CapabilitySchema(
@@ -162,11 +164,11 @@ def performance_thresholds():
     """Performance thresholds based on SARK v2.0 requirements."""
     return {
         "adapter_overhead_ms": 100,  # Max 100ms overhead per spec
-        "discovery_time_ms": 5000,   # Max 5s for discovery
-        "health_check_ms": 100,      # Max 100ms for health check
-        "throughput_rps": 100,       # Min 100 requests/sec per adapter
-        "p95_latency_ms": 150,       # P95 latency under 150ms
-        "p99_latency_ms": 250,       # P99 latency under 250ms
+        "discovery_time_ms": 5000,  # Max 5s for discovery
+        "health_check_ms": 100,  # Max 100ms for health check
+        "throughput_rps": 100,  # Min 100 requests/sec per adapter
+        "p95_latency_ms": 150,  # P95 latency under 150ms
+        "p99_latency_ms": 250,  # P99 latency under 250ms
         "concurrent_requests": 1000,  # Support 1000 concurrent requests
     }
 
@@ -196,7 +198,7 @@ async def async_timer():
 def percentile_calculator():
     """Helper function to calculate percentiles."""
 
-    def calculate(values: List[float], percentile: int) -> float:
+    def calculate(values: list[float], percentile: int) -> float:
         """Calculate percentile value from list."""
         if not values:
             return 0.0

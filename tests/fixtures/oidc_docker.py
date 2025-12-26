@@ -1,10 +1,9 @@
 """Docker-based OIDC fixtures for integration testing."""
 
-import time
-from typing import Generator
+from collections.abc import Generator
 
-import pytest
 import httpx
+import pytest
 
 # Check if pytest-docker is available
 try:
@@ -31,10 +30,7 @@ def oidc_service(docker_services: Services) -> Generator[dict, None, None]:
     docker_services.wait_until_responsive(
         timeout=60.0,
         pause=0.5,
-        check=lambda: is_oidc_responsive(
-            "localhost",
-            docker_services.port_for("oidc-mock", 8080)
-        ),
+        check=lambda: is_oidc_responsive("localhost", docker_services.port_for("oidc-mock", 8080)),
     )
 
     # Get connection details
@@ -70,8 +66,7 @@ def is_oidc_responsive(host: str, port: int) -> bool:
     """
     try:
         response = httpx.get(
-            f"http://{host}:{port}/default/.well-known/openid-configuration",
-            timeout=2.0
+            f"http://{host}:{port}/default/.well-known/openid-configuration", timeout=2.0
         )
         return response.status_code == 200
     except Exception:

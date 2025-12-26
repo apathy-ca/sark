@@ -1,8 +1,9 @@
 """Configuration for prompt injection detection system."""
 
-import os
 from dataclasses import dataclass
+import os
 from typing import ClassVar
+
 import structlog
 
 logger = structlog.get_logger()
@@ -89,11 +90,17 @@ class InjectionDetectionConfig:
 
         # Validate severity weights
         if self.severity_weight_high < 0:
-            errors.append(f"severity_weight_high must be non-negative, got {self.severity_weight_high}")
+            errors.append(
+                f"severity_weight_high must be non-negative, got {self.severity_weight_high}"
+            )
         if self.severity_weight_medium < 0:
-            errors.append(f"severity_weight_medium must be non-negative, got {self.severity_weight_medium}")
+            errors.append(
+                f"severity_weight_medium must be non-negative, got {self.severity_weight_medium}"
+            )
         if self.severity_weight_low < 0:
-            errors.append(f"severity_weight_low must be non-negative, got {self.severity_weight_low}")
+            errors.append(
+                f"severity_weight_low must be non-negative, got {self.severity_weight_low}"
+            )
 
         # Validate weight ordering (high > medium > low)
         if self.severity_weight_high < self.severity_weight_medium:
@@ -112,7 +119,9 @@ class InjectionDetectionConfig:
             errors.append(f"max_parameter_depth must be at least 1, got {self.max_parameter_depth}")
 
         if errors:
-            error_msg = "Invalid injection detection configuration:\n" + "\n".join(f"  - {e}" for e in errors)
+            error_msg = "Invalid injection detection configuration:\n" + "\n".join(
+                f"  - {e}" for e in errors
+            )
             logger.error("injection_config_validation_failed", errors=errors)
             raise ValueError(error_msg)
 

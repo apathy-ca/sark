@@ -10,22 +10,21 @@ Usage: python run_grpc_benchmarks.py
 """
 
 import asyncio
-import sys
 from pathlib import Path
+import sys
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "src"))
 
 from sark.adapters.grpc_adapter import GRPCAdapter
 from sark.models.base import InvocationRequest
-from tests.performance.v2.benchmarks import run_comprehensive_benchmarks
 
 
 async def main():
     """Run gRPC adapter benchmarks."""
-    print("="*80)
+    print("=" * 80)
     print("gRPC ADAPTER PERFORMANCE BENCHMARKS")
-    print("="*80)
+    print("=" * 80)
     print("\nInitializing gRPC adapter for benchmarking...")
 
     # Create gRPC adapter
@@ -56,9 +55,9 @@ async def main():
     # 2. Update the endpoint and capability_id above
     # 3. Run the benchmarks
 
-    print("="*80)
+    print("=" * 80)
     print("gRPC ADAPTER BENCHMARK FRAMEWORK READY")
-    print("="*80)
+    print("=" * 80)
     print("\nTo run actual benchmarks:")
     print("1. Deploy a test gRPC service (see tests/fixtures/grpc_test_server.py)")
     print("2. Update endpoint and capability_id in this script")

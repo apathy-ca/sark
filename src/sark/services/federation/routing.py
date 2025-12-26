@@ -14,31 +14,30 @@ hosted by other SARK instances in the federation.
 """
 
 import asyncio
-import uuid
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, Set
 from collections import defaultdict
-import structlog
+from datetime import datetime
+from typing import Any
+import uuid
 
 import httpx
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+import structlog
 
-from sark.models.base import FederationNode, Resource, Capability
+from sark.models.base import FederationNode, Resource
 from sark.models.federation import (
-    NodeStatus,
-    RouteEntry,
-    RoutingTable,
-    RouteQuery,
-    RouteResponse,
-    FederatedResourceRequest,
-    FederatedResourceResponse,
-    FederatedAuditEvent,
     AuditCorrelationQuery,
     AuditCorrelationResponse,
+    FederatedAuditEvent,
+    FederatedResourceRequest,
+    FederatedResourceResponse,
     NodeHealthCheck,
+    NodeStatus,
+    RouteEntry,
+    RouteQuery,
+    RouteResponse,
+    RoutingTable,
 )
-from sark.adapters.base import InvocationRequest, InvocationResult
 
 logger = structlog.get_logger(__name__)
 
@@ -52,10 +51,7 @@ class CircuitBreaker:
     """
 
     def __init__(
-        self,
-        failure_threshold: int = 5,
-        timeout_seconds: int = 60,
-        half_open_requests: int = 1
+        self, failure_threshold: int = 5, timeout_seconds: int = 60, half_open_requests: int = 1
     ):
         """
         Initialize circuit breaker.
@@ -70,10 +66,10 @@ class CircuitBreaker:
         self.half_open_requests = half_open_requests
 
         # Circuit state per node
-        self._states: Dict[str, str] = defaultdict(lambda: "closed")
-        self._failure_counts: Dict[str, int] = defaultdict(int)
-        self._last_failure_time: Dict[str, datetime] = {}
-        self._half_open_attempts: Dict[str, int] = defaultdict(int)
+        self._states: dict[str, str] = defaultdict(lambda: "closed")
+        self._failure_counts: dict[str, int] = defaultdict(int)
+        self._last_failure_time: dict[str, datetime] = {}
+        self._half_open_attempts: dict[str, int] = defaultdict(int)
 
         self.logger = logger.bind(component="circuit-breaker")
 
@@ -100,10 +96,7 @@ class CircuitBreaker:
                     # Transition to half-open
                     self._states[node_id] = "half-open"
                     self._half_open_attempts[node_id] = 0
-                    self.logger.info(
-                        "circuit_half_open",
-                        node_id=node_id
-                    )
+                    self.logger.info("circuit_half_open", node_id=node_id)
                     return True
             return False
 
@@ -130,10 +123,7 @@ class CircuitBreaker:
             self._states[node_id] = "closed"
             self._failure_counts[node_id] = 0
             self._half_open_attempts[node_id] = 0
-            self.logger.info(
-                "circuit_closed",
-                node_id=node_id
-            )
+            self.logger.info("circuit_closed", node_id=node_id)
         elif state == "closed":
             # Reset failure count on success
             self._failure_counts[node_id] = 0
@@ -152,18 +142,13 @@ class CircuitBreaker:
         if state == "half-open":
             # Failure in half-open reopens the circuit
             self._states[node_id] = "open"
-            self.logger.warning(
-                "circuit_reopened",
-                node_id=node_id
-            )
+            self.logger.warning("circuit_reopened", node_id=node_id)
         elif state == "closed":
             # Check if we should open the circuit
             if self._failure_counts[node_id] >= self.failure_threshold:
                 self._states[node_id] = "open"
                 self.logger.warning(
-                    "circuit_opened",
-                    node_id=node_id,
-                    failures=self._failure_counts[node_id]
+                    "circuit_opened", node_id=node_id, failures=self._failure_counts[node_id]
                 )
 
     def get_state(self, node_id: str) -> str:
@@ -188,10 +173,7 @@ class RoutingService:
     """
 
     def __init__(
-        self,
-        local_node_id: str,
-        ssl_context: Optional[Any] = None,
-        timeout_seconds: int = 30
+        self, local_node_id: str, ssl_context: Any | None = None, timeout_seconds: int = 30
     ):
         """
         Initialize routing service.
@@ -209,29 +191,24 @@ class RoutingService:
 
         # HTTP client for federation requests
         self.client = httpx.AsyncClient(
-            timeout=timeout_seconds,
-            verify=ssl_context if ssl_context else True
+            timeout=timeout_seconds, verify=ssl_context if ssl_context else True
         )
 
         # Circuit breaker for node health management
         self.circuit_breaker = CircuitBreaker()
 
         # Routing table cache
-        self._routing_table: Dict[str, List[RouteEntry]] = {}
+        self._routing_table: dict[str, list[RouteEntry]] = {}
         self._routing_table_updated: datetime = datetime.utcnow()
 
         # Audit event buffer for correlation
-        self._audit_events: List[FederatedAuditEvent] = []
+        self._audit_events: list[FederatedAuditEvent] = []
 
     async def close(self):
         """Close HTTP client and cleanup resources."""
         await self.client.aclose()
 
-    async def find_route(
-        self,
-        query: RouteQuery,
-        db: AsyncSession
-    ) -> RouteResponse:
+    async def find_route(self, query: RouteQuery, db: AsyncSession) -> RouteResponse:
         """
         Find routes to a resource.
 
@@ -243,9 +220,7 @@ class RoutingService:
             Route response with available routes
         """
         self.logger.info(
-            "finding_route",
-            resource_id=query.resource_id,
-            preferred_node=query.preferred_node
+            "finding_route", resource_id=query.resource_id, preferred_node=query.preferred_node
         )
 
         # Check local routing table cache
@@ -269,10 +244,7 @@ class RoutingService:
 
         # If no cached routes, query federation nodes
         if not available_routes:
-            available_routes = await self._discover_routes(
-                query.resource_id,
-                db
-            )
+            available_routes = await self._discover_routes(query.resource_id, db)
 
         # Select recommended route
         recommended_route = None
@@ -287,27 +259,24 @@ class RoutingService:
             if not recommended_route:
                 # Select route with lowest latency
                 recommended_route = min(
-                    available_routes,
-                    key=lambda r: r.latency_ms if r.latency_ms else float('inf')
+                    available_routes, key=lambda r: r.latency_ms if r.latency_ms else float("inf")
                 )
 
         self.logger.info(
             "route_found",
             resource_id=query.resource_id,
             available_routes=len(available_routes),
-            recommended_node=recommended_route.node_id if recommended_route else None
+            recommended_node=recommended_route.node_id if recommended_route else None,
         )
 
         return RouteResponse(
             resource_id=query.resource_id,
             available_routes=available_routes,
-            recommended_route=recommended_route
+            recommended_route=recommended_route,
         )
 
     async def invoke_federated(
-        self,
-        request: FederatedResourceRequest,
-        db: AsyncSession
+        self, request: FederatedResourceRequest, db: AsyncSession
     ) -> FederatedResourceResponse:
         """
         Invoke a capability on a federated resource.
@@ -326,7 +295,7 @@ class RoutingService:
             target_node=request.target_node_id,
             resource_id=request.resource_id,
             capability_id=request.capability_id,
-            correlation_id=correlation_id
+            correlation_id=correlation_id,
         )
 
         start_time = asyncio.get_event_loop().time()
@@ -334,9 +303,7 @@ class RoutingService:
         try:
             # Get target node details
             result = await db.execute(
-                select(FederationNode).where(
-                    FederationNode.node_id == request.target_node_id
-                )
+                select(FederationNode).where(FederationNode.node_id == request.target_node_id)
             )
             node = result.scalar_one_or_none()
 
@@ -348,7 +315,9 @@ class RoutingService:
 
             # Check circuit breaker
             if not self.circuit_breaker.is_available(request.target_node_id):
-                raise ValueError(f"Federation node is unavailable (circuit open): {request.target_node_id}")
+                raise ValueError(
+                    f"Federation node is unavailable (circuit open): {request.target_node_id}"
+                )
 
             # Build federated invocation request
             invocation_url = f"{node.endpoint}/api/v2/federation/invoke"
@@ -367,9 +336,7 @@ class RoutingService:
 
             # Make federated request
             response = await self.client.post(
-                invocation_url,
-                json=payload,
-                timeout=self.timeout_seconds
+                invocation_url, json=payload, timeout=self.timeout_seconds
             )
 
             response.raise_for_status()
@@ -391,7 +358,7 @@ class RoutingService:
                 action="invoke",
                 success=True,
                 duration_ms=duration_ms,
-                metadata=request.context
+                metadata=request.context,
             )
             self._audit_events.append(audit_event)
 
@@ -400,7 +367,7 @@ class RoutingService:
                 target_node=request.target_node_id,
                 resource_id=request.resource_id,
                 correlation_id=correlation_id,
-                duration_ms=duration_ms
+                duration_ms=duration_ms,
             )
 
             return FederatedResourceResponse(
@@ -410,7 +377,7 @@ class RoutingService:
                 result=result_data.get("result"),
                 metadata=result_data.get("metadata", {}),
                 duration_ms=duration_ms,
-                audit_correlation_id=correlation_id
+                audit_correlation_id=correlation_id,
             )
 
         except Exception as e:
@@ -430,7 +397,7 @@ class RoutingService:
                 action="invoke",
                 success=False,
                 duration_ms=duration_ms,
-                metadata={"error": str(e)}
+                metadata={"error": str(e)},
             )
             self._audit_events.append(audit_event)
 
@@ -439,7 +406,7 @@ class RoutingService:
                 target_node=request.target_node_id,
                 resource_id=request.resource_id,
                 correlation_id=correlation_id,
-                error=str(e)
+                error=str(e),
             )
 
             return FederatedResourceResponse(
@@ -448,13 +415,10 @@ class RoutingService:
                 resource_id=request.resource_id,
                 error=str(e),
                 duration_ms=duration_ms,
-                audit_correlation_id=correlation_id
+                audit_correlation_id=correlation_id,
             )
 
-    async def check_node_health(
-        self,
-        node: FederationNode
-    ) -> NodeHealthCheck:
+    async def check_node_health(self, node: FederationNode) -> NodeHealthCheck:
         """
         Check health of a federation node.
 
@@ -472,22 +436,23 @@ class RoutingService:
             health_url = f"{node.endpoint}/api/v2/health"
 
             response = await self.client.get(
-                health_url,
-                timeout=5.0  # Short timeout for health checks
+                health_url, timeout=5.0  # Short timeout for health checks
             )
 
             response_time_ms = (asyncio.get_event_loop().time() - start_time) * 1000
 
             if response.status_code == 200:
                 data = response.json()
-                status = NodeStatus.ONLINE if data.get("status") == "healthy" else NodeStatus.DEGRADED
+                status = (
+                    NodeStatus.ONLINE if data.get("status") == "healthy" else NodeStatus.DEGRADED
+                )
 
                 return NodeHealthCheck(
                     node_id=node.node_id,
                     status=status,
                     last_check=datetime.utcnow(),
                     response_time_ms=response_time_ms,
-                    metadata=data
+                    metadata=data,
                 )
             else:
                 return NodeHealthCheck(
@@ -495,30 +460,24 @@ class RoutingService:
                     status=NodeStatus.DEGRADED,
                     last_check=datetime.utcnow(),
                     response_time_ms=response_time_ms,
-                    error=f"HTTP {response.status_code}"
+                    error=f"HTTP {response.status_code}",
                 )
 
         except Exception as e:
             response_time_ms = (asyncio.get_event_loop().time() - start_time) * 1000
 
-            self.logger.warning(
-                "node_health_check_failed",
-                node_id=node.node_id,
-                error=str(e)
-            )
+            self.logger.warning("node_health_check_failed", node_id=node.node_id, error=str(e))
 
             return NodeHealthCheck(
                 node_id=node.node_id,
                 status=NodeStatus.OFFLINE,
                 last_check=datetime.utcnow(),
                 response_time_ms=response_time_ms,
-                error=str(e)
+                error=str(e),
             )
 
     async def correlate_audit_events(
-        self,
-        query: AuditCorrelationQuery,
-        db: AsyncSession
+        self, query: AuditCorrelationQuery, db: AsyncSession
     ) -> AuditCorrelationResponse:
         """
         Correlate audit events across federation nodes.
@@ -533,7 +492,7 @@ class RoutingService:
         self.logger.info(
             "correlating_audit_events",
             correlation_id=query.correlation_id,
-            principal_id=query.principal_id
+            principal_id=query.principal_id,
         )
 
         start_time = asyncio.get_event_loop().time()
@@ -565,21 +524,17 @@ class RoutingService:
         self.logger.info(
             "audit_correlation_complete",
             events_found=len(local_events),
-            duration_ms=query_duration_ms
+            duration_ms=query_duration_ms,
         )
 
         return AuditCorrelationResponse(
             events=local_events,
             total_events=len(local_events),
             nodes_queried=[self.local_node_id],
-            query_duration_ms=query_duration_ms
+            query_duration_ms=query_duration_ms,
         )
 
-    async def _discover_routes(
-        self,
-        resource_id: str,
-        db: AsyncSession
-    ) -> List[RouteEntry]:
+    async def _discover_routes(self, resource_id: str, db: AsyncSession) -> list[RouteEntry]:
         """
         Discover routes to a resource across federation.
 
@@ -595,9 +550,7 @@ class RoutingService:
         routes = []
 
         # Check if resource exists locally
-        local_result = await db.execute(
-            select(Resource).where(Resource.id == resource_id)
-        )
+        local_result = await db.execute(select(Resource).where(Resource.id == resource_id))
         local_resource = local_result.scalar_one_or_none()
 
         if local_resource:
@@ -605,11 +558,11 @@ class RoutingService:
             route = RouteEntry(
                 resource_id=resource_id,
                 node_id=self.local_node_id,
-                endpoint=f"http://localhost:8000",  # Local endpoint
+                endpoint="http://localhost:8000",  # Local endpoint
                 last_verified=datetime.utcnow(),
                 health_status=NodeStatus.ONLINE,
                 latency_ms=0.1,  # Essentially zero latency for local
-                metadata={"local": True}
+                metadata={"local": True},
             )
             routes.append(route)
 
@@ -627,10 +580,7 @@ class RoutingService:
             try:
                 # Query node for resource
                 resource_url = f"{node.endpoint}/api/v2/resources/{resource_id}"
-                response = await self.client.get(
-                    resource_url,
-                    timeout=5.0
-                )
+                response = await self.client.get(resource_url, timeout=5.0)
 
                 if response.status_code == 200:
                     # Resource found on this node
@@ -641,7 +591,7 @@ class RoutingService:
                         last_verified=datetime.utcnow(),
                         health_status=NodeStatus.ONLINE,
                         latency_ms=response.elapsed.total_seconds() * 1000,
-                        metadata={"remote": True}
+                        metadata={"remote": True},
                     )
                     routes.append(route)
 
@@ -650,7 +600,7 @@ class RoutingService:
                     "route_discovery_failed",
                     node_id=node.node_id,
                     resource_id=resource_id,
-                    error=str(e)
+                    error=str(e),
                 )
 
         # Update routing table cache
@@ -670,10 +620,7 @@ class RoutingService:
         for routes in self._routing_table.values():
             all_entries.extend(routes)
 
-        return RoutingTable(
-            entries=all_entries,
-            last_updated=self._routing_table_updated
-        )
+        return RoutingTable(entries=all_entries, last_updated=self._routing_table_updated)
 
     def clear_routing_cache(self):
         """Clear routing table cache."""
@@ -682,4 +629,4 @@ class RoutingService:
         self.logger.info("routing_cache_cleared")
 
 
-__all__ = ["RoutingService", "CircuitBreaker"]
+__all__ = ["CircuitBreaker", "RoutingService"]

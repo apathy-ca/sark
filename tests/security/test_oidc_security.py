@@ -11,10 +11,9 @@ Priority: P0 (Blocking v2.0.0 release)
 Vulnerability: CSRF attack vector if state not validated
 """
 
-import pytest
-from fastapi.testclient import TestClient
 from unittest.mock import MagicMock, patch
-import secrets
+
+import pytest
 
 
 class TestOIDCStateSecurity:
@@ -207,6 +206,7 @@ class TestOIDCErrorHandling:
 
 # Mock implementations for testing (to be used once ENGINEER-1 implements fixes)
 
+
 @pytest.fixture
 def mock_oidc_provider():
     """Mock OIDC provider for testing."""
@@ -214,12 +214,12 @@ def mock_oidc_provider():
         provider = MagicMock()
         provider.get_authorization_url.return_value = (
             "https://oidc.example.com/authorize?state=mock_state",
-            "mock_state"
+            "mock_state",
         )
         provider.exchange_code_for_tokens.return_value = {
             "access_token": "mock_access_token",
             "id_token": "mock_id_token",
-            "refresh_token": "mock_refresh_token"
+            "refresh_token": "mock_refresh_token",
         }
         mock.return_value = provider
         yield provider

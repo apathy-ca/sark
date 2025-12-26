@@ -4,9 +4,9 @@ Tests for coordinating multiple gateway servers simultaneously,
 failover scenarios, and load distribution.
 """
 
-import pytest
 import asyncio
-from httpx import AsyncClient
+
+import pytest
 
 pytestmark = pytest.mark.asyncio
 
@@ -49,9 +49,7 @@ async def test_multiple_servers_registration(app_client, mock_user_token):
     assert len(registered_servers) >= 5
 
 
-async def test_server_deregistration_during_active_operations(
-    app_client, mock_user_token
-):
+async def test_server_deregistration_during_active_operations(app_client, mock_user_token):
     """Test server deregistration while operations are in progress."""
 
     # Register a server
@@ -97,9 +95,7 @@ async def test_server_deregistration_during_active_operations(
     assert deregister_response.status_code in [200, 204]
 
 
-async def test_failover_when_primary_server_unavailable(
-    app_client, mock_user_token
-):
+async def test_failover_when_primary_server_unavailable(app_client, mock_user_token):
     """Test automatic failover when primary server becomes unavailable."""
 
     # Register primary and backup servers

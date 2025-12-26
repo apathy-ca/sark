@@ -1,9 +1,9 @@
 """Gateway metrics collector for Prometheus."""
 
-from prometheus_client import Counter, Histogram, Gauge, Summary
-import time
-from typing import Optional
 from contextlib import contextmanager
+import time
+
+from prometheus_client import Counter, Gauge, Histogram, Summary
 
 # ============================================================================
 # Request Metrics
@@ -145,7 +145,7 @@ class GatewayMetricsCollector:
         self._request_start_times = {}
 
     @contextmanager
-    def track_request(self, method: str, endpoint: str, user: Optional[str] = None):
+    def track_request(self, method: str, endpoint: str, user: str | None = None):
         """
         Context manager to track request metrics.
 
@@ -174,7 +174,7 @@ class GatewayMetricsCollector:
                 tool="",
             ).inc()
 
-        except Exception as e:
+        except Exception:
             # Error case
             gateway_requests_total.labels(
                 method=method,
@@ -251,7 +251,7 @@ class GatewayMetricsCollector:
             severity=severity,
         ).inc()
 
-    def record_auth_failure(self, reason: str, user: Optional[str] = None):
+    def record_auth_failure(self, reason: str, user: str | None = None):
         """
         Record authentication failure.
 
@@ -344,7 +344,7 @@ _collector = GatewayMetricsCollector()
 
 
 # Convenience functions
-def record_request(method: str, endpoint: str, user: Optional[str] = None):
+def record_request(method: str, endpoint: str, user: str | None = None):
     """Record a request."""
     return _collector.track_request(method, endpoint, user)
 

@@ -1,6 +1,6 @@
 """Audit and SIEM metrics for Gateway."""
 
-from prometheus_client import Counter, Histogram, Gauge, Summary
+from prometheus_client import Counter, Gauge, Histogram, Summary
 
 # ============================================================================
 # Audit Writing Metrics

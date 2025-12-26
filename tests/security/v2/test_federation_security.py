@@ -9,12 +9,6 @@ Deliverable: tests/security/v2/test_federation_security.py
 """
 
 import pytest
-from unittest.mock import Mock, AsyncMock, patch
-from typing import Dict, Any, List
-import jwt
-from datetime import datetime, timedelta
-
-from sark.adapters.base import ProtocolAdapter
 
 
 class TestFederationAuthentication:
@@ -205,9 +199,9 @@ class TestAdapterSecurityBaseline:
             dangerous_patterns = ["<script>", "javascript:", "onerror=", "onclick="]
 
             for pattern in dangerous_patterns:
-                assert pattern.lower() not in result_str.lower(), (
-                    f"Dangerous pattern '{pattern}' found in result"
-                )
+                assert (
+                    pattern.lower() not in result_str.lower()
+                ), f"Dangerous pattern '{pattern}' found in result"
 
     @pytest.mark.asyncio
     async def test_adapter_error_information_disclosure(self, mock_adapter):
@@ -244,9 +238,9 @@ class TestAdapterSecurityBaseline:
 
             error_lower = result.error.lower()
             for pattern in sensitive_patterns:
-                assert pattern not in error_lower, (
-                    f"Sensitive pattern '{pattern}' found in error message"
-                )
+                assert (
+                    pattern not in error_lower
+                ), f"Sensitive pattern '{pattern}' found in error message"
 
     @pytest.mark.asyncio
     async def test_adapter_resource_limits(self, mock_adapter, sample_invocation_request):
@@ -259,18 +253,19 @@ class TestAdapterSecurityBaseline:
         # Should not cause OOM or hang
         try:
             result = await asyncio.wait_for(
-                mock_adapter.invoke(large_request),
-                timeout=5.0  # Should respond within 5 seconds
+                mock_adapter.invoke(large_request), timeout=5.0  # Should respond within 5 seconds
             )
             # If it succeeds, that's OK (adapter handled it)
             # If it fails, error should be reasonable
             if not result.success:
                 assert "too large" in result.error.lower() or "limit" in result.error.lower()
-        except asyncio.TimeoutError:
+        except TimeoutError:
             pytest.fail("Adapter hung on large payload (DoS vulnerability)")
 
     @pytest.mark.asyncio
-    async def test_adapter_concurrent_request_isolation(self, mock_adapter, sample_invocation_request):
+    async def test_adapter_concurrent_request_isolation(
+        self, mock_adapter, sample_invocation_request
+    ):
         """Test that concurrent requests don't interfere with each other."""
         import asyncio
 
@@ -287,8 +282,7 @@ class TestAdapterSecurityBaseline:
 
         # Execute concurrently
         results = await asyncio.gather(
-            *[mock_adapter.invoke(req) for req in requests],
-            return_exceptions=True
+            *[mock_adapter.invoke(req) for req in requests], return_exceptions=True
         )
 
         # Verify no data mixing/bleeding between requests

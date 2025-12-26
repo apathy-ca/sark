@@ -6,21 +6,22 @@ Tests cover various rollback scenarios including partial rollbacks, data preserv
 and emergency recovery procedures.
 """
 
-import pytest
-from datetime import datetime, UTC
 from uuid import uuid4
-from sqlalchemy import create_engine, text, inspect
+
+import pytest
+from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import sessionmaker
 
 from sark.db.base import Base
-from sark.models.mcp_server import MCPServer, MCPTool, TransportType, SensitivityLevel, ServerStatus
-from sark.models.base import Resource, Capability
+from sark.models.base import Capability, Resource
+from sark.models.mcp_server import MCPServer, SensitivityLevel, ServerStatus, TransportType
 
 
 @pytest.fixture
 def test_db_url():
     """Test database URL."""
     import os
+
     return os.getenv("TEST_DATABASE_URL", "postgresql://sark:sark@localhost:5432/sark_test")
 
 
@@ -69,14 +70,16 @@ class TestBasicRollback:
 
         # Migrate to v2.0
         session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO resources (id, name, protocol, endpoint, sensitivity_level, metadata, created_at, updated_at)
                 SELECT
                     id::text, name, 'mcp', command, sensitivity_level::text,
                     '{}'::jsonb, created_at, updated_at
                 FROM mcp_servers
                 ON CONFLICT (id) DO NOTHING
-            """)
+            """
+            )
         )
         session.commit()
 
@@ -191,14 +194,16 @@ class TestPartialRollback:
 
         # Migrate all to v2.0
         session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO resources (id, name, protocol, endpoint, sensitivity_level, metadata, created_at, updated_at)
                 SELECT
                     id::text, name, 'mcp', command, sensitivity_level::text,
                     '{}'::jsonb, created_at, updated_at
                 FROM mcp_servers
                 ON CONFLICT (id) DO NOTHING
-            """)
+            """
+            )
         )
         session.commit()
 
@@ -264,14 +269,16 @@ class TestDataIntegrityDuringRollback:
 
         # Migrate
         session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO resources (id, name, protocol, endpoint, sensitivity_level, metadata, created_at, updated_at)
                 SELECT
                     id::text, name, 'mcp', command, sensitivity_level::text,
                     '{}'::jsonb, created_at, updated_at
                 FROM mcp_servers
                 ON CONFLICT (id) DO NOTHING
-            """)
+            """
+            )
         )
         session.commit()
 
@@ -300,14 +307,16 @@ class TestDataIntegrityDuringRollback:
         session.commit()
 
         session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO resources (id, name, protocol, endpoint, sensitivity_level, metadata, created_at, updated_at)
                 SELECT
                     id::text, name, 'mcp', command, sensitivity_level::text,
                     '{}'::jsonb, created_at, updated_at
                 FROM mcp_servers
                 ON CONFLICT (id) DO NOTHING
-            """)
+            """
+            )
         )
         session.commit()
 
@@ -394,7 +403,8 @@ class TestComplexRollbackScenarios:
         # Partially migrate (only first 5)
         first_five_ids = [s.id for s in servers[:5]]
         session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO resources (id, name, protocol, endpoint, sensitivity_level, metadata, created_at, updated_at)
                 SELECT
                     id::text, name, 'mcp', command, sensitivity_level::text,
@@ -402,7 +412,8 @@ class TestComplexRollbackScenarios:
                 FROM mcp_servers
                 WHERE id = ANY(:ids)
                 ON CONFLICT (id) DO NOTHING
-            """),
+            """
+            ),
             {"ids": first_five_ids},
         )
         session.commit()
@@ -450,20 +461,24 @@ class TestEmergencyRecovery:
 
         # Verify orphaned capability
         orphaned = session.execute(
-            text("""
+            text(
+                """
                 SELECT COUNT(*)
                 FROM capabilities c
                 WHERE NOT EXISTS (SELECT 1 FROM resources r WHERE r.id = c.resource_id)
-            """)
+            """
+            )
         ).scalar()
         assert orphaned == 1
 
         # Recovery: Clean up orphaned capabilities
         session.execute(
-            text("""
+            text(
+                """
                 DELETE FROM capabilities
                 WHERE NOT EXISTS (SELECT 1 FROM resources r WHERE r.id = resource_id)
-            """)
+            """
+            )
         )
         session.commit()
 
@@ -484,7 +499,8 @@ class TestEmergencyRecovery:
 
         # First migration
         session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO resources (id, name, protocol, endpoint, sensitivity_level, metadata, created_at, updated_at)
                 SELECT
                     id::text, name, 'mcp', command, sensitivity_level::text,
@@ -493,13 +509,15 @@ class TestEmergencyRecovery:
                 ON CONFLICT (id) DO UPDATE SET
                     name = EXCLUDED.name,
                     updated_at = EXCLUDED.updated_at
-            """)
+            """
+            )
         )
         session.commit()
 
         # Second migration (should be idempotent)
         session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO resources (id, name, protocol, endpoint, sensitivity_level, metadata, created_at, updated_at)
                 SELECT
                     id::text, name, 'mcp', command, sensitivity_level::text,
@@ -508,7 +526,8 @@ class TestEmergencyRecovery:
                 ON CONFLICT (id) DO UPDATE SET
                     name = EXCLUDED.name,
                     updated_at = EXCLUDED.updated_at
-            """)
+            """
+            )
         )
         session.commit()
 

@@ -4,19 +4,18 @@ Performance Benchmark Reporting
 Generates detailed performance reports with historical tracking and regression detection.
 """
 
-import json
-import time
-import statistics
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime
+import json
 from pathlib import Path
-from typing import List, Dict, Any, Optional
-import sys
+import statistics
+from typing import Any
 
 
 @dataclass
 class BenchmarkResult:
     """Single benchmark result"""
+
     name: str
     iterations: int
     min_ms: float
@@ -28,9 +27,9 @@ class BenchmarkResult:
     std_dev_ms: float
     timestamp: str
     passed: bool
-    target_ms: Optional[float] = None
+    target_ms: float | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         return asdict(self)
 
@@ -38,18 +37,19 @@ class BenchmarkResult:
 @dataclass
 class BenchmarkSuite:
     """Collection of benchmark results"""
-    suite_name: str
-    results: List[BenchmarkResult]
-    timestamp: str
-    git_commit: Optional[str] = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    suite_name: str
+    results: list[BenchmarkResult]
+    timestamp: str
+    git_commit: str | None = None
+
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         return {
             "suite_name": self.suite_name,
             "timestamp": self.timestamp,
             "git_commit": self.git_commit,
-            "results": [r.to_dict() for r in self.results]
+            "results": [r.to_dict() for r in self.results],
         }
 
 
@@ -62,10 +62,7 @@ class BenchmarkReporter:
         self.history_file = self.output_dir / "benchmark_history.jsonl"
 
     def create_result(
-        self,
-        name: str,
-        latencies_ms: List[float],
-        target_ms: Optional[float] = None
+        self, name: str, latencies_ms: list[float], target_ms: float | None = None
     ) -> BenchmarkResult:
         """
         Create benchmark result from latency measurements
@@ -100,7 +97,7 @@ class BenchmarkReporter:
             std_dev_ms=statistics.stdev(sorted_latencies) if n > 1 else 0.0,
             timestamp=datetime.now().isoformat(),
             passed=sorted_latencies[p95_idx] <= target_ms if target_ms else True,
-            target_ms=target_ms
+            target_ms=target_ms,
         )
 
         return result
@@ -108,21 +105,21 @@ class BenchmarkReporter:
     def save_suite(self, suite: BenchmarkSuite):
         """Save benchmark suite to history"""
         # Append to JSONL history file
-        with open(self.history_file, 'a') as f:
-            f.write(json.dumps(suite.to_dict()) + '\n')
+        with open(self.history_file, "a") as f:
+            f.write(json.dumps(suite.to_dict()) + "\n")
 
         # Also save latest run as JSON
         latest_file = self.output_dir / "latest_benchmark.json"
-        with open(latest_file, 'w') as f:
+        with open(latest_file, "w") as f:
             json.dump(suite.to_dict(), f, indent=2)
 
-    def load_history(self, limit: Optional[int] = None) -> List[BenchmarkSuite]:
+    def load_history(self, limit: int | None = None) -> list[BenchmarkSuite]:
         """Load benchmark history"""
         if not self.history_file.exists():
             return []
 
         suites = []
-        with open(self.history_file, 'r') as f:
+        with open(self.history_file) as f:
             for line in f:
                 data = json.loads(line)
                 # Reconstruct suite (simplified)
@@ -134,10 +131,8 @@ class BenchmarkReporter:
         return suites
 
     def detect_regressions(
-        self,
-        current: BenchmarkSuite,
-        threshold_percent: float = 10.0
-    ) -> List[Dict[str, Any]]:
+        self, current: BenchmarkSuite, threshold_percent: float = 10.0
+    ) -> list[dict[str, Any]]:
         """
         Detect performance regressions
 
@@ -158,14 +153,14 @@ class BenchmarkReporter:
         regressions = []
 
         # Build lookup for previous results
-        prev_results = {r['name']: r for r in previous['results']}
+        prev_results = {r["name"]: r for r in previous["results"]}
 
         for current_result in current.results:
             name = current_result.name
             if name not in prev_results:
                 continue
 
-            prev_p95 = prev_results[name]['p95_ms']
+            prev_p95 = prev_results[name]["p95_ms"]
             curr_p95 = current_result.p95_ms
 
             # Calculate percent change
@@ -173,20 +168,22 @@ class BenchmarkReporter:
                 percent_change = ((curr_p95 - prev_p95) / prev_p95) * 100
 
                 if percent_change > threshold_percent:
-                    regressions.append({
-                        'name': name,
-                        'previous_p95_ms': prev_p95,
-                        'current_p95_ms': curr_p95,
-                        'percent_change': percent_change,
-                        'threshold_percent': threshold_percent
-                    })
+                    regressions.append(
+                        {
+                            "name": name,
+                            "previous_p95_ms": prev_p95,
+                            "current_p95_ms": curr_p95,
+                            "percent_change": percent_change,
+                            "threshold_percent": threshold_percent,
+                        }
+                    )
 
         return regressions
 
     def print_report(self, suite: BenchmarkSuite):
         """Print formatted benchmark report to console"""
         print("\n" + "=" * 80)
-        print(f"SARK v1.3.0 Security Performance Benchmark Report")
+        print("SARK v1.3.0 Security Performance Benchmark Report")
         print(f"Suite: {suite.suite_name}")
         print(f"Timestamp: {suite.timestamp}")
         if suite.git_commit:
@@ -201,8 +198,10 @@ class BenchmarkReporter:
             status = "✅ PASS" if result.passed else "❌ FAIL"
             target = f"{result.target_ms:.1f}" if result.target_ms else "N/A"
 
-            print(f"{result.name:<40} {result.median_ms:>7.2f}  {result.p95_ms:>7.2f}  "
-                  f"{result.p99_ms:>7.2f}  {target:>7}  {status:>8}")
+            print(
+                f"{result.name:<40} {result.median_ms:>7.2f}  {result.p95_ms:>7.2f}  "
+                f"{result.p99_ms:>7.2f}  {target:>7}  {status:>8}"
+            )
 
         # Summary
         print("\n" + "-" * 80)
@@ -217,8 +216,10 @@ class BenchmarkReporter:
         if regressions:
             print("\n⚠️  REGRESSIONS DETECTED:")
             for reg in regressions:
-                print(f"  - {reg['name']}: {reg['previous_p95_ms']:.2f}ms → "
-                      f"{reg['current_p95_ms']:.2f}ms (+{reg['percent_change']:.1f}%)")
+                print(
+                    f"  - {reg['name']}: {reg['previous_p95_ms']:.2f}ms → "
+                    f"{reg['current_p95_ms']:.2f}ms (+{reg['percent_change']:.1f}%)"
+                )
         else:
             print("\n✅ No regressions detected")
 
@@ -356,7 +357,7 @@ class BenchmarkReporter:
                     {reg['previous_p95_ms']:.2f}ms → {reg['current_p95_ms']:.2f}ms
                     (+{reg['percent_change']:.1f}%)</li>
                 """
-            html += '</ul></div>'
+            html += "</ul></div>"
 
         html += """
             </div>
@@ -366,26 +367,24 @@ class BenchmarkReporter:
 
         # Save HTML report
         html_file = self.output_dir / f"benchmark_{suite.timestamp.replace(':', '-')}.html"
-        with open(html_file, 'w') as f:
+        with open(html_file, "w") as f:
             f.write(html)
 
         # Also save as latest
         latest_html = self.output_dir / "latest_benchmark.html"
-        with open(latest_html, 'w') as f:
+        with open(latest_html, "w") as f:
             f.write(html)
 
         return str(html_file)
 
 
-def get_git_commit() -> Optional[str]:
+def get_git_commit() -> str | None:
     """Get current git commit hash"""
     try:
         import subprocess
+
         result = subprocess.run(
-            ['git', 'rev-parse', '--short', 'HEAD'],
-            capture_output=True,
-            text=True,
-            timeout=5
+            ["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True, timeout=5
         )
         if result.returncode == 0:
             return result.stdout.strip()

@@ -1,32 +1,32 @@
 """Database models and schemas."""
 
 from sark.models.audit import AuditEvent
+
+# v2.0 base classes for protocol abstraction
+from sark.models.base import (
+    CapabilityBase,
+    CapabilitySchema,
+    InvocationRequest,
+    InvocationResult,
+    ResourceBase,
+    ResourceSchema,
+)
+from sark.models.gateway import (
+    A2AAuthorizationRequest,
+    AgentContext,
+    AgentType,
+    GatewayAuditEvent,
+    GatewayAuthorizationRequest,
+    GatewayAuthorizationResponse,
+    GatewayServerInfo,
+    GatewayToolInfo,
+    SensitivityLevel,
+    TrustLevel,
+)
 from sark.models.mcp_server import MCPServer, MCPTool
 from sark.models.policy import Policy, PolicyVersion
 from sark.models.session import Session, SessionCreateRequest, SessionListResponse, SessionResponse
 from sark.models.user import Team, User
-from sark.models.gateway import (
-    SensitivityLevel,
-    GatewayServerInfo,
-    GatewayToolInfo,
-    AgentType,
-    TrustLevel,
-    AgentContext,
-    GatewayAuthorizationRequest,
-    GatewayAuthorizationResponse,
-    A2AAuthorizationRequest,
-    GatewayAuditEvent,
-)
-
-# v2.0 base classes for protocol abstraction
-from sark.models.base import (
-    ResourceBase,
-    CapabilityBase,
-    ResourceSchema,
-    CapabilitySchema,
-    InvocationRequest,
-    InvocationResult,
-)
 
 # v2.0 type aliases - gradual terminology migration
 # In v2.0, these will become actual base classes

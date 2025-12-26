@@ -6,8 +6,9 @@ Full implementation will be provided by Engineer 1.
 This provides the interface that Engineer 2's API endpoints depend on.
 """
 
-import structlog
 from typing import Optional
+
+import structlog
 
 from sark.models.gateway import GatewayServerInfo, GatewayToolInfo
 

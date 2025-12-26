@@ -9,10 +9,12 @@ This module provides comprehensive error handling for Gateway operations includi
 """
 
 import asyncio
-import time
-from datetime import datetime, timedelta, timezone
+import builtins
+from collections.abc import Callable
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Callable, TypeVar
+from typing import Any, TypeVar
+
 import structlog
 
 logger = structlog.get_logger()
@@ -144,7 +146,7 @@ class CircuitBreaker:
         """Update circuit state based on elapsed time and counters."""
         if self._state == CircuitState.OPEN:
             if self._last_failure_time:
-                elapsed = datetime.now(timezone.utc) - self._last_failure_time
+                elapsed = datetime.now(UTC) - self._last_failure_time
                 if elapsed.total_seconds() >= self.timeout_seconds:
                     self._transition_to(CircuitState.HALF_OPEN)
 
@@ -184,7 +186,7 @@ class CircuitBreaker:
         """Record a failed call."""
         self._total_failures += 1
         self._failure_count += 1
-        self._last_failure_time = datetime.now(timezone.utc)
+        self._last_failure_time = datetime.now(UTC)
 
         if self._state == CircuitState.CLOSED:
             if self._failure_count >= self.failure_threshold:
@@ -275,9 +277,9 @@ class CircuitBreaker:
             "total_successes": self._total_successes,
             "failure_rate": self.failure_rate,
             "state_changes": self._state_changes,
-            "last_failure_time": self._last_failure_time.isoformat()
-            if self._last_failure_time
-            else None,
+            "last_failure_time": (
+                self._last_failure_time.isoformat() if self._last_failure_time else None
+            ),
         }
 
 
@@ -321,9 +323,7 @@ class RetryConfig:
         import random
 
         # Calculate exponential delay
-        delay = min(
-            self.initial_delay * (self.exponential_base**attempt), self.max_delay
-        )
+        delay = min(self.initial_delay * (self.exponential_base**attempt), self.max_delay)
 
         # Add jitter (±25% random variance)
         if self.jitter:
@@ -392,7 +392,7 @@ async def with_retry(
                     error=str(e),
                 )
                 raise RetryExhaustedError(
-                    f"Failed after {config.max_attempts} attempts: {str(e)}"
+                    f"Failed after {config.max_attempts} attempts: {e!s}"
                 ) from e
 
             # Calculate delay and retry
@@ -445,19 +445,15 @@ async def with_timeout(
         ```
     """
     try:
-        result = await asyncio.wait_for(
-            func(*args, **kwargs), timeout=timeout_seconds
-        )
+        result = await asyncio.wait_for(func(*args, **kwargs), timeout=timeout_seconds)
         return result
-    except asyncio.TimeoutError as e:
+    except builtins.TimeoutError as e:
         logger.error(
             "operation_timeout",
             timeout_seconds=timeout_seconds,
             function=func.__name__,
         )
-        raise TimeoutError(
-            f"Operation timed out after {timeout_seconds} seconds"
-        ) from e
+        raise TimeoutError(f"Operation timed out after {timeout_seconds} seconds") from e
 
 
 class GatewayErrorHandler:

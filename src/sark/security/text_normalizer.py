@@ -6,6 +6,7 @@ character substitution, and other evasion techniques.
 
 import re
 import unicodedata
+
 import structlog
 
 logger = structlog.get_logger()
@@ -16,40 +17,100 @@ class TextNormalizer:
 
     # Zero-width characters that should be removed
     ZERO_WIDTH_CHARS = [
-        '\u200B',  # Zero-width space
-        '\u200C',  # Zero-width non-joiner
-        '\u200D',  # Zero-width joiner
-        '\u2060',  # Word joiner
-        '\uFEFF',  # Zero-width no-break space
+        "\u200B",  # Zero-width space
+        "\u200C",  # Zero-width non-joiner
+        "\u200D",  # Zero-width joiner
+        "\u2060",  # Word joiner
+        "\uFEFF",  # Zero-width no-break space
     ]
 
     # Homoglyph mapping (visually similar Unicode -> ASCII)
     HOMOGLYPH_MAP = {
         # Cyrillic
-        'а': 'a', 'е': 'e', 'о': 'o', 'р': 'p', 'с': 'c', 'у': 'y', 'х': 'x',
-        'А': 'A', 'В': 'B', 'Е': 'E', 'К': 'K', 'М': 'M', 'Н': 'H', 'О': 'O',
-        'Р': 'P', 'С': 'C', 'Т': 'T', 'Х': 'X',
-
+        "а": "a",
+        "е": "e",
+        "о": "o",
+        "р": "p",
+        "с": "c",
+        "у": "y",
+        "х": "x",
+        "А": "A",
+        "В": "B",
+        "Е": "E",
+        "К": "K",
+        "М": "M",
+        "Н": "H",
+        "О": "O",
+        "Р": "P",
+        "С": "C",
+        "Т": "T",
+        "Х": "X",
         # Greek
-        'α': 'a', 'β': 'b', 'γ': 'g', 'δ': 'd', 'ε': 'e', 'ζ': 'z', 'η': 'h',
-        'θ': 'th', 'ι': 'i', 'κ': 'k', 'λ': 'l', 'μ': 'u', 'ν': 'v', 'ξ': 'x',
-        'ο': 'o', 'π': 'p', 'ρ': 'r', 'σ': 's', 'τ': 't', 'υ': 'u', 'φ': 'f',
-        'χ': 'ch', 'ψ': 'ps', 'ω': 'o',
-        'Α': 'A', 'Β': 'B', 'Γ': 'G', 'Δ': 'D', 'Ε': 'E', 'Ζ': 'Z', 'Η': 'H',
-        'Θ': 'TH', 'Ι': 'I', 'Κ': 'K', 'Λ': 'L', 'Μ': 'M', 'Ν': 'N', 'Ξ': 'X',
-        'Ο': 'O', 'Π': 'P', 'Ρ': 'R', 'Σ': 'S', 'Τ': 'T', 'Υ': 'Y', 'Φ': 'F',
-        'Χ': 'CH', 'Ψ': 'PS', 'Ω': 'O',
+        "α": "a",
+        "β": "b",
+        "γ": "g",
+        "δ": "d",
+        "ε": "e",
+        "ζ": "z",
+        "η": "h",
+        "θ": "th",
+        "ι": "i",
+        "κ": "k",
+        "λ": "l",
+        "μ": "u",
+        "ν": "v",
+        "ξ": "x",
+        "ο": "o",
+        "π": "p",
+        "ρ": "r",
+        "σ": "s",
+        "τ": "t",
+        "υ": "u",
+        "φ": "f",
+        "χ": "ch",
+        "ψ": "ps",
+        "ω": "o",
+        "Α": "A",
+        "Β": "B",
+        "Γ": "G",
+        "Δ": "D",
+        "Ε": "E",
+        "Ζ": "Z",
+        "Η": "H",
+        "Θ": "TH",
+        "Ι": "I",
+        "Κ": "K",
+        "Λ": "L",
+        "Μ": "M",
+        "Ν": "N",
+        "Ξ": "X",
+        "Ο": "O",
+        "Π": "P",
+        "Ρ": "R",
+        "Σ": "S",
+        "Τ": "T",
+        "Υ": "Y",
+        "Φ": "F",
+        "Χ": "CH",
+        "Ψ": "PS",
+        "Ω": "O",
     }
 
     # Leet speak mapping (1337 -> normal)
     LEET_MAP = {
-        '0': 'o', '1': 'i', '3': 'e', '4': 'a', '5': 's',
-        '7': 't', '8': 'b', '9': 'g',
+        "0": "o",
+        "1": "i",
+        "3": "e",
+        "4": "a",
+        "5": "s",
+        "7": "t",
+        "8": "b",
+        "9": "g",
     }
 
     def __init__(self):
         """Initialize normalizer."""
-        self._zero_width_pattern = re.compile('[' + ''.join(self.ZERO_WIDTH_CHARS) + ']')
+        self._zero_width_pattern = re.compile("[" + "".join(self.ZERO_WIDTH_CHARS) + "]")
 
     def normalize(self, text: str, aggressive: bool = False) -> str:
         """
@@ -72,7 +133,7 @@ class TextNormalizer:
         normalized = self.remove_zero_width_characters(normalized)
 
         # 2. Unicode normalization (NFC form)
-        normalized = unicodedata.normalize('NFC', normalized)
+        normalized = unicodedata.normalize("NFC", normalized)
 
         # 3. Replace homoglyphs
         normalized = self.replace_homoglyphs(normalized)
@@ -105,7 +166,7 @@ class TextNormalizer:
         Returns:
             Text with zero-width characters removed
         """
-        return self._zero_width_pattern.sub('', text)
+        return self._zero_width_pattern.sub("", text)
 
     def replace_homoglyphs(self, text: str) -> str:
         """
@@ -120,7 +181,7 @@ class TextNormalizer:
         result = []
         for char in text:
             result.append(self.HOMOGLYPH_MAP.get(char, char))
-        return ''.join(result)
+        return "".join(result)
 
     def fullwidth_to_halfwidth(self, text: str) -> str:
         """
@@ -141,7 +202,7 @@ class TextNormalizer:
                 result.append(chr(code - 0xFEE0))
             else:
                 result.append(char)
-        return ''.join(result)
+        return "".join(result)
 
     def remove_combining_marks(self, text: str) -> str:
         """
@@ -154,10 +215,9 @@ class TextNormalizer:
             Text with combining marks removed
         """
         # Decompose then remove combining marks
-        nfd = unicodedata.normalize('NFD', text)
-        return ''.join(
-            char for char in nfd
-            if unicodedata.category(char) != 'Mn'  # Mn = Nonspacing_Mark
+        nfd = unicodedata.normalize("NFD", text)
+        return "".join(
+            char for char in nfd if unicodedata.category(char) != "Mn"  # Mn = Nonspacing_Mark
         )
 
     def normalize_whitespace(self, text: str) -> str:
@@ -178,7 +238,7 @@ class TextNormalizer:
             Text with normalized whitespace
         """
         # Replace all whitespace characters with single space
-        normalized = re.sub(r'\s+', ' ', text)
+        normalized = re.sub(r"\s+", " ", text)
         return normalized.strip()
 
     def decode_leet_speak(self, text: str) -> str:
@@ -202,7 +262,7 @@ class TextNormalizer:
                 result.append(self.LEET_MAP.get(char, char))
             else:
                 result.append(char)
-        return ''.join(result)
+        return "".join(result)
 
     def detect_obfuscation(self, text: str) -> dict[str, bool]:
         """
@@ -215,18 +275,17 @@ class TextNormalizer:
             Dictionary of detected obfuscation techniques
         """
         detections = {
-            'has_zero_width': bool(self._zero_width_pattern.search(text)),
-            'has_homoglyphs': any(char in self.HOMOGLYPH_MAP for char in text),
-            'has_fullwidth': any(0xFF01 <= ord(char) <= 0xFF5E for char in text),
-            'has_combining_marks': any(
-                unicodedata.category(char) == 'Mn'
-                for char in unicodedata.normalize('NFD', text)
+            "has_zero_width": bool(self._zero_width_pattern.search(text)),
+            "has_homoglyphs": any(char in self.HOMOGLYPH_MAP for char in text),
+            "has_fullwidth": any(0xFF01 <= ord(char) <= 0xFF5E for char in text),
+            "has_combining_marks": any(
+                unicodedata.category(char) == "Mn" for char in unicodedata.normalize("NFD", text)
             ),
-            'has_non_ascii': any(ord(char) > 127 for char in text),
-            'has_leet_speak': any(char in self.LEET_MAP for char in text.lower()),
+            "has_non_ascii": any(ord(char) > 127 for char in text),
+            "has_leet_speak": any(char in self.LEET_MAP for char in text.lower()),
         }
 
-        detections['is_obfuscated'] = any(detections.values())
+        detections["is_obfuscated"] = any(detections.values())
         return detections
 
 

@@ -1,7 +1,6 @@
 """Unit tests for injection detection configuration."""
 
 import pytest
-import os
 
 from sark.security.config import (
     InjectionDetectionConfig,
@@ -63,7 +62,9 @@ class TestInjectionDetectionConfig:
 
     def test_alert_threshold_greater_than_block(self):
         """Test that alert_threshold > block_threshold is rejected."""
-        with pytest.raises(ValueError, match="alert_threshold.*cannot be greater than.*block_threshold"):
+        with pytest.raises(
+            ValueError, match="alert_threshold.*cannot be greater than.*block_threshold"
+        ):
             InjectionDetectionConfig(
                 block_threshold=50,
                 alert_threshold=60,

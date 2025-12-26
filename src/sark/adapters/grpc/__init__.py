@@ -22,8 +22,8 @@ from sark.adapters.grpc.streaming import (
 
 __all__ = [
     "GRPCReflectionClient",
-    "ServiceInfo",
-    "MethodInfo",
     "GRPCStreamHandler",
+    "MethodInfo",
     "ProtobufMessageHandler",
+    "ServiceInfo",
 ]

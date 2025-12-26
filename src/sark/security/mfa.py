@@ -7,23 +7,24 @@ Provides MFA challenges for critical actions using multiple methods:
 - Push notifications (via mobile app)
 """
 
-import secrets
-import time
-import hmac
-import hashlib
 import base64
-import struct
-from typing import Dict, Any, Optional, List
 from dataclasses import dataclass
-from enum import Enum
 from datetime import datetime, timedelta
+from enum import Enum
+import hashlib
+import hmac
 import logging
+import secrets
+import struct
+import time
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
 class MFAMethod(str, Enum):
     """MFA authentication methods"""
+
     TOTP = "totp"
     SMS = "sms"
     PUSH = "push"
@@ -32,6 +33,7 @@ class MFAMethod(str, Enum):
 
 class MFAStatus(str, Enum):
     """MFA challenge status"""
+
     PENDING = "pending"
     APPROVED = "approved"
     DENIED = "denied"
@@ -41,6 +43,7 @@ class MFAStatus(str, Enum):
 @dataclass
 class MFAChallenge:
     """Represents an MFA challenge"""
+
     challenge_id: str
     user_id: str
     method: MFAMethod
@@ -48,7 +51,7 @@ class MFAChallenge:
     created_at: datetime
     expires_at: datetime
     status: MFAStatus
-    code: Optional[str] = None  # For TOTP/SMS
+    code: str | None = None  # For TOTP/SMS
     attempts: int = 0
     max_attempts: int = 3
 
@@ -74,7 +77,7 @@ class MFAConfig:
 class TOTPGenerator:
     """Generate and verify TOTP codes"""
 
-    def __init__(self, secret: Optional[str] = None):
+    def __init__(self, secret: str | None = None):
         """
         Initialize TOTP generator
 
@@ -86,9 +89,9 @@ class TOTPGenerator:
         else:
             # Generate random secret
             random_bytes = secrets.token_bytes(20)
-            self.secret = base64.b32encode(random_bytes).decode('utf-8')
+            self.secret = base64.b32encode(random_bytes).decode("utf-8")
 
-    def generate_code(self, timestamp: Optional[int] = None) -> str:
+    def generate_code(self, timestamp: int | None = None) -> str:
         """
         Generate TOTP code
 
@@ -105,7 +108,7 @@ class TOTPGenerator:
         time_step = timestamp // 30
 
         # Convert to bytes
-        time_bytes = struct.pack('>Q', time_step)
+        time_bytes = struct.pack(">Q", time_step)
 
         # Decode secret
         secret_bytes = base64.b32decode(self.secret)
@@ -115,20 +118,15 @@ class TOTPGenerator:
 
         # Dynamic truncation
         offset = hmac_hash[-1] & 0x0F
-        code_bytes = hmac_hash[offset:offset + 4]
-        code_int = struct.unpack('>I', code_bytes)[0] & 0x7FFFFFFF
+        code_bytes = hmac_hash[offset : offset + 4]
+        code_int = struct.unpack(">I", code_bytes)[0] & 0x7FFFFFFF
 
         # Generate 6-digit code
         code = str(code_int % 1000000).zfill(6)
 
         return code
 
-    def verify_code(
-        self,
-        code: str,
-        timestamp: Optional[int] = None,
-        window: int = 1
-    ) -> bool:
+    def verify_code(self, code: str, timestamp: int | None = None, window: int = 1) -> bool:
         """
         Verify TOTP code
 
@@ -159,12 +157,12 @@ class MFAChallengeSystem:
 
     def __init__(
         self,
-        storage: Optional[Any] = None,
-        sms_service: Optional[Any] = None,
-        push_service: Optional[Any] = None,
-        email_service: Optional[Any] = None,
-        audit_logger: Optional[Any] = None,
-        config: Optional[MFAConfig] = None
+        storage: Any | None = None,
+        sms_service: Any | None = None,
+        push_service: Any | None = None,
+        email_service: Any | None = None,
+        audit_logger: Any | None = None,
+        config: MFAConfig | None = None,
     ):
         """
         Initialize MFA challenge system
@@ -185,14 +183,14 @@ class MFAChallengeSystem:
         self.config = config or MFAConfig()
 
         # TOTP generators per user (in production, store in database)
-        self._totp_secrets: Dict[str, str] = {}
+        self._totp_secrets: dict[str, str] = {}
 
     async def require_mfa(
         self,
         user_id: str,
         action: str,
-        method: Optional[MFAMethod] = None,
-        user_contact: Optional[Dict[str, str]] = None
+        method: MFAMethod | None = None,
+        user_contact: dict[str, str] | None = None,
     ) -> bool:
         """
         Require MFA for an action
@@ -222,12 +220,7 @@ class MFAChallengeSystem:
 
         return result
 
-    async def verify_code(
-        self,
-        user_id: str,
-        challenge_id: str,
-        code: str
-    ) -> bool:
+    async def verify_code(self, user_id: str, challenge_id: str, code: str) -> bool:
         """
         Verify MFA code
 
@@ -280,18 +273,17 @@ class MFAChallengeSystem:
         if is_valid:
             challenge.status = MFAStatus.APPROVED
         else:
-            challenge.status = MFAStatus.DENIED if challenge.attempts >= challenge.max_attempts else MFAStatus.PENDING
+            challenge.status = (
+                MFAStatus.DENIED
+                if challenge.attempts >= challenge.max_attempts
+                else MFAStatus.PENDING
+            )
 
         await self._update_challenge(challenge)
 
         return is_valid
 
-    async def _create_challenge(
-        self,
-        user_id: str,
-        action: str,
-        method: MFAMethod
-    ) -> MFAChallenge:
+    async def _create_challenge(self, user_id: str, action: str, method: MFAMethod) -> MFAChallenge:
         """Create new MFA challenge"""
         challenge_id = secrets.token_urlsafe(32)
         now = datetime.now()
@@ -299,9 +291,7 @@ class MFAChallengeSystem:
         # Generate code for SMS/Email
         code = None
         if method in [MFAMethod.SMS, MFAMethod.EMAIL]:
-            code = "".join(
-                str(secrets.randbelow(10)) for _ in range(self.config.code_length)
-            )
+            code = "".join(str(secrets.randbelow(10)) for _ in range(self.config.code_length))
 
         challenge = MFAChallenge(
             challenge_id=challenge_id,
@@ -312,31 +302,25 @@ class MFAChallengeSystem:
             expires_at=now + timedelta(seconds=self.config.timeout_seconds),
             status=MFAStatus.PENDING,
             code=code,
-            max_attempts=self.config.max_attempts
+            max_attempts=self.config.max_attempts,
         )
 
         # Store challenge
         if self.storage:
             await self.storage.set(
-                f"mfa:challenge:{challenge_id}",
-                challenge,
-                ex=self.config.timeout_seconds
+                f"mfa:challenge:{challenge_id}", challenge, ex=self.config.timeout_seconds
             )
 
         return challenge
 
-    async def _send_challenge(
-        self,
-        challenge: MFAChallenge,
-        user_contact: Optional[Dict[str, str]]
-    ):
+    async def _send_challenge(self, challenge: MFAChallenge, user_contact: dict[str, str] | None):
         """Send MFA challenge to user"""
         try:
             if challenge.method == MFAMethod.SMS:
                 if self.sms_service and user_contact and user_contact.get("phone"):
                     await self.sms_service.send_sms(
                         to=user_contact["phone"],
-                        message=f"Your SARK verification code is: {challenge.code}"
+                        message=f"Your SARK verification code is: {challenge.code}",
                     )
                 else:
                     logger.warning(f"Cannot send SMS for challenge {challenge.challenge_id}")
@@ -346,7 +330,7 @@ class MFAChallengeSystem:
                     await self.email_service.send_email(
                         to=user_contact["email"],
                         subject="SARK MFA Verification",
-                        body=f"Your verification code is: {challenge.code}\n\nThis code expires in {self.config.timeout_seconds} seconds."
+                        body=f"Your verification code is: {challenge.code}\n\nThis code expires in {self.config.timeout_seconds} seconds.",
                     )
                 else:
                     logger.warning(f"Cannot send email for challenge {challenge.challenge_id}")
@@ -357,7 +341,7 @@ class MFAChallengeSystem:
                         user_id=challenge.user_id,
                         title="MFA Required",
                         body=f"Approve action: {challenge.action}",
-                        data={"challenge_id": challenge.challenge_id}
+                        data={"challenge_id": challenge.challenge_id},
                     )
                 else:
                     logger.warning(f"Cannot send push for challenge {challenge.challenge_id}")
@@ -369,11 +353,7 @@ class MFAChallengeSystem:
         except Exception as e:
             logger.error(f"Failed to send MFA challenge: {e}")
 
-    async def _wait_for_response(
-        self,
-        challenge: MFAChallenge,
-        poll_interval: float = 2.0
-    ) -> bool:
+    async def _wait_for_response(self, challenge: MFAChallenge, poll_interval: float = 2.0) -> bool:
         """
         Wait for MFA response (for automated flows)
 
@@ -425,7 +405,7 @@ class MFAChallengeSystem:
 
         return self._totp_secrets[user_id]
 
-    async def _get_challenge(self, challenge_id: str) -> Optional[MFAChallenge]:
+    async def _get_challenge(self, challenge_id: str) -> MFAChallenge | None:
         """Retrieve challenge from storage"""
         if not self.storage:
             return None
@@ -438,9 +418,7 @@ class MFAChallengeSystem:
             return
 
         await self.storage.set(
-            f"mfa:challenge:{challenge.challenge_id}",
-            challenge,
-            ex=self.config.timeout_seconds
+            f"mfa:challenge:{challenge.challenge_id}", challenge, ex=self.config.timeout_seconds
         )
 
     async def _log_mfa_event(self, challenge: MFAChallenge, result: bool):
@@ -457,7 +435,7 @@ class MFAChallengeSystem:
                 action=challenge.action,
                 status=challenge.status.value,
                 attempts=challenge.attempts,
-                result="success" if result else "failure"
+                result="success" if result else "failure",
             )
         except Exception as e:
             logger.error(f"Failed to log MFA event: {e}")
@@ -465,4 +443,5 @@ class MFAChallengeSystem:
     async def _sleep(self, seconds: float):
         """Async sleep"""
         import asyncio
+
         await asyncio.sleep(seconds)

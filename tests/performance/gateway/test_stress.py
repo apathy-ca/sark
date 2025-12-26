@@ -1,8 +1,9 @@
 """Stress Testing - Extreme Load and Recovery."""
 
-import pytest
 import asyncio
 import time
+
+import pytest
 
 pytestmark = pytest.mark.performance
 
@@ -24,12 +25,10 @@ async def test_extreme_load_behavior(app_client, mock_user_token):
     responses = await asyncio.gather(*tasks, return_exceptions=True)
     duration = time.perf_counter() - start
 
-    successful = sum(
-        1 for r in responses if not isinstance(r, Exception) and r.status_code == 200
-    )
+    successful = sum(1 for r in responses if not isinstance(r, Exception) and r.status_code == 200)
     failed = len(responses) - successful
 
-    print(f"\nExtreme Load Results:")
+    print("\nExtreme Load Results:")
     print(f"  Total: {len(responses)}")
     print(f"  Successful: {successful}")
     print(f"  Failed: {failed}")

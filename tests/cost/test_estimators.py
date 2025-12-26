@@ -2,17 +2,18 @@
 Tests for cost estimators (OpenAI, Anthropic, etc.).
 """
 
-import pytest
 from decimal import Decimal
+
+import pytest
 
 from sark.models.base import InvocationRequest, InvocationResult
 from sark.services.cost.estimator import (
-    NoCostEstimator,
-    FixedCostEstimator,
     CostEstimationError,
+    FixedCostEstimator,
+    NoCostEstimator,
 )
-from sark.services.cost.providers.openai import OpenAICostEstimator
 from sark.services.cost.providers.anthropic import AnthropicCostEstimator
+from sark.services.cost.providers.openai import OpenAICostEstimator
 
 
 class TestNoCostEstimator:
@@ -41,10 +42,7 @@ class TestFixedCostEstimator:
     @pytest.mark.asyncio
     async def test_returns_fixed_cost(self):
         """Test that FixedCostEstimator returns the configured cost."""
-        estimator = FixedCostEstimator(
-            cost_per_call=Decimal("0.50"),
-            provider="custom-api"
-        )
+        estimator = FixedCostEstimator(cost_per_call=Decimal("0.50"), provider="custom-api")
 
         request = InvocationRequest(
             capability_id="cap-1",
@@ -71,9 +69,7 @@ class TestOpenAICostEstimator:
             capability_id="cap-1",
             principal_id="user-1",
             arguments={
-                "messages": [
-                    {"role": "user", "content": "What is the capital of France?"}
-                ],
+                "messages": [{"role": "user", "content": "What is the capital of France?"}],
                 "max_tokens": 100,
             },
         )
@@ -176,9 +172,7 @@ class TestOpenAICostEstimator:
 
         resource_metadata = {"model": "gpt-4"}
 
-        actual_estimate = await estimator.record_actual_cost(
-            request, result, resource_metadata
-        )
+        actual_estimate = await estimator.record_actual_cost(request, result, resource_metadata)
 
         assert actual_estimate is not None
         assert actual_estimate.estimated_cost > Decimal("0.00")
@@ -220,9 +214,7 @@ class TestAnthropicCostEstimator:
             capability_id="cap-1",
             principal_id="user-1",
             arguments={
-                "messages": [
-                    {"role": "user", "content": "What is quantum computing?"}
-                ],
+                "messages": [{"role": "user", "content": "What is quantum computing?"}],
                 "max_tokens": 1024,
             },
         )
@@ -247,9 +239,7 @@ class TestAnthropicCostEstimator:
             principal_id="user-1",
             arguments={
                 "system": "You are a helpful AI assistant specializing in physics.",
-                "messages": [
-                    {"role": "user", "content": "Explain relativity."}
-                ],
+                "messages": [{"role": "user", "content": "Explain relativity."}],
                 "max_tokens": 2000,
             },
         )
@@ -290,9 +280,7 @@ class TestAnthropicCostEstimator:
 
         resource_metadata = {"model": "claude-3-haiku-20240307"}
 
-        actual_estimate = await estimator.record_actual_cost(
-            request, result, resource_metadata
-        )
+        actual_estimate = await estimator.record_actual_cost(request, result, resource_metadata)
 
         assert actual_estimate is not None
         assert actual_estimate.estimated_cost > Decimal("0.00")
@@ -334,9 +322,7 @@ class TestAnthropicCostEstimator:
             request, {"model": "claude-3-haiku-20240307"}
         )
 
-        opus_estimate = await estimator.estimate_cost(
-            request, {"model": "claude-3-opus-20240229"}
-        )
+        opus_estimate = await estimator.estimate_cost(request, {"model": "claude-3-opus-20240229"})
 
         assert haiku_estimate.estimated_cost < opus_estimate.estimated_cost
 

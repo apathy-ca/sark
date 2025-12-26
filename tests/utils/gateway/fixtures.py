@@ -1,7 +1,8 @@
 """Pytest fixtures for Gateway tests."""
 
+from typing import Any
+
 import pytest
-from typing import Dict, Any
 
 
 # Mock models until real models are available from Engineer 1
@@ -33,8 +34,8 @@ class GatewayAuthorizationRequest:
         action: str,
         server_name: str,
         tool_name: str,
-        parameters: Dict[str, Any],
-        gateway_metadata: Dict[str, Any],
+        parameters: dict[str, Any],
+        gateway_metadata: dict[str, Any],
     ):
         self.action = action
         self.server_name = server_name
@@ -46,9 +47,7 @@ class GatewayAuthorizationRequest:
 class UserContext:
     """Mock UserContext model."""
 
-    def __init__(
-        self, user_id: str, email: str, role: str, teams: list[str]
-    ):
+    def __init__(self, user_id: str, email: str, role: str, teams: list[str]):
         self.user_id = user_id
         self.email = email
         self.role = role

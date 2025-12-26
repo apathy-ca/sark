@@ -438,9 +438,7 @@ reason := "test" if { true }
         test_valid = {
             "suite_name": "Valid",
             "policy": "valid.rego",
-            "tests": [
-                {"name": "Test", "input": {}, "expected": {"allow": True}}
-            ],
+            "tests": [{"name": "Test", "input": {}, "expected": {"allow": True}}],
         }
         with open(tmp_path / "valid.yaml", "w") as f:
             yaml.dump(test_valid, f)
@@ -449,9 +447,7 @@ reason := "test" if { true }
         test_invalid = {
             "suite_name": "Invalid",
             "policy": "nonexistent.rego",
-            "tests": [
-                {"name": "Test", "input": {}, "expected": {}}
-            ],
+            "tests": [{"name": "Test", "input": {}, "expected": {}}],
         }
         with open(tmp_path / "invalid.yaml", "w") as f:
             yaml.dump(test_invalid, f)

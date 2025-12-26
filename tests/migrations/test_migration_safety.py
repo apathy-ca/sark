@@ -10,21 +10,22 @@ These tests ensure that:
 6. Indexes are created correctly
 """
 
-import pytest
-from datetime import datetime, UTC
 from uuid import uuid4
-from sqlalchemy import create_engine, text, inspect
+
+import pytest
+from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import sessionmaker
 
 from sark.db.base import Base
-from sark.models.mcp_server import MCPServer, MCPTool, TransportType, SensitivityLevel, ServerStatus
-from sark.models.base import Resource, Capability, FederationNode, CostTracking, PrincipalBudget
+from sark.models.base import Capability, CostTracking, FederationNode, PrincipalBudget, Resource
+from sark.models.mcp_server import MCPServer, MCPTool, SensitivityLevel, ServerStatus, TransportType
 
 
 @pytest.fixture
 def test_db_url():
     """Test database URL."""
     import os
+
     return os.getenv("TEST_DATABASE_URL", "postgresql://sark:sark@localhost:5432/sark_test")
 
 
@@ -268,11 +269,13 @@ class TestMigration007Federation:
     def test_materialized_view_exists(self, session):
         """Test that materialized view for cost analysis is created."""
         result = session.execute(
-            text("""
+            text(
+                """
                 SELECT EXISTS (
                     SELECT 1 FROM pg_matviews WHERE matviewname = 'mv_daily_cost_summary'
                 )
-            """)
+            """
+            )
         )
         assert result.scalar() is True
 
@@ -297,7 +300,8 @@ class TestDataMigration:
 
         # Run migration (simulated - in practice would be via alembic or script)
         session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO resources (id, name, protocol, endpoint, sensitivity_level, metadata, created_at, updated_at)
                 SELECT
                     id::text,
@@ -315,7 +319,8 @@ class TestDataMigration:
                 FROM mcp_servers
                 WHERE id = :server_id
                 ON CONFLICT (id) DO NOTHING
-            """),
+            """
+            ),
             {"server_id": server_id},
         )
         session.commit()
@@ -357,20 +362,23 @@ class TestDataMigration:
 
         # Migrate server first
         session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO resources (id, name, protocol, endpoint, sensitivity_level, metadata, created_at, updated_at)
                 SELECT
                     id::text, name, 'mcp', command, sensitivity_level::text,
                     '{}'::jsonb, created_at, updated_at
                 FROM mcp_servers WHERE id = :server_id
                 ON CONFLICT (id) DO NOTHING
-            """),
+            """
+            ),
             {"server_id": server_id},
         )
 
         # Migrate tool
         session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO capabilities (id, resource_id, name, description, input_schema, output_schema, sensitivity_level, metadata)
                 SELECT
                     id::text,
@@ -384,7 +392,8 @@ class TestDataMigration:
                 FROM mcp_tools
                 WHERE id = :tool_id
                 ON CONFLICT (id) DO NOTHING
-            """),
+            """
+            ),
             {"tool_id": tool_id},
         )
         session.commit()
@@ -429,18 +438,21 @@ class TestDataMigration:
 
         # Run full migration
         session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO resources (id, name, protocol, endpoint, sensitivity_level, metadata, created_at, updated_at)
                 SELECT
                     id::text, name, 'mcp', command, sensitivity_level::text,
                     '{}'::jsonb, created_at, updated_at
                 FROM mcp_servers
                 ON CONFLICT (id) DO NOTHING
-            """)
+            """
+            )
         )
 
         session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO capabilities (id, resource_id, name, description, input_schema, output_schema, sensitivity_level, metadata)
                 SELECT
                     id::text, server_id::text, name, description,
@@ -448,7 +460,8 @@ class TestDataMigration:
                     sensitivity_level::text, '{}'::jsonb
                 FROM mcp_tools
                 ON CONFLICT (id) DO NOTHING
-            """)
+            """
+            )
         )
         session.commit()
 
@@ -482,32 +495,38 @@ class TestDataMigration:
 
         # Migrate
         session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO resources (id, name, protocol, endpoint, sensitivity_level, metadata, created_at, updated_at)
                 SELECT id::text, name, 'mcp', command, sensitivity_level::text, '{}'::jsonb, created_at, updated_at
                 FROM mcp_servers
                 ON CONFLICT (id) DO NOTHING
-            """)
+            """
+            )
         )
 
         session.execute(
-            text("""
+            text(
+                """
                 INSERT INTO capabilities (id, resource_id, name, description, input_schema, output_schema, sensitivity_level, metadata)
                 SELECT id::text, server_id::text, name, description, COALESCE(parameters, '{}'::jsonb),
                        '{}'::jsonb, sensitivity_level::text, '{}'::jsonb
                 FROM mcp_tools
                 ON CONFLICT (id) DO NOTHING
-            """)
+            """
+            )
         )
         session.commit()
 
         # Verify FK integrity - should be no orphaned capabilities
         orphaned = session.execute(
-            text("""
+            text(
+                """
                 SELECT COUNT(*)
                 FROM capabilities c
                 WHERE NOT EXISTS (SELECT 1 FROM resources r WHERE r.id = c.resource_id)
-            """)
+            """
+            )
         ).scalar()
 
         assert orphaned == 0

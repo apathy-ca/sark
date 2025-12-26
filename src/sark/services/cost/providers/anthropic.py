@@ -6,11 +6,12 @@ Pricing data as of December 2024.
 """
 
 from decimal import Decimal
-from typing import Any, Dict, Optional
+from typing import Any
+
 import structlog
 
 from sark.models.base import InvocationRequest, InvocationResult
-from sark.services.cost.estimator import CostEstimator, CostEstimate, CostEstimationError
+from sark.services.cost.estimator import CostEstimate, CostEstimationError, CostEstimator
 
 logger = structlog.get_logger(__name__)
 
@@ -21,25 +22,18 @@ ANTHROPIC_PRICING = {
     # Claude 3.5 Sonnet
     "claude-3-5-sonnet-20241022": (Decimal("3.00"), Decimal("15.00")),
     "claude-3-5-sonnet-20240620": (Decimal("3.00"), Decimal("15.00")),
-
     # Claude 3 Opus
     "claude-3-opus-20240229": (Decimal("15.00"), Decimal("75.00")),
-
     # Claude 3 Sonnet
     "claude-3-sonnet-20240229": (Decimal("3.00"), Decimal("15.00")),
-
     # Claude 3 Haiku
     "claude-3-haiku-20240307": (Decimal("0.25"), Decimal("1.25")),
-
     # Claude 2.1
     "claude-2.1": (Decimal("8.00"), Decimal("24.00")),
-
     # Claude 2.0
     "claude-2.0": (Decimal("8.00"), Decimal("24.00")),
-
     # Claude Instant
     "claude-instant-1.2": (Decimal("0.80"), Decimal("2.40")),
-
     # Default fallback (use Sonnet pricing)
     "default": (Decimal("3.00"), Decimal("15.00")),
 }
@@ -80,11 +74,7 @@ class AnthropicCostEstimator(CostEstimator):
                 return pricing
 
         # Default pricing
-        logger.warning(
-            "anthropic_pricing_not_found",
-            model=model,
-            using_default=True
-        )
+        logger.warning("anthropic_pricing_not_found", model=model, using_default=True)
         return ANTHROPIC_PRICING["default"]
 
     def _estimate_tokens(self, text: str) -> int:
@@ -103,9 +93,7 @@ class AnthropicCostEstimator(CostEstimator):
         return max(1, len(text) // 4)
 
     async def estimate_cost(
-        self,
-        request: InvocationRequest,
-        resource_metadata: Dict[str, Any]
+        self, request: InvocationRequest, resource_metadata: dict[str, Any]
     ) -> CostEstimate:
         """
         Estimate Anthropic API call cost.
@@ -129,10 +117,7 @@ class AnthropicCostEstimator(CostEstimator):
         # Extract model
         model = resource_metadata.get("model")
         if not model:
-            raise CostEstimationError(
-                "Missing 'model' in resource metadata",
-                provider="anthropic"
-            )
+            raise CostEstimationError("Missing 'model' in resource metadata", provider="anthropic")
 
         # Get pricing
         input_price, output_price = self._get_pricing(model)
@@ -161,8 +146,7 @@ class AnthropicCostEstimator(CostEstimator):
                     input_tokens += self._estimate_tokens(str(content))
         else:
             raise CostEstimationError(
-                "Cannot estimate tokens: no 'messages' in arguments",
-                provider="anthropic"
+                "Cannot estimate tokens: no 'messages' in arguments", provider="anthropic"
             )
 
         # Estimate output tokens
@@ -197,8 +181,8 @@ class AnthropicCostEstimator(CostEstimator):
         self,
         request: InvocationRequest,
         result: InvocationResult,
-        resource_metadata: Dict[str, Any]
-    ) -> Optional[CostEstimate]:
+        resource_metadata: dict[str, Any],
+    ) -> CostEstimate | None:
         """
         Extract actual cost from Anthropic API response.
 
@@ -260,4 +244,4 @@ class AnthropicCostEstimator(CostEstimator):
         )
 
 
-__all__ = ["AnthropicCostEstimator", "ANTHROPIC_PRICING"]
+__all__ = ["ANTHROPIC_PRICING", "AnthropicCostEstimator"]

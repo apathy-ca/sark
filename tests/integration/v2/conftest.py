@@ -8,8 +8,9 @@ Provides fixtures for:
 - Adapter registry testing
 """
 
+from collections.abc import AsyncIterator
 from datetime import UTC, datetime
-from typing import Any, AsyncIterator, Dict, List
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
@@ -18,12 +19,11 @@ import pytest
 from sark.adapters.base import ProtocolAdapter
 from sark.adapters.registry import AdapterRegistry, reset_registry
 from sark.models.base import (
-    ResourceSchema,
     CapabilitySchema,
     InvocationRequest,
     InvocationResult,
+    ResourceSchema,
 )
-
 
 # ============================================================================
 # Mock Adapters
@@ -41,17 +41,14 @@ class MockMCPAdapter(ProtocolAdapter):
     def protocol_version(self) -> str:
         return "2024-11-05"
 
-    async def discover_resources(
-        self,
-        discovery_config: Dict[str, Any]
-    ) -> List[ResourceSchema]:
+    async def discover_resources(self, discovery_config: dict[str, Any]) -> list[ResourceSchema]:
         """Mock MCP resource discovery."""
         return [
             ResourceSchema(
                 id=f"mcp-{discovery_config.get('name', 'server')}",
-                name=discovery_config.get('name', 'Test MCP Server'),
+                name=discovery_config.get("name", "Test MCP Server"),
                 protocol="mcp",
-                endpoint=discovery_config.get('command', 'npx'),
+                endpoint=discovery_config.get("command", "npx"),
                 capabilities=[],
                 metadata=discovery_config,
                 sensitivity_level="medium",
@@ -60,10 +57,7 @@ class MockMCPAdapter(ProtocolAdapter):
             )
         ]
 
-    async def get_capabilities(
-        self,
-        resource: ResourceSchema
-    ) -> List[CapabilitySchema]:
+    async def get_capabilities(self, resource: ResourceSchema) -> list[CapabilitySchema]:
         """Mock capability listing."""
         return [
             CapabilitySchema(
@@ -73,10 +67,8 @@ class MockMCPAdapter(ProtocolAdapter):
                 description="Read a file from the filesystem",
                 input_schema={
                     "type": "object",
-                    "properties": {
-                        "path": {"type": "string"}
-                    },
-                    "required": ["path"]
+                    "properties": {"path": {"type": "string"}},
+                    "required": ["path"],
                 },
                 output_schema={},
                 metadata={},
@@ -87,29 +79,18 @@ class MockMCPAdapter(ProtocolAdapter):
                 resource_id=resource.id,
                 name="list_files",
                 description="List files in a directory",
-                input_schema={
-                    "type": "object",
-                    "properties": {
-                        "path": {"type": "string"}
-                    }
-                },
+                input_schema={"type": "object", "properties": {"path": {"type": "string"}}},
                 output_schema={},
                 metadata={},
                 sensitivity_level="low",
             ),
         ]
 
-    async def validate_request(
-        self,
-        request: InvocationRequest
-    ) -> bool:
+    async def validate_request(self, request: InvocationRequest) -> bool:
         """Mock request validation."""
         return True
 
-    async def invoke(
-        self,
-        request: InvocationRequest
-    ) -> InvocationResult:
+    async def invoke(self, request: InvocationRequest) -> InvocationResult:
         """Mock MCP tool invocation."""
         return InvocationResult(
             success=True,
@@ -118,10 +99,7 @@ class MockMCPAdapter(ProtocolAdapter):
             duration_ms=10.5,
         )
 
-    async def health_check(
-        self,
-        resource: ResourceSchema
-    ) -> bool:
+    async def health_check(self, resource: ResourceSchema) -> bool:
         """Mock health check."""
         return True
 
@@ -137,22 +115,19 @@ class MockHTTPAdapter(ProtocolAdapter):
     def protocol_version(self) -> str:
         return "1.1"
 
-    async def discover_resources(
-        self,
-        discovery_config: Dict[str, Any]
-    ) -> List[ResourceSchema]:
+    async def discover_resources(self, discovery_config: dict[str, Any]) -> list[ResourceSchema]:
         """Mock HTTP API discovery via OpenAPI."""
-        base_url = discovery_config.get('base_url', 'https://api.example.com')
+        base_url = discovery_config.get("base_url", "https://api.example.com")
         return [
             ResourceSchema(
                 id=base_url,
-                name=discovery_config.get('name', 'Test REST API'),
+                name=discovery_config.get("name", "Test REST API"),
                 protocol="http",
                 endpoint=base_url,
                 capabilities=[],
                 metadata={
-                    "openapi_spec_url": discovery_config.get('openapi_spec_url'),
-                    "auth_type": discovery_config.get('auth_type', 'bearer'),
+                    "openapi_spec_url": discovery_config.get("openapi_spec_url"),
+                    "auth_type": discovery_config.get("auth_type", "bearer"),
                 },
                 sensitivity_level="medium",
                 created_at=datetime.now(UTC),
@@ -160,10 +135,7 @@ class MockHTTPAdapter(ProtocolAdapter):
             )
         ]
 
-    async def get_capabilities(
-        self,
-        resource: ResourceSchema
-    ) -> List[CapabilitySchema]:
+    async def get_capabilities(self, resource: ResourceSchema) -> list[CapabilitySchema]:
         """Mock HTTP endpoint capabilities."""
         return [
             CapabilitySchema(
@@ -189,7 +161,7 @@ class MockHTTPAdapter(ProtocolAdapter):
                     "properties": {
                         "name": {"type": "string"},
                         "email": {"type": "string"},
-                    }
+                    },
                 },
                 output_schema={},
                 metadata={
@@ -200,17 +172,11 @@ class MockHTTPAdapter(ProtocolAdapter):
             ),
         ]
 
-    async def validate_request(
-        self,
-        request: InvocationRequest
-    ) -> bool:
+    async def validate_request(self, request: InvocationRequest) -> bool:
         """Mock HTTP request validation."""
         return True
 
-    async def invoke(
-        self,
-        request: InvocationRequest
-    ) -> InvocationResult:
+    async def invoke(self, request: InvocationRequest) -> InvocationResult:
         """Mock HTTP API call."""
         return InvocationResult(
             success=True,
@@ -219,10 +185,7 @@ class MockHTTPAdapter(ProtocolAdapter):
             duration_ms=25.3,
         )
 
-    async def health_check(
-        self,
-        resource: ResourceSchema
-    ) -> bool:
+    async def health_check(self, resource: ResourceSchema) -> bool:
         """Mock HTTP health check."""
         return True
 
@@ -238,22 +201,19 @@ class MockGRPCAdapter(ProtocolAdapter):
     def protocol_version(self) -> str:
         return "1.0"
 
-    async def discover_resources(
-        self,
-        discovery_config: Dict[str, Any]
-    ) -> List[ResourceSchema]:
+    async def discover_resources(self, discovery_config: dict[str, Any]) -> list[ResourceSchema]:
         """Mock gRPC service discovery via reflection."""
-        endpoint = discovery_config.get('endpoint', 'localhost:50051')
+        endpoint = discovery_config.get("endpoint", "localhost:50051")
         return [
             ResourceSchema(
                 id=f"grpc-{endpoint}",
-                name=discovery_config.get('name', 'Test gRPC Service'),
+                name=discovery_config.get("name", "Test gRPC Service"),
                 protocol="grpc",
                 endpoint=endpoint,
                 capabilities=[],
                 metadata={
-                    "use_reflection": discovery_config.get('use_reflection', True),
-                    "proto_files": discovery_config.get('proto_files', []),
+                    "use_reflection": discovery_config.get("use_reflection", True),
+                    "proto_files": discovery_config.get("proto_files", []),
                 },
                 sensitivity_level="medium",
                 created_at=datetime.now(UTC),
@@ -261,10 +221,7 @@ class MockGRPCAdapter(ProtocolAdapter):
             )
         ]
 
-    async def get_capabilities(
-        self,
-        resource: ResourceSchema
-    ) -> List[CapabilitySchema]:
+    async def get_capabilities(self, resource: ResourceSchema) -> list[CapabilitySchema]:
         """Mock gRPC method capabilities."""
         return [
             CapabilitySchema(
@@ -272,12 +229,7 @@ class MockGRPCAdapter(ProtocolAdapter):
                 resource_id=resource.id,
                 name="GetUser",
                 description="Get user by ID",
-                input_schema={
-                    "type": "object",
-                    "properties": {
-                        "user_id": {"type": "string"}
-                    }
-                },
+                input_schema={"type": "object", "properties": {"user_id": {"type": "string"}}},
                 output_schema={},
                 metadata={
                     "service": "UserService",
@@ -302,17 +254,11 @@ class MockGRPCAdapter(ProtocolAdapter):
             ),
         ]
 
-    async def validate_request(
-        self,
-        request: InvocationRequest
-    ) -> bool:
+    async def validate_request(self, request: InvocationRequest) -> bool:
         """Mock gRPC request validation."""
         return True
 
-    async def invoke(
-        self,
-        request: InvocationRequest
-    ) -> InvocationResult:
+    async def invoke(self, request: InvocationRequest) -> InvocationResult:
         """Mock gRPC method invocation."""
         return InvocationResult(
             success=True,
@@ -321,17 +267,11 @@ class MockGRPCAdapter(ProtocolAdapter):
             duration_ms=15.7,
         )
 
-    async def health_check(
-        self,
-        resource: ResourceSchema
-    ) -> bool:
+    async def health_check(self, resource: ResourceSchema) -> bool:
         """Mock gRPC health check."""
         return True
 
-    async def invoke_streaming(
-        self,
-        request: InvocationRequest
-    ) -> AsyncIterator[Any]:
+    async def invoke_streaming(self, request: InvocationRequest) -> AsyncIterator[Any]:
         """Mock streaming gRPC response."""
         for i in range(3):
             yield {"index": i, "data": f"chunk_{i}"}
@@ -528,7 +468,7 @@ def multi_protocol_scenario():
                 "capability": "GetUser",
                 "arguments": {"user_id": "123"},
             },
-        ]
+        ],
     }
 
 

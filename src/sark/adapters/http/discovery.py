@@ -11,13 +11,14 @@ Version: 2.0.0
 Engineer: ENGINEER-2
 """
 
-from typing import Any, Dict, List, Optional, Tuple
-import structlog
-import httpx
+from typing import Any
 from urllib.parse import urljoin
 
-from sark.models.base import ResourceSchema, CapabilitySchema
+import httpx
+import structlog
+
 from sark.adapters.exceptions import DiscoveryError
+from sark.models.base import CapabilitySchema, ResourceSchema
 
 logger = structlog.get_logger(__name__)
 
@@ -46,7 +47,7 @@ class OpenAPIDiscovery:
         "/docs/swagger.json",
     ]
 
-    def __init__(self, base_url: str, spec_url: Optional[str] = None):
+    def __init__(self, base_url: str, spec_url: str | None = None):
         """
         Initialize OpenAPI discovery.
 
@@ -56,10 +57,10 @@ class OpenAPIDiscovery:
         """
         self.base_url = base_url.rstrip("/")
         self.spec_url = spec_url
-        self.spec: Optional[Dict[str, Any]] = None
-        self.openapi_version: Optional[str] = None
+        self.spec: dict[str, Any] | None = None
+        self.openapi_version: str | None = None
 
-    async def discover_spec(self) -> Dict[str, Any]:
+    async def discover_spec(self) -> dict[str, Any]:
         """
         Discover and fetch OpenAPI specification.
 
@@ -102,10 +103,10 @@ class OpenAPIDiscovery:
                 "base_url": self.base_url,
                 "tried_paths": self.COMMON_SPEC_PATHS,
                 "spec_url": self.spec_url,
-            }
+            },
         )
 
-    async def _fetch_spec(self, client: httpx.AsyncClient, url: str) -> Optional[Dict[str, Any]]:
+    async def _fetch_spec(self, client: httpx.AsyncClient, url: str) -> dict[str, Any] | None:
         """
         Fetch and parse OpenAPI spec from URL.
 
@@ -126,6 +127,7 @@ class OpenAPIDiscovery:
             except Exception:
                 # Try YAML
                 import yaml
+
                 spec = yaml.safe_load(response.text)
 
             # Validate it's an OpenAPI/Swagger spec
@@ -145,10 +147,8 @@ class OpenAPIDiscovery:
             return None
 
     async def discover_capabilities(
-        self,
-        resource: ResourceSchema,
-        spec: Optional[Dict[str, Any]] = None
-    ) -> List[CapabilitySchema]:
+        self, resource: ResourceSchema, spec: dict[str, Any] | None = None
+    ) -> list[CapabilitySchema]:
         """
         Discover capabilities from OpenAPI spec.
 
@@ -165,7 +165,7 @@ class OpenAPIDiscovery:
         if spec is None:
             spec = await self.discover_spec()
 
-        capabilities: List[CapabilitySchema] = []
+        capabilities: list[CapabilitySchema] = []
 
         # Parse paths and operations
         paths = spec.get("paths", {})
@@ -186,7 +186,7 @@ class OpenAPIDiscovery:
                     method=method.upper(),
                     operation=operation,
                     path_params=path_params,
-                    spec=spec
+                    spec=spec,
                 )
 
                 if capability:
@@ -195,7 +195,7 @@ class OpenAPIDiscovery:
         logger.info(
             "Discovered capabilities from OpenAPI spec",
             resource_id=resource.id,
-            count=len(capabilities)
+            count=len(capabilities),
         )
 
         return capabilities
@@ -205,10 +205,10 @@ class OpenAPIDiscovery:
         resource: ResourceSchema,
         path: str,
         method: str,
-        operation: Dict[str, Any],
-        path_params: List[Dict[str, Any]],
-        spec: Dict[str, Any]
-    ) -> Optional[CapabilitySchema]:
+        operation: dict[str, Any],
+        path_params: list[dict[str, Any]],
+        spec: dict[str, Any],
+    ) -> CapabilitySchema | None:
         """
         Create capability from OpenAPI operation.
 
@@ -265,15 +265,12 @@ class OpenAPIDiscovery:
             input_schema=input_schema,
             output_schema=output_schema,
             sensitivity_level=sensitivity_level,
-            metadata=metadata
+            metadata=metadata,
         )
 
     def _build_input_schema(
-        self,
-        operation: Dict[str, Any],
-        parameters: List[Dict[str, Any]],
-        spec: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, operation: dict[str, Any], parameters: list[dict[str, Any]], spec: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Build JSON Schema for operation inputs.
 
@@ -291,7 +288,7 @@ class OpenAPIDiscovery:
         Returns:
             JSON Schema for inputs
         """
-        schema: Dict[str, Any] = {
+        schema: dict[str, Any] = {
             "type": "object",
             "properties": {},
             "required": [],
@@ -354,10 +351,8 @@ class OpenAPIDiscovery:
         return schema
 
     def _build_output_schema(
-        self,
-        operation: Dict[str, Any],
-        spec: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, operation: dict[str, Any], spec: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Build JSON Schema for operation outputs.
 
@@ -408,7 +403,7 @@ class OpenAPIDiscovery:
 
         return {"type": "object"}
 
-    def _resolve_ref(self, ref: str, spec: Dict[str, Any]) -> Dict[str, Any]:
+    def _resolve_ref(self, ref: str, spec: dict[str, Any]) -> dict[str, Any]:
         """
         Resolve $ref in OpenAPI spec.
 
@@ -436,12 +431,7 @@ class OpenAPIDiscovery:
 
         return current
 
-    def _determine_sensitivity(
-        self,
-        method: str,
-        path: str,
-        operation: Dict[str, Any]
-    ) -> str:
+    def _determine_sensitivity(self, method: str, path: str, operation: dict[str, Any]) -> str:
         """
         Determine sensitivity level for operation.
 
@@ -470,7 +460,7 @@ class OpenAPIDiscovery:
 
         return "medium" if has_security else "low"
 
-    async def get_server_info(self, spec: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    async def get_server_info(self, spec: dict[str, Any] | None = None) -> dict[str, Any]:
         """
         Extract server information from OpenAPI spec.
 

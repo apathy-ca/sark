@@ -9,11 +9,11 @@ Detects accidentally exposed secrets in tool responses:
 - Base64-encoded secrets
 """
 
-import re
 import copy
-from typing import Dict, Any, List, Optional, Tuple
 from dataclasses import dataclass
 import logging
+import re
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class SecretFinding:
     """Represents a detected secret"""
+
     secret_type: str
     location: str
     matched_value: str  # Truncated for security
@@ -38,7 +39,7 @@ class SecretScanner:
     MAX_STRING_LENGTH = 1_000_000  # 1MB max to prevent catastrophic backtracking
 
     # Secret detection patterns (pattern, name, confidence)
-    SECRET_PATTERNS: List[Tuple[str, str, float]] = [
+    SECRET_PATTERNS: list[tuple[str, str, float]] = [
         # API Keys
         (r"sk-[a-zA-Z0-9]{20,}", "OpenAI API Key", 1.0),
         (r"sk-proj-[a-zA-Z0-9\-_]{20,}", "OpenAI Project API Key", 1.0),
@@ -51,36 +52,40 @@ class SecretScanner:
         (r"AIza[0-9A-Za-z\-_]{35}", "Google API Key", 0.95),
         (r"ya29\.[0-9A-Za-z\-_]+", "Google OAuth Token", 0.95),
         (r"xox[baprs]-[0-9a-zA-Z]{10,48}", "Slack Token", 1.0),
-
         # Private Keys
         (r"-----BEGIN[ A-Z]*PRIVATE KEY-----", "Private Key (PEM)", 1.0),
         (r"-----BEGIN RSA PRIVATE KEY-----", "RSA Private Key", 1.0),
         (r"-----BEGIN EC PRIVATE KEY-----", "EC Private Key", 1.0),
         (r"-----BEGIN OPENSSH PRIVATE KEY-----", "OpenSSH Private Key", 1.0),
-
         # JWT Tokens
         (r"eyJ[a-zA-Z0-9_\-]+\.eyJ[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-]+", "JWT Token", 0.9),
-
         # Generic secrets
-        (r"(?i)(password|passwd|pwd)\s*[:=]\s*['\"]?[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};:,.<>?]{8,}['\"]?", "Password", 0.7),
-        (r"(?i)(api[_\-]?key|apikey)\s*[:=]\s*['\"]?[a-zA-Z0-9]{16,}['\"]?", "Generic API Key", 0.8),
+        (
+            r"(?i)(password|passwd|pwd)\s*[:=]\s*['\"]?[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};:,.<>?]{8,}['\"]?",
+            "Password",
+            0.7,
+        ),
+        (
+            r"(?i)(api[_\-]?key|apikey)\s*[:=]\s*['\"]?[a-zA-Z0-9]{16,}['\"]?",
+            "Generic API Key",
+            0.8,
+        ),
         (r"(?i)(secret|token)\s*[:=]\s*['\"]?[a-zA-Z0-9]{16,}['\"]?", "Generic Secret/Token", 0.7),
-
         # Database connection strings
         (r"(?i)(postgres|mysql|mongodb)://[^:]+:[^@]+@[^/]+", "Database Connection String", 0.95),
-
         # Stripe
         (r"sk_live_[0-9a-zA-Z]{24,}", "Stripe Secret Key", 1.0),
         (r"rk_live_[0-9a-zA-Z]{24,}", "Stripe Restricted Key", 1.0),
-
         # Twilio
         (r"SK[0-9a-fA-F]{32}", "Twilio API Key", 0.85),
-
         # Anthropic
         (r"sk-ant-[a-zA-Z0-9\-_]{70,}", "Anthropic API Key", 1.0),
-
         # Potential base64 encoded secrets (long base64 strings - minimum 64 chars)
-        (r"(?:[A-Za-z0-9+/]{4}){16,}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?", "Potential Base64 Secret", 0.5),
+        (
+            r"(?:[A-Za-z0-9+/]{4}){16,}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?",
+            "Potential Base64 Secret",
+            0.5,
+        ),
     ]
 
     # Patterns that should never be redacted (false positive reduction)
@@ -93,7 +98,7 @@ class SecretScanner:
         r"(?i)placeholder",
     ]
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
+    def __init__(self, config: dict[str, Any] | None = None):
         """
         Initialize secret scanner
 
@@ -114,7 +119,7 @@ class SecretScanner:
             re.compile(pattern) for pattern in self.FALSE_POSITIVE_PATTERNS
         ]
 
-    def scan(self, data: Dict[str, Any]) -> List[SecretFinding]:
+    def scan(self, data: dict[str, Any]) -> list[SecretFinding]:
         """
         Scan data for exposed secrets
 
@@ -130,7 +135,8 @@ class SecretScanner:
         # Use min_str_len=16 as a balance between performance and detection
         # (Most API keys are 20+ chars, but some tokens can be 16+)
         candidates = [
-            (loc, val) for loc, val in self._flatten_dict_generator(data, min_str_len=16)
+            (loc, val)
+            for loc, val in self._flatten_dict_generator(data, min_str_len=16)
             if self._could_contain_secret(val)
         ]
 
@@ -141,10 +147,8 @@ class SecretScanner:
         return findings
 
     def redact_secrets(
-        self,
-        data: Dict[str, Any],
-        findings: Optional[List[SecretFinding]] = None
-    ) -> Dict[str, Any]:
+        self, data: dict[str, Any], findings: list[SecretFinding] | None = None
+    ) -> dict[str, Any]:
         """
         Redact secrets from data
 
@@ -171,12 +175,14 @@ class SecretScanner:
 
         return redacted
 
-    def _scan_value(self, value: str, location: str) -> List[SecretFinding]:
+    def _scan_value(self, value: str, location: str) -> list[SecretFinding]:
         """Scan a single string value for secrets"""
         # Truncate extremely long strings to prevent catastrophic backtracking
         if len(value) > self.MAX_STRING_LENGTH:
-            logger.warning(f"String at {location} exceeds max length ({len(value)} > {self.MAX_STRING_LENGTH}), truncating")
-            value = value[:self.MAX_STRING_LENGTH]
+            logger.warning(
+                f"String at {location} exceeds max length ({len(value)} > {self.MAX_STRING_LENGTH}), truncating"
+            )
+            value = value[: self.MAX_STRING_LENGTH]
 
         # Use chunked processing for large strings to prevent backtracking
         if len(value) > self.CHUNK_SIZE:
@@ -184,7 +190,7 @@ class SecretScanner:
         else:
             return self._scan_value_direct(value, location)
 
-    def _scan_value_direct(self, value: str, location: str) -> List[SecretFinding]:
+    def _scan_value_direct(self, value: str, location: str) -> list[SecretFinding]:
         """Scan a string directly (for small strings)"""
         findings = []
 
@@ -198,18 +204,20 @@ class SecretScanner:
                 if self._is_false_positive(matched_text):
                     continue
 
-                findings.append(SecretFinding(
-                    secret_type=secret_type,
-                    location=location,
-                    matched_value=self._truncate_secret(matched_text),  # Truncated for display
-                    confidence=confidence,
-                    should_redact=confidence >= 0.7,  # Only redact high-confidence findings
-                    _full_match=matched_text  # Full value for redaction
-                ))
+                findings.append(
+                    SecretFinding(
+                        secret_type=secret_type,
+                        location=location,
+                        matched_value=self._truncate_secret(matched_text),  # Truncated for display
+                        confidence=confidence,
+                        should_redact=confidence >= 0.7,  # Only redact high-confidence findings
+                        _full_match=matched_text,  # Full value for redaction
+                    )
+                )
 
         return findings
 
-    def _scan_value_chunked(self, value: str, location: str) -> List[SecretFinding]:
+    def _scan_value_chunked(self, value: str, location: str) -> list[SecretFinding]:
         """Scan a large string in chunks to prevent backtracking"""
         findings = []
         seen_secrets = set()  # Deduplicate findings from overlapping chunks
@@ -234,11 +242,26 @@ class SecretScanner:
         return findings
 
     # Pre-compiled set of secret prefixes for faster lookup
-    _SECRET_PREFIXES = frozenset([
-        'sk-', 'ghp_', 'gho_', 'ghs_', 'glpat-', 'AKIA',
-        'AIza', 'ya29', 'xox', 'sk_', 'rk_', 'pk_',
-        '-----BEGIN', 'postgres://', 'mysql://', 'mongodb://'
-    ])
+    _SECRET_PREFIXES = frozenset(
+        [
+            "sk-",
+            "ghp_",
+            "gho_",
+            "ghs_",
+            "glpat-",
+            "AKIA",
+            "AIza",
+            "ya29",
+            "xox",
+            "sk_",
+            "rk_",
+            "pk_",
+            "-----BEGIN",
+            "postgres://",
+            "mysql://",
+            "mongodb://",
+        ]
+    )
 
     def _could_contain_secret(self, value: str) -> bool:
         """
@@ -252,18 +275,23 @@ class SecretScanner:
         # Use membership test on first few chars for common patterns
         if len(value) >= 3:
             prefix_3 = value[:3]
-            if prefix_3 in ('sk-', 'ghp', 'gho', 'ghs', 'glp', 'xox', 'sk_', 'rk_', 'pk_'):
+            if prefix_3 in ("sk-", "ghp", "gho", "ghs", "glp", "xox", "sk_", "rk_", "pk_"):
                 return True
 
             # Check for longer prefixes
-            if value[:4] == 'AKIA' or value[:4] == 'AIza' or value[:4] == 'ya29':
+            if value[:4] == "AKIA" or value[:4] == "AIza" or value[:4] == "ya29":
                 return True
 
-            if value.startswith('-----BEGIN') or value.startswith('postgres://') or value.startswith('mysql://') or value.startswith('mongodb://'):
+            if (
+                value.startswith("-----BEGIN")
+                or value.startswith("postgres://")
+                or value.startswith("mysql://")
+                or value.startswith("mongodb://")
+            ):
                 return True
 
         # Check for secret keywords (case-insensitive for these specific ones)
-        if 'password' in value or 'secret' in value or 'token' in value or 'api_key' in value:
+        if "password" in value or "secret" in value or "token" in value or "api_key" in value:
             return True
 
         # For longer strings (40+), check if they look like base64/random tokens
@@ -292,7 +320,9 @@ class SecretScanner:
 
         return secret[:show_chars] + "..."
 
-    def _flatten_dict_generator(self, data: Any, prefix: str = "", depth: int = 0, min_str_len: int = 20):
+    def _flatten_dict_generator(
+        self, data: Any, prefix: str = "", depth: int = 0, min_str_len: int = 20
+    ):
         """
         Generator that yields (location, value) pairs from nested data structures.
         Only yields string values >= min_str_len for efficiency.
@@ -321,7 +351,9 @@ class SecretScanner:
                         if len(value) >= min_str_len:
                             yield (f"{prefix}.{key}", value)
                     elif isinstance(value, (dict, list)):
-                        yield from self._flatten_dict_generator(value, f"{prefix}.{key}", depth + 1, min_str_len)
+                        yield from self._flatten_dict_generator(
+                            value, f"{prefix}.{key}", depth + 1, min_str_len
+                        )
             else:
                 for key, value in data.items():
                     if isinstance(value, str):
@@ -336,12 +368,14 @@ class SecretScanner:
                     if len(item) >= min_str_len:
                         yield (f"{prefix}[{i}]", item)
                 elif isinstance(item, (dict, list)):
-                    yield from self._flatten_dict_generator(item, f"{prefix}[{i}]", depth + 1, min_str_len)
+                    yield from self._flatten_dict_generator(
+                        item, f"{prefix}[{i}]", depth + 1, min_str_len
+                    )
 
         elif isinstance(data, str) and len(data) >= min_str_len:
             yield (prefix, data)
 
-    def _flatten_dict(self, data: Dict[str, Any], prefix: str = "") -> Dict[str, Any]:
+    def _flatten_dict(self, data: dict[str, Any], prefix: str = "") -> dict[str, Any]:
         """
         Flatten nested dictionary
 
@@ -370,7 +404,7 @@ class SecretScanner:
 
         return flat
 
-    def _redact_location(self, data: Dict[str, Any], location: str, secret: str) -> Dict[str, Any]:
+    def _redact_location(self, data: dict[str, Any], location: str, secret: str) -> dict[str, Any]:
         """
         Redact a secret at a specific location
 
@@ -402,7 +436,7 @@ class SecretScanner:
 
         return data
 
-    def _parse_location(self, location: str) -> List[Any]:
+    def _parse_location(self, location: str) -> list[Any]:
         """
         Parse location string into keys
 
