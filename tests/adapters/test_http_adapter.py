@@ -14,31 +14,29 @@ Version: 2.0.0
 Engineer: ENGINEER-2
 """
 
-import pytest
 import asyncio
 from datetime import datetime
-from typing import Dict, Any
 from unittest.mock import AsyncMock, MagicMock, patch
-import httpx
 
-from sark.adapters.http.http_adapter import HTTPAdapter, CircuitBreaker, RateLimiter
+import httpx
+import pytest
+
+from sark.adapters.exceptions import (
+    AuthenticationError,
+    InvocationError,
+    ValidationError,
+)
 from sark.adapters.http.authentication import (
-    NoAuthStrategy,
+    APIKeyStrategy,
     BasicAuthStrategy,
     BearerAuthStrategy,
+    NoAuthStrategy,
     OAuth2Strategy,
-    APIKeyStrategy,
     create_auth_strategy,
 )
 from sark.adapters.http.discovery import OpenAPIDiscovery
-from sark.models.base import ResourceSchema, CapabilitySchema, InvocationRequest, InvocationResult
-from sark.adapters.exceptions import (
-    ValidationError,
-    InvocationError,
-    AuthenticationError,
-    DiscoveryError,
-)
-
+from sark.adapters.http.http_adapter import CircuitBreaker, HTTPAdapter, RateLimiter
+from sark.models.base import InvocationRequest, ResourceSchema
 
 # ============================================================================
 # Authentication Tests
@@ -187,37 +185,29 @@ class TestCreateAuthStrategy:
 
     def test_create_basic(self):
         """Test creating BasicAuthStrategy."""
-        strategy = create_auth_strategy({
-            "type": "basic",
-            "username": "user",
-            "password": "pass"
-        })
+        strategy = create_auth_strategy({"type": "basic", "username": "user", "password": "pass"})
         assert isinstance(strategy, BasicAuthStrategy)
 
     def test_create_bearer(self):
         """Test creating BearerAuthStrategy."""
-        strategy = create_auth_strategy({
-            "type": "bearer",
-            "token": "test-token"
-        })
+        strategy = create_auth_strategy({"type": "bearer", "token": "test-token"})
         assert isinstance(strategy, BearerAuthStrategy)
 
     def test_create_oauth2(self):
         """Test creating OAuth2Strategy."""
-        strategy = create_auth_strategy({
-            "type": "oauth2",
-            "token_url": "https://auth.example.com/token",
-            "client_id": "client",
-            "client_secret": "secret"
-        })
+        strategy = create_auth_strategy(
+            {
+                "type": "oauth2",
+                "token_url": "https://auth.example.com/token",
+                "client_id": "client",
+                "client_secret": "secret",
+            }
+        )
         assert isinstance(strategy, OAuth2Strategy)
 
     def test_create_api_key(self):
         """Test creating APIKeyStrategy."""
-        strategy = create_auth_strategy({
-            "type": "api_key",
-            "api_key": "key123"
-        })
+        strategy = create_auth_strategy({"type": "api_key", "api_key": "key123"})
         assert isinstance(strategy, APIKeyStrategy)
 
     def test_create_unsupported_type(self):
@@ -240,7 +230,7 @@ class TestOpenAPIDiscovery:
         openapi_spec = {
             "openapi": "3.0.0",
             "info": {"title": "Test API", "version": "1.0.0"},
-            "paths": {}
+            "paths": {},
         }
 
         with patch("httpx.AsyncClient") as mock_client_class:
@@ -253,8 +243,7 @@ class TestOpenAPIDiscovery:
             mock_client.get.return_value = mock_response
 
             discovery = OpenAPIDiscovery(
-                base_url="https://api.example.com",
-                spec_url="https://api.example.com/openapi.json"
+                base_url="https://api.example.com", spec_url="https://api.example.com/openapi.json"
             )
 
             spec = await discovery.discover_spec()
@@ -273,7 +262,7 @@ class TestOpenAPIDiscovery:
                     "get": {
                         "operationId": "listUsers",
                         "summary": "List all users",
-                        "responses": {"200": {"description": "Success"}}
+                        "responses": {"200": {"description": "Success"}},
                     }
                 },
                 "/users/{id}": {
@@ -281,12 +270,17 @@ class TestOpenAPIDiscovery:
                         "operationId": "getUser",
                         "summary": "Get user by ID",
                         "parameters": [
-                            {"name": "id", "in": "path", "required": True, "schema": {"type": "string"}}
+                            {
+                                "name": "id",
+                                "in": "path",
+                                "required": True,
+                                "schema": {"type": "string"},
+                            }
                         ],
-                        "responses": {"200": {"description": "Success"}}
+                        "responses": {"200": {"description": "Success"}},
                     }
-                }
-            }
+                },
+            },
         }
 
         resource = ResourceSchema(
@@ -424,9 +418,7 @@ class TestHTTPAdapter:
         adapter = HTTPAdapter(base_url="https://api.example.com")
 
         request = InvocationRequest(
-            capability_id="cap-1",
-            principal_id="user-1",
-            arguments={"param": "value"}
+            capability_id="cap-1", principal_id="user-1", arguments={"param": "value"}
         )
 
         assert await adapter.validate_request(request) is True
@@ -436,11 +428,7 @@ class TestHTTPAdapter:
         """Test validation fails if capability_id missing."""
         adapter = HTTPAdapter(base_url="https://api.example.com")
 
-        request = InvocationRequest(
-            capability_id="",
-            principal_id="user-1",
-            arguments={}
-        )
+        request = InvocationRequest(capability_id="", principal_id="user-1", arguments={})
 
         with pytest.raises(ValidationError):
             await adapter.validate_request(request)
@@ -451,11 +439,7 @@ class TestHTTPAdapter:
         adapter = HTTPAdapter(base_url="https://api.example.com")
 
         # Create request with invalid arguments
-        request = InvocationRequest(
-            capability_id="cap-1",
-            principal_id="user-1",
-            arguments={}
-        )
+        request = InvocationRequest(capability_id="cap-1", principal_id="user-1", arguments={})
         request.arguments = "invalid"  # Override with invalid type
 
         with pytest.raises(ValidationError):
@@ -466,23 +450,21 @@ class TestHTTPAdapter:
         """Test resource discovery from OpenAPI spec."""
         openapi_spec = {
             "openapi": "3.0.0",
-            "info": {
-                "title": "Test API",
-                "version": "1.0.0",
-                "description": "A test API"
-            },
+            "info": {"title": "Test API", "version": "1.0.0", "description": "A test API"},
             "servers": [{"url": "https://api.example.com"}],
-            "paths": {}
+            "paths": {},
         }
 
         adapter = HTTPAdapter(base_url="https://api.example.com")
 
-        with patch.object(OpenAPIDiscovery, "discover_spec", new_callable=AsyncMock) as mock_discover:
+        with patch.object(
+            OpenAPIDiscovery, "discover_spec", new_callable=AsyncMock
+        ) as mock_discover:
             mock_discover.return_value = openapi_spec
 
             discovery_config = {
                 "base_url": "https://api.example.com",
-                "openapi_spec_url": "https://api.example.com/openapi.json"
+                "openapi_spec_url": "https://api.example.com/openapi.json",
             }
 
             resources = await adapter.discover_resources(discovery_config)

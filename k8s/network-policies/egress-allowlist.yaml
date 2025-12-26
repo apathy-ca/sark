@@ -1,0 +1,69 @@
+---
+# SARK Gateway External Egress Allow-list
+# Requires Calico or similar CNI with domain-based policies
+#
+# This policy explicitly allows traffic to specific external domains
+# All other external traffic is blocked by default
+#
+# v1.3.0 Network Security Feature
+
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: sark-gateway-external-egress
+spec:
+  selector: app == 'sark-gateway'
+  types:
+    - Egress
+
+  # Priority: Higher number = higher priority
+  order: 100
+
+  egress:
+    # Allow specific external AI/LLM providers
+    - action: Allow
+      protocol: TCP
+      destination:
+        domains:
+          # OpenAI
+          - "*.openai.com"
+          - "openai.com"
+
+          # Anthropic
+          - "*.anthropic.com"
+          - "anthropic.com"
+
+          # MCP Server domains (customize per deployment)
+          - "*.your-company.com"
+          - "internal-mcp.example.com"
+      ports:
+        - 443
+
+    # Allow specific infrastructure services
+    - action: Allow
+      protocol: TCP
+      destination:
+        domains:
+          # Container registries (for health checks, etc.)
+          - "*.docker.io"
+          - "gcr.io"
+          - "*.gcr.io"
+
+          # Cloud provider metadata services
+          - "169.254.169.254/32"  # AWS, GCP metadata
+      ports:
+        - 443
+        - 80
+
+    # Deny all other external egress
+    - action: Deny
+      protocol: TCP
+      destination:
+        nets:
+          # Deny all external (non-RFC1918) addresses
+          - "0.0.0.0/0"
+        notNets:
+          # Except private networks (handled by other policies)
+          - "10.0.0.0/8"
+          - "172.16.0.0/12"
+          - "192.168.0.0/16"

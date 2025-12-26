@@ -5,23 +5,21 @@ All protocol adapters MUST inherit from BaseAdapterTest and pass all contract te
 These tests verify compliance with the ProtocolAdapter interface contract.
 """
 
-import pytest
 from abc import ABC
-from typing import Any, Dict, List
-from datetime import datetime
+from typing import Any
+
+import pytest
 
 from sark.adapters.base import ProtocolAdapter
+from sark.adapters.exceptions import (
+    UnsupportedOperationError,
+    ValidationError,
+)
 from sark.models.base import (
-    ResourceSchema,
     CapabilitySchema,
     InvocationRequest,
     InvocationResult,
-)
-from sark.adapters.exceptions import (
-    ValidationError,
-    UnsupportedOperationError,
-    InvocationError,
-    CapabilityNotFoundError,
+    ResourceSchema,
 )
 
 
@@ -50,7 +48,7 @@ class BaseAdapterTest(ABC):
         raise NotImplementedError("Subclass must implement adapter() fixture")
 
     @pytest.fixture
-    def discovery_config(self) -> Dict[str, Any]:
+    def discovery_config(self) -> dict[str, Any]:
         """Return valid discovery configuration for this adapter."""
         raise NotImplementedError("Subclass must implement discovery_config() fixture")
 
@@ -150,7 +148,7 @@ class BaseAdapterTest(ABC):
         invalid_request = InvocationRequest(
             capability_id="invalid-capability-id-that-does-not-exist",
             principal_id="test-principal",
-            arguments={}
+            arguments={},
         )
         # Should either return False or raise ValidationError
         try:
@@ -228,7 +226,7 @@ class BaseAdapterTest(ABC):
         if adapter.supports_streaming():
             # Should return an async iterator
             result = adapter.invoke_streaming(valid_invocation_request)
-            assert hasattr(result, '__aiter__')
+            assert hasattr(result, "__aiter__")
         else:
             # Should raise UnsupportedOperationError
             with pytest.raises(UnsupportedOperationError):

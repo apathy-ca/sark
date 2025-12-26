@@ -1,20 +1,21 @@
 """Unit tests for Gateway data models."""
 
-import pytest
 from datetime import datetime
+
 from pydantic import ValidationError
+import pytest
 
 from sark.models.gateway import (
-    SensitivityLevel,
-    GatewayServerInfo,
-    GatewayToolInfo,
-    AgentType,
-    TrustLevel,
+    A2AAuthorizationRequest,
     AgentContext,
+    AgentType,
+    GatewayAuditEvent,
     GatewayAuthorizationRequest,
     GatewayAuthorizationResponse,
-    A2AAuthorizationRequest,
-    GatewayAuditEvent,
+    GatewayServerInfo,
+    GatewayToolInfo,
+    SensitivityLevel,
+    TrustLevel,
 )
 
 
@@ -39,7 +40,7 @@ class TestGatewayServerInfo:
             server_name="test-server",
             server_url="http://localhost:8080",
             health_status="healthy",
-            tools_count=5
+            tools_count=5,
         )
         assert server.server_id == "srv_123"
         assert server.server_name == "test-server"
@@ -61,7 +62,7 @@ class TestGatewayServerInfo:
             health_status="healthy",
             tools_count=10,
             created_at=now,
-            updated_at=now
+            updated_at=now,
         )
         assert server.sensitivity_level == SensitivityLevel.HIGH
         assert server.authorized_teams == ["team1", "team2"]
@@ -77,7 +78,7 @@ class TestGatewayServerInfo:
                 server_name="test-server",
                 server_url="http://localhost:8080",
                 health_status="healthy",
-                tools_count=-1
+                tools_count=-1,
             )
         assert "tools_count" in str(exc_info.value)
 
@@ -89,7 +90,7 @@ class TestGatewayServerInfo:
                 server_name="test-server",
                 server_url="not-a-url",
                 health_status="healthy",
-                tools_count=0
+                tools_count=0,
             )
         assert "server_url" in str(exc_info.value)
 
@@ -100,9 +101,7 @@ class TestGatewayToolInfo:
     def test_valid_tool_info(self):
         """Test creating valid tool info."""
         tool = GatewayToolInfo(
-            tool_name="execute_query",
-            server_name="postgres-mcp",
-            description="Execute SQL query"
+            tool_name="execute_query", server_name="postgres-mcp", description="Execute SQL query"
         )
         assert tool.tool_name == "execute_query"
         assert tool.server_name == "postgres-mcp"
@@ -115,7 +114,7 @@ class TestGatewayToolInfo:
         """Test tool info with all optional fields."""
         parameters = [
             {"name": "query", "type": "string", "required": True},
-            {"name": "database", "type": "string", "required": True}
+            {"name": "database", "type": "string", "required": True},
         ]
         tool = GatewayToolInfo(
             tool_name="execute_query",
@@ -124,7 +123,7 @@ class TestGatewayToolInfo:
             sensitivity_level=SensitivityLevel.HIGH,
             parameters=parameters,
             sensitive_params=["password", "secret"],
-            required_capabilities=["database", "admin"]
+            required_capabilities=["database", "admin"],
         )
         assert tool.sensitivity_level == SensitivityLevel.HIGH
         assert tool.parameters == parameters
@@ -138,9 +137,7 @@ class TestAgentContext:
     def test_valid_agent_context(self):
         """Test creating valid agent context."""
         context = AgentContext(
-            agent_id="agent_123",
-            agent_type=AgentType.SERVICE,
-            environment="production"
+            agent_id="agent_123", agent_type=AgentType.SERVICE, environment="production"
         )
         assert context.agent_id == "agent_123"
         assert context.agent_type == AgentType.SERVICE
@@ -157,7 +154,7 @@ class TestAgentContext:
             capabilities=["execute", "query"],
             environment="staging",
             rate_limited=True,
-            metadata={"version": "1.0"}
+            metadata={"version": "1.0"},
         )
         assert context.trust_level == TrustLevel.TRUSTED
         assert context.capabilities == ["execute", "query"]
@@ -170,9 +167,7 @@ class TestGatewayAuthorizationRequest:
 
     def test_valid_authorization_request(self):
         """Test creating valid authorization request."""
-        request = GatewayAuthorizationRequest(
-            action="gateway:tool:invoke"
-        )
+        request = GatewayAuthorizationRequest(action="gateway:tool:invoke")
         assert request.action == "gateway:tool:invoke"
         assert request.server_name is None
         assert request.tool_name is None
@@ -185,7 +180,7 @@ class TestGatewayAuthorizationRequest:
             server_name="postgres-mcp",
             tool_name="execute_query",
             parameters={"query": "SELECT * FROM users"},
-            gateway_metadata={"request_id": "req_123"}
+            gateway_metadata={"request_id": "req_123"},
         )
         assert request.server_name == "postgres-mcp"
         assert request.tool_name == "execute_query"
@@ -201,10 +196,10 @@ class TestGatewayAuthorizationRequest:
     def test_authorization_request_valid_actions(self):
         """Test all valid actions are accepted."""
         valid_actions = [
-            'gateway:tool:invoke',
-            'gateway:server:list',
-            'gateway:tool:discover',
-            'gateway:server:info'
+            "gateway:tool:invoke",
+            "gateway:server:list",
+            "gateway:tool:discover",
+            "gateway:server:info",
         ]
         for action in valid_actions:
             request = GatewayAuthorizationRequest(action=action)
@@ -216,10 +211,7 @@ class TestGatewayAuthorizationResponse:
 
     def test_valid_authorization_response(self):
         """Test creating valid authorization response."""
-        response = GatewayAuthorizationResponse(
-            allow=True,
-            reason="User has permission"
-        )
+        response = GatewayAuthorizationResponse(allow=True, reason="User has permission")
         assert response.allow is True
         assert response.reason == "User has permission"
         assert response.cache_ttl == 60
@@ -231,7 +223,7 @@ class TestGatewayAuthorizationResponse:
             reason="Insufficient permissions",
             filtered_parameters={"query": "REDACTED"},
             audit_id="audit_123",
-            cache_ttl=120
+            cache_ttl=120,
         )
         assert response.allow is False
         assert response.filtered_parameters == {"query": "REDACTED"}
@@ -241,11 +233,7 @@ class TestGatewayAuthorizationResponse:
     def test_authorization_response_negative_cache_ttl(self):
         """Test that negative cache_ttl is rejected."""
         with pytest.raises(ValidationError) as exc_info:
-            GatewayAuthorizationResponse(
-                allow=True,
-                reason="Test",
-                cache_ttl=-1
-            )
+            GatewayAuthorizationResponse(allow=True, reason="Test", cache_ttl=-1)
         assert "cache_ttl" in str(exc_info.value)
 
 
@@ -258,7 +246,7 @@ class TestA2AAuthorizationRequest:
             source_agent_id="agent_1",
             target_agent_id="agent_2",
             capability="execute",
-            message_type="request"
+            message_type="request",
         )
         assert request.source_agent_id == "agent_1"
         assert request.target_agent_id == "agent_2"
@@ -273,7 +261,7 @@ class TestA2AAuthorizationRequest:
             target_agent_id="agent_2",
             capability="query",
             message_type="response",
-            payload_metadata={"task_id": "task_123"}
+            payload_metadata={"task_id": "task_123"},
         )
         assert request.payload_metadata == {"task_id": "task_123"}
 
@@ -284,19 +272,19 @@ class TestA2AAuthorizationRequest:
                 source_agent_id="agent_1",
                 target_agent_id="agent_2",
                 capability="invalid",
-                message_type="request"
+                message_type="request",
             )
         assert "Capability must be one of" in str(exc_info.value)
 
     def test_a2a_request_valid_capabilities(self):
         """Test all valid capabilities are accepted."""
-        valid_capabilities = ['execute', 'query', 'delegate']
+        valid_capabilities = ["execute", "query", "delegate"]
         for capability in valid_capabilities:
             request = A2AAuthorizationRequest(
                 source_agent_id="agent_1",
                 target_agent_id="agent_2",
                 capability=capability,
-                message_type="request"
+                message_type="request",
             )
             assert request.capability == capability
 
@@ -311,7 +299,7 @@ class TestGatewayAuditEvent:
             decision="allow",
             reason="User authorized",
             timestamp=1234567890,
-            gateway_request_id="req_123"
+            gateway_request_id="req_123",
         )
         assert event.event_type == "tool_invoke"
         assert event.decision == "allow"
@@ -331,7 +319,7 @@ class TestGatewayAuditEvent:
             reason="Insufficient permissions",
             timestamp=1234567890,
             gateway_request_id="req_123",
-            metadata={"ip": "192.168.1.1"}
+            metadata={"ip": "192.168.1.1"},
         )
         assert event.user_id == "user_123"
         assert event.agent_id == "agent_456"

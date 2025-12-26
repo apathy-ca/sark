@@ -1,10 +1,10 @@
 """Docker-based SAML fixtures for integration testing."""
 
 import base64
-from typing import Generator
+from collections.abc import Generator
 
-import pytest
 import httpx
+import pytest
 
 # Check if pytest-docker is available
 try:
@@ -31,10 +31,7 @@ def saml_service(docker_services: Services) -> Generator[dict, None, None]:
     docker_services.wait_until_responsive(
         timeout=90.0,
         pause=1.0,
-        check=lambda: is_saml_responsive(
-            "localhost",
-            docker_services.port_for("saml-idp", 8080)
-        ),
+        check=lambda: is_saml_responsive("localhost", docker_services.port_for("saml-idp", 8080)),
     )
 
     # Get connection details
@@ -54,8 +51,18 @@ def saml_service(docker_services: Services) -> Generator[dict, None, None]:
         "sp_slo_url": "http://localhost:8000/saml/sls",
         # Test IdP provides test users
         "test_users": [
-            {"username": "user1", "password": "user1pass", "email": "user1@example.com", "name": "User 1"},
-            {"username": "user2", "password": "user2pass", "email": "user2@example.com", "name": "User 2"},
+            {
+                "username": "user1",
+                "password": "user1pass",
+                "email": "user1@example.com",
+                "name": "User 1",
+            },
+            {
+                "username": "user2",
+                "password": "user2pass",
+                "email": "user2@example.com",
+                "name": "User 2",
+            },
         ],
     }
 
@@ -75,9 +82,7 @@ def is_saml_responsive(host: str, port: int) -> bool:
     """
     try:
         response = httpx.get(
-            f"http://{host}:{port}/simplesaml/",
-            timeout=5.0,
-            follow_redirects=True
+            f"http://{host}:{port}/simplesaml/", timeout=5.0, follow_redirects=True
         )
         return response.status_code == 200
     except Exception:
@@ -100,6 +105,7 @@ def saml_provider_config(saml_service):
     # Fetch IdP metadata to get X.509 certificate
     try:
         import httpx
+
         response = httpx.get(saml_service["idp_entity_id"], timeout=10.0)
         if response.status_code == 200:
             # Extract certificate from metadata (simplified)

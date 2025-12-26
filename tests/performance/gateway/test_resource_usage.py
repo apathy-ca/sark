@@ -1,10 +1,10 @@
 """Resource Usage Testing - Memory, CPU, Connection Pools."""
 
-import pytest
 import asyncio
-import time
-import psutil
 import os
+
+import psutil
+import pytest
 
 pytestmark = pytest.mark.performance
 
@@ -30,7 +30,7 @@ async def test_memory_usage_under_load(app_client, mock_user_token):
     final_memory = process.memory_info().rss / 1024 / 1024
     memory_increase = final_memory - initial_memory
 
-    print(f"\nMemory Usage:")
+    print("\nMemory Usage:")
     print(f"  Initial: {initial_memory:.2f} MB")
     print(f"  Final: {final_memory:.2f} MB")
     print(f"  Increase: {memory_increase:.2f} MB")

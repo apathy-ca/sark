@@ -11,8 +11,9 @@ Or use the test runner:
     ./scripts/run_integration_tests.sh test
 """
 
-import pytest
 from uuid import uuid4
+
+import pytest
 
 # Import Docker fixtures - this enables all Docker services
 pytest_plugins = ["tests.fixtures.integration_docker"]
@@ -21,6 +22,7 @@ pytest_plugins = ["tests.fixtures.integration_docker"]
 # =============================================================================
 # PostgreSQL Integration Tests
 # =============================================================================
+
 
 @pytest.mark.integration
 class TestPostgreSQLIntegration:
@@ -38,26 +40,30 @@ class TestPostgreSQLIntegration:
         """Test table creation and basic operations."""
         async with postgres_connection.acquire() as conn:
             # Create table
-            await conn.execute("""
+            await conn.execute(
+                """
                 CREATE TEMPORARY TABLE test_servers (
                     id UUID PRIMARY KEY,
                     name VARCHAR(255) NOT NULL,
                     endpoint VARCHAR(500)
                 )
-            """)
+            """
+            )
 
             # Insert data
             test_id = uuid4()
-            await conn.execute("""
+            await conn.execute(
+                """
                 INSERT INTO test_servers (id, name, endpoint)
                 VALUES ($1, $2, $3)
-            """, test_id, "test-server", "http://example.com")
+            """,
+                test_id,
+                "test-server",
+                "http://example.com",
+            )
 
             # Query data
-            result = await conn.fetchrow(
-                "SELECT * FROM test_servers WHERE id = $1",
-                test_id
-            )
+            result = await conn.fetchrow("SELECT * FROM test_servers WHERE id = $1", test_id)
 
             assert result["name"] == "test-server"
             assert result["endpoint"] == "http://example.com"
@@ -67,18 +73,19 @@ class TestPostgreSQLIntegration:
         """Test transaction rollback behavior."""
         async with postgres_connection.acquire() as conn:
             # Create temp table
-            await conn.execute("""
+            await conn.execute(
+                """
                 CREATE TEMPORARY TABLE test_rollback (
                     id SERIAL PRIMARY KEY,
                     value TEXT
                 )
-            """)
+            """
+            )
 
             # Test rollback
             async with conn.transaction():
                 await conn.execute(
-                    "INSERT INTO test_rollback (value) VALUES ($1)",
-                    "should_rollback"
+                    "INSERT INTO test_rollback (value) VALUES ($1)", "should_rollback"
                 )
                 # Explicit rollback by raising exception
                 try:
@@ -87,7 +94,7 @@ class TestPostgreSQLIntegration:
                     pass
 
             # Verify no data was committed
-            count = await conn.fetchval("SELECT COUNT(*) FROM test_rollback")
+            await conn.fetchval("SELECT COUNT(*) FROM test_rollback")
             # Due to exception, this should be 0
             # (Note: in real test, you'd use proper transaction context)
 
@@ -95,6 +102,7 @@ class TestPostgreSQLIntegration:
 # =============================================================================
 # Redis Integration Tests
 # =============================================================================
+
 
 @pytest.mark.integration
 class TestRedisIntegration:
@@ -130,11 +138,10 @@ class TestRedisIntegration:
     async def test_redis_hash_operations(self, clean_redis):
         """Test Redis hash operations."""
         # Set hash fields
-        await clean_redis.hset("user:1", mapping={
-            "name": "Test User",
-            "email": "test@example.com",
-            "role": "developer"
-        })
+        await clean_redis.hset(
+            "user:1",
+            mapping={"name": "Test User", "email": "test@example.com", "role": "developer"},
+        )
 
         # Get single field
         name = await clean_redis.hget("user:1", "name")
@@ -164,6 +171,7 @@ class TestRedisIntegration:
 # TimescaleDB Integration Tests
 # =============================================================================
 
+
 @pytest.mark.integration
 class TestTimescaleDBIntegration:
     """Test TimescaleDB operations with real Docker container."""
@@ -180,31 +188,37 @@ class TestTimescaleDBIntegration:
         """Test creating and using a hypertable."""
         async with timescaledb_connection.acquire() as conn:
             # Create regular table
-            await conn.execute("""
+            await conn.execute(
+                """
                 CREATE TEMPORARY TABLE test_metrics (
                     time TIMESTAMPTZ NOT NULL,
                     device_id INTEGER,
                     temperature DOUBLE PRECISION
                 )
-            """)
+            """
+            )
 
             # Convert to hypertable
-            await conn.execute("""
+            await conn.execute(
+                """
                 SELECT create_hypertable(
                     'test_metrics',
                     'time',
                     if_not_exists => TRUE
                 )
-            """)
+            """
+            )
 
             # Insert time-series data
-            await conn.execute("""
+            await conn.execute(
+                """
                 INSERT INTO test_metrics (time, device_id, temperature)
                 VALUES
                     (NOW(), 1, 20.5),
                     (NOW() - INTERVAL '1 hour', 1, 21.0),
                     (NOW() - INTERVAL '2 hours', 1, 19.5)
-            """)
+            """
+            )
 
             # Query data
             count = await conn.fetchval("SELECT COUNT(*) FROM test_metrics")
@@ -214,6 +228,7 @@ class TestTimescaleDBIntegration:
 # =============================================================================
 # OPA Integration Tests
 # =============================================================================
+
 
 @pytest.mark.integration
 class TestOPAIntegration:
@@ -250,6 +265,7 @@ class TestOPAIntegration:
 # Multi-Service Integration Tests
 # =============================================================================
 
+
 @pytest.mark.integration
 class TestMultiServiceIntegration:
     """Test scenarios involving multiple services."""
@@ -269,34 +285,34 @@ class TestMultiServiceIntegration:
         assert all_services["opa"]["port"] == 8181
 
     @pytest.mark.asyncio
-    async def test_cache_and_database(
-        self,
-        postgres_connection,
-        clean_redis
-    ):
+    async def test_cache_and_database(self, postgres_connection, clean_redis):
         """Test caching layer with database operations."""
         # Create temp table
         async with postgres_connection.acquire() as conn:
-            await conn.execute("""
+            await conn.execute(
+                """
                 CREATE TEMPORARY TABLE test_cache_db (
                     id UUID PRIMARY KEY,
                     name VARCHAR(255),
                     value TEXT
                 )
-            """)
+            """
+            )
 
             # Insert data
             test_id = uuid4()
-            await conn.execute("""
+            await conn.execute(
+                """
                 INSERT INTO test_cache_db (id, name, value)
                 VALUES ($1, $2, $3)
-            """, test_id, "test-item", "test-value")
+            """,
+                test_id,
+                "test-item",
+                "test-value",
+            )
 
             # Query from database
-            result = await conn.fetchrow(
-                "SELECT * FROM test_cache_db WHERE id = $1",
-                test_id
-            )
+            result = await conn.fetchrow("SELECT * FROM test_cache_db WHERE id = $1", test_id)
             db_value = result["value"]
 
             # Cache the result in Redis
@@ -314,6 +330,7 @@ class TestMultiServiceIntegration:
 # Database Initialization Tests
 # =============================================================================
 
+
 @pytest.mark.integration
 class TestDatabaseInitialization:
     """Test database initialization fixtures."""
@@ -323,10 +340,12 @@ class TestDatabaseInitialization:
         """Test that initialized_db fixture creates tables."""
         async with initialized_db.acquire() as conn:
             # Check that tables exist
-            tables = await conn.fetch("""
+            tables = await conn.fetch(
+                """
                 SELECT tablename FROM pg_tables
                 WHERE schemaname = 'public'
-            """)
+            """
+            )
 
             table_names = [t["tablename"] for t in tables]
 
@@ -341,18 +360,23 @@ class TestDatabaseInitialization:
         async with initialized_db.acquire() as conn:
             # Insert server
             server_id = uuid4()
-            await conn.execute("""
+            await conn.execute(
+                """
                 INSERT INTO mcp_servers (
                     id, name, transport, endpoint, sensitivity_level, is_active
                 )
                 VALUES ($1, $2, $3, $4, $5, $6)
-            """, server_id, "test-server", "http", "http://test.com", "medium", True)
+            """,
+                server_id,
+                "test-server",
+                "http",
+                "http://test.com",
+                "medium",
+                True,
+            )
 
             # Verify insertion
-            result = await conn.fetchrow(
-                "SELECT * FROM mcp_servers WHERE id = $1",
-                server_id
-            )
+            result = await conn.fetchrow("SELECT * FROM mcp_servers WHERE id = $1", server_id)
 
             assert result["name"] == "test-server"
             assert result["transport"] == "http"
@@ -361,6 +385,7 @@ class TestDatabaseInitialization:
 # =============================================================================
 # Performance and Stress Tests
 # =============================================================================
+
 
 @pytest.mark.integration
 @pytest.mark.slow
@@ -373,21 +398,20 @@ class TestPerformance:
         import time
 
         async with postgres_connection.acquire() as conn:
-            await conn.execute("""
+            await conn.execute(
+                """
                 CREATE TEMPORARY TABLE test_bulk (
                     id SERIAL PRIMARY KEY,
                     value TEXT
                 )
-            """)
+            """
+            )
 
             # Bulk insert
             start = time.time()
 
             values = [(f"value_{i}",) for i in range(1000)]
-            await conn.executemany(
-                "INSERT INTO test_bulk (value) VALUES ($1)",
-                values
-            )
+            await conn.executemany("INSERT INTO test_bulk (value) VALUES ($1)", values)
 
             duration = time.time() - start
 

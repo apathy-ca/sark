@@ -1,9 +1,10 @@
 """Gateway integration data models."""
 
-from pydantic import BaseModel, Field, HttpUrl, field_validator, ConfigDict
-from typing import Any
 from datetime import datetime
 from enum import Enum
+from typing import Any
+
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl, field_validator
 
 
 class SensitivityLevel(str, Enum):

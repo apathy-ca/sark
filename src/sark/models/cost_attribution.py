@@ -4,10 +4,9 @@ Cost attribution models for SARK v2.0.
 Extends the base CostTracking model with rich attribution and reporting capabilities.
 """
 
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from decimal import Decimal
-from typing import Any, Dict, Optional
-from uuid import UUID
+from typing import Any
 
 from pydantic import BaseModel, Field
 from sqlalchemy import func, select
@@ -22,16 +21,17 @@ class CostAttributionRecord(BaseModel):
 
     Used for API responses and reporting.
     """
+
     timestamp: datetime
     principal_id: str
     resource_id: str
     capability_id: str
-    estimated_cost: Optional[Decimal] = None
-    actual_cost: Optional[Decimal] = None
-    provider: Optional[str] = None
-    model: Optional[str] = None
-    breakdown: Dict[str, Any] = Field(default_factory=dict)
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    estimated_cost: Decimal | None = None
+    actual_cost: Decimal | None = None
+    provider: str | None = None
+    model: str | None = None
+    breakdown: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
     class Config:
         from_attributes = True
@@ -41,15 +41,16 @@ class BudgetStatus(BaseModel):
     """
     Budget status for a principal.
     """
+
     principal_id: str
-    daily_budget: Optional[Decimal] = None
-    monthly_budget: Optional[Decimal] = None
+    daily_budget: Decimal | None = None
+    monthly_budget: Decimal | None = None
     daily_spent: Decimal = Decimal("0.00")
     monthly_spent: Decimal = Decimal("0.00")
-    daily_remaining: Optional[Decimal] = None
-    monthly_remaining: Optional[Decimal] = None
-    daily_percent_used: Optional[float] = None
-    monthly_percent_used: Optional[float] = None
+    daily_remaining: Decimal | None = None
+    monthly_remaining: Decimal | None = None
+    daily_percent_used: float | None = None
+    monthly_percent_used: float | None = None
     currency: str = "USD"
 
     class Config:
@@ -60,15 +61,16 @@ class CostSummary(BaseModel):
     """
     Aggregated cost summary.
     """
+
     total_cost: Decimal
     record_count: int
-    principal_id: Optional[str] = None
-    resource_id: Optional[str] = None
-    capability_id: Optional[str] = None
-    provider: Optional[str] = None
-    period_start: Optional[datetime] = None
-    period_end: Optional[datetime] = None
-    breakdown: Dict[str, Any] = Field(default_factory=dict)
+    principal_id: str | None = None
+    resource_id: str | None = None
+    capability_id: str | None = None
+    provider: str | None = None
+    period_start: datetime | None = None
+    period_end: datetime | None = None
+    breakdown: dict[str, Any] = Field(default_factory=dict)
 
 
 class CostAttributionService:
@@ -92,9 +94,9 @@ class CostAttributionService:
         principal_id: str,
         resource_id: str,
         capability_id: str,
-        estimated_cost: Optional[Decimal] = None,
-        actual_cost: Optional[Decimal] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        estimated_cost: Decimal | None = None,
+        actual_cost: Decimal | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> CostTracking:
         """
         Record a cost attribution entry.
@@ -124,18 +126,13 @@ class CostAttributionService:
 
         # Update principal budget spending
         await self._update_principal_spending(
-            principal_id,
-            actual_cost or estimated_cost or Decimal("0.00")
+            principal_id, actual_cost or estimated_cost or Decimal("0.00")
         )
 
         await self.db.commit()
         return record
 
-    async def _update_principal_spending(
-        self,
-        principal_id: str,
-        cost: Decimal
-    ) -> None:
+    async def _update_principal_spending(self, principal_id: str, cost: Decimal) -> None:
         """
         Update principal's daily and monthly spending.
 
@@ -168,7 +165,10 @@ class CostAttributionService:
 
         # Monthly reset (simple: reset on day 1 of month)
         if budget.last_monthly_reset:
-            if now.month != budget.last_monthly_reset.month or now.year != budget.last_monthly_reset.year:
+            if (
+                now.month != budget.last_monthly_reset.month
+                or now.year != budget.last_monthly_reset.year
+            ):
                 budget.monthly_spent = Decimal("0.00")
                 budget.last_monthly_reset = now
         else:
@@ -179,10 +179,8 @@ class CostAttributionService:
         budget.monthly_spent += cost
 
     async def check_budget(
-        self,
-        principal_id: str,
-        estimated_cost: Decimal
-    ) -> tuple[bool, Optional[str]]:
+        self, principal_id: str, estimated_cost: Decimal
+    ) -> tuple[bool, str | None]:
         """
         Check if a principal has sufficient budget for an operation.
 
@@ -201,19 +199,22 @@ class CostAttributionService:
         # Check daily budget
         if budget.daily_budget is not None:
             if budget.daily_spent + estimated_cost > budget.daily_budget:
-                return False, f"Daily budget exceeded (limit: {budget.daily_budget} {budget.currency})"
+                return (
+                    False,
+                    f"Daily budget exceeded (limit: {budget.daily_budget} {budget.currency})",
+                )
 
         # Check monthly budget
         if budget.monthly_budget is not None:
             if budget.monthly_spent + estimated_cost > budget.monthly_budget:
-                return False, f"Monthly budget exceeded (limit: {budget.monthly_budget} {budget.currency})"
+                return (
+                    False,
+                    f"Monthly budget exceeded (limit: {budget.monthly_budget} {budget.currency})",
+                )
 
         return True, None
 
-    async def get_budget_status(
-        self,
-        principal_id: str
-    ) -> Optional[BudgetStatus]:
+    async def get_budget_status(self, principal_id: str) -> BudgetStatus | None:
         """
         Get budget status for a principal.
 
@@ -235,11 +236,19 @@ class CostAttributionService:
 
         if budget.daily_budget is not None:
             daily_remaining = budget.daily_budget - budget.daily_spent
-            daily_percent = float(budget.daily_spent / budget.daily_budget * 100) if budget.daily_budget > 0 else 0.0
+            daily_percent = (
+                float(budget.daily_spent / budget.daily_budget * 100)
+                if budget.daily_budget > 0
+                else 0.0
+            )
 
         if budget.monthly_budget is not None:
             monthly_remaining = budget.monthly_budget - budget.monthly_spent
-            monthly_percent = float(budget.monthly_spent / budget.monthly_budget * 100) if budget.monthly_budget > 0 else 0.0
+            monthly_percent = (
+                float(budget.monthly_spent / budget.monthly_budget * 100)
+                if budget.monthly_budget > 0
+                else 0.0
+            )
 
         return BudgetStatus(
             principal_id=principal_id,
@@ -256,11 +265,11 @@ class CostAttributionService:
 
     async def get_cost_summary(
         self,
-        principal_id: Optional[str] = None,
-        resource_id: Optional[str] = None,
-        capability_id: Optional[str] = None,
-        period_start: Optional[datetime] = None,
-        period_end: Optional[datetime] = None,
+        principal_id: str | None = None,
+        resource_id: str | None = None,
+        capability_id: str | None = None,
+        period_start: datetime | None = None,
+        period_end: datetime | None = None,
     ) -> CostSummary:
         """
         Get aggregated cost summary with optional filters.
@@ -276,8 +285,10 @@ class CostAttributionService:
             Cost summary
         """
         query = select(
-            func.sum(func.coalesce(CostTracking.actual_cost, CostTracking.estimated_cost)).label("total"),
-            func.count(CostTracking.id).label("count")
+            func.sum(func.coalesce(CostTracking.actual_cost, CostTracking.estimated_cost)).label(
+                "total"
+            ),
+            func.count(CostTracking.id).label("count"),
         )
 
         # Apply filters
@@ -311,8 +322,8 @@ class CostAttributionService:
     async def set_budget(
         self,
         principal_id: str,
-        daily_budget: Optional[Decimal] = None,
-        monthly_budget: Optional[Decimal] = None,
+        daily_budget: Decimal | None = None,
+        monthly_budget: Decimal | None = None,
         currency: str = "USD",
     ) -> PrincipalBudget:
         """
@@ -350,8 +361,8 @@ class CostAttributionService:
 
 
 __all__ = [
-    "CostAttributionRecord",
     "BudgetStatus",
-    "CostSummary",
+    "CostAttributionRecord",
     "CostAttributionService",
+    "CostSummary",
 ]

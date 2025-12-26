@@ -2,8 +2,6 @@
 Shared fixtures and configuration for chaos engineering tests.
 """
 
-import pytest
-
 
 def pytest_configure(config):
     """Configure pytest with chaos test markers."""

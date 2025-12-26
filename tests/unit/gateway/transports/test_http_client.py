@@ -1,8 +1,6 @@
 """Comprehensive tests for Gateway HTTP transport client."""
 
-import asyncio
-from unittest.mock import AsyncMock, MagicMock, patch
-from uuid import uuid4
+from unittest.mock import AsyncMock, MagicMock
 
 import httpx
 import pytest
@@ -13,10 +11,8 @@ from sark.gateway.transports.http_client import (
     GatewayHTTPClient,
     PaginationParams,
 )
-from sark.models.gateway import GatewayServerInfo, GatewayToolInfo
 from sark.services.policy.opa_client import (
     AuthorizationDecision,
-    AuthorizationInput,
     OPAClient,
 )
 
@@ -221,7 +217,9 @@ class TestGatewayHTTPClient:
         assert metrics["cache_misses"] == 1
         await client.close()
 
-    async def test_list_all_servers_pagination(self, client, sample_server_data, httpx_mock: HTTPXMock):
+    async def test_list_all_servers_pagination(
+        self, client, sample_server_data, httpx_mock: HTTPXMock
+    ):
         """Test listing all servers with automatic pagination."""
         # Page 1: Full page
         httpx_mock.add_response(
@@ -280,7 +278,9 @@ class TestGatewayHTTPClient:
         assert tools[0].tool_name == "execute_query"
         await client.close()
 
-    async def test_list_tools_filtered_by_server(self, client, sample_tool_data, httpx_mock: HTTPXMock):
+    async def test_list_tools_filtered_by_server(
+        self, client, sample_tool_data, httpx_mock: HTTPXMock
+    ):
         """Test listing tools filtered by server."""
         httpx_mock.add_response(
             method="GET",
@@ -361,7 +361,9 @@ class TestGatewayHTTPClient:
 
         await client_with_opa.close()
 
-    async def test_invoke_tool_with_filtered_parameters(self, client_with_opa, httpx_mock: HTTPXMock):
+    async def test_invoke_tool_with_filtered_parameters(
+        self, client_with_opa, httpx_mock: HTTPXMock
+    ):
         """Test invoking tool with OPA-filtered parameters."""
         # Mock OPA authorization with filtered parameters
         client_with_opa.opa_client.evaluate_gateway_policy = AsyncMock(
@@ -414,7 +416,9 @@ class TestGatewayHTTPClient:
         assert health["healthy"] is False
         await client.close()
 
-    async def test_retry_logic_on_server_error(self, client, sample_server_data, httpx_mock: HTTPXMock):
+    async def test_retry_logic_on_server_error(
+        self, client, sample_server_data, httpx_mock: HTTPXMock
+    ):
         """Test retry logic on server errors (5xx)."""
         # First two requests fail, third succeeds
         httpx_mock.add_response(

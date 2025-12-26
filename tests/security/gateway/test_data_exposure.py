@@ -72,9 +72,7 @@ async def test_unauthorized_tool_enumeration(app_client, restricted_user_token):
     if response.status_code == 200:
         tools = response.json()
         # Should only see allowed tools
-        assert len(tools) == 0 or all(
-            tool.get("visibility") == "public" for tool in tools
-        )
+        assert len(tools) == 0 or all(tool.get("visibility") == "public" for tool in tools)
     else:
         assert response.status_code in [403, 404]
 

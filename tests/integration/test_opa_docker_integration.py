@@ -15,11 +15,12 @@ Tests include:
 - Multi-policy evaluation
 """
 
-import pytest
+import asyncio
 import time
 from uuid import uuid4
-from typing import Any
+
 import httpx
+import pytest
 
 # Enable Docker fixtures
 pytest_plugins = ["tests.fixtures.integration_docker"]
@@ -28,6 +29,7 @@ pytest_plugins = ["tests.fixtures.integration_docker"]
 # =============================================================================
 # Fixtures
 # =============================================================================
+
 
 @pytest.fixture
 async def sample_policies():
@@ -119,6 +121,7 @@ async def sample_policies():
 @pytest.fixture
 async def load_policy(opa_client):
     """Helper fixture to load policies into OPA."""
+
     async def _load_policy(policy_name: str, policy_content: str):
         """Load a policy into OPA.
 
@@ -142,6 +145,7 @@ async def load_policy(opa_client):
 # OPA Connection and Health Tests
 # =============================================================================
 
+
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_opa_health_check(opa_client):
@@ -164,6 +168,7 @@ async def test_opa_server_info(opa_service):
 # Policy Upload and Management Tests
 # =============================================================================
 
+
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_upload_simple_policy(opa_client, load_policy, sample_policies):
@@ -177,10 +182,12 @@ async def test_upload_simple_policy(opa_client, load_policy, sample_policies):
     assert result is not None
 
     # Test policy decision
-    decision = await opa_client.evaluate_policy({
-        "action": "gateway:tool:invoke",
-        "user": {"id": "test-user"},
-    })
+    decision = await opa_client.evaluate_policy(
+        {
+            "action": "gateway:tool:invoke",
+            "user": {"id": "test-user"},
+        }
+    )
 
     assert decision.allow is True
 
@@ -195,24 +202,30 @@ async def test_upload_role_based_policy(opa_client, load_policy, sample_policies
     await load_policy(policy_name, policy_content)
 
     # Admin should be allowed to invoke
-    decision_admin = await opa_client.evaluate_policy({
-        "action": "gateway:tool:invoke",
-        "user": {"id": "admin-user", "role": "admin"},
-    })
+    decision_admin = await opa_client.evaluate_policy(
+        {
+            "action": "gateway:tool:invoke",
+            "user": {"id": "admin-user", "role": "admin"},
+        }
+    )
     assert decision_admin.allow is True
 
     # Regular user should be denied for invoke
-    decision_user = await opa_client.evaluate_policy({
-        "action": "gateway:tool:invoke",
-        "user": {"id": "regular-user", "role": "user"},
-    })
+    decision_user = await opa_client.evaluate_policy(
+        {
+            "action": "gateway:tool:invoke",
+            "user": {"id": "regular-user", "role": "user"},
+        }
+    )
     assert decision_user.allow is False
 
     # But allowed for read
-    decision_read = await opa_client.evaluate_policy({
-        "action": "gateway:tool:read",
-        "user": {"id": "regular-user", "role": "user"},
-    })
+    decision_read = await opa_client.evaluate_policy(
+        {
+            "action": "gateway:tool:read",
+            "user": {"id": "regular-user", "role": "user"},
+        }
+    )
     assert decision_read.allow is True
 
 
@@ -252,6 +265,7 @@ async def test_delete_policy(opa_client, load_policy, sample_policies):
 # =============================================================================
 # Gateway Authorization Tests
 # =============================================================================
+
 
 @pytest.mark.integration
 @pytest.mark.asyncio
@@ -295,6 +309,7 @@ async def test_gateway_authorization_with_reason(opa_client, load_policy, sample
 # Server Registration Policy Tests
 # =============================================================================
 
+
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_server_sensitivity_level_policy(opa_client, load_policy, sample_policies):
@@ -302,49 +317,60 @@ async def test_server_sensitivity_level_policy(opa_client, load_policy, sample_p
     await load_policy("server_policy", sample_policies["server_sensitivity"])
 
     # Low sensitivity - everyone can register
-    decision_low = await opa_client.evaluate_policy({
-        "action": "register",
-        "user": {"id": "user123", "role": "user"},
-        "resource": {"type": "server", "sensitivity": "low"},
-    })
+    decision_low = await opa_client.evaluate_policy(
+        {
+            "action": "register",
+            "user": {"id": "user123", "role": "user"},
+            "resource": {"type": "server", "sensitivity": "low"},
+        }
+    )
     assert decision_low.allow is True
 
     # Medium sensitivity - developers and admins only
-    decision_med_dev = await opa_client.evaluate_policy({
-        "action": "register",
-        "user": {"id": "dev123", "role": "developer"},
-        "resource": {"type": "server", "sensitivity": "medium"},
-    })
+    decision_med_dev = await opa_client.evaluate_policy(
+        {
+            "action": "register",
+            "user": {"id": "dev123", "role": "developer"},
+            "resource": {"type": "server", "sensitivity": "medium"},
+        }
+    )
     assert decision_med_dev.allow is True
 
     # Medium sensitivity - regular user denied
-    decision_med_user = await opa_client.evaluate_policy({
-        "action": "register",
-        "user": {"id": "user123", "role": "user"},
-        "resource": {"type": "server", "sensitivity": "medium"},
-    })
+    decision_med_user = await opa_client.evaluate_policy(
+        {
+            "action": "register",
+            "user": {"id": "user123", "role": "user"},
+            "resource": {"type": "server", "sensitivity": "medium"},
+        }
+    )
     assert decision_med_user.allow is False
 
     # High sensitivity - admins only
-    decision_high_admin = await opa_client.evaluate_policy({
-        "action": "register",
-        "user": {"id": "admin123", "role": "admin"},
-        "resource": {"type": "server", "sensitivity": "high"},
-    })
+    decision_high_admin = await opa_client.evaluate_policy(
+        {
+            "action": "register",
+            "user": {"id": "admin123", "role": "admin"},
+            "resource": {"type": "server", "sensitivity": "high"},
+        }
+    )
     assert decision_high_admin.allow is True
 
     # High sensitivity - developer denied
-    decision_high_dev = await opa_client.evaluate_policy({
-        "action": "register",
-        "user": {"id": "dev123", "role": "developer"},
-        "resource": {"type": "server", "sensitivity": "high"},
-    })
+    decision_high_dev = await opa_client.evaluate_policy(
+        {
+            "action": "register",
+            "user": {"id": "dev123", "role": "developer"},
+            "resource": {"type": "server", "sensitivity": "high"},
+        }
+    )
     assert decision_high_dev.allow is False
 
 
 # =============================================================================
 # Parameter Filtering Tests
 # =============================================================================
+
 
 @pytest.mark.integration
 @pytest.mark.asyncio
@@ -360,8 +386,8 @@ async def test_parameter_filtering_policy(opa_client, load_policy, sample_polici
         "parameters": {
             "query": "SELECT *",
             "password": "secret123",  # Should be filtered
-            "secret": "api_key",       # Should be filtered
-            "limit": 10,               # Should remain
+            "secret": "api_key",  # Should be filtered
+            "limit": 10,  # Should remain
         },
     }
 
@@ -388,6 +414,7 @@ async def test_parameter_filtering_policy(opa_client, load_policy, sample_polici
 # Performance and Caching Tests
 # =============================================================================
 
+
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_policy_evaluation_performance(opa_client, load_policy, sample_policies):
@@ -395,26 +422,30 @@ async def test_policy_evaluation_performance(opa_client, load_policy, sample_pol
     await load_policy("perf_test", sample_policies["gateway_allow_all"])
 
     # Warm up
-    await opa_client.evaluate_policy({
-        "action": "gateway:tool:invoke",
-        "user": {"id": "test-user"},
-    })
+    await opa_client.evaluate_policy(
+        {
+            "action": "gateway:tool:invoke",
+            "user": {"id": "test-user"},
+        }
+    )
 
     # Measure multiple evaluations
     start_time = time.perf_counter()
     iterations = 100
 
     for i in range(iterations):
-        decision = await opa_client.evaluate_policy({
-            "action": "gateway:tool:invoke",
-            "user": {"id": f"user-{i}"},
-        })
+        decision = await opa_client.evaluate_policy(
+            {
+                "action": "gateway:tool:invoke",
+                "user": {"id": f"user-{i}"},
+            }
+        )
         assert decision.allow is True
 
     elapsed = (time.perf_counter() - start_time) * 1000  # ms
     avg_latency = elapsed / iterations
 
-    print(f"\nOPA evaluation performance:")
+    print("\nOPA evaluation performance:")
     print(f"  Total: {elapsed:.2f}ms for {iterations} evaluations")
     print(f"  Average: {avg_latency:.2f}ms per evaluation")
     print(f"  Throughput: {iterations / (elapsed / 1000):.2f} req/s")
@@ -433,15 +464,14 @@ async def test_concurrent_policy_evaluations(opa_client, load_policy, sample_pol
 
     # Create many concurrent evaluation tasks
     async def evaluate(user_id: str, role: str):
-        return await opa_client.evaluate_policy({
-            "action": "gateway:tool:invoke",
-            "user": {"id": user_id, "role": role},
-        })
+        return await opa_client.evaluate_policy(
+            {
+                "action": "gateway:tool:invoke",
+                "user": {"id": user_id, "role": role},
+            }
+        )
 
-    tasks = [
-        evaluate(f"user-{i}", "admin" if i % 2 == 0 else "user")
-        for i in range(50)
-    ]
+    tasks = [evaluate(f"user-{i}", "admin" if i % 2 == 0 else "user") for i in range(50)]
 
     start_time = time.perf_counter()
     results = await asyncio.gather(*tasks)
@@ -464,14 +494,14 @@ async def test_concurrent_policy_evaluations(opa_client, load_policy, sample_pol
 # Fail-Closed Behavior Tests
 # =============================================================================
 
+
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_fail_closed_on_invalid_policy(opa_client):
     """Test fail-closed behavior when policy doesn't exist."""
     # Query non-existent policy package
     decision = await opa_client.evaluate_policy(
-        {"action": "test"},
-        policy_path="sark/nonexistent_package"
+        {"action": "test"}, policy_path="sark/nonexistent_package"
     )
 
     # Should fail closed (deny)
@@ -487,10 +517,12 @@ async def test_fail_closed_on_network_error(opa_client):
 
     bad_client = OPAClient(opa_url="http://localhost:9999")  # Wrong port
 
-    decision = await bad_client.evaluate_policy({
-        "action": "gateway:tool:invoke",
-        "user": {"id": "test"},
-    })
+    decision = await bad_client.evaluate_policy(
+        {
+            "action": "gateway:tool:invoke",
+            "user": {"id": "test"},
+        }
+    )
 
     # Should fail closed (deny)
     assert decision.allow is False
@@ -499,6 +531,7 @@ async def test_fail_closed_on_network_error(opa_client):
 # =============================================================================
 # Complex Policy Tests
 # =============================================================================
+
 
 @pytest.mark.integration
 @pytest.mark.asyncio
@@ -526,36 +559,42 @@ async def test_context_enriched_policy(opa_client, load_policy):
     await load_policy("context_policy", policy_content)
 
     # Test with proper context - should allow
-    decision_allowed = await opa_client.evaluate_policy({
-        "action": "gateway:tool:invoke",
-        "user": {"id": "user123", "role": "user"},
-        "context": {
-            "time_of_day": "business_hours",
-            "location": "office",
-        },
-    })
+    decision_allowed = await opa_client.evaluate_policy(
+        {
+            "action": "gateway:tool:invoke",
+            "user": {"id": "user123", "role": "user"},
+            "context": {
+                "time_of_day": "business_hours",
+                "location": "office",
+            },
+        }
+    )
     assert decision_allowed.allow is True
 
     # Test with wrong context - should deny
-    decision_denied = await opa_client.evaluate_policy({
-        "action": "gateway:tool:invoke",
-        "user": {"id": "user123", "role": "user"},
-        "context": {
-            "time_of_day": "night",
-            "location": "remote",
-        },
-    })
+    decision_denied = await opa_client.evaluate_policy(
+        {
+            "action": "gateway:tool:invoke",
+            "user": {"id": "user123", "role": "user"},
+            "context": {
+                "time_of_day": "night",
+                "location": "remote",
+            },
+        }
+    )
     assert decision_denied.allow is False
 
     # Admin should always be allowed regardless of context
-    decision_admin = await opa_client.evaluate_policy({
-        "action": "gateway:tool:invoke",
-        "user": {"id": "admin123", "role": "admin"},
-        "context": {
-            "time_of_day": "night",
-            "location": "remote",
-        },
-    })
+    decision_admin = await opa_client.evaluate_policy(
+        {
+            "action": "gateway:tool:invoke",
+            "user": {"id": "admin123", "role": "admin"},
+            "context": {
+                "time_of_day": "night",
+                "location": "remote",
+            },
+        }
+    )
     assert decision_admin.allow is True
 
 
@@ -580,23 +619,28 @@ async def test_multi_resource_policy(opa_client, load_policy):
 
     # Test approved servers
     for server_name in ["approved-server-1", "approved-server-2", "approved-server-3"]:
-        decision = await opa_client.evaluate_policy({
-            "action": "gateway:tool:invoke",
-            "server": {"name": server_name},
-        })
+        decision = await opa_client.evaluate_policy(
+            {
+                "action": "gateway:tool:invoke",
+                "server": {"name": server_name},
+            }
+        )
         assert decision.allow is True, f"Server {server_name} should be allowed"
 
     # Test unapproved server
-    decision_denied = await opa_client.evaluate_policy({
-        "action": "gateway:tool:invoke",
-        "server": {"name": "unknown-server"},
-    })
+    decision_denied = await opa_client.evaluate_policy(
+        {
+            "action": "gateway:tool:invoke",
+            "server": {"name": "unknown-server"},
+        }
+    )
     assert decision_denied.allow is False
 
 
 # =============================================================================
 # Policy Update and Versioning Tests
 # =============================================================================
+
 
 @pytest.mark.integration
 @pytest.mark.asyncio
@@ -608,10 +652,12 @@ async def test_policy_hot_reload(opa_client, load_policy, sample_policies):
     await load_policy(policy_name, sample_policies["gateway_allow_all"])
 
     # Test that it allows
-    decision1 = await opa_client.evaluate_policy({
-        "action": "gateway:tool:invoke",
-        "user": {"id": "test", "role": "user"},
-    })
+    decision1 = await opa_client.evaluate_policy(
+        {
+            "action": "gateway:tool:invoke",
+            "user": {"id": "test", "role": "user"},
+        }
+    )
     assert decision1.allow is True
 
     # Update policy (deny all)
@@ -626,16 +672,19 @@ async def test_policy_hot_reload(opa_client, load_policy, sample_policies):
     await asyncio.sleep(0.1)
 
     # Test that it now denies
-    decision2 = await opa_client.evaluate_policy({
-        "action": "gateway:tool:invoke",
-        "user": {"id": "test", "role": "user"},
-    })
+    decision2 = await opa_client.evaluate_policy(
+        {
+            "action": "gateway:tool:invoke",
+            "user": {"id": "test", "role": "user"},
+        }
+    )
     assert decision2.allow is False
 
 
 # =============================================================================
 # Data API Tests
 # =============================================================================
+
 
 @pytest.mark.integration
 @pytest.mark.asyncio
@@ -650,9 +699,7 @@ async def test_opa_data_api(opa_client):
         )
 
         # Retrieve data
-        response = await client.get(
-            f"{opa_client.opa_url}/v1/data/sark/servers/allowed_list"
-        )
+        response = await client.get(f"{opa_client.opa_url}/v1/data/sark/servers/allowed_list")
         assert response.status_code == 200
 
         result = response.json()
@@ -688,15 +735,19 @@ async def test_policy_with_external_data(opa_client, load_policy):
     await load_policy("data_driven", policy_content)
 
     # Test with allowed server
-    decision_allowed = await opa_client.evaluate_policy({
-        "action": "gateway:tool:invoke",
-        "server": {"name": "approved-1"},
-    })
+    decision_allowed = await opa_client.evaluate_policy(
+        {
+            "action": "gateway:tool:invoke",
+            "server": {"name": "approved-1"},
+        }
+    )
     assert decision_allowed.allow is True
 
     # Test with blocked server
-    decision_denied = await opa_client.evaluate_policy({
-        "action": "gateway:tool:invoke",
-        "server": {"name": "unapproved-server"},
-    })
+    decision_denied = await opa_client.evaluate_policy(
+        {
+            "action": "gateway:tool:invoke",
+            "server": {"name": "unapproved-server"},
+        }
+    )
     assert decision_denied.allow is False

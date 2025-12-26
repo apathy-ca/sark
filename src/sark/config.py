@@ -175,10 +175,13 @@ class FeatureFlags:
     def from_env(cls) -> "FeatureFlags":
         """Load feature flags from environment variables."""
         return cls(
-            enable_protocol_adapters=os.getenv("FEATURE_PROTOCOL_ADAPTERS", "false").lower() == "true",
+            enable_protocol_adapters=os.getenv("FEATURE_PROTOCOL_ADAPTERS", "false").lower()
+            == "true",
             enable_federation=os.getenv("FEATURE_FEDERATION", "false").lower() == "true",
-            enable_cost_attribution=os.getenv("FEATURE_COST_ATTRIBUTION", "false").lower() == "true",
-            enable_programmatic_policies=os.getenv("FEATURE_PROGRAMMATIC_POLICIES", "false").lower() == "true",
+            enable_cost_attribution=os.getenv("FEATURE_COST_ATTRIBUTION", "false").lower()
+            == "true",
+            enable_programmatic_policies=os.getenv("FEATURE_PROGRAMMATIC_POLICIES", "false").lower()
+            == "true",
         )
 
 
@@ -201,7 +204,8 @@ class ProtocolConfig:
         return cls(
             enabled_protocols=enabled_protocols,
             mcp_discovery_enabled=os.getenv("PROTOCOL_MCP_DISCOVERY", "true").lower() == "true",
-            http_openapi_validation=os.getenv("PROTOCOL_HTTP_OPENAPI_VALIDATION", "true").lower() == "true",
+            http_openapi_validation=os.getenv("PROTOCOL_HTTP_OPENAPI_VALIDATION", "true").lower()
+            == "true",
             grpc_reflection_enabled=os.getenv("PROTOCOL_GRPC_REFLECTION", "true").lower() == "true",
         )
 

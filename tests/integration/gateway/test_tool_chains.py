@@ -5,8 +5,6 @@ circular dependency detection, timeout handling, and failure recovery.
 """
 
 import pytest
-import asyncio
-from httpx import AsyncClient
 
 pytestmark = pytest.mark.asyncio
 

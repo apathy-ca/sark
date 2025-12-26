@@ -4,9 +4,9 @@ Tests for complete audit trail tracking, event correlation, SIEM integration,
 and audit log integrity.
 """
 
-import pytest
 import asyncio
-import hashlib
+
+import pytest
 
 pytestmark = pytest.mark.asyncio
 
@@ -249,6 +249,7 @@ async def test_audit_performance_under_load(app_client, mock_user_token):
     ]
 
     import time
+
     start = time.perf_counter()
     responses = await asyncio.gather(*tasks)
     duration = (time.perf_counter() - start) * 1000

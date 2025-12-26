@@ -9,29 +9,27 @@ Version: 2.0.0
 Engineer: ENGINEER-2
 """
 
-from sark.adapters.http.http_adapter import HTTPAdapter
 from sark.adapters.http.authentication import (
+    APIKeyStrategy,
     AuthStrategy,
-    NoAuthStrategy,
     BasicAuthStrategy,
     BearerAuthStrategy,
+    NoAuthStrategy,
     OAuth2Strategy,
-    APIKeyStrategy,
 )
 from sark.adapters.http.discovery import OpenAPIDiscovery
+from sark.adapters.http.http_adapter import HTTPAdapter
 
 __all__ = [
-    # Main adapter
-    "HTTPAdapter",
-
+    "APIKeyStrategy",
     # Authentication
     "AuthStrategy",
-    "NoAuthStrategy",
     "BasicAuthStrategy",
     "BearerAuthStrategy",
+    # Main adapter
+    "HTTPAdapter",
+    "NoAuthStrategy",
     "OAuth2Strategy",
-    "APIKeyStrategy",
-
     # Discovery
     "OpenAPIDiscovery",
 ]

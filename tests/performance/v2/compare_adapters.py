@@ -10,11 +10,10 @@ Deliverable: Adapter comparison analysis
 """
 
 import asyncio
-import json
-import sys
-from pathlib import Path
-from typing import Dict, List
 from dataclasses import dataclass
+import json
+from pathlib import Path
+import sys
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "src"))
@@ -51,18 +50,24 @@ class AdapterComparison:
 
     def generate_report(self) -> str:
         """Generate comparison report."""
-        lines = ["="*80]
+        lines = ["=" * 80]
         lines.append("HTTP vs gRPC ADAPTER COMPARISON")
-        lines.append("="*80)
+        lines.append("=" * 80)
         lines.append("")
 
         lines.append("LATENCY COMPARISON (milliseconds):")
         lines.append("-" * 80)
         lines.append(f"{'Metric':<15} {'HTTP':<15} {'gRPC':<15} {'Improvement':<15}")
         lines.append("-" * 80)
-        lines.append(f"{'P50 Latency':<15} {self.http_latency_p50:>10.2f}ms {self.grpc_latency_p50:>10.2f}ms {self.latency_improvement_p50:>10.1f}%")
-        lines.append(f"{'P95 Latency':<15} {self.http_latency_p95:>10.2f}ms {self.grpc_latency_p95:>10.2f}ms {self.latency_improvement_p95:>10.1f}%")
-        lines.append(f"{'P99 Latency':<15} {self.http_latency_p99:>10.2f}ms {self.grpc_latency_p99:>10.2f}ms")
+        lines.append(
+            f"{'P50 Latency':<15} {self.http_latency_p50:>10.2f}ms {self.grpc_latency_p50:>10.2f}ms {self.latency_improvement_p50:>10.1f}%"
+        )
+        lines.append(
+            f"{'P95 Latency':<15} {self.http_latency_p95:>10.2f}ms {self.grpc_latency_p95:>10.2f}ms {self.latency_improvement_p95:>10.1f}%"
+        )
+        lines.append(
+            f"{'P99 Latency':<15} {self.http_latency_p99:>10.2f}ms {self.grpc_latency_p99:>10.2f}ms"
+        )
         lines.append("")
 
         lines.append("THROUGHPUT COMPARISON:")
@@ -112,16 +117,16 @@ class AdapterComparison:
         lines.append("  • Better performance for high-frequency calls")
         lines.append("  • Built-in load balancing support")
         lines.append("")
-        lines.append("="*80)
+        lines.append("=" * 80)
 
         return "\n".join(lines)
 
 
 async def compare_adapters():
     """Compare HTTP and gRPC adapter performance."""
-    print("="*80)
+    print("=" * 80)
     print("ADAPTER PERFORMANCE COMPARISON ANALYSIS")
-    print("="*80)
+    print("=" * 80)
     print()
 
     # Load benchmark results
@@ -143,7 +148,6 @@ async def compare_adapters():
             http_latency_p95=125.7,
             http_latency_p99=187.2,
             http_throughput=234.5,
-
             grpc_latency_p50=32.1,
             grpc_latency_p95=89.4,
             grpc_latency_p99=134.8,
@@ -167,12 +171,10 @@ async def compare_adapters():
 
     # Extract metrics from HTTP results
     http_latency_result = next(
-        (r for r in http_data["results"] if r["benchmark_name"] == "latency_baseline"),
-        None
+        (r for r in http_data["results"] if r["benchmark_name"] == "latency_baseline"), None
     )
     http_throughput_result = next(
-        (r for r in http_data["results"] if r["benchmark_name"] == "throughput_baseline"),
-        None
+        (r for r in http_data["results"] if r["benchmark_name"] == "throughput_baseline"), None
     )
 
     if not http_latency_result or not http_throughput_result:
@@ -185,12 +187,10 @@ async def compare_adapters():
             grpc_data = json.load(f)
 
         grpc_latency_result = next(
-            (r for r in grpc_data["results"] if r["benchmark_name"] == "latency_baseline"),
-            None
+            (r for r in grpc_data["results"] if r["benchmark_name"] == "latency_baseline"), None
         )
         grpc_throughput_result = next(
-            (r for r in grpc_data["results"] if r["benchmark_name"] == "throughput_baseline"),
-            None
+            (r for r in grpc_data["results"] if r["benchmark_name"] == "throughput_baseline"), None
         )
 
         comparison = AdapterComparison(
@@ -198,7 +198,6 @@ async def compare_adapters():
             http_latency_p95=http_latency_result["latency_p95"],
             http_latency_p99=http_latency_result["latency_p99"],
             http_throughput=http_throughput_result["throughput_rps"],
-
             grpc_latency_p50=grpc_latency_result["latency_median"],
             grpc_latency_p95=grpc_latency_result["latency_p95"],
             grpc_latency_p99=grpc_latency_result["latency_p99"],
@@ -215,7 +214,6 @@ async def compare_adapters():
             http_latency_p95=http_latency_result["latency_p95"],
             http_latency_p99=http_latency_result["latency_p99"],
             http_throughput=http_throughput_result["throughput_rps"],
-
             grpc_latency_p50=http_latency_result["latency_median"] * 0.75,
             grpc_latency_p95=http_latency_result["latency_p95"] * 0.70,
             grpc_latency_p99=http_latency_result["latency_p99"] * 0.72,
@@ -233,25 +231,29 @@ async def compare_adapters():
     # Save JSON
     json_file = results_dir / "adapter_comparison.json"
     with open(json_file, "w") as f:
-        json.dump({
-            "http": {
-                "latency_p50": comparison.http_latency_p50,
-                "latency_p95": comparison.http_latency_p95,
-                "latency_p99": comparison.http_latency_p99,
-                "throughput": comparison.http_throughput,
+        json.dump(
+            {
+                "http": {
+                    "latency_p50": comparison.http_latency_p50,
+                    "latency_p95": comparison.http_latency_p95,
+                    "latency_p99": comparison.http_latency_p99,
+                    "throughput": comparison.http_throughput,
+                },
+                "grpc": {
+                    "latency_p50": comparison.grpc_latency_p50,
+                    "latency_p95": comparison.grpc_latency_p95,
+                    "latency_p99": comparison.grpc_latency_p99,
+                    "throughput": comparison.grpc_throughput,
+                },
+                "improvements": {
+                    "latency_p50": comparison.latency_improvement_p50,
+                    "latency_p95": comparison.latency_improvement_p95,
+                    "throughput": comparison.throughput_improvement,
+                },
             },
-            "grpc": {
-                "latency_p50": comparison.grpc_latency_p50,
-                "latency_p95": comparison.grpc_latency_p95,
-                "latency_p99": comparison.grpc_latency_p99,
-                "throughput": comparison.grpc_throughput,
-            },
-            "improvements": {
-                "latency_p50": comparison.latency_improvement_p50,
-                "latency_p95": comparison.latency_improvement_p95,
-                "throughput": comparison.throughput_improvement,
-            },
-        }, f, indent=2)
+            f,
+            indent=2,
+        )
 
     print(f"JSON data saved to: {json_file}")
 

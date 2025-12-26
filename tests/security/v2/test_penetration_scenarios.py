@@ -8,10 +8,9 @@ Engineer: QA-2
 Deliverable: Penetration testing suite
 """
 
-import pytest
 import asyncio
-from typing import Dict, Any, List
-from unittest.mock import Mock, AsyncMock, patch
+
+import pytest
 
 
 @pytest.mark.security
@@ -110,7 +109,7 @@ class TestAuthenticationBypass:
         """Test that requests without principal are rejected."""
         from sark.models.base import InvocationRequest
 
-        request = InvocationRequest(
+        InvocationRequest(
             capability_id="test.admin",
             principal_id=None,  # Missing principal
             arguments={},
@@ -125,10 +124,6 @@ class TestAuthenticationBypass:
     async def test_token_forgery(self):
         """Test resistance to forged authentication tokens."""
         # Attempt to create fake JWT tokens
-        fake_tokens = [
-            "eyJhbGciOiJub25lIn0.eyJzdWIiOiJhZG1pbiJ9.",  # "none" algorithm
-            "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiJ9.fake",  # Invalid signature
-        ]
 
         # Tokens should be validated and rejected
         # TODO: Implement when token validation is in place
@@ -209,33 +204,28 @@ class TestDenialOfService:
         # 2. Handle it without crashing or hanging
         try:
             result = await asyncio.wait_for(
-                mock_adapter.invoke(sample_invocation_request),
-                timeout=10.0
+                mock_adapter.invoke(sample_invocation_request), timeout=10.0
             )
             # If completed, check it didn't crash
             assert result is not None
-        except asyncio.TimeoutError:
+        except TimeoutError:
             pytest.fail("Service hung on large payload (DoS vulnerability)")
 
     @pytest.mark.asyncio
     async def test_rapid_request_dos(self, mock_adapter, sample_invocation_request):
         """Test handling of rapid-fire requests (rate limit bypass)."""
         # Send 1000 requests as fast as possible
-        tasks = [
-            mock_adapter.invoke(sample_invocation_request)
-            for _ in range(1000)
-        ]
+        tasks = [mock_adapter.invoke(sample_invocation_request) for _ in range(1000)]
 
         # Should either rate limit or handle gracefully
         # Should not crash or exhaust resources
         try:
             results = await asyncio.wait_for(
-                asyncio.gather(*tasks, return_exceptions=True),
-                timeout=30.0
+                asyncio.gather(*tasks, return_exceptions=True), timeout=30.0
             )
             # Check that service survived
             assert len(results) > 0
-        except asyncio.TimeoutError:
+        except TimeoutError:
             pytest.fail("Service hung under rapid requests (DoS vulnerability)")
 
     @pytest.mark.asyncio
@@ -265,11 +255,8 @@ class TestDenialOfService:
 
         # Should timeout or reject, not hang indefinitely
         try:
-            result = await asyncio.wait_for(
-                mock_adapter.invoke(request),
-                timeout=5.0
-            )
-        except asyncio.TimeoutError:
+            await asyncio.wait_for(mock_adapter.invoke(request), timeout=5.0)
+        except TimeoutError:
             pytest.fail("Service vulnerable to ReDoS attack")
 
 
@@ -311,9 +298,9 @@ class TestInformationDisclosure:
             ]
 
             for indicator in sensitive_indicators:
-                assert indicator not in error_lower, (
-                    f"Stack trace indicator '{indicator}' found in error message"
-                )
+                assert (
+                    indicator not in error_lower
+                ), f"Stack trace indicator '{indicator}' found in error message"
 
     @pytest.mark.asyncio
     async def test_version_disclosure(self):
@@ -431,12 +418,6 @@ class TestSecurityMisconfiguration:
     async def test_default_credentials(self):
         """Test that no default credentials are in use."""
         # Check for common default passwords
-        default_creds = [
-            ("admin", "admin"),
-            ("admin", "password"),
-            ("root", "root"),
-            ("sark", "sark"),
-        ]
 
         # Should all be rejected
         # TODO: Test against authentication system

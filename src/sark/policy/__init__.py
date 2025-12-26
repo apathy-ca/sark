@@ -5,8 +5,8 @@ injection attacks and ensure policy quality.
 """
 
 from sark.policy.loader import (
-    PolicyLoadError,
     PolicyLoader,
+    PolicyLoadError,
     load_and_validate_policy,
     validate_policy_file,
 )
@@ -25,20 +25,20 @@ from sark.policy.validator import (
 )
 
 __all__ = [
-    # Validator
-    "PolicyValidator",
-    "ValidationResult",
-    "ValidationIssue",
-    "Severity",
+    "PolicyLoadError",
     # Loader
     "PolicyLoader",
-    "PolicyLoadError",
-    "validate_policy_file",
-    "load_and_validate_policy",
     # Test Runner
     "PolicyTestRunner",
+    # Validator
+    "PolicyValidator",
+    "Severity",
     "TestCase",
     "TestResult",
     "TestStatus",
     "TestSuiteResult",
+    "ValidationIssue",
+    "ValidationResult",
+    "load_and_validate_policy",
+    "validate_policy_file",
 ]

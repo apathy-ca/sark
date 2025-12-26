@@ -1,10 +1,10 @@
 """Gateway authorization latency tests."""
 
-import pytest
 import asyncio
 import statistics
 import time
-from httpx import AsyncClient
+
+import pytest
 
 
 @pytest.mark.performance
@@ -34,7 +34,7 @@ async def test_authorization_latency_p95(app_client, mock_user_token):
     p95 = latencies[int(len(latencies) * 0.95)]
     p99 = latencies[int(len(latencies) * 0.99)]
 
-    print(f"\nLatency Results (ms):")
+    print("\nLatency Results (ms):")
     print(f"  P50: {p50:.2f}")
     print(f"  P95: {p95:.2f}")
     print(f"  P99: {p99:.2f}")
@@ -92,7 +92,7 @@ async def test_sustained_load(app_client, mock_user_token):
     duration = end_time - start_time
     throughput = total_requests / duration
 
-    print(f"\nSustained Load Results:")
+    print("\nSustained Load Results:")
     print(f"  Total Requests: {total_requests}")
     print(f"  Duration: {duration:.2f}s")
     print(f"  Throughput: {throughput:.2f} req/s")
@@ -140,7 +140,7 @@ async def test_spike_load(app_client, mock_user_token):
     success_rate = success_count / len(spike_tasks)
 
     duration = end_time - start_time
-    print(f"\nSpike Load Results:")
+    print("\nSpike Load Results:")
     print(f"  Spike Size: {len(spike_tasks)} requests")
     print(f"  Duration: {duration:.2f}s")
     print(f"  Success Rate: {success_rate*100:.2f}%")
@@ -192,7 +192,7 @@ async def test_cache_performance(app_client, mock_user_token):
     avg_latency = statistics.mean(cache_hit_latencies)
     p95_latency = sorted(cache_hit_latencies)[int(len(cache_hit_latencies) * 0.95)]
 
-    print(f"\nCache Performance Results:")
+    print("\nCache Performance Results:")
     print(f"  Average Latency: {avg_latency:.2f}ms")
     print(f"  P95 Latency: {p95_latency:.2f}ms")
 

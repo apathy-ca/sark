@@ -8,13 +8,10 @@ Engineer: QA-2
 Deliverable: tests/security/v2/test_mtls_security.py
 """
 
-import pytest
+from datetime import datetime
 import ssl
-import asyncio
-from pathlib import Path
-from datetime import datetime, timedelta
-from typing import Dict, Any
-from unittest.mock import Mock, patch, AsyncMock
+
+import pytest
 
 
 class TestMTLSCertificateValidation:
@@ -92,9 +89,9 @@ class TestMTLSConnectionSecurity:
         min_tls_version = ssl.TLSVersion.TLSv1_2
 
         # In production config, verify TLS version enforcement
-        assert min_tls_version >= ssl.TLSVersion.TLSv1_2, (
-            "Minimum TLS version must be 1.2 or higher"
-        )
+        assert (
+            min_tls_version >= ssl.TLSVersion.TLSv1_2
+        ), "Minimum TLS version must be 1.2 or higher"
 
     @pytest.mark.asyncio
     async def test_cipher_suite_security(self):
@@ -103,20 +100,8 @@ class TestMTLSConnectionSecurity:
         # Avoid weak ciphers like RC4, 3DES, MD5
 
         # Example secure ciphers
-        secure_ciphers = [
-            "ECDHE-RSA-AES256-GCM-SHA384",
-            "ECDHE-RSA-AES128-GCM-SHA256",
-            "ECDHE-ECDSA-AES256-GCM-SHA384",
-        ]
 
         # Weak ciphers that should NOT be used
-        weak_ciphers = [
-            "RC4",
-            "3DES",
-            "MD5",
-            "NULL",
-            "EXPORT",
-        ]
 
         # TODO: Integrate with actual TLS configuration
         pytest.skip("Pending TLS cipher suite configuration")
@@ -176,9 +161,7 @@ class TestMTLSKeyManagement:
         # Mock private key file
         key_file_permissions = "0600"  # Owner read/write only
 
-        assert key_file_permissions == "0600", (
-            "Private key files must have 600 permissions"
-        )
+        assert key_file_permissions == "0600", "Private key files must have 600 permissions"
         # TODO: Implement actual key file permission checks
 
     @pytest.mark.asyncio
@@ -241,9 +224,7 @@ class TestMTLSAuditAndLogging:
         ]
 
         for pattern in sensitive_patterns:
-            assert pattern not in log_entry, (
-                f"Sensitive pattern '{pattern}' found in logs"
-            )
+            assert pattern not in log_entry, f"Sensitive pattern '{pattern}' found in logs"
 
 
 class TestMTLSErrorHandling:
@@ -283,7 +264,6 @@ class TestMTLSPerformance:
         """Test that mTLS handshake completes within acceptable time."""
         # TLS handshake should complete in < 500ms
         # Subsequent connections can use session resumption for speed
-        max_handshake_ms = 500
 
         # TODO: Measure actual handshake time
         pytest.skip("Pending mTLS performance testing")

@@ -11,12 +11,11 @@ Tests federation resilience under adverse conditions:
 - Recovery mechanisms
 """
 
-import pytest
 import asyncio
-from datetime import datetime, UTC
-from unittest.mock import AsyncMock, MagicMock, patch
-from uuid import uuid4
+from datetime import UTC, datetime
+from unittest.mock import AsyncMock, MagicMock
 
+import pytest
 
 # ============================================================================
 # Network Partition Chaos Tests
@@ -35,15 +34,17 @@ class TestFederationNetworkPartitions:
         # Simulate network partition
         mock_federation_node.is_healthy = AsyncMock(return_value=False)
         mock_federation_node.authorize_remote = AsyncMock(
-            side_effect=asyncio.TimeoutError("Network partition")
+            side_effect=TimeoutError("Network partition")
         )
 
         # Attempt authorization during partition
         with pytest.raises(asyncio.TimeoutError):
-            await mock_federation_node.authorize_remote({
-                "principal": "alice@org-a.com",
-                "resource": "resource-123",
-            })
+            await mock_federation_node.authorize_remote(
+                {
+                    "principal": "alice@org-a.com",
+                    "resource": "resource-123",
+                }
+            )
 
     @pytest.mark.asyncio
     async def test_partial_network_partition(self, mock_federation_service):
@@ -62,8 +63,7 @@ class TestFederationNetworkPartitions:
 
         # Verify partial connectivity
         reachable_nodes = [
-            node for node, reachable in node_reachability["org-a"].items()
-            if reachable
+            node for node, reachable in node_reachability["org-a"].items() if reachable
         ]
         assert len(reachable_nodes) == 1
         assert "org-b" in reachable_nodes
@@ -119,6 +119,7 @@ class TestFederationNodeFailures:
     @pytest.mark.asyncio
     async def test_sudden_node_crash(self, mock_federation_node):
         """Test handling sudden node crash mid-request."""
+
         async def crash_midway(*args, **kwargs):
             raise ConnectionError("Node crashed")
 
@@ -229,10 +230,12 @@ class TestFederationCertificateChaos:
         }
 
         # Trust should be immediately invalidated
-        mock_federation_service.check_revocation = AsyncMock(return_value={
-            "revoked": True,
-            "reason": revocation_event["reason"],
-        })
+        mock_federation_service.check_revocation = AsyncMock(
+            return_value={
+                "revoked": True,
+                "reason": revocation_event["reason"],
+            }
+        )
 
         revocation_status = await mock_federation_service.check_revocation("1234567890")
 
@@ -283,10 +286,12 @@ class TestFederationByzantineFailures:
     async def test_node_returning_malformed_responses(self, mock_federation_node):
         """Test handling node that returns malformed responses."""
         # Node returns invalid/malformed response
-        mock_federation_node.authorize_remote = AsyncMock(return_value={
-            "malformed": "response",
-            # Missing required 'allow' field
-        })
+        mock_federation_node.authorize_remote = AsyncMock(
+            return_value={
+                "malformed": "response",
+                # Missing required 'allow' field
+            }
+        )
 
         response = await mock_federation_node.authorize_remote({})
 
@@ -314,6 +319,7 @@ class TestFederationByzantineFailures:
     @pytest.mark.asyncio
     async def test_slow_loris_attack(self, mock_federation_node):
         """Test handling slow-sending node (slowloris-style attack)."""
+
         async def slow_response(*args, **kwargs):
             await asyncio.sleep(30)  # Very slow
             return {"allow": True}
@@ -322,23 +328,15 @@ class TestFederationByzantineFailures:
 
         # Should timeout
         with pytest.raises(asyncio.TimeoutError):
-            await asyncio.wait_for(
-                mock_federation_node.authorize_remote({}),
-                timeout=1.0
-            )
+            await asyncio.wait_for(mock_federation_node.authorize_remote({}), timeout=1.0)
 
     @pytest.mark.asyncio
     async def test_resource_exhaustion_attack(self, mock_federation_service):
         """Test handling node attempting resource exhaustion."""
         # Malicious node sends massive response
-        huge_response = {
-            "allow": True,
-            "metadata": {f"key_{i}": "x" * 1000 for i in range(10000)}
-        }
+        huge_response = {"allow": True, "metadata": {f"key_{i}": "x" * 1000 for i in range(10000)}}
 
-        mock_federation_service.query_remote_authorization = AsyncMock(
-            return_value=huge_response
-        )
+        mock_federation_service.query_remote_authorization = AsyncMock(return_value=huge_response)
 
         response = await mock_federation_service.query_remote_authorization({})
 
@@ -443,7 +441,7 @@ class TestFederationRecovery:
                 break
             except ConnectionError:
                 if attempt < max_retries - 1:
-                    await asyncio.sleep(0.1 * (2 ** attempt))  # Exponential backoff
+                    await asyncio.sleep(0.1 * (2**attempt))  # Exponential backoff
                 else:
                     raise
 
@@ -457,7 +455,7 @@ class TestFederationRecovery:
         circuit_state = {"status": "closed", "failure_count": 0, "threshold": 3}
 
         # Simulate failures
-        for i in range(5):
+        for _i in range(5):
             mock_federation_service.query_remote_authorization = AsyncMock(
                 side_effect=ConnectionError("Failed")
             )
@@ -518,10 +516,8 @@ class TestFederationRecovery:
         health_gen = health_sequence()
 
         for _ in range(5):
-            mock_federation_node.is_healthy = AsyncMock(
-                return_value=await health_gen.__anext__()
-            )
-            status = await mock_federation_node.is_healthy()
+            mock_federation_node.is_healthy = AsyncMock(return_value=await health_gen.__anext__())
+            await mock_federation_node.is_healthy()
 
         # Should detect recovery (transition from False to True)
         assert health_checks == [False, False, True, True, True]
@@ -546,10 +542,12 @@ class TestFederationLoadChaos:
         """Test federation under sudden load spike."""
         # Simulate sudden spike: 100 concurrent requests
         tasks = [
-            mock_federation_node.authorize_remote({
-                "principal": f"user{i}@org-a.com",
-                "resource": f"resource-{i}",
-            })
+            mock_federation_node.authorize_remote(
+                {
+                    "principal": f"user{i}@org-a.com",
+                    "resource": f"resource-{i}",
+                }
+            )
             for i in range(100)
         ]
 
@@ -591,8 +589,7 @@ class TestFederationLoadChaos:
 
         # All reconnect simultaneously
         tasks = [
-            mock_federation_service.establish_trust({"node": node})
-            for node in reconnecting_nodes
+            mock_federation_service.establish_trust({"node": node}) for node in reconnecting_nodes
         ]
 
         results = await asyncio.gather(*tasks)

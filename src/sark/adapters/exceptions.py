@@ -5,7 +5,7 @@ This module defines a comprehensive exception hierarchy for all adapter-related
 errors. All adapters should raise these exceptions for consistent error handling.
 """
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 
 class AdapterError(Exception):
@@ -15,9 +15,9 @@ class AdapterError(Exception):
         self,
         message: str,
         *,
-        adapter_name: Optional[str] = None,
-        resource_id: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None
+        adapter_name: str | None = None,
+        resource_id: str | None = None,
+        details: dict[str, Any] | None = None,
     ):
         """
         Initialize adapter error.
@@ -34,7 +34,7 @@ class AdapterError(Exception):
         self.resource_id = resource_id
         self.details = details or {}
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """
         Convert exception to dictionary for API responses.
 
@@ -46,35 +46,32 @@ class AdapterError(Exception):
             "message": self.message,
             "adapter": self.adapter_name,
             "resource_id": self.resource_id,
-            "details": self.details
+            "details": self.details,
         }
 
 
 class DiscoveryError(AdapterError):
     """Raised when resource discovery fails."""
+
     pass
 
 
 class ConnectionError(AdapterError):
     """Raised when adapter cannot connect to the resource."""
+
     pass
 
 
 class AuthenticationError(AdapterError):
     """Raised when authentication fails."""
+
     pass
 
 
 class ValidationError(AdapterError):
     """Raised when request validation fails."""
 
-    def __init__(
-        self,
-        message: str,
-        *,
-        validation_errors: Optional[list] = None,
-        **kwargs
-    ):
+    def __init__(self, message: str, *, validation_errors: list | None = None, **kwargs):
         """
         Initialize validation error.
 
@@ -95,9 +92,9 @@ class InvocationError(AdapterError):
         self,
         message: str,
         *,
-        capability_id: Optional[str] = None,
-        protocol_error: Optional[str] = None,
-        **kwargs
+        capability_id: str | None = None,
+        protocol_error: str | None = None,
+        **kwargs,
     ):
         """
         Initialize invocation error.
@@ -117,6 +114,7 @@ class InvocationError(AdapterError):
 
 class ResourceNotFoundError(AdapterError):
     """Raised when a resource cannot be found."""
+
     pass
 
 
@@ -127,9 +125,9 @@ class CapabilityNotFoundError(AdapterError):
         self,
         message: str,
         *,
-        capability_id: Optional[str] = None,
-        available_capabilities: Optional[list] = None,
-        **kwargs
+        capability_id: str | None = None,
+        available_capabilities: list | None = None,
+        **kwargs,
     ):
         """
         Initialize capability not found error.
@@ -149,13 +147,7 @@ class CapabilityNotFoundError(AdapterError):
 class TimeoutError(AdapterError):
     """Raised when an operation times out."""
 
-    def __init__(
-        self,
-        message: str,
-        *,
-        timeout_seconds: Optional[float] = None,
-        **kwargs
-    ):
+    def __init__(self, message: str, *, timeout_seconds: float | None = None, **kwargs):
         """
         Initialize timeout error.
 
@@ -176,10 +168,10 @@ class ProtocolError(AdapterError):
         self,
         message: str,
         *,
-        protocol_name: Optional[str] = None,
-        protocol_version: Optional[str] = None,
-        protocol_details: Optional[Dict[str, Any]] = None,
-        **kwargs
+        protocol_name: str | None = None,
+        protocol_version: str | None = None,
+        protocol_details: dict[str, Any] | None = None,
+        **kwargs,
     ):
         """
         Initialize protocol error.
@@ -203,13 +195,7 @@ class ProtocolError(AdapterError):
 class StreamingError(AdapterError):
     """Raised when streaming operations fail."""
 
-    def __init__(
-        self,
-        message: str,
-        *,
-        chunks_received: Optional[int] = None,
-        **kwargs
-    ):
+    def __init__(self, message: str, *, chunks_received: int | None = None, **kwargs):
         """
         Initialize streaming error.
 
@@ -225,19 +211,14 @@ class StreamingError(AdapterError):
 
 class AdapterConfigurationError(AdapterError):
     """Raised when adapter configuration is invalid."""
+
     pass
 
 
 class UnsupportedOperationError(AdapterError):
     """Raised when an operation is not supported by the adapter."""
 
-    def __init__(
-        self,
-        message: str,
-        *,
-        operation: Optional[str] = None,
-        **kwargs
-    ):
+    def __init__(self, message: str, *, operation: str | None = None, **kwargs):
         """
         Initialize unsupported operation error.
 
@@ -252,17 +233,17 @@ class UnsupportedOperationError(AdapterError):
 
 
 __all__ = [
-    "AdapterError",
-    "DiscoveryError",
-    "ConnectionError",
-    "AuthenticationError",
-    "ValidationError",
-    "InvocationError",
-    "ResourceNotFoundError",
-    "CapabilityNotFoundError",
-    "TimeoutError",
-    "ProtocolError",
-    "StreamingError",
     "AdapterConfigurationError",
+    "AdapterError",
+    "AuthenticationError",
+    "CapabilityNotFoundError",
+    "ConnectionError",
+    "DiscoveryError",
+    "InvocationError",
+    "ProtocolError",
+    "ResourceNotFoundError",
+    "StreamingError",
+    "TimeoutError",
     "UnsupportedOperationError",
+    "ValidationError",
 ]

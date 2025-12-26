@@ -13,11 +13,12 @@ Engineer: ENGINEER-2
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
-from datetime import datetime, timedelta
 import base64
-import structlog
+from datetime import datetime, timedelta
+from typing import Any
+
 import httpx
+import structlog
 
 from sark.adapters.exceptions import AuthenticationError
 
@@ -55,7 +56,7 @@ class AuthStrategy(ABC):
         pass
 
     @abstractmethod
-    def validate_config(self, config: Dict[str, Any]) -> bool:
+    def validate_config(self, config: dict[str, Any]) -> bool:
         """
         Validate authentication configuration.
 
@@ -82,7 +83,7 @@ class NoAuthStrategy(AuthStrategy):
         """No credentials to refresh."""
         pass
 
-    def validate_config(self, config: Dict[str, Any]) -> bool:
+    def validate_config(self, config: dict[str, Any]) -> bool:
         """No configuration needed."""
         return True
 
@@ -115,12 +116,12 @@ class BasicAuthStrategy(AuthStrategy):
         """Basic auth doesn't need refresh."""
         pass
 
-    def validate_config(self, config: Dict[str, Any]) -> bool:
+    def validate_config(self, config: dict[str, Any]) -> bool:
         """Validate Basic Auth configuration."""
         if "username" not in config or "password" not in config:
             raise AuthenticationError(
                 "Basic auth requires 'username' and 'password'",
-                details={"config_keys": list(config.keys())}
+                details={"config_keys": list(config.keys())},
             )
         return True
 
@@ -136,10 +137,10 @@ class BearerAuthStrategy(AuthStrategy):
     def __init__(
         self,
         token: str,
-        refresh_url: Optional[str] = None,
-        refresh_token: Optional[str] = None,
-        client_id: Optional[str] = None,
-        client_secret: Optional[str] = None,
+        refresh_url: str | None = None,
+        refresh_token: str | None = None,
+        client_id: str | None = None,
+        client_secret: str | None = None,
     ):
         """
         Initialize Bearer Auth strategy.
@@ -156,7 +157,7 @@ class BearerAuthStrategy(AuthStrategy):
         self.refresh_token = refresh_token
         self.client_id = client_id
         self.client_secret = client_secret
-        self.token_expiry: Optional[datetime] = None
+        self.token_expiry: datetime | None = None
 
     def apply(self, request: httpx.Request) -> None:
         """Add Bearer token to request."""
@@ -182,7 +183,7 @@ class BearerAuthStrategy(AuthStrategy):
                         "refresh_token": self.refresh_token,
                         "client_id": self.client_id,
                         "client_secret": self.client_secret,
-                    }
+                    },
                 )
                 response.raise_for_status()
 
@@ -201,16 +202,14 @@ class BearerAuthStrategy(AuthStrategy):
 
         except Exception as e:
             raise AuthenticationError(
-                f"Failed to refresh bearer token: {str(e)}",
-                details={"refresh_url": self.refresh_url}
+                f"Failed to refresh bearer token: {e!s}", details={"refresh_url": self.refresh_url}
             )
 
-    def validate_config(self, config: Dict[str, Any]) -> bool:
+    def validate_config(self, config: dict[str, Any]) -> bool:
         """Validate Bearer Auth configuration."""
         if "token" not in config:
             raise AuthenticationError(
-                "Bearer auth requires 'token'",
-                details={"config_keys": list(config.keys())}
+                "Bearer auth requires 'token'", details={"config_keys": list(config.keys())}
             )
         return True
 
@@ -231,9 +230,9 @@ class OAuth2Strategy(AuthStrategy):
         client_id: str,
         client_secret: str,
         grant_type: str = "client_credentials",
-        scope: Optional[str] = None,
-        username: Optional[str] = None,
-        password: Optional[str] = None,
+        scope: str | None = None,
+        username: str | None = None,
+        password: str | None = None,
     ):
         """
         Initialize OAuth2 strategy.
@@ -254,16 +253,16 @@ class OAuth2Strategy(AuthStrategy):
         self.scope = scope
         self.username = username
         self.password = password
-        self.access_token: Optional[str] = None
-        self.refresh_token: Optional[str] = None
-        self.token_expiry: Optional[datetime] = None
+        self.access_token: str | None = None
+        self.refresh_token: str | None = None
+        self.token_expiry: datetime | None = None
 
     def apply(self, request: httpx.Request) -> None:
         """Add OAuth2 token to request."""
         if not self.access_token:
             raise AuthenticationError(
                 "OAuth2 token not available. Call refresh() first.",
-                details={"grant_type": self.grant_type}
+                details={"grant_type": self.grant_type},
             )
         request.headers["Authorization"] = f"Bearer {self.access_token}"
 
@@ -275,7 +274,7 @@ class OAuth2Strategy(AuthStrategy):
             AuthenticationError: If token request fails
         """
         try:
-            data: Dict[str, Any] = {
+            data: dict[str, Any] = {
                 "grant_type": self.grant_type,
                 "client_id": self.client_id,
                 "client_secret": self.client_secret,
@@ -288,15 +287,14 @@ class OAuth2Strategy(AuthStrategy):
                 if not self.username or not self.password:
                     raise AuthenticationError(
                         "Password grant requires username and password",
-                        details={"grant_type": "password"}
+                        details={"grant_type": "password"},
                     )
                 data["username"] = self.username
                 data["password"] = self.password
             elif self.grant_type == "refresh_token":
                 if not self.refresh_token:
                     raise AuthenticationError(
-                        "Refresh token not available",
-                        details={"grant_type": "refresh_token"}
+                        "Refresh token not available", details={"grant_type": "refresh_token"}
                     )
                 data["refresh_token"] = self.refresh_token
 
@@ -311,12 +309,14 @@ class OAuth2Strategy(AuthStrategy):
                     self.refresh_token = token_data["refresh_token"]
 
                 if "expires_in" in token_data:
-                    self.token_expiry = datetime.utcnow() + timedelta(seconds=token_data["expires_in"])
+                    self.token_expiry = datetime.utcnow() + timedelta(
+                        seconds=token_data["expires_in"]
+                    )
 
                 logger.info(
                     "OAuth2 token obtained",
                     grant_type=self.grant_type,
-                    expires_in=token_data.get("expires_in")
+                    expires_in=token_data.get("expires_in"),
                 )
 
         except httpx.HTTPStatusError as e:
@@ -326,15 +326,15 @@ class OAuth2Strategy(AuthStrategy):
                     "token_url": self.token_url,
                     "grant_type": self.grant_type,
                     "response": e.response.text,
-                }
+                },
             )
         except Exception as e:
             raise AuthenticationError(
-                f"OAuth2 authentication failed: {str(e)}",
-                details={"token_url": self.token_url, "grant_type": self.grant_type}
+                f"OAuth2 authentication failed: {e!s}",
+                details={"token_url": self.token_url, "grant_type": self.grant_type},
             )
 
-    def validate_config(self, config: Dict[str, Any]) -> bool:
+    def validate_config(self, config: dict[str, Any]) -> bool:
         """Validate OAuth2 configuration."""
         required = ["token_url", "client_id", "client_secret"]
         missing = [key for key in required if key not in config]
@@ -342,14 +342,14 @@ class OAuth2Strategy(AuthStrategy):
         if missing:
             raise AuthenticationError(
                 f"OAuth2 auth requires: {', '.join(required)}",
-                details={"missing_keys": missing, "provided_keys": list(config.keys())}
+                details={"missing_keys": missing, "provided_keys": list(config.keys())},
             )
 
         if config.get("grant_type") == "password":
             if "username" not in config or "password" not in config:
                 raise AuthenticationError(
                     "Password grant requires 'username' and 'password'",
-                    details={"grant_type": "password"}
+                    details={"grant_type": "password"},
                 )
 
         return True
@@ -386,7 +386,7 @@ class APIKeyStrategy(AuthStrategy):
         if self.location not in ("header", "query", "cookie"):
             raise AuthenticationError(
                 f"Invalid API key location: {location}",
-                details={"valid_locations": ["header", "query", "cookie"]}
+                details={"valid_locations": ["header", "query", "cookie"]},
             )
 
     def apply(self, request: httpx.Request) -> None:
@@ -405,25 +405,24 @@ class APIKeyStrategy(AuthStrategy):
         """API keys don't need refresh."""
         pass
 
-    def validate_config(self, config: Dict[str, Any]) -> bool:
+    def validate_config(self, config: dict[str, Any]) -> bool:
         """Validate API Key configuration."""
         if "api_key" not in config:
             raise AuthenticationError(
-                "API key auth requires 'api_key'",
-                details={"config_keys": list(config.keys())}
+                "API key auth requires 'api_key'", details={"config_keys": list(config.keys())}
             )
 
         location = config.get("location", "header")
         if location not in ("header", "query", "cookie"):
             raise AuthenticationError(
                 f"Invalid API key location: {location}",
-                details={"valid_locations": ["header", "query", "cookie"]}
+                details={"valid_locations": ["header", "query", "cookie"]},
             )
 
         return True
 
 
-def create_auth_strategy(auth_config: Dict[str, Any]) -> AuthStrategy:
+def create_auth_strategy(auth_config: dict[str, Any]) -> AuthStrategy:
     """
     Factory function to create authentication strategy from configuration.
 
@@ -464,8 +463,7 @@ def create_auth_strategy(auth_config: Dict[str, Any]) -> AuthStrategy:
         strategy = NoAuthStrategy()
     elif auth_type == "basic":
         strategy = BasicAuthStrategy(
-            username=auth_config["username"],
-            password=auth_config["password"]
+            username=auth_config["username"], password=auth_config["password"]
         )
     elif auth_type == "bearer":
         strategy = BearerAuthStrategy(
@@ -494,9 +492,7 @@ def create_auth_strategy(auth_config: Dict[str, Any]) -> AuthStrategy:
     else:
         raise AuthenticationError(
             f"Unsupported authentication type: {auth_type}",
-            details={
-                "supported_types": ["none", "basic", "bearer", "oauth2", "api_key"]
-            }
+            details={"supported_types": ["none", "basic", "bearer", "oauth2", "api_key"]},
         )
 
     # Validate configuration
@@ -506,11 +502,11 @@ def create_auth_strategy(auth_config: Dict[str, Any]) -> AuthStrategy:
 
 
 __all__ = [
+    "APIKeyStrategy",
     "AuthStrategy",
-    "NoAuthStrategy",
     "BasicAuthStrategy",
     "BearerAuthStrategy",
+    "NoAuthStrategy",
     "OAuth2Strategy",
-    "APIKeyStrategy",
     "create_auth_strategy",
 ]

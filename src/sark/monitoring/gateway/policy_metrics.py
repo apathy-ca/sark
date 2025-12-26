@@ -1,7 +1,6 @@
 """Policy evaluation metrics for Gateway."""
 
-from prometheus_client import Counter, Histogram, Gauge
-from typing import Optional
+from prometheus_client import Counter, Gauge, Histogram
 
 # ============================================================================
 # Policy Decision Metrics
@@ -98,7 +97,7 @@ class PolicyMetricsCollector:
         policy_name: str,
         decision: str,
         resource_type: str,
-        denial_reason: Optional[str] = None,
+        denial_reason: str | None = None,
     ):
         """
         Record a policy decision.
@@ -226,7 +225,7 @@ def record_policy_decision(
     policy_name: str,
     decision: str,
     resource_type: str,
-    denial_reason: Optional[str] = None,
+    denial_reason: str | None = None,
 ):
     """Record a policy decision."""
     _collector.record_decision(policy_name, decision, resource_type, denial_reason)

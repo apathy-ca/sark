@@ -1,7 +1,8 @@
 """Network Chaos Engineering Tests."""
 
-import pytest
 import asyncio
+
+import pytest
 
 pytestmark = pytest.mark.chaos
 
@@ -20,7 +21,7 @@ async def test_slow_network_conditions(app_client, mock_user_token):
 
         # Should either complete or timeout gracefully
         assert response.status_code in [200, 408, 504]
-    except asyncio.TimeoutError:
+    except TimeoutError:
         # Graceful timeout handling is acceptable
         pass
 
@@ -41,9 +42,7 @@ async def test_intermittent_connection_failures(app_client, mock_user_token):
     results = await asyncio.gather(*tasks, return_exceptions=True)
 
     # At least some should succeed
-    successful = sum(
-        1 for r in results if not isinstance(r, Exception) and r.status_code == 200
-    )
+    successful = sum(1 for r in results if not isinstance(r, Exception) and r.status_code == 200)
 
     assert successful > 0, "Some requests should succeed despite intermittent failures"
 

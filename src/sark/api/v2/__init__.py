@@ -18,7 +18,7 @@ router = APIRouter(prefix="/api/v2", tags=["v2"])
 async def v2_status():
     """
     Get v2 API status.
-    
+
     Returns information about v2 API availability and features.
     """
     return {
@@ -29,14 +29,14 @@ async def v2_status():
             "protocol_adapters": "planned",
             "federation": "planned",
             "cost_attribution": "planned",
-            "programmatic_policies": "planned"
+            "programmatic_policies": "planned",
         },
         "available_endpoints": [
             "GET /api/v2/status",
             "GET /api/v2/adapters (coming soon)",
             "POST /api/v2/resources (coming soon)",
             "GET /api/v2/resources (coming soon)",
-        ]
+        ],
     }
 
 
@@ -44,20 +44,20 @@ async def v2_status():
 async def list_adapters():
     """
     List available protocol adapters.
-    
+
     In v2.0, this will return all registered adapters.
     For v1.x, this is a preview endpoint.
     """
     from sark.adapters import get_registry
-    
+
     registry = get_registry()
     info = registry.get_info()
-    
+
     return {
         "status": "preview",
         "message": "Adapter registry is ready but no adapters are implemented yet",
         "registry": info,
-        "note": "Full adapter implementation coming in v2.0"
+        "note": "Full adapter implementation coming in v2.0",
     }
 
 

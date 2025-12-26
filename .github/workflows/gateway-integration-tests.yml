@@ -48,9 +48,14 @@ jobs:
       opa:
         image: openpolicyagent/opa:latest
         options: >-
-          --entrypoint "opa run --server --addr :8181"
+          --health-cmd="wget --spider --quiet http://localhost:8181/health || exit 1"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
         ports:
           - 8181:8181
+        # Start OPA in server mode explicitly
+        cmd: ["run", "--server", "--addr=0.0.0.0:8181"]
 
     steps:
       - uses: actions/checkout@v4

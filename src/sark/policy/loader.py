@@ -4,14 +4,14 @@ This module provides safe policy loading with automatic validation
 to prevent policy injection attacks and ensure policy quality.
 """
 
+from pathlib import Path
 import subprocess
 import tempfile
-from pathlib import Path
 from typing import Any
 
 import structlog
 
-from sark.policy.validator import PolicyValidator, Severity, ValidationResult
+from sark.policy.validator import PolicyValidator, ValidationResult
 
 logger = structlog.get_logger()
 
@@ -91,9 +91,7 @@ class PolicyLoader:
 
             # Check validation result
             if not validation_result.valid:
-                error_msg = self._format_validation_errors(
-                    validation_result, policy_path
-                )
+                error_msg = self._format_validation_errors(validation_result, policy_path)
 
                 if force:
                     logger.warning(
@@ -169,13 +167,11 @@ class PolicyLoader:
                             sample_inputs = [sample_inputs]
 
                 # Load policy
-                content, validation = self.load_policy(
-                    policy_file, sample_inputs=sample_inputs
-                )
+                content, validation = self.load_policy(policy_file, sample_inputs=sample_inputs)
                 policies[policy_file.name] = (content, validation)
 
             except PolicyLoadError as e:
-                errors.append(f"{policy_file.name}: {str(e)}")
+                errors.append(f"{policy_file.name}: {e!s}")
                 logger.error(
                     "policy_load_failed",
                     policy_file=str(policy_file),
@@ -184,9 +180,7 @@ class PolicyLoader:
 
         # Report errors
         if errors:
-            error_msg = f"Failed to load {len(errors)} policies:\n" + "\n".join(
-                errors
-            )
+            error_msg = f"Failed to load {len(errors)} policies:\n" + "\n".join(errors)
             raise PolicyLoadError(error_msg)
 
         logger.info(
@@ -248,9 +242,7 @@ class PolicyLoader:
                     )
 
                     if result.returncode != 0:
-                        raise RuntimeError(
-                            f"OPA deployment verification failed: {result.stderr}"
-                        )
+                        raise RuntimeError(f"OPA deployment verification failed: {result.stderr}")
 
                 finally:
                     tmp_path.unlink(missing_ok=True)
@@ -260,10 +252,8 @@ class PolicyLoader:
             return True
 
         except Exception as e:
-            logger.error(
-                "policy_deployment_failed", policy_name=policy_name, error=str(e)
-            )
-            raise RuntimeError(f"Failed to deploy policy {policy_name}: {str(e)}")
+            logger.error("policy_deployment_failed", policy_name=policy_name, error=str(e))
+            raise RuntimeError(f"Failed to deploy policy {policy_name}: {e!s}")
 
     def _format_validation_errors(
         self, validation_result: ValidationResult, policy_path: Path

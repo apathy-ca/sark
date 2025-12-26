@@ -11,16 +11,15 @@ Tests cover:
 """
 
 import asyncio
-import json
-import pytest
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock, Mock, patch
+
+import pytest
 
 from sark.gateway.transports.stdio_client import (
     HealthConfig,
     ProcessCrashError,
     ProcessStartError,
-    ResourceLimitExceededError,
     ResourceLimits,
     StdioTransport,
     StdioTransportError,
@@ -106,9 +105,11 @@ class TestStdioTransportLifecycle:
         """Test successful subprocess start."""
         transport = StdioTransport(command=["python", "server.py"])
 
-        with patch("asyncio.create_subprocess_exec", return_value=mock_process), patch(
-            "psutil.Process", return_value=mock_psutil_process
-        ), patch("asyncio.create_task"):
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=mock_process),
+            patch("psutil.Process", return_value=mock_psutil_process),
+            patch("asyncio.create_task"),
+        ):
             await transport.start()
 
             assert transport.is_running is True
@@ -121,9 +122,11 @@ class TestStdioTransportLifecycle:
         """Test starting already-started transport."""
         transport = StdioTransport(command=["python", "server.py"])
 
-        with patch("asyncio.create_subprocess_exec", return_value=mock_process), patch(
-            "psutil.Process", return_value=mock_psutil_process
-        ), patch("asyncio.create_task"):
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=mock_process),
+            patch("psutil.Process", return_value=mock_psutil_process),
+            patch("asyncio.create_task"),
+        ):
             await transport.start()
             # Start again - should log warning and return
             await transport.start()
@@ -149,9 +152,11 @@ class TestStdioTransportLifecycle:
         """Test graceful subprocess stop."""
         transport = StdioTransport(command=["python", "server.py"])
 
-        with patch("asyncio.create_subprocess_exec", return_value=mock_process), patch(
-            "psutil.Process", return_value=mock_psutil_process
-        ), patch("asyncio.create_task"):
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=mock_process),
+            patch("psutil.Process", return_value=mock_psutil_process),
+            patch("asyncio.create_task"),
+        ):
             await transport.start()
             await transport.stop(timeout=5.0)
 
@@ -165,11 +170,13 @@ class TestStdioTransportLifecycle:
         transport = StdioTransport(command=["python", "server.py"])
 
         # Make wait() timeout
-        mock_process.wait.side_effect = [asyncio.TimeoutError(), None]
+        mock_process.wait.side_effect = [TimeoutError(), None]
 
-        with patch("asyncio.create_subprocess_exec", return_value=mock_process), patch(
-            "psutil.Process", return_value=mock_psutil_process
-        ), patch("asyncio.create_task"):
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=mock_process),
+            patch("psutil.Process", return_value=mock_psutil_process),
+            patch("asyncio.create_task"),
+        ):
             await transport.start()
             await transport.stop(timeout=0.1)
 
@@ -181,9 +188,11 @@ class TestStdioTransportLifecycle:
         """Test successful subprocess restart."""
         transport = StdioTransport(command=["python", "server.py"])
 
-        with patch("asyncio.create_subprocess_exec", return_value=mock_process), patch(
-            "psutil.Process", return_value=mock_psutil_process
-        ), patch("asyncio.create_task"):
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=mock_process),
+            patch("psutil.Process", return_value=mock_psutil_process),
+            patch("asyncio.create_task"),
+        ):
             await transport.start()
             initial_restart_count = transport._restart_count
 
@@ -200,9 +209,11 @@ class TestStdioTransportLifecycle:
             max_restart_attempts=2,
         )
 
-        with patch("asyncio.create_subprocess_exec", return_value=mock_process), patch(
-            "psutil.Process", return_value=mock_psutil_process
-        ), patch("asyncio.create_task"):
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=mock_process),
+            patch("psutil.Process", return_value=mock_psutil_process),
+            patch("asyncio.create_task"),
+        ):
             await transport.start()
 
             # Exhaust restart attempts
@@ -221,8 +232,9 @@ class TestStdioTransportMessaging:
         """Test successful JSON-RPC request."""
         transport = StdioTransport(command=["python", "server.py"])
 
-        with patch("asyncio.create_subprocess_exec", return_value=mock_process), patch(
-            "psutil.Process", return_value=mock_psutil_process
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=mock_process),
+            patch("psutil.Process", return_value=mock_psutil_process),
         ):
             # Don't mock create_task to let background tasks run
             await transport.start()
@@ -232,7 +244,7 @@ class TestStdioTransportMessaging:
                 await asyncio.sleep(0.05)
                 # Trigger response handling
                 if transport._pending_requests:
-                    request_id = list(transport._pending_requests.keys())[0]
+                    request_id = next(iter(transport._pending_requests.keys()))
                     transport._pending_requests[request_id].set_result({"status": "ok"})
 
             asyncio.create_task(simulate_response())
@@ -250,9 +262,11 @@ class TestStdioTransportMessaging:
         """Test request timeout."""
         transport = StdioTransport(command=["python", "server.py"])
 
-        with patch("asyncio.create_subprocess_exec", return_value=mock_process), patch(
-            "psutil.Process", return_value=mock_psutil_process
-        ), patch("asyncio.create_task"):
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=mock_process),
+            patch("psutil.Process", return_value=mock_psutil_process),
+            patch("asyncio.create_task"),
+        ):
             await transport.start()
 
             # Don't simulate response - should timeout
@@ -272,9 +286,11 @@ class TestStdioTransportMessaging:
         """Test sending JSON-RPC notification."""
         transport = StdioTransport(command=["python", "server.py"])
 
-        with patch("asyncio.create_subprocess_exec", return_value=mock_process), patch(
-            "psutil.Process", return_value=mock_psutil_process
-        ), patch("asyncio.create_task"):
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=mock_process),
+            patch("psutil.Process", return_value=mock_psutil_process),
+            patch("asyncio.create_task"),
+        ):
             await transport.start()
 
             await transport.send_notification("test/notify", {"data": "value"})
@@ -288,8 +304,9 @@ class TestStdioTransportMessaging:
         """Test handling JSON-RPC error response."""
         transport = StdioTransport(command=["python", "server.py"])
 
-        with patch("asyncio.create_subprocess_exec", return_value=mock_process), patch(
-            "psutil.Process", return_value=mock_psutil_process
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=mock_process),
+            patch("psutil.Process", return_value=mock_psutil_process),
         ):
             await transport.start()
 
@@ -297,7 +314,7 @@ class TestStdioTransportMessaging:
             async def simulate_error():
                 await asyncio.sleep(0.05)
                 if transport._pending_requests:
-                    request_id = list(transport._pending_requests.keys())[0]
+                    request_id = next(iter(transport._pending_requests.keys()))
                     transport._pending_requests[request_id].set_exception(
                         StdioTransportError("JSON-RPC error: Method not found")
                     )
@@ -319,9 +336,11 @@ class TestStdioTransportHealthChecks:
         """Test heartbeat updates on message activity."""
         transport = StdioTransport(command=["python", "server.py"])
 
-        with patch("asyncio.create_subprocess_exec", return_value=mock_process), patch(
-            "psutil.Process", return_value=mock_psutil_process
-        ), patch("asyncio.create_task"):
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=mock_process),
+            patch("psutil.Process", return_value=mock_psutil_process),
+            patch("asyncio.create_task"),
+        ):
             await transport.start()
 
             initial_heartbeat = transport._last_heartbeat
@@ -344,13 +363,15 @@ class TestStdioTransportHealthChecks:
             ),
         )
 
-        with patch("asyncio.create_subprocess_exec", return_value=mock_process), patch(
-            "psutil.Process", return_value=mock_psutil_process
-        ), patch("asyncio.create_task") as mock_create_task:
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=mock_process),
+            patch("psutil.Process", return_value=mock_psutil_process),
+            patch("asyncio.create_task"),
+        ):
             await transport.start()
 
             # Simulate old heartbeat (hung process)
-            transport._last_heartbeat = datetime.now(timezone.utc) - timedelta(seconds=1.0)
+            transport._last_heartbeat = datetime.now(UTC) - timedelta(seconds=1.0)
 
             # Wait for health check to detect hung process
             # The health check loop should trigger restart
@@ -370,9 +391,7 @@ class TestStdioTransportResourceLimits:
         # Create psutil process with high memory usage
         mock_psutil_process = MagicMock()
         mock_psutil_process.is_running.return_value = True
-        mock_psutil_process.memory_info.return_value = MagicMock(
-            rss=2048 * 1024 * 1024  # 2GB
-        )
+        mock_psutil_process.memory_info.return_value = MagicMock(rss=2048 * 1024 * 1024)  # 2GB
         mock_psutil_process.cpu_percent.return_value = 50.0
         mock_psutil_process.num_fds.return_value = 50
 
@@ -382,8 +401,9 @@ class TestStdioTransportResourceLimits:
             health_config=HealthConfig(heartbeat_interval=0.1),
         )
 
-        with patch("asyncio.create_subprocess_exec", return_value=mock_process), patch(
-            "psutil.Process", return_value=mock_psutil_process
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=mock_process),
+            patch("psutil.Process", return_value=mock_psutil_process),
         ):
             await transport.start()
 
@@ -411,8 +431,9 @@ class TestStdioTransportResourceLimits:
             health_config=HealthConfig(heartbeat_interval=0.1),
         )
 
-        with patch("asyncio.create_subprocess_exec", return_value=mock_process), patch(
-            "psutil.Process", return_value=mock_psutil_process
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=mock_process),
+            patch("psutil.Process", return_value=mock_psutil_process),
         ):
             await transport.start()
 
@@ -440,9 +461,11 @@ class TestStdioTransportResourceLimits:
             health_config=HealthConfig(heartbeat_interval=0.1),
         )
 
-        with patch("asyncio.create_subprocess_exec", return_value=mock_process), patch(
-            "psutil.Process", return_value=mock_psutil_process
-        ), patch("asyncio.create_task"):
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=mock_process),
+            patch("psutil.Process", return_value=mock_psutil_process),
+            patch("asyncio.create_task"),
+        ):
             await transport.start()
 
             # Wait for health check
@@ -464,9 +487,11 @@ class TestStdioTransportErrorHandling:
         # Simulate process crash by returning empty line (EOF)
         mock_process.stdout.readline.return_value = b""
 
-        with patch("asyncio.create_subprocess_exec", return_value=mock_process), patch(
-            "psutil.Process", return_value=mock_psutil_process
-        ), patch("asyncio.create_task") as mock_create_task:
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=mock_process),
+            patch("psutil.Process", return_value=mock_psutil_process),
+            patch("asyncio.create_task"),
+        ):
             await transport.start()
 
             # Manually trigger stdout reader to simulate crash
@@ -481,8 +506,9 @@ class TestStdioTransportErrorHandling:
         """Test cleanup of pending requests on stop."""
         transport = StdioTransport(command=["python", "server.py"])
 
-        with patch("asyncio.create_subprocess_exec", return_value=mock_process), patch(
-            "psutil.Process", return_value=mock_psutil_process
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=mock_process),
+            patch("psutil.Process", return_value=mock_psutil_process),
         ):
             await transport.start()
 
@@ -508,9 +534,11 @@ class TestStdioTransportErrorHandling:
         # Simulate invalid JSON response
         mock_process.stdout.readline.return_value = b"invalid json\n"
 
-        with patch("asyncio.create_subprocess_exec", return_value=mock_process), patch(
-            "psutil.Process", return_value=mock_psutil_process
-        ), patch("asyncio.create_task"):
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=mock_process),
+            patch("psutil.Process", return_value=mock_psutil_process),
+            patch("asyncio.create_task"),
+        ):
             await transport.start()
 
             # Read invalid JSON - should log warning and continue
@@ -531,9 +559,11 @@ class TestStdioTransportErrorHandling:
         # Simulate process disappearing
         mock_psutil_process.is_running.return_value = False
 
-        with patch("asyncio.create_subprocess_exec", return_value=mock_process), patch(
-            "psutil.Process", return_value=mock_psutil_process
-        ), patch("asyncio.create_task"):
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=mock_process),
+            patch("psutil.Process", return_value=mock_psutil_process),
+            patch("asyncio.create_task"),
+        ):
             await transport.start()
 
             # Wait for health check to detect missing process
@@ -554,9 +584,11 @@ class TestStdioTransportProperties:
         """Test is_running after start."""
         transport = StdioTransport(command=["python", "server.py"])
 
-        with patch("asyncio.create_subprocess_exec", return_value=mock_process), patch(
-            "psutil.Process", return_value=mock_psutil_process
-        ), patch("asyncio.create_task"):
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=mock_process),
+            patch("psutil.Process", return_value=mock_psutil_process),
+            patch("asyncio.create_task"),
+        ):
             await transport.start()
             assert transport.is_running is True
 
@@ -570,8 +602,10 @@ class TestStdioTransportProperties:
         """Test PID after start."""
         transport = StdioTransport(command=["python", "server.py"])
 
-        with patch("asyncio.create_subprocess_exec", return_value=mock_process), patch(
-            "psutil.Process", return_value=mock_psutil_process
-        ), patch("asyncio.create_task"):
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=mock_process),
+            patch("psutil.Process", return_value=mock_psutil_process),
+            patch("asyncio.create_task"),
+        ):
             await transport.start()
             assert transport.pid == 12345

@@ -1,12 +1,9 @@
 """Comprehensive tests for Gateway SSE transport client."""
 
-import asyncio
-from unittest.mock import AsyncMock, MagicMock, patch
-from collections.abc import AsyncIterator
+from unittest.mock import MagicMock
 
 import httpx
 import pytest
-from pytest_httpx import HTTPXMock
 
 from sark.gateway.transports.sse_client import (
     ConnectionState,
@@ -183,6 +180,7 @@ class TestGatewaySSEClient:
 
     async def test_stream_events_basic(self, client):
         """Test basic event streaming."""
+
         # Create mock async iterator for SSE stream
         async def mock_aiter_lines():
             yield "event: test_event"
@@ -228,6 +226,7 @@ class TestGatewaySSEClient:
 
     async def test_stream_events_with_filter(self, client):
         """Test streaming events with type filter."""
+
         async def mock_aiter_lines():
             yield "event: tool_invoked"
             yield "data: tool data"
@@ -274,6 +273,7 @@ class TestGatewaySSEClient:
 
     async def test_stream_audit_events(self, client):
         """Test streaming audit events."""
+
         async def mock_aiter_lines():
             yield "event: authorization_denied"
             yield "data: audit data"
@@ -306,6 +306,7 @@ class TestGatewaySSEClient:
 
     async def test_stream_server_events(self, client):
         """Test streaming server-specific events."""
+
         async def mock_aiter_lines():
             yield "event: server_health"
             yield "data: healthy"
@@ -368,7 +369,7 @@ class TestGatewaySSEClient:
         client.client.stream = mock_stream
 
         with pytest.raises(RuntimeError, match="Connection pool exhausted"):
-            async for event in client.stream_events(endpoint="/test"):
+            async for _event in client.stream_events(endpoint="/test"):
                 break
 
         await client.close()
@@ -415,6 +416,7 @@ class TestGatewaySSEClient:
 
     async def test_no_reconnection_when_disabled(self, client_no_reconnect):
         """Test that reconnection doesn't happen when disabled."""
+
         async def mock_aiter_lines():
             raise httpx.RequestError("Connection lost")
 
@@ -435,13 +437,14 @@ class TestGatewaySSEClient:
         client_no_reconnect.client.stream = mock_stream
 
         with pytest.raises(httpx.RequestError):
-            async for event in client_no_reconnect.stream_events(endpoint="/test"):
+            async for _event in client_no_reconnect.stream_events(endpoint="/test"):
                 pass
 
         await client_no_reconnect.close()
 
     async def test_max_retries_exceeded(self, client):
         """Test max retries exceeded."""
+
         async def mock_aiter_lines():
             raise httpx.RequestError("Persistent error")
 
@@ -464,13 +467,14 @@ class TestGatewaySSEClient:
         client.reconnect_initial_delay = 0.01
 
         with pytest.raises(RuntimeError, match="max retries exceeded"):
-            async for event in client.stream_events(endpoint="/test"):
+            async for _event in client.stream_events(endpoint="/test"):
                 pass
 
         await client.close()
 
     async def test_no_retry_on_client_error(self, client):
         """Test no retry on 4xx client errors."""
+
         async def mock_stream(*args, **kwargs):
             class MockAsyncContext:
                 async def __aenter__(self):
@@ -493,7 +497,7 @@ class TestGatewaySSEClient:
         client.client.stream = mock_stream
 
         with pytest.raises(httpx.HTTPStatusError):
-            async for event in client.stream_events(endpoint="/test"):
+            async for _event in client.stream_events(endpoint="/test"):
                 pass
 
         await client.close()
@@ -525,6 +529,7 @@ class TestGatewaySSEClient:
 
     async def test_health_check_failure(self, client):
         """Test health check failure."""
+
         async def mock_get(*args, **kwargs):
             raise httpx.RequestError("Connection failed")
 

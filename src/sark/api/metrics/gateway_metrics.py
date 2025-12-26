@@ -1,6 +1,6 @@
 """Prometheus metrics for Gateway integration."""
 
-from prometheus_client import Counter, Histogram, Gauge
+from prometheus_client import Counter, Gauge, Histogram
 
 # ============================================================================
 # Authorization Metrics

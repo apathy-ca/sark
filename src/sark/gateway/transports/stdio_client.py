@@ -10,15 +10,17 @@ Provides subprocess-based MCP communication via stdin/stdout with:
 """
 
 import asyncio
+from asyncio import StreamReader, StreamWriter
+import contextlib
+from dataclasses import dataclass
+from datetime import UTC, datetime
 import json
 import os
-import psutil
 import signal
+from typing import Any
+
+import psutil
 import structlog
-from asyncio import StreamReader, StreamWriter
-from dataclasses import dataclass
-from datetime import datetime, timezone
-from typing import Any, Optional
 
 logger = structlog.get_logger()
 
@@ -82,10 +84,10 @@ class StdioTransport:
     def __init__(
         self,
         command: list[str],
-        cwd: Optional[str] = None,
-        env: Optional[dict[str, str]] = None,
-        resource_limits: Optional[ResourceLimits] = None,
-        health_config: Optional[HealthConfig] = None,
+        cwd: str | None = None,
+        env: dict[str, str] | None = None,
+        resource_limits: ResourceLimits | None = None,
+        health_config: HealthConfig | None = None,
         max_restart_attempts: int = 3,
     ):
         """
@@ -107,16 +109,16 @@ class StdioTransport:
         self.max_restart_attempts = max_restart_attempts
 
         # Process state
-        self._process: Optional[asyncio.subprocess.Process] = None
-        self._stdin: Optional[StreamWriter] = None
-        self._stdout: Optional[StreamReader] = None
-        self._stderr: Optional[StreamReader] = None
-        self._psutil_process: Optional[psutil.Process] = None
+        self._process: asyncio.subprocess.Process | None = None
+        self._stdin: StreamWriter | None = None
+        self._stdout: StreamReader | None = None
+        self._stderr: StreamReader | None = None
+        self._psutil_process: psutil.Process | None = None
 
         # Health monitoring
-        self._last_heartbeat: Optional[datetime] = None
-        self._health_check_task: Optional[asyncio.Task] = None
-        self._stderr_reader_task: Optional[asyncio.Task] = None
+        self._last_heartbeat: datetime | None = None
+        self._health_check_task: asyncio.Task | None = None
+        self._stderr_reader_task: asyncio.Task | None = None
 
         # Restart tracking
         self._restart_count: int = 0
@@ -162,7 +164,7 @@ class StdioTransport:
             self._psutil_process = psutil.Process(self._process.pid)
 
             # Start health monitoring
-            self._last_heartbeat = datetime.now(timezone.utc)
+            self._last_heartbeat = datetime.now(UTC)
             self._health_check_task = asyncio.create_task(self._health_check_loop())
 
             # Start stderr reader
@@ -216,7 +218,7 @@ class StdioTransport:
                         "stdio_transport_stopped_gracefully",
                         pid=self._process.pid,
                     )
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     # Force kill if graceful shutdown times out
                     logger.warning(
                         "stdio_transport_force_killing",
@@ -276,12 +278,12 @@ class StdioTransport:
             )
 
             # Update heartbeat
-            self._last_heartbeat = datetime.now(timezone.utc)
+            self._last_heartbeat = datetime.now(UTC)
 
             # Wait for response
             return await asyncio.wait_for(future, timeout=timeout)
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             logger.error(
                 "stdio_transport_request_timeout",
                 method=method,
@@ -325,7 +327,7 @@ class StdioTransport:
         )
 
         # Update heartbeat
-        self._last_heartbeat = datetime.now(timezone.utc)
+        self._last_heartbeat = datetime.now(UTC)
 
     async def restart(self) -> None:
         """
@@ -340,9 +342,7 @@ class StdioTransport:
         self._restart_count += 1
 
         if self._restart_count > self.max_restart_attempts:
-            raise ProcessCrashError(
-                f"Exceeded max restart attempts ({self.max_restart_attempts})"
-            )
+            raise ProcessCrashError(f"Exceeded max restart attempts ({self.max_restart_attempts})")
 
         await self.start()
 
@@ -356,7 +356,7 @@ class StdioTransport:
         )
 
     @property
-    def pid(self) -> Optional[int]:
+    def pid(self) -> int | None:
         """Get subprocess PID."""
         return self._process.pid if self._process else None
 
@@ -402,7 +402,7 @@ class StdioTransport:
                             )
 
                     # Update heartbeat
-                    self._last_heartbeat = datetime.now(timezone.utc)
+                    self._last_heartbeat = datetime.now(UTC)
 
                 except json.JSONDecodeError as e:
                     logger.warning(
@@ -450,7 +450,7 @@ class StdioTransport:
                 # Check for hung process
                 if self._last_heartbeat:
                     time_since_heartbeat = (
-                        datetime.now(timezone.utc) - self._last_heartbeat
+                        datetime.now(UTC) - self._last_heartbeat
                     ).total_seconds()
 
                     if time_since_heartbeat > self.health_config.hung_timeout:
@@ -528,18 +528,14 @@ class StdioTransport:
         # Cancel health check task
         if self._health_check_task and not self._health_check_task.done():
             self._health_check_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._health_check_task
-            except asyncio.CancelledError:
-                pass
 
         # Cancel stderr reader task
         if self._stderr_reader_task and not self._stderr_reader_task.done():
             self._stderr_reader_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._stderr_reader_task
-            except asyncio.CancelledError:
-                pass
 
         # Fail pending requests
         for future in self._pending_requests.values():
@@ -550,10 +546,8 @@ class StdioTransport:
         # Close streams
         if self._stdin and not self._stdin.is_closing():
             self._stdin.close()
-            try:
+            with contextlib.suppress(Exception):
                 await self._stdin.wait_closed()
-            except Exception:
-                pass
 
         # Reset state
         self._process = None

@@ -10,8 +10,8 @@ Usage: python run_http_benchmarks.py
 """
 
 import asyncio
-import sys
 from pathlib import Path
+import sys
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "src"))
@@ -23,9 +23,9 @@ from tests.performance.v2.benchmarks import run_comprehensive_benchmarks
 
 async def main():
     """Run HTTP adapter benchmarks."""
-    print("="*80)
+    print("=" * 80)
     print("HTTP ADAPTER PERFORMANCE BENCHMARKS")
-    print("="*80)
+    print("=" * 80)
     print("\nInitializing HTTP adapter for benchmarking...")
 
     # Create HTTP adapter (using httpbin for testing)
@@ -62,9 +62,9 @@ async def main():
         output_dir=output_dir,
     )
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("HTTP ADAPTER BENCHMARKS COMPLETE")
-    print("="*80)
+    print("=" * 80)
     print(f"\nResults saved to: {output_dir}")
 
     # Print summary

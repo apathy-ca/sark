@@ -1,11 +1,11 @@
 """Health check endpoints for Gateway."""
 
-import time
-import asyncio
-from typing import Dict, Any, Optional
 from enum import Enum
-from pydantic import BaseModel
+import time
+from typing import Any
+
 import httpx
+from pydantic import BaseModel
 import structlog
 
 logger = structlog.get_logger()
@@ -13,6 +13,7 @@ logger = structlog.get_logger()
 
 class HealthStatus(str, Enum):
     """Health status values."""
+
     HEALTHY = "healthy"
     DEGRADED = "degraded"
     UNHEALTHY = "unhealthy"
@@ -20,17 +21,19 @@ class HealthStatus(str, Enum):
 
 class ComponentHealth(BaseModel):
     """Health status for a component."""
+
     status: HealthStatus
     message: str
-    latency_ms: Optional[float] = None
-    details: Dict[str, Any] = {}
+    latency_ms: float | None = None
+    details: dict[str, Any] = {}
 
 
 class OverallHealth(BaseModel):
     """Overall system health."""
+
     status: HealthStatus
     timestamp: float
-    components: Dict[str, ComponentHealth]
+    components: dict[str, ComponentHealth]
     uptime_seconds: float
 
 
@@ -109,10 +112,10 @@ class HealthChecker:
             try:
                 components[component_name] = await checker()
             except Exception as e:
-                logger.error(f"health_check_failed", component=component_name, error=str(e))
+                logger.error("health_check_failed", component=component_name, error=str(e))
                 components[component_name] = ComponentHealth(
                     status=HealthStatus.UNHEALTHY,
-                    message=f"Health check failed: {str(e)}",
+                    message=f"Health check failed: {e!s}",
                 )
 
         # Determine overall status
@@ -148,8 +151,9 @@ class HealthChecker:
 
         try:
             # Import here to avoid circular dependency
-            from sark.db.session import get_db
             from sqlalchemy import text
+
+            from sark.db.session import get_db
 
             async for session in get_db():
                 await session.execute(text("SELECT 1"))
@@ -167,7 +171,7 @@ class HealthChecker:
             latency_ms = (time.time() - start_time) * 1000
             return ComponentHealth(
                 status=HealthStatus.UNHEALTHY,
-                message=f"Database connection failed: {str(e)}",
+                message=f"Database connection failed: {e!s}",
                 latency_ms=latency_ms,
             )
 
@@ -190,7 +194,7 @@ class HealthChecker:
             latency_ms = (time.time() - start_time) * 1000
             return ComponentHealth(
                 status=HealthStatus.UNHEALTHY,
-                message=f"Redis connection failed: {str(e)}",
+                message=f"Redis connection failed: {e!s}",
                 latency_ms=latency_ms,
             )
 
@@ -200,9 +204,10 @@ class HealthChecker:
 
         try:
             from sark.config.settings import get_settings
+
             settings = get_settings()
 
-            if not hasattr(settings, 'opa_url'):
+            if not hasattr(settings, "opa_url"):
                 return ComponentHealth(
                     status=HealthStatus.DEGRADED,
                     message="OPA URL not configured",
@@ -225,7 +230,7 @@ class HealthChecker:
             latency_ms = (time.time() - start_time) * 1000
             return ComponentHealth(
                 status=HealthStatus.UNHEALTHY,
-                message=f"OPA health check failed: {str(e)}",
+                message=f"OPA health check failed: {e!s}",
                 latency_ms=latency_ms,
             )
 
@@ -236,10 +241,11 @@ class HealthChecker:
         try:
             # Check if SIEM is configured
             from sark.config.settings import get_settings
+
             settings = get_settings()
 
-            has_splunk = hasattr(settings, 'splunk_hec_url') and settings.splunk_hec_url
-            has_datadog = hasattr(settings, 'datadog_api_key') and settings.datadog_api_key
+            has_splunk = hasattr(settings, "splunk_hec_url") and settings.splunk_hec_url
+            has_datadog = hasattr(settings, "datadog_api_key") and settings.datadog_api_key
 
             if not has_splunk and not has_datadog:
                 return ComponentHealth(
@@ -265,7 +271,7 @@ class HealthChecker:
             latency_ms = (time.time() - start_time) * 1000
             return ComponentHealth(
                 status=HealthStatus.DEGRADED,
-                message=f"SIEM check failed: {str(e)}",
+                message=f"SIEM check failed: {e!s}",
                 latency_ms=latency_ms,
             )
 
@@ -290,7 +296,7 @@ class HealthChecker:
             latency_ms = (time.time() - start_time) * 1000
             return ComponentHealth(
                 status=HealthStatus.UNHEALTHY,
-                message=f"Gateway check failed: {str(e)}",
+                message=f"Gateway check failed: {e!s}",
                 latency_ms=latency_ms,
             )
 

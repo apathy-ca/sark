@@ -10,11 +10,11 @@ Tests federation scenarios including:
 - Federation error handling and fallbacks
 """
 
-import pytest
-from datetime import datetime, UTC
-from unittest.mock import AsyncMock, MagicMock, patch
+from datetime import UTC, datetime
+from unittest.mock import AsyncMock
 from uuid import uuid4
 
+import pytest
 
 # ============================================================================
 # Federation Node Discovery Tests
@@ -85,7 +85,9 @@ class TestFederationNodeDiscovery:
     async def test_node_discovery_failure_handling(self, mock_federation_service):
         """Test handling failures in node discovery."""
         # Simulate discovery failure
-        mock_federation_service.discover_nodes = AsyncMock(side_effect=Exception("DNS lookup failed"))
+        mock_federation_service.discover_nodes = AsyncMock(
+            side_effect=Exception("DNS lookup failed")
+        )
 
         with pytest.raises(Exception, match="DNS lookup failed"):
             await mock_federation_service.discover_nodes()
@@ -151,11 +153,13 @@ class TestMTLSTrustEstablishment:
     async def test_mutual_authentication(self, mock_federation_node):
         """Test mutual authentication between federation nodes."""
         # Both nodes should authenticate each other
-        mock_federation_node.authenticate_peer = AsyncMock(return_value={
-            "authenticated": True,
-            "peer_identity": "sark.org-b.com",
-            "cert_fingerprint": "SHA256:abc123...",
-        })
+        mock_federation_node.authenticate_peer = AsyncMock(
+            return_value={
+                "authenticated": True,
+                "peer_identity": "sark.org-b.com",
+                "cert_fingerprint": "SHA256:abc123...",
+            }
+        )
 
         auth_result = await mock_federation_node.authenticate_peer()
 
@@ -212,11 +216,13 @@ class TestCrossOrgAuthorization:
 
         mock_federation_service.query_remote_authorization = AsyncMock(return_value=policy_decision)
 
-        decision = await mock_federation_service.query_remote_authorization({
-            "principal": "alice@org-a.com",
-            "resource": "resource-123",
-            "action": "read",
-        })
+        decision = await mock_federation_service.query_remote_authorization(
+            {
+                "principal": "alice@org-a.com",
+                "resource": "resource-123",
+                "action": "read",
+            }
+        )
 
         assert decision["allow"] is True
         assert decision["evaluated_by"] == "org-b"
@@ -232,11 +238,13 @@ class TestCrossOrgAuthorization:
 
         mock_federation_service.query_remote_authorization = AsyncMock(return_value=denial_response)
 
-        decision = await mock_federation_service.query_remote_authorization({
-            "principal": "unknown@org-c.com",
-            "resource": "resource-123",
-            "action": "write",
-        })
+        decision = await mock_federation_service.query_remote_authorization(
+            {
+                "principal": "unknown@org-c.com",
+                "resource": "resource-123",
+                "action": "write",
+            }
+        )
 
         assert decision["allow"] is False
         assert "not authorized" in decision["reason"]
@@ -250,11 +258,13 @@ class TestCrossOrgAuthorization:
             "requested_scope": ["resource:read"],
         }
 
-        mock_federation_node.exchange_token = AsyncMock(return_value={
-            "federated_token": "eyK...",  # Cross-org token
-            "expires_in": 3600,
-            "scope": ["resource:read"],
-        })
+        mock_federation_node.exchange_token = AsyncMock(
+            return_value={
+                "federated_token": "eyK...",  # Cross-org token
+                "expires_in": 3600,
+                "scope": ["resource:read"],
+            }
+        )
 
         token_response = await mock_federation_node.exchange_token(token_request)
 
@@ -287,18 +297,20 @@ class TestFederatedResourceLookup:
     @pytest.mark.asyncio
     async def test_federated_resource_capabilities(self, mock_federation_node):
         """Test listing capabilities of federated resource."""
-        mock_federation_node.query_resource = AsyncMock(return_value={
-            "exists": True,
-            "resource": {
-                "id": "shared-api",
-                "name": "Shared API Gateway",
-                "protocol": "http",
-                "capabilities": [
-                    {"name": "get_data", "sensitivity": "medium"},
-                    {"name": "post_data", "sensitivity": "high"},
-                ],
+        mock_federation_node.query_resource = AsyncMock(
+            return_value={
+                "exists": True,
+                "resource": {
+                    "id": "shared-api",
+                    "name": "Shared API Gateway",
+                    "protocol": "http",
+                    "capabilities": [
+                        {"name": "get_data", "sensitivity": "medium"},
+                        {"name": "post_data", "sensitivity": "high"},
+                    ],
+                },
             }
-        })
+        )
 
         resource = await mock_federation_node.query_resource({"resource_id": "shared-api"})
 
@@ -307,32 +319,33 @@ class TestFederatedResourceLookup:
 
     @pytest.mark.asyncio
     async def test_cross_org_resource_invocation(
-        self,
-        mock_federation_node,
-        populated_registry,
-        sample_http_resource
+        self, mock_federation_node, populated_registry, sample_http_resource
     ):
         """Test invoking capability on federated resource."""
         # Simulate cross-org invocation
         http_adapter = populated_registry.get("http")
 
         # 1. Authorize with remote org
-        auth_decision = await mock_federation_node.authorize_remote({
-            "principal": "alice@org-a.com",
-            "resource": sample_http_resource.id,
-            "action": "invoke",
-        })
+        auth_decision = await mock_federation_node.authorize_remote(
+            {
+                "principal": "alice@org-a.com",
+                "resource": sample_http_resource.id,
+                "action": "invoke",
+            }
+        )
         assert auth_decision["allow"] is True
 
         # 2. Invoke capability if authorized
         from sark.models.base import InvocationRequest
 
-        result = await http_adapter.invoke(InvocationRequest(
-            capability_id=f"{sample_http_resource.id}-GET-/users",
-            principal_id="alice@org-a.com",
-            arguments={},
-            context={"federated": True, "source_org": "org-a"}
-        ))
+        result = await http_adapter.invoke(
+            InvocationRequest(
+                capability_id=f"{sample_http_resource.id}-GET-/users",
+                principal_id="alice@org-a.com",
+                arguments={},
+                context={"federated": True, "source_org": "org-a"},
+            )
+        )
 
         assert result.success is True
 
@@ -402,7 +415,7 @@ class TestFederationAuditCorrelation:
                 "trust_established": True,
                 "cert_fingerprint": "SHA256:abc...",
                 "authorization_path": ["org-a", "org-b"],
-            }
+            },
         }
 
         # Verify federation metadata is present
@@ -463,8 +476,7 @@ class TestFederationErrorHandling:
         # Should timeout
         with pytest.raises(asyncio.TimeoutError):
             await asyncio.wait_for(
-                mock_federation_service.query_remote_authorization({}),
-                timeout=0.1
+                mock_federation_service.query_remote_authorization({}), timeout=0.1
             )
 
     @pytest.mark.asyncio
@@ -537,11 +549,13 @@ class TestMultiNodeFederation:
         ]
 
         # Each org in chain must authorize
-        mock_federation_service.authorize_chain = AsyncMock(return_value={
-            "allow": True,
-            "authorization_chain": federation_chain,
-            "final_decision_by": "org-c",
-        })
+        mock_federation_service.authorize_chain = AsyncMock(
+            return_value={
+                "allow": True,
+                "authorization_chain": federation_chain,
+                "final_decision_by": "org-c",
+            }
+        )
 
         decision = await mock_federation_service.authorize_chain(federation_chain)
 
@@ -555,8 +569,7 @@ class TestMultiNodeFederation:
         mesh_nodes = ["org-a", "org-b", "org-c", "org-d"]
 
         trust_matrix = {
-            node: {other: True for other in mesh_nodes if other != node}
-            for node in mesh_nodes
+            node: {other: True for other in mesh_nodes if other != node} for node in mesh_nodes
         }
 
         # Verify mesh: each node trusts all others
@@ -573,10 +586,12 @@ class TestMultiNodeFederation:
             "resource": "resource-123",
         }
 
-        mock_federation_service.query_remote_authorization = AsyncMock(return_value={
-            "allow": False,
-            "reason": "Source organization not in trust list",
-        })
+        mock_federation_service.query_remote_authorization = AsyncMock(
+            return_value={
+                "allow": False,
+                "reason": "Source organization not in trust list",
+            }
+        )
 
         decision = await mock_federation_service.query_remote_authorization(untrusted_request)
 
@@ -602,10 +617,12 @@ class TestFederationPerformance:
 
         start = time.time()
 
-        await mock_federation_node.authorize_remote({
-            "principal": "alice@org-a.com",
-            "resource": "resource-123",
-        })
+        await mock_federation_node.authorize_remote(
+            {
+                "principal": "alice@org-a.com",
+                "resource": "resource-123",
+            }
+        )
 
         latency_ms = (time.time() - start) * 1000
 
@@ -619,10 +636,12 @@ class TestFederationPerformance:
 
         # Simulate 10 concurrent cross-org authorization requests
         tasks = [
-            mock_federation_node.authorize_remote({
-                "principal": f"user{i}@org-a.com",
-                "resource": f"resource-{i}",
-            })
+            mock_federation_node.authorize_remote(
+                {
+                    "principal": f"user{i}@org-a.com",
+                    "resource": f"resource-{i}",
+                }
+            )
             for i in range(10)
         ]
 

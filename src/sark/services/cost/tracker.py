@@ -6,16 +6,16 @@ system to provide comprehensive cost tracking.
 """
 
 from decimal import Decimal
-from typing import Any, Dict, Optional
-import structlog
+from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
+import structlog
 
 from sark.models.base import InvocationRequest, InvocationResult
 from sark.models.cost_attribution import CostAttributionService
-from sark.services.cost.estimator import CostEstimator, CostEstimate, NoCostEstimator
-from sark.services.cost.providers.openai import OpenAICostEstimator
+from sark.services.cost.estimator import CostEstimate, CostEstimator, NoCostEstimator
 from sark.services.cost.providers.anthropic import AnthropicCostEstimator
+from sark.services.cost.providers.openai import OpenAICostEstimator
 
 logger = structlog.get_logger(__name__)
 
@@ -38,17 +38,13 @@ class CostTracker:
         self.attribution_service = CostAttributionService(db)
 
         # Registry of cost estimators by provider
-        self._estimators: Dict[str, CostEstimator] = {
+        self._estimators: dict[str, CostEstimator] = {
             "openai": OpenAICostEstimator(),
             "anthropic": AnthropicCostEstimator(),
             "free": NoCostEstimator(),
         }
 
-    def register_estimator(
-        self,
-        provider: str,
-        estimator: CostEstimator
-    ) -> None:
+    def register_estimator(self, provider: str, estimator: CostEstimator) -> None:
         """
         Register a custom cost estimator.
 
@@ -60,13 +56,10 @@ class CostTracker:
         logger.info(
             "cost_estimator_registered",
             provider=provider,
-            estimator_class=estimator.__class__.__name__
+            estimator_class=estimator.__class__.__name__,
         )
 
-    def get_estimator(
-        self,
-        provider: str
-    ) -> Optional[CostEstimator]:
+    def get_estimator(self, provider: str) -> CostEstimator | None:
         """
         Get cost estimator for a provider.
 
@@ -79,9 +72,7 @@ class CostTracker:
         return self._estimators.get(provider)
 
     async def estimate_invocation_cost(
-        self,
-        request: InvocationRequest,
-        resource_metadata: Dict[str, Any]
+        self, request: InvocationRequest, resource_metadata: dict[str, Any]
     ) -> CostEstimate:
         """
         Estimate cost for an invocation request.
@@ -94,16 +85,14 @@ class CostTracker:
             Cost estimate
         """
         # Determine provider
-        provider = resource_metadata.get("cost_provider") or resource_metadata.get("provider", "free")
+        provider = resource_metadata.get("cost_provider") or resource_metadata.get(
+            "provider", "free"
+        )
 
         # Get estimator
         estimator = self.get_estimator(provider)
         if not estimator:
-            logger.warning(
-                "cost_estimator_not_found",
-                provider=provider,
-                using_default=True
-            )
+            logger.warning("cost_estimator_not_found", provider=provider, using_default=True)
             estimator = NoCostEstimator()
 
         # Estimate cost
@@ -114,7 +103,7 @@ class CostTracker:
                 provider=provider,
                 estimated_cost=str(estimate.estimated_cost),
                 principal_id=request.principal_id,
-                capability_id=request.capability_id
+                capability_id=request.capability_id,
             )
             return estimate
         except Exception as e:
@@ -123,21 +112,19 @@ class CostTracker:
                 error=str(e),
                 provider=provider,
                 principal_id=request.principal_id,
-                capability_id=request.capability_id
+                capability_id=request.capability_id,
             )
             # Return zero cost estimate on failure
             return CostEstimate(
                 estimated_cost=Decimal("0.00"),
                 currency="USD",
                 provider=provider,
-                metadata={"error": str(e), "fallback": True}
+                metadata={"error": str(e), "fallback": True},
             )
 
     async def check_budget_before_invocation(
-        self,
-        request: InvocationRequest,
-        resource_metadata: Dict[str, Any]
-    ) -> tuple[bool, Optional[str]]:
+        self, request: InvocationRequest, resource_metadata: dict[str, Any]
+    ) -> tuple[bool, str | None]:
         """
         Check if principal has sufficient budget for an invocation.
 
@@ -153,8 +140,7 @@ class CostTracker:
 
         # Check budget
         allowed, reason = await self.attribution_service.check_budget(
-            request.principal_id,
-            estimate.estimated_cost
+            request.principal_id, estimate.estimated_cost
         )
 
         if not allowed:
@@ -162,7 +148,7 @@ class CostTracker:
                 "budget_check_failed",
                 principal_id=request.principal_id,
                 estimated_cost=str(estimate.estimated_cost),
-                reason=reason
+                reason=reason,
             )
 
         return allowed, reason
@@ -172,7 +158,7 @@ class CostTracker:
         request: InvocationRequest,
         result: InvocationResult,
         resource_id: str,
-        resource_metadata: Dict[str, Any]
+        resource_metadata: dict[str, Any],
     ) -> None:
         """
         Record cost for a completed invocation.
@@ -186,7 +172,9 @@ class CostTracker:
             resource_metadata: Resource metadata
         """
         # Determine provider
-        provider = resource_metadata.get("cost_provider") or resource_metadata.get("provider", "free")
+        provider = resource_metadata.get("cost_provider") or resource_metadata.get(
+            "provider", "free"
+        )
 
         # Get estimator
         estimator = self.get_estimator(provider)
@@ -198,16 +186,10 @@ class CostTracker:
         if result.success and estimator.supports_actual_cost():
             try:
                 actual_estimate = await estimator.record_actual_cost(
-                    request,
-                    result,
-                    resource_metadata
+                    request, result, resource_metadata
                 )
             except Exception as e:
-                logger.warning(
-                    "actual_cost_extraction_failed",
-                    error=str(e),
-                    provider=provider
-                )
+                logger.warning("actual_cost_extraction_failed", error=str(e), provider=provider)
 
         # Get estimated cost if we don't have actual
         estimated_cost = None
@@ -216,11 +198,7 @@ class CostTracker:
                 estimate = await estimator.estimate_cost(request, resource_metadata)
                 estimated_cost = estimate.estimated_cost
             except Exception as e:
-                logger.error(
-                    "cost_estimation_failed_on_record",
-                    error=str(e),
-                    provider=provider
-                )
+                logger.error("cost_estimation_failed_on_record", error=str(e), provider=provider)
 
         # Prepare metadata
         metadata = {
@@ -228,11 +206,13 @@ class CostTracker:
         }
 
         if actual_estimate:
-            metadata.update({
-                "model": actual_estimate.model,
-                "breakdown": actual_estimate.breakdown,
-                "actual": True,
-            })
+            metadata.update(
+                {
+                    "model": actual_estimate.model,
+                    "breakdown": actual_estimate.breakdown,
+                    "actual": True,
+                }
+            )
 
         # Record cost
         try:
@@ -242,7 +222,7 @@ class CostTracker:
                 capability_id=request.capability_id,
                 estimated_cost=estimated_cost,
                 actual_cost=actual_estimate.estimated_cost if actual_estimate else None,
-                metadata=metadata
+                metadata=metadata,
             )
 
             logger.info(
@@ -252,14 +232,14 @@ class CostTracker:
                 capability_id=request.capability_id,
                 estimated_cost=str(estimated_cost) if estimated_cost else None,
                 actual_cost=str(actual_estimate.estimated_cost) if actual_estimate else None,
-                provider=provider
+                provider=provider,
             )
         except Exception as e:
             logger.error(
                 "cost_recording_failed",
                 error=str(e),
                 principal_id=request.principal_id,
-                capability_id=request.capability_id
+                capability_id=request.capability_id,
             )
 
 

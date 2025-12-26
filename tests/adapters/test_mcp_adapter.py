@@ -5,28 +5,28 @@ This test suite ensures the MCP adapter correctly implements the ProtocolAdapter
 interface and handles MCP-specific functionality.
 """
 
-import pytest
 from datetime import datetime
-from typing import Any, Dict
-from unittest.mock import AsyncMock, MagicMock, patch
+from typing import Any
+from unittest.mock import MagicMock, patch
 
-from sark.adapters.mcp_adapter import MCPAdapter
+import pytest
+
 from sark.adapters.base import ProtocolAdapter
+from sark.adapters.exceptions import (
+    AdapterConfigurationError,
+    DiscoveryError,
+)
+from sark.adapters.exceptions import (
+    ConnectionError as AdapterConnectionError,
+)
+from sark.adapters.mcp_adapter import MCPAdapter
 from sark.models.base import (
-    ResourceSchema,
     CapabilitySchema,
     InvocationRequest,
     InvocationResult,
-)
-from sark.adapters.exceptions import (
-    AdapterConfigurationError,
-    ConnectionError as AdapterConnectionError,
-    DiscoveryError,
-    ProtocolError,
-    ValidationError,
+    ResourceSchema,
 )
 from tests.adapters.base_adapter_test import BaseAdapterTest
-
 
 # ============================================================================
 # Contract Tests for MCPAdapter
@@ -46,7 +46,7 @@ class TestMCPAdapterContract(BaseAdapterTest):
         return MCPAdapter()
 
     @pytest.fixture
-    def discovery_config(self) -> Dict[str, Any]:
+    def discovery_config(self) -> dict[str, Any]:
         """Return valid discovery configuration for stdio transport."""
         return {
             "transport": "stdio",
@@ -235,6 +235,7 @@ class TestMCPAdapterDiscovery:
         # Mock connection failure
         with patch.object(adapter._http_client, "get") as mock_get:
             import httpx
+
             # Wrap the exception properly
             async def raise_error(*args, **kwargs):
                 raise httpx.ConnectError("Connection refused")
@@ -361,9 +362,7 @@ class TestMCPAdapterCapabilities:
         """MCPAdapter should detect high sensitivity keywords."""
         adapter = MCPAdapter()
 
-        sensitivity = adapter._detect_tool_sensitivity(
-            "delete_database", "Delete entire database"
-        )
+        sensitivity = adapter._detect_tool_sensitivity("delete_database", "Delete entire database")
 
         assert sensitivity == "high"
 
@@ -372,9 +371,7 @@ class TestMCPAdapterCapabilities:
         """MCPAdapter should detect medium sensitivity keywords."""
         adapter = MCPAdapter()
 
-        sensitivity = adapter._detect_tool_sensitivity(
-            "write_file", "Write content to a file"
-        )
+        sensitivity = adapter._detect_tool_sensitivity("write_file", "Write content to a file")
 
         assert sensitivity == "medium"
 
@@ -383,9 +380,7 @@ class TestMCPAdapterCapabilities:
         """MCPAdapter should detect low sensitivity keywords."""
         adapter = MCPAdapter()
 
-        sensitivity = adapter._detect_tool_sensitivity(
-            "read_file", "Read a file from disk"
-        )
+        sensitivity = adapter._detect_tool_sensitivity("read_file", "Read a file from disk")
 
         assert sensitivity == "low"
 

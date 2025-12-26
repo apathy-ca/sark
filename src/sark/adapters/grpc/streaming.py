@@ -12,12 +12,12 @@ Engineer: ENGINEER-3
 """
 
 import asyncio
-from typing import Any, AsyncIterator, Dict, Iterable, List, Optional
+from collections.abc import AsyncIterator, Iterable
+from typing import Any
 
 import grpc
-import structlog
-from google.protobuf import json_format
 from grpc import aio
+import structlog
 
 logger = structlog.get_logger(__name__)
 
@@ -47,10 +47,10 @@ class GRPCStreamHandler:
         self,
         service_name: str,
         method_name: str,
-        request_data: Dict[str, Any],
-        timeout: Optional[float] = None,
-        metadata: Optional[Dict[str, str]] = None,
-    ) -> Dict[str, Any]:
+        request_data: dict[str, Any],
+        timeout: float | None = None,
+        metadata: dict[str, str] | None = None,
+    ) -> dict[str, Any]:
         """
         Invoke a unary RPC (single request, single response).
 
@@ -120,7 +120,7 @@ class GRPCStreamHandler:
 
             return response_data
 
-        except asyncio.TimeoutError as e:
+        except TimeoutError as e:
             logger.error(
                 "unary_rpc_timeout",
                 service=service_name,
@@ -143,10 +143,10 @@ class GRPCStreamHandler:
         self,
         service_name: str,
         method_name: str,
-        request_data: Dict[str, Any],
-        timeout: Optional[float] = None,
-        metadata: Optional[Dict[str, str]] = None,
-    ) -> AsyncIterator[Dict[str, Any]]:
+        request_data: dict[str, Any],
+        timeout: float | None = None,
+        metadata: dict[str, str] | None = None,
+    ) -> AsyncIterator[dict[str, Any]]:
         """
         Invoke a server streaming RPC (single request, stream of responses).
 
@@ -230,10 +230,10 @@ class GRPCStreamHandler:
         self,
         service_name: str,
         method_name: str,
-        request_iterator: Iterable[Dict[str, Any]],
-        timeout: Optional[float] = None,
-        metadata: Optional[Dict[str, str]] = None,
-    ) -> Dict[str, Any]:
+        request_iterator: Iterable[dict[str, Any]],
+        timeout: float | None = None,
+        metadata: dict[str, str] | None = None,
+    ) -> dict[str, Any]:
         """
         Invoke a client streaming RPC (stream of requests, single response).
 
@@ -330,10 +330,10 @@ class GRPCStreamHandler:
         self,
         service_name: str,
         method_name: str,
-        request_iterator: Iterable[Dict[str, Any]],
-        timeout: Optional[float] = None,
-        metadata: Optional[Dict[str, str]] = None,
-    ) -> AsyncIterator[Dict[str, Any]]:
+        request_iterator: Iterable[dict[str, Any]],
+        timeout: float | None = None,
+        metadata: dict[str, str] | None = None,
+    ) -> AsyncIterator[dict[str, Any]]:
         """
         Invoke a bidirectional streaming RPC (stream of requests and responses).
 
@@ -432,9 +432,7 @@ class GRPCStreamHandler:
             )
             raise
 
-    def _build_metadata(
-        self, metadata: Optional[Dict[str, str]] = None
-    ) -> Optional[List[tuple]]:
+    def _build_metadata(self, metadata: dict[str, str] | None = None) -> list[tuple] | None:
         """
         Build gRPC metadata from dictionary.
 
@@ -471,9 +469,7 @@ class ProtobufMessageHandler:
         self._reflection_client = reflection_client
         logger.debug("protobuf_message_handler_initialized")
 
-    async def serialize_request(
-        self, message_type: str, data: Dict[str, Any]
-    ) -> bytes:
+    async def serialize_request(self, message_type: str, data: dict[str, Any]) -> bytes:
         """
         Serialize a request dictionary to protobuf bytes.
 
@@ -486,14 +482,10 @@ class ProtobufMessageHandler:
         """
         try:
             # Get message descriptor
-            descriptor = await self._reflection_client.get_message_descriptor(
-                message_type
-            )
+            await self._reflection_client.get_message_descriptor(message_type)
 
             # Create message instance
-            message = self._reflection_client.create_request_message(
-                message_type, data
-            )
+            message = self._reflection_client.create_request_message(message_type, data)
 
             # Serialize to bytes
             return message.SerializeToString()
@@ -509,9 +501,7 @@ class ProtobufMessageHandler:
 
             return json.dumps(data).encode("utf-8")
 
-    def deserialize_response(
-        self, message_type: str, data: bytes
-    ) -> Dict[str, Any]:
+    def deserialize_response(self, message_type: str, data: bytes) -> dict[str, Any]:
         """
         Deserialize protobuf bytes to dictionary.
 

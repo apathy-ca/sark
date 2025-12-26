@@ -9,12 +9,11 @@ Deliverable: tests/performance/v2/test_adapter_performance.py
 """
 
 import asyncio
-import time
 import statistics
-from typing import List
+import time
+
 import pytest
 
-from sark.adapters.base import ProtocolAdapter
 from sark.models.base import InvocationRequest, InvocationResult
 
 
@@ -37,9 +36,7 @@ class TestAdapterOverhead:
         )
 
     @pytest.mark.asyncio
-    async def test_discovery_performance(
-        self, mock_adapter, performance_thresholds
-    ):
+    async def test_discovery_performance(self, mock_adapter, performance_thresholds):
         """Test resource discovery completes within acceptable time."""
         start = time.perf_counter()
         resources = await mock_adapter.discover_resources({"test": True})
@@ -67,9 +64,7 @@ class TestAdapterOverhead:
         )
 
     @pytest.mark.asyncio
-    async def test_validation_overhead(
-        self, mock_adapter, sample_invocation_request
-    ):
+    async def test_validation_overhead(self, mock_adapter, sample_invocation_request):
         """Test request validation has minimal overhead."""
         latencies = []
         iterations = 100
@@ -154,21 +149,21 @@ class TestAdapterThroughput:
                 "throughput": throughput,
                 "elapsed_sec": elapsed_sec,
                 "success_rate": sum(
-                    1 for r in invocation_results
-                    if isinstance(r, InvocationResult) and r.success
-                ) / len(invocation_results),
+                    1 for r in invocation_results if isinstance(r, InvocationResult) and r.success
+                )
+                / len(invocation_results),
             }
 
         # Verify throughput improves with concurrency (up to a point)
-        assert results[10]["throughput"] > results[1]["throughput"], (
-            "Throughput should improve with concurrency"
-        )
+        assert (
+            results[10]["throughput"] > results[1]["throughput"]
+        ), "Throughput should improve with concurrency"
 
         # All concurrency levels should maintain high success rate
         for concurrency, metrics in results.items():
-            assert metrics["success_rate"] > 0.95, (
-                f"Success rate at concurrency {concurrency} is {metrics['success_rate']:.2%}"
-            )
+            assert (
+                metrics["success_rate"] > 0.95
+            ), f"Success rate at concurrency {concurrency} is {metrics['success_rate']:.2%}"
 
 
 class TestLatencyDistribution:
@@ -201,24 +196,22 @@ class TestLatencyDistribution:
         print(f"  P99: {p99:.2f}ms")
         print(f"  Avg: {avg:.2f}ms ± {stddev:.2f}ms")
 
-        assert p95 < performance_thresholds["p95_latency_ms"], (
-            f"P95 latency {p95:.2f}ms exceeds threshold {performance_thresholds['p95_latency_ms']}ms"
-        )
-        assert p99 < performance_thresholds["p99_latency_ms"], (
-            f"P99 latency {p99:.2f}ms exceeds threshold {performance_thresholds['p99_latency_ms']}ms"
-        )
+        assert (
+            p95 < performance_thresholds["p95_latency_ms"]
+        ), f"P95 latency {p95:.2f}ms exceeds threshold {performance_thresholds['p95_latency_ms']}ms"
+        assert (
+            p99 < performance_thresholds["p99_latency_ms"]
+        ), f"P99 latency {p99:.2f}ms exceeds threshold {performance_thresholds['p99_latency_ms']}ms"
 
     @pytest.mark.asyncio
-    async def test_latency_consistency(
-        self, mock_adapter, sample_invocation_request
-    ):
+    async def test_latency_consistency(self, mock_adapter, sample_invocation_request):
         """Test latency is consistent (low variance)."""
         latencies = []
         iterations = 100
 
         for _ in range(iterations):
             start = time.perf_counter()
-            result = await mock_adapter.invoke(sample_invocation_request)
+            await mock_adapter.invoke(sample_invocation_request)
             elapsed_ms = (time.perf_counter() - start) * 1000
             latencies.append(elapsed_ms)
 
@@ -227,18 +220,16 @@ class TestLatencyDistribution:
         coefficient_of_variation = stddev / avg
 
         # Coefficient of variation should be low (<0.5 means consistent)
-        assert coefficient_of_variation < 0.5, (
-            f"Latency variance too high (CV={coefficient_of_variation:.2f})"
-        )
+        assert (
+            coefficient_of_variation < 0.5
+        ), f"Latency variance too high (CV={coefficient_of_variation:.2f})"
 
 
 class TestBatchOperations:
     """Test batch operation performance if adapter supports it."""
 
     @pytest.mark.asyncio
-    async def test_batch_vs_sequential(
-        self, mock_adapter, load_test_requests
-    ):
+    async def test_batch_vs_sequential(self, mock_adapter, load_test_requests):
         """Compare batch operation performance vs sequential."""
         test_requests = load_test_requests[:20]
 
@@ -270,16 +261,14 @@ class TestStreamingPerformance:
     """Test streaming operation performance if adapter supports it."""
 
     @pytest.mark.asyncio
-    async def test_streaming_overhead(
-        self, mock_adapter, sample_invocation_request
-    ):
+    async def test_streaming_overhead(self, mock_adapter, sample_invocation_request):
         """Test streaming has acceptable overhead vs regular invocation."""
         if not mock_adapter.supports_streaming():
             pytest.skip(f"{mock_adapter.protocol_name} adapter doesn't support streaming")
 
         # Test regular invocation
         start = time.perf_counter()
-        regular_result = await mock_adapter.invoke(sample_invocation_request)
+        await mock_adapter.invoke(sample_invocation_request)
         regular_time = (time.perf_counter() - start) * 1000
 
         # Test streaming invocation
@@ -291,9 +280,7 @@ class TestStreamingPerformance:
 
         # Streaming overhead should be reasonable (<50% more than regular)
         overhead_ratio = streaming_time / regular_time
-        assert overhead_ratio < 1.5, (
-            f"Streaming overhead {overhead_ratio:.2f}x too high"
-        )
+        assert overhead_ratio < 1.5, f"Streaming overhead {overhead_ratio:.2f}x too high"
 
 
 @pytest.mark.benchmark
@@ -301,9 +288,7 @@ class TestAdapterBenchmarks:
     """Comprehensive benchmarks for performance baselines."""
 
     @pytest.mark.asyncio
-    async def test_benchmark_full_cycle(
-        self, mock_adapter, benchmark_config, performance_metrics
-    ):
+    async def test_benchmark_full_cycle(self, mock_adapter, benchmark_config, performance_metrics):
         """Benchmark full discovery -> invoke -> health check cycle."""
         metrics = {}
 
@@ -315,7 +300,7 @@ class TestAdapterBenchmarks:
         discovery_times = []
         for _ in range(50):
             start = time.perf_counter()
-            resources = await mock_adapter.discover_resources({"test": True})
+            await mock_adapter.discover_resources({"test": True})
             elapsed_ms = (time.perf_counter() - start) * 1000
             discovery_times.append(elapsed_ms)
 
@@ -325,7 +310,6 @@ class TestAdapterBenchmarks:
         }
 
         # Benchmark invocations
-        from sark.models.base import InvocationRequest
 
         request = InvocationRequest(
             capability_id="test",
@@ -337,7 +321,7 @@ class TestAdapterBenchmarks:
         invocation_times = []
         for _ in range(benchmark_config["benchmark_iterations"]):
             start = time.perf_counter()
-            result = await mock_adapter.invoke(request)
+            await mock_adapter.invoke(request)
             elapsed_ms = (time.perf_counter() - start) * 1000
             invocation_times.append(elapsed_ms)
 

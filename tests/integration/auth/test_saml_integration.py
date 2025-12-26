@@ -138,7 +138,9 @@ class TestSAMLIntegrationEdgeCases:
     """SAML edge case integration tests."""
 
     @pytest.mark.asyncio
-    async def test_validate_token_delegates_to_authenticate(self, saml_provider, sample_saml_response):
+    async def test_validate_token_delegates_to_authenticate(
+        self, saml_provider, sample_saml_response
+    ):
         """Test that validate_token properly delegates to authenticate."""
         result = await saml_provider.validate_token(sample_saml_response)
 

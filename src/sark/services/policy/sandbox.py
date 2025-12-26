@@ -5,11 +5,12 @@ Provides resource limits and security constraints for policy plugin execution.
 """
 
 import asyncio
-import resource
-import signal
-import sys
+from collections.abc import Callable
 from contextlib import contextmanager
-from typing import Any, Callable, Optional
+import resource
+import sys
+from typing import Any
+
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -42,7 +43,7 @@ class ResourceLimits:
 class SandboxViolation(Exception):
     """Raised when a plugin violates sandbox constraints."""
 
-    def __init__(self, message: str, violation_type: str = None, **kwargs):
+    def __init__(self, message: str, violation_type: str | None = None, **kwargs):
         super().__init__(message)
         self.violation_type = violation_type
         self.metadata = kwargs
@@ -55,7 +56,7 @@ class PolicyPluginSandbox:
     Provides memory limits, CPU time limits, and controlled execution environment.
     """
 
-    def __init__(self, limits: Optional[ResourceLimits] = None):
+    def __init__(self, limits: ResourceLimits | None = None):
         """
         Initialize sandbox.
 
@@ -96,7 +97,7 @@ class PolicyPluginSandbox:
                 old_cpu_limit = resource.getrlimit(resource.RLIMIT_CPU)
                 resource.setrlimit(
                     resource.RLIMIT_CPU,
-                    (self.limits.max_cpu_time_seconds, self.limits.max_cpu_time_seconds)
+                    (self.limits.max_cpu_time_seconds, self.limits.max_cpu_time_seconds),
                 )
             except (ValueError, OSError) as e:
                 logger.warning("failed_to_set_cpu_limit", error=str(e))
@@ -106,7 +107,7 @@ class PolicyPluginSandbox:
                 old_nofile_limit = resource.getrlimit(resource.RLIMIT_NOFILE)
                 resource.setrlimit(
                     resource.RLIMIT_NOFILE,
-                    (self.limits.max_file_descriptors, self.limits.max_file_descriptors)
+                    (self.limits.max_file_descriptors, self.limits.max_file_descriptors),
                 )
             except (ValueError, OSError) as e:
                 logger.warning("failed_to_set_nofile_limit", error=str(e))
@@ -125,12 +126,7 @@ class PolicyPluginSandbox:
             except (ValueError, OSError) as e:
                 logger.warning("failed_to_restore_limits", error=str(e))
 
-    async def execute(
-        self,
-        func: Callable,
-        *args,
-        **kwargs
-    ) -> Any:
+    async def execute(self, func: Callable, *args, **kwargs) -> Any:
         """
         Execute a function within the sandbox.
 
@@ -153,38 +149,27 @@ class PolicyPluginSandbox:
         try:
             # Execute with timeout
             result = await asyncio.wait_for(
-                func(*args, **kwargs),
-                timeout=self.limits.max_execution_time_seconds
+                func(*args, **kwargs), timeout=self.limits.max_execution_time_seconds
             )
             return result
 
-        except asyncio.TimeoutError:
-            logger.error(
-                "plugin_execution_timeout",
-                timeout=self.limits.max_execution_time_seconds
-            )
+        except TimeoutError:
+            logger.error("plugin_execution_timeout", timeout=self.limits.max_execution_time_seconds)
             raise SandboxViolation(
                 f"Execution exceeded {self.limits.max_execution_time_seconds}s time limit",
-                violation_type="timeout"
+                violation_type="timeout",
             )
 
         except MemoryError:
-            logger.error(
-                "plugin_memory_limit_exceeded",
-                limit_mb=self.limits.max_memory_mb
-            )
+            logger.error("plugin_memory_limit_exceeded", limit_mb=self.limits.max_memory_mb)
             raise SandboxViolation(
-                f"Memory limit of {self.limits.max_memory_mb}MB exceeded",
-                violation_type="memory"
+                f"Memory limit of {self.limits.max_memory_mb}MB exceeded", violation_type="memory"
             )
 
         except OSError as e:
             if "resource" in str(e).lower():
                 logger.error("plugin_resource_limit_exceeded", error=str(e))
-                raise SandboxViolation(
-                    f"Resource limit exceeded: {str(e)}",
-                    violation_type="resource"
-                )
+                raise SandboxViolation(f"Resource limit exceeded: {e!s}", violation_type="resource")
             raise
 
 
@@ -234,7 +219,7 @@ class RestrictedImportContext:
         "builtins",
     }
 
-    def __init__(self, allowed_modules: Optional[set] = None):
+    def __init__(self, allowed_modules: set | None = None):
         """
         Initialize import restrictions.
 
@@ -271,11 +256,7 @@ class RestrictedImportContext:
                 return self._original_import(name, *args, **kwargs)
 
         # Default: deny
-        logger.warning(
-            "plugin_import_denied",
-            module=name,
-            reason="not in allowed list"
-        )
+        logger.warning("plugin_import_denied", module=name, reason="not in allowed list")
         raise ImportError(
             f"Import of module '{name}' is not allowed in policy plugins. "
             f"Contact administrator to whitelist if needed."
@@ -284,6 +265,7 @@ class RestrictedImportContext:
     def __enter__(self):
         """Enable import restrictions."""
         import builtins
+
         self._original_import = builtins.__import__
         builtins.__import__ = self._restricted_import
         return self
@@ -291,11 +273,12 @@ class RestrictedImportContext:
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Disable import restrictions."""
         import builtins
+
         if self._original_import:
             builtins.__import__ = self._original_import
 
 
-def validate_plugin_code(code: str) -> tuple[bool, Optional[str]]:
+def validate_plugin_code(code: str) -> tuple[bool, str | None]:
     """
     Statically validate plugin code for dangerous patterns.
 
@@ -329,9 +312,9 @@ def validate_plugin_code(code: str) -> tuple[bool, Optional[str]]:
 
 
 __all__ = [
-    "ResourceLimits",
     "PolicyPluginSandbox",
-    "SandboxViolation",
+    "ResourceLimits",
     "RestrictedImportContext",
+    "SandboxViolation",
     "validate_plugin_code",
 ]

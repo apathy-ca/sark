@@ -1,10 +1,11 @@
 """Unit tests for Gateway audit service."""
 
-import pytest
-import uuid
 from datetime import datetime
-from unittest.mock import AsyncMock, MagicMock, patch
 import time
+from unittest.mock import AsyncMock, patch
+import uuid
+
+import pytest
 
 from sark.models.gateway import GatewayAuditEvent
 from sark.services.audit.gateway_audit import log_gateway_event
@@ -23,7 +24,7 @@ def sample_gateway_event():
         reason="User has required permissions",
         timestamp=int(time.time()),
         gateway_request_id="req_abc123",
-        metadata={"database": "production", "query_type": "SELECT"}
+        metadata={"database": "production", "query_type": "SELECT"},
     )
 
 
@@ -40,7 +41,7 @@ def sample_a2a_event():
         reason="Agent has execute capability",
         timestamp=int(time.time()),
         gateway_request_id="req_a2a_xyz789",
-        metadata={"capability": "execute", "target_agent": "agent_service_002"}
+        metadata={"capability": "execute", "target_agent": "agent_service_002"},
     )
 
 
@@ -52,7 +53,7 @@ async def test_log_gateway_event_success(sample_gateway_event):
     mock_session.execute = AsyncMock()
     mock_session.commit = AsyncMock()
 
-    with patch('sark.services.audit.gateway_audit.get_db_session') as mock_get_session:
+    with patch("sark.services.audit.gateway_audit.get_db_session") as mock_get_session:
         mock_get_session.return_value.__aenter__.return_value = mock_session
 
         # Execute
@@ -79,7 +80,7 @@ async def test_log_gateway_event_deny_decision(sample_gateway_event):
     mock_session.execute = AsyncMock()
     mock_session.commit = AsyncMock()
 
-    with patch('sark.services.audit.gateway_audit.get_db_session') as mock_get_session:
+    with patch("sark.services.audit.gateway_audit.get_db_session") as mock_get_session:
         mock_get_session.return_value.__aenter__.return_value = mock_session
 
         audit_id = await log_gateway_event(sample_gateway_event)
@@ -91,7 +92,7 @@ async def test_log_gateway_event_deny_decision(sample_gateway_event):
         call_args = mock_session.execute.call_args
         assert call_args is not None
         params = call_args[0][1] if len(call_args[0]) > 1 else call_args[1]
-        assert params['decision'] == 'deny'
+        assert params["decision"] == "deny"
 
 
 @pytest.mark.asyncio
@@ -101,7 +102,7 @@ async def test_log_a2a_event(sample_a2a_event):
     mock_session.execute = AsyncMock()
     mock_session.commit = AsyncMock()
 
-    with patch('sark.services.audit.gateway_audit.get_db_session') as mock_get_session:
+    with patch("sark.services.audit.gateway_audit.get_db_session") as mock_get_session:
         mock_get_session.return_value.__aenter__.return_value = mock_session
 
         audit_id = await log_gateway_event(sample_a2a_event)
@@ -112,8 +113,8 @@ async def test_log_a2a_event(sample_a2a_event):
         # Verify agent_id was used instead of user_id
         call_args = mock_session.execute.call_args
         params = call_args[0][1] if len(call_args[0]) > 1 else call_args[1]
-        assert params['agent_id'] == 'agent_worker_001'
-        assert params['user_id'] is None
+        assert params["agent_id"] == "agent_worker_001"
+        assert params["user_id"] is None
 
 
 @pytest.mark.asyncio
@@ -122,14 +123,14 @@ async def test_log_gateway_event_with_metadata(sample_gateway_event):
     sample_gateway_event.metadata = {
         "ip_address": "192.168.1.100",
         "user_agent": "SARK-Client/1.0",
-        "request_duration_ms": 45
+        "request_duration_ms": 45,
     }
 
     mock_session = AsyncMock()
     mock_session.execute = AsyncMock()
     mock_session.commit = AsyncMock()
 
-    with patch('sark.services.audit.gateway_audit.get_db_session') as mock_get_session:
+    with patch("sark.services.audit.gateway_audit.get_db_session") as mock_get_session:
         mock_get_session.return_value.__aenter__.return_value = mock_session
 
         audit_id = await log_gateway_event(sample_gateway_event)
@@ -139,7 +140,7 @@ async def test_log_gateway_event_with_metadata(sample_gateway_event):
         # Verify metadata was included
         call_args = mock_session.execute.call_args
         params = call_args[0][1] if len(call_args[0]) > 1 else call_args[1]
-        assert params['metadata'] == sample_gateway_event.metadata
+        assert params["metadata"] == sample_gateway_event.metadata
 
 
 @pytest.mark.asyncio
@@ -148,7 +149,7 @@ async def test_log_gateway_event_database_error(sample_gateway_event):
     mock_session = AsyncMock()
     mock_session.execute.side_effect = Exception("Database connection failed")
 
-    with patch('sark.services.audit.gateway_audit.get_db_session') as mock_get_session:
+    with patch("sark.services.audit.gateway_audit.get_db_session") as mock_get_session:
         mock_get_session.return_value.__aenter__.return_value = mock_session
 
         # Should raise the exception
@@ -163,12 +164,14 @@ async def test_log_gateway_event_triggers_siem_forwarding(sample_gateway_event):
     mock_session.execute = AsyncMock()
     mock_session.commit = AsyncMock()
 
-    with patch('sark.services.audit.gateway_audit.get_db_session') as mock_get_session:
+    with patch("sark.services.audit.gateway_audit.get_db_session") as mock_get_session:
         mock_get_session.return_value.__aenter__.return_value = mock_session
 
-        with patch('sark.services.audit.gateway_audit.asyncio.create_task') as mock_create_task:
-            with patch('sark.services.siem.gateway_forwarder.forward_gateway_event') as mock_forward:
-                audit_id = await log_gateway_event(sample_gateway_event)
+        with patch("sark.services.audit.gateway_audit.asyncio.create_task") as mock_create_task:
+            with patch(
+                "sark.services.siem.gateway_forwarder.forward_gateway_event"
+            ) as mock_forward:
+                await log_gateway_event(sample_gateway_event)
 
                 # SIEM forwarding should be triggered asynchronously
                 assert mock_create_task.called or mock_forward.called
@@ -182,19 +185,19 @@ async def test_log_gateway_event_with_missing_optional_fields():
         user_id="user_456",
         agent_id=None,
         server_name=None,  # Optional
-        tool_name=None,    # Optional
+        tool_name=None,  # Optional
         decision="allow",
         reason="Discovery allowed for authenticated user",
         timestamp=int(time.time()),
         gateway_request_id="req_minimal_123",
-        metadata={}
+        metadata={},
     )
 
     mock_session = AsyncMock()
     mock_session.execute = AsyncMock()
     mock_session.commit = AsyncMock()
 
-    with patch('sark.services.audit.gateway_audit.get_db_session') as mock_get_session:
+    with patch("sark.services.audit.gateway_audit.get_db_session") as mock_get_session:
         mock_get_session.return_value.__aenter__.return_value = mock_session
 
         audit_id = await log_gateway_event(minimal_event)
@@ -205,8 +208,8 @@ async def test_log_gateway_event_with_missing_optional_fields():
         # Verify None values were handled
         call_args = mock_session.execute.call_args
         params = call_args[0][1] if len(call_args[0]) > 1 else call_args[1]
-        assert params['server_name'] is None
-        assert params['tool_name'] is None
+        assert params["server_name"] is None
+        assert params["tool_name"] is None
 
 
 @pytest.mark.asyncio
@@ -219,7 +222,7 @@ async def test_timestamp_conversion(sample_gateway_event):
     mock_session.execute = AsyncMock()
     mock_session.commit = AsyncMock()
 
-    with patch('sark.services.audit.gateway_audit.get_db_session') as mock_get_session:
+    with patch("sark.services.audit.gateway_audit.get_db_session") as mock_get_session:
         mock_get_session.return_value.__aenter__.return_value = mock_session
 
         await log_gateway_event(sample_gateway_event)
@@ -227,5 +230,5 @@ async def test_timestamp_conversion(sample_gateway_event):
         # Verify timestamp was converted
         call_args = mock_session.execute.call_args
         params = call_args[0][1] if len(call_args[0]) > 1 else call_args[1]
-        assert isinstance(params['timestamp'], datetime)
-        assert params['timestamp'] == datetime.fromtimestamp(unix_timestamp)
+        assert isinstance(params["timestamp"], datetime)
+        assert params["timestamp"] == datetime.fromtimestamp(unix_timestamp)

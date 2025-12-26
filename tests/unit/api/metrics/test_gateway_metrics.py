@@ -1,25 +1,22 @@
 """Unit tests for Gateway Prometheus metrics."""
 
-import pytest
-from unittest.mock import MagicMock, patch
-
 from sark.api.metrics.gateway_metrics import (
+    a2a_authorization_requests_total,
+    decrement_active_connections,
+    gateway_active_connections,
+    gateway_audit_events_total,
+    gateway_authorization_latency_seconds,
+    gateway_authorization_requests_total,
+    gateway_client_errors_total,
+    gateway_policy_cache_hits_total,
+    gateway_policy_cache_misses_total,
+    increment_active_connections,
+    record_a2a_authorization,
+    record_audit_event,
     record_authorization,
     record_cache_hit,
     record_cache_miss,
     record_client_error,
-    record_audit_event,
-    record_a2a_authorization,
-    increment_active_connections,
-    decrement_active_connections,
-    gateway_authorization_requests_total,
-    gateway_authorization_latency_seconds,
-    gateway_policy_cache_hits_total,
-    gateway_policy_cache_misses_total,
-    gateway_client_errors_total,
-    gateway_audit_events_total,
-    a2a_authorization_requests_total,
-    gateway_active_connections,
 )
 
 
@@ -30,24 +27,17 @@ class TestAuthorizationMetrics:
         """Test that record_authorization increments the counter."""
         # Get initial value
         initial_value = gateway_authorization_requests_total.labels(
-            decision="allow",
-            action="gateway:tool:invoke",
-            server="test-server"
+            decision="allow", action="gateway:tool:invoke", server="test-server"
         )._value.get()
 
         # Record authorization
         record_authorization(
-            decision="allow",
-            action="gateway:tool:invoke",
-            server="test-server",
-            latency=0.025
+            decision="allow", action="gateway:tool:invoke", server="test-server", latency=0.025
         )
 
         # Verify counter incremented
         new_value = gateway_authorization_requests_total.labels(
-            decision="allow",
-            action="gateway:tool:invoke",
-            server="test-server"
+            decision="allow", action="gateway:tool:invoke", server="test-server"
         )._value.get()
 
         assert new_value == initial_value + 1
@@ -56,10 +46,7 @@ class TestAuthorizationMetrics:
         """Test that authorization latency is recorded."""
         # Record with specific latency
         record_authorization(
-            decision="allow",
-            action="gateway:tool:invoke",
-            server="test-server",
-            latency=0.05
+            decision="allow", action="gateway:tool:invoke", server="test-server", latency=0.05
         )
 
         # Verify histogram was observed
@@ -71,31 +58,21 @@ class TestAuthorizationMetrics:
         """Test recording different authorization decisions."""
         # Record allow
         record_authorization(
-            decision="allow",
-            action="gateway:tool:invoke",
-            server="server1",
-            latency=0.01
+            decision="allow", action="gateway:tool:invoke", server="server1", latency=0.01
         )
 
         # Record deny
         record_authorization(
-            decision="deny",
-            action="gateway:tool:invoke",
-            server="server1",
-            latency=0.015
+            decision="deny", action="gateway:tool:invoke", server="server1", latency=0.015
         )
 
         # Both should be recorded separately
         allow_count = gateway_authorization_requests_total.labels(
-            decision="allow",
-            action="gateway:tool:invoke",
-            server="server1"
+            decision="allow", action="gateway:tool:invoke", server="server1"
         )._value.get()
 
         deny_count = gateway_authorization_requests_total.labels(
-            decision="deny",
-            action="gateway:tool:invoke",
-            server="server1"
+            decision="deny", action="gateway:tool:invoke", server="server1"
         )._value.get()
 
         assert allow_count >= 1
@@ -149,18 +126,13 @@ class TestErrorMetrics:
     def test_record_client_error(self):
         """Test client error recording."""
         initial_value = gateway_client_errors_total.labels(
-            operation="tool_invoke",
-            error_type="timeout"
+            operation="tool_invoke", error_type="timeout"
         )._value.get()
 
-        record_client_error(
-            operation="tool_invoke",
-            error_type="timeout"
-        )
+        record_client_error(operation="tool_invoke", error_type="timeout")
 
         new_value = gateway_client_errors_total.labels(
-            operation="tool_invoke",
-            error_type="timeout"
+            operation="tool_invoke", error_type="timeout"
         )._value.get()
 
         assert new_value == initial_value + 1
@@ -173,13 +145,11 @@ class TestErrorMetrics:
 
         # All should be recorded with different labels
         network_errors = gateway_client_errors_total.labels(
-            operation="discovery",
-            error_type="network"
+            operation="discovery", error_type="network"
         )._value.get()
 
         auth_errors = gateway_client_errors_total.labels(
-            operation="discovery",
-            error_type="auth"
+            operation="discovery", error_type="auth"
         )._value.get()
 
         assert network_errors >= 1
@@ -192,18 +162,13 @@ class TestAuditMetrics:
     def test_record_audit_event(self):
         """Test audit event recording."""
         initial_value = gateway_audit_events_total.labels(
-            event_type="tool_invoke",
-            decision="allow"
+            event_type="tool_invoke", decision="allow"
         )._value.get()
 
-        record_audit_event(
-            event_type="tool_invoke",
-            decision="allow"
-        )
+        record_audit_event(event_type="tool_invoke", decision="allow")
 
         new_value = gateway_audit_events_total.labels(
-            event_type="tool_invoke",
-            decision="allow"
+            event_type="tool_invoke", decision="allow"
         )._value.get()
 
         assert new_value == initial_value + 1
@@ -216,13 +181,11 @@ class TestAuditMetrics:
 
         # Verify all types are recorded
         invoke_events = gateway_audit_events_total.labels(
-            event_type="tool_invoke",
-            decision="allow"
+            event_type="tool_invoke", decision="allow"
         )._value.get()
 
         discovery_events = gateway_audit_events_total.labels(
-            event_type="discovery",
-            decision="allow"
+            event_type="discovery", decision="allow"
         )._value.get()
 
         assert invoke_events >= 1
@@ -235,50 +198,30 @@ class TestA2AMetrics:
     def test_record_a2a_authorization(self):
         """Test A2A authorization recording."""
         initial_value = a2a_authorization_requests_total.labels(
-            decision="allow",
-            source_type="service",
-            target_type="worker"
+            decision="allow", source_type="service", target_type="worker"
         )._value.get()
 
-        record_a2a_authorization(
-            decision="allow",
-            source_type="service",
-            target_type="worker"
-        )
+        record_a2a_authorization(decision="allow", source_type="service", target_type="worker")
 
         new_value = a2a_authorization_requests_total.labels(
-            decision="allow",
-            source_type="service",
-            target_type="worker"
+            decision="allow", source_type="service", target_type="worker"
         )._value.get()
 
         assert new_value == initial_value + 1
 
     def test_record_a2a_different_combinations(self):
         """Test recording different A2A combinations."""
-        record_a2a_authorization(
-            decision="allow",
-            source_type="service",
-            target_type="worker"
-        )
+        record_a2a_authorization(decision="allow", source_type="service", target_type="worker")
 
-        record_a2a_authorization(
-            decision="deny",
-            source_type="worker",
-            target_type="service"
-        )
+        record_a2a_authorization(decision="deny", source_type="worker", target_type="service")
 
         # Both should be recorded separately
         allow_count = a2a_authorization_requests_total.labels(
-            decision="allow",
-            source_type="service",
-            target_type="worker"
+            decision="allow", source_type="service", target_type="worker"
         )._value.get()
 
         deny_count = a2a_authorization_requests_total.labels(
-            decision="deny",
-            source_type="worker",
-            target_type="service"
+            decision="deny", source_type="worker", target_type="service"
         )._value.get()
 
         assert allow_count >= 1
@@ -328,44 +271,32 @@ class TestMetricLabels:
         """Test authorization requests metric labels."""
         # This metric should have: decision, action, server
         metric = gateway_authorization_requests_total.labels(
-            decision="allow",
-            action="gateway:tool:invoke",
-            server="test"
+            decision="allow", action="gateway:tool:invoke", server="test"
         )
         assert metric is not None
 
     def test_authorization_latency_labels(self):
         """Test authorization latency metric labels."""
         # This metric should have: action
-        metric = gateway_authorization_latency_seconds.labels(
-            action="gateway:tool:invoke"
-        )
+        metric = gateway_authorization_latency_seconds.labels(action="gateway:tool:invoke")
         assert metric is not None
 
     def test_client_errors_labels(self):
         """Test client errors metric labels."""
         # This metric should have: operation, error_type
-        metric = gateway_client_errors_total.labels(
-            operation="invoke",
-            error_type="timeout"
-        )
+        metric = gateway_client_errors_total.labels(operation="invoke", error_type="timeout")
         assert metric is not None
 
     def test_audit_events_labels(self):
         """Test audit events metric labels."""
         # This metric should have: event_type, decision
-        metric = gateway_audit_events_total.labels(
-            event_type="tool_invoke",
-            decision="allow"
-        )
+        metric = gateway_audit_events_total.labels(event_type="tool_invoke", decision="allow")
         assert metric is not None
 
     def test_a2a_requests_labels(self):
         """Test A2A requests metric labels."""
         # This metric should have: decision, source_type, target_type
         metric = a2a_authorization_requests_total.labels(
-            decision="allow",
-            source_type="service",
-            target_type="worker"
+            decision="allow", source_type="service", target_type="worker"
         )
         assert metric is not None

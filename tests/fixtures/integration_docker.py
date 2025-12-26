@@ -1,12 +1,10 @@
 """Docker-based fixtures for integration testing infrastructure."""
 
-import asyncio
-import time
-from typing import AsyncGenerator, Generator
+from collections.abc import Generator
 
-import pytest
 import httpx
 import psycopg2
+import pytest
 import redis
 
 # Check if pytest-docker is available
@@ -33,6 +31,7 @@ def docker_cleanup():
 # PostgreSQL Fixtures
 # =============================================================================
 
+
 @pytest.fixture(scope="session")
 def postgres_service(docker_services: Services) -> Generator[dict, None, None]:
     """
@@ -46,8 +45,7 @@ def postgres_service(docker_services: Services) -> Generator[dict, None, None]:
         timeout=60.0,
         pause=0.5,
         check=lambda: is_postgres_responsive(
-            docker_services.docker_ip,
-            docker_services.port_for("postgres", 5432)
+            docker_services.docker_ip, docker_services.port_for("postgres", 5432)
         ),
     )
 
@@ -75,7 +73,7 @@ def is_postgres_responsive(host: str, port: int) -> bool:
             user="sark_test",
             password="sark_test",
             database="sark_test",
-            connect_timeout=2
+            connect_timeout=2,
         )
         conn.close()
         return True
@@ -115,6 +113,7 @@ async def postgres_connection(postgres_service):
 # TimescaleDB Fixtures
 # =============================================================================
 
+
 @pytest.fixture(scope="session")
 def timescaledb_service(docker_services: Services) -> Generator[dict, None, None]:
     """
@@ -127,8 +126,7 @@ def timescaledb_service(docker_services: Services) -> Generator[dict, None, None
         timeout=60.0,
         pause=0.5,
         check=lambda: is_postgres_responsive(
-            docker_services.docker_ip,
-            docker_services.port_for("timescaledb", 5432)
+            docker_services.docker_ip, docker_services.port_for("timescaledb", 5432)
         ),
     )
 
@@ -171,6 +169,7 @@ async def timescaledb_connection(timescaledb_service):
 # Redis Fixtures
 # =============================================================================
 
+
 @pytest.fixture(scope="session")
 def redis_service(docker_services: Services) -> Generator[dict, None, None]:
     """
@@ -183,8 +182,7 @@ def redis_service(docker_services: Services) -> Generator[dict, None, None]:
         timeout=60.0,
         pause=0.5,
         check=lambda: is_redis_responsive(
-            docker_services.docker_ip,
-            docker_services.port_for("redis", 6379)
+            docker_services.docker_ip, docker_services.port_for("redis", 6379)
         ),
     )
 
@@ -231,6 +229,7 @@ async def redis_connection(redis_service):
 # OPA Fixtures
 # =============================================================================
 
+
 @pytest.fixture(scope="session")
 def opa_service(docker_services: Services) -> Generator[dict, None, None]:
     """
@@ -243,8 +242,7 @@ def opa_service(docker_services: Services) -> Generator[dict, None, None]:
         timeout=60.0,
         pause=0.5,
         check=lambda: is_opa_responsive(
-            docker_services.docker_ip,
-            docker_services.port_for("opa", 8181)
+            docker_services.docker_ip, docker_services.port_for("opa", 8181)
         ),
     )
 
@@ -283,6 +281,7 @@ def opa_client(opa_service):
 # gRPC Mock Server Fixtures
 # =============================================================================
 
+
 @pytest.fixture(scope="session")
 def grpc_mock_service(docker_services: Services) -> Generator[dict, None, None]:
     """
@@ -295,8 +294,7 @@ def grpc_mock_service(docker_services: Services) -> Generator[dict, None, None]:
         timeout=60.0,
         pause=0.5,
         check=lambda: is_grpc_mock_responsive(
-            docker_services.docker_ip,
-            docker_services.port_for("grpc-mock", 4770)
+            docker_services.docker_ip, docker_services.port_for("grpc-mock", 4770)
         ),
     )
 
@@ -318,6 +316,7 @@ def grpc_mock_service(docker_services: Services) -> Generator[dict, None, None]:
 def is_grpc_mock_responsive(host: str, port: int) -> bool:
     """Check if gRPC mock server is responsive."""
     import socket
+
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(2)
@@ -331,6 +330,7 @@ def is_grpc_mock_responsive(host: str, port: int) -> bool:
 # =============================================================================
 # Combined Fixtures (All Services)
 # =============================================================================
+
 
 @pytest.fixture(scope="session")
 def all_services(
@@ -359,6 +359,7 @@ def all_services(
 # Database Initialization Fixtures
 # =============================================================================
 
+
 @pytest.fixture
 async def initialized_db(postgres_connection):
     """
@@ -368,7 +369,8 @@ async def initialized_db(postgres_connection):
     """
     async with postgres_connection.acquire() as conn:
         # Create tables (simplified - in real implementation use Alembic)
-        await conn.execute("""
+        await conn.execute(
+            """
             CREATE TABLE IF NOT EXISTS mcp_servers (
                 id UUID PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
@@ -380,9 +382,11 @@ async def initialized_db(postgres_connection):
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
                 updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
             );
-        """)
+        """
+        )
 
-        await conn.execute("""
+        await conn.execute(
+            """
             CREATE TABLE IF NOT EXISTS policies (
                 id UUID PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
@@ -392,9 +396,11 @@ async def initialized_db(postgres_connection):
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
                 updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
             );
-        """)
+        """
+        )
 
-        await conn.execute("""
+        await conn.execute(
+            """
             CREATE TABLE IF NOT EXISTS users (
                 id UUID PRIMARY KEY,
                 email VARCHAR(255) UNIQUE NOT NULL,
@@ -406,7 +412,8 @@ async def initialized_db(postgres_connection):
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
                 updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
             );
-        """)
+        """
+        )
 
     yield postgres_connection
 

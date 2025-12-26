@@ -15,31 +15,28 @@ Security is paramount for federation - all communications between nodes
 must use mTLS with proper certificate validation.
 """
 
-import asyncio
-import hashlib
-import secrets
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Set, Tuple
+import hashlib
 from pathlib import Path
+import secrets
 import ssl
-import structlog
 
 from cryptography import x509
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import rsa, padding
-from cryptography.x509.oid import ExtensionOID, NameOID
 from cryptography.exceptions import InvalidSignature
-
-from sqlalchemy.ext.asyncio import AsyncSession
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.x509.oid import ExtensionOID
 from sqlalchemy import select, update
+from sqlalchemy.ext.asyncio import AsyncSession
+import structlog
 
 from sark.models.base import FederationNode
 from sark.models.federation import (
-    TrustLevel,
     CertificateInfo,
     TrustEstablishmentRequest,
     TrustEstablishmentResponse,
+    TrustLevel,
     TrustVerificationRequest,
     TrustVerificationResponse,
 )
@@ -67,7 +64,7 @@ class CertificateValidator:
             ValueError: If certificate is invalid
         """
         try:
-            cert_bytes = cert_pem.encode('utf-8')
+            cert_bytes = cert_pem.encode("utf-8")
             cert = x509.load_pem_x509_certificate(cert_bytes, default_backend())
             return cert
         except Exception as e:
@@ -91,7 +88,7 @@ class CertificateValidator:
         issuer = cert.issuer.rfc4514_string()
 
         # Serial number
-        serial_number = format(cert.serial_number, 'x')
+        serial_number = format(cert.serial_number, "x")
 
         # Validity dates
         not_before = cert.not_valid_before_utc
@@ -133,14 +130,13 @@ class CertificateValidator:
             not_after=not_after,
             fingerprint_sha256=fingerprint,
             key_usage=key_usage,
-            extended_key_usage=extended_key_usage
+            extended_key_usage=extended_key_usage,
         )
 
     @staticmethod
     def validate_certificate(
-        cert: x509.Certificate,
-        trust_anchor: Optional[x509.Certificate] = None
-    ) -> Tuple[bool, Optional[str]]:
+        cert: x509.Certificate, trust_anchor: x509.Certificate | None = None
+    ) -> tuple[bool, str | None]:
         """
         Validate certificate.
 
@@ -180,12 +176,10 @@ class CertificateValidator:
 
             # Should have either client or server auth
             has_client_auth = any(
-                u.dotted_string == "1.3.6.1.5.5.7.3.2"  # id-kp-clientAuth
-                for u in eku
+                u.dotted_string == "1.3.6.1.5.5.7.3.2" for u in eku  # id-kp-clientAuth
             )
             has_server_auth = any(
-                u.dotted_string == "1.3.6.1.5.5.7.3.1"  # id-kp-serverAuth
-                for u in eku
+                u.dotted_string == "1.3.6.1.5.5.7.3.1" for u in eku  # id-kp-serverAuth
             )
 
             if not (has_client_auth or has_server_auth):
@@ -222,9 +216,9 @@ class TrustService:
 
     def __init__(
         self,
-        ca_cert_path: Optional[Path] = None,
-        cert_path: Optional[Path] = None,
-        key_path: Optional[Path] = None
+        ca_cert_path: Path | None = None,
+        cert_path: Path | None = None,
+        key_path: Path | None = None,
     ):
         """
         Initialize trust service.
@@ -241,35 +235,27 @@ class TrustService:
         self.key_path = key_path
 
         # Load CA certificate if provided
-        self.ca_cert: Optional[x509.Certificate] = None
+        self.ca_cert: x509.Certificate | None = None
         if ca_cert_path and ca_cert_path.exists():
-            with open(ca_cert_path, 'rb') as f:
-                self.ca_cert = x509.load_pem_x509_certificate(
-                    f.read(),
-                    default_backend()
-                )
+            with open(ca_cert_path, "rb") as f:
+                self.ca_cert = x509.load_pem_x509_certificate(f.read(), default_backend())
                 self.logger.info("ca_cert_loaded", path=str(ca_cert_path))
 
         # Load node certificate if provided
-        self.node_cert: Optional[x509.Certificate] = None
+        self.node_cert: x509.Certificate | None = None
         if cert_path and cert_path.exists():
-            with open(cert_path, 'rb') as f:
-                self.node_cert = x509.load_pem_x509_certificate(
-                    f.read(),
-                    default_backend()
-                )
+            with open(cert_path, "rb") as f:
+                self.node_cert = x509.load_pem_x509_certificate(f.read(), default_backend())
                 self.logger.info("node_cert_loaded", path=str(cert_path))
 
         # Active challenge tokens for trust establishment
-        self._active_challenges: Dict[str, Tuple[str, datetime]] = {}
+        self._active_challenges: dict[str, tuple[str, datetime]] = {}
 
         # Certificate validator
         self.validator = CertificateValidator()
 
     async def establish_trust(
-        self,
-        request: TrustEstablishmentRequest,
-        db: AsyncSession
+        self, request: TrustEstablishmentRequest, db: AsyncSession
     ) -> TrustEstablishmentResponse:
         """
         Establish trust with a federation node.
@@ -283,10 +269,7 @@ class TrustService:
         Returns:
             Trust establishment response
         """
-        self.logger.info(
-            "establishing_trust",
-            node_id=request.node_id
-        )
+        self.logger.info("establishing_trust", node_id=request.node_id)
 
         try:
             # Parse client certificate
@@ -296,16 +279,11 @@ class TrustService:
             cert_info = self.validator.extract_certificate_info(client_cert)
 
             # Validate certificate
-            is_valid, error = self.validator.validate_certificate(
-                client_cert,
-                self.ca_cert
-            )
+            is_valid, error = self.validator.validate_certificate(client_cert, self.ca_cert)
 
             if not is_valid:
                 self.logger.warning(
-                    "certificate_validation_failed",
-                    node_id=request.node_id,
-                    error=error
+                    "certificate_validation_failed", node_id=request.node_id, error=error
                 )
                 return TrustEstablishmentResponse(
                     success=False,
@@ -313,7 +291,7 @@ class TrustService:
                     trust_level=TrustLevel.UNTRUSTED,
                     certificate_info=cert_info,
                     expires_at=datetime.utcnow(),
-                    message=f"Certificate validation failed: {error}"
+                    message=f"Certificate validation failed: {error}",
                 )
 
             # Verify challenge if provided
@@ -325,23 +303,16 @@ class TrustService:
                         trust_level=TrustLevel.UNTRUSTED,
                         certificate_info=cert_info,
                         expires_at=datetime.utcnow(),
-                        message="Challenge verification failed"
+                        message="Challenge verification failed",
                     )
 
             # Update or create federation node
-            node = await self._get_or_create_node(
-                db,
-                request.node_id,
-                request.client_cert,
-                cert_info
-            )
+            await self._get_or_create_node(db, request.node_id, request.client_cert, cert_info)
 
             # Generate challenge response
             challenge_response = None
             if request.challenge:
-                challenge_response = self._generate_challenge_response(
-                    request.challenge
-                )
+                challenge_response = self._generate_challenge_response(request.challenge)
 
             # Calculate certificate expiry
             expires_at = client_cert.not_valid_after_utc
@@ -350,7 +321,7 @@ class TrustService:
                 "trust_established",
                 node_id=request.node_id,
                 trust_level=TrustLevel.TRUSTED,
-                expires_at=expires_at
+                expires_at=expires_at,
             )
 
             return TrustEstablishmentResponse(
@@ -360,15 +331,11 @@ class TrustService:
                 certificate_info=cert_info,
                 challenge_response=challenge_response,
                 expires_at=expires_at,
-                message="Trust established successfully"
+                message="Trust established successfully",
             )
 
         except Exception as e:
-            self.logger.error(
-                "trust_establishment_failed",
-                node_id=request.node_id,
-                error=str(e)
-            )
+            self.logger.error("trust_establishment_failed", node_id=request.node_id, error=str(e))
             return TrustEstablishmentResponse(
                 success=False,
                 node_id=request.node_id,
@@ -381,16 +348,14 @@ class TrustService:
                     not_after=datetime.utcnow(),
                     fingerprint_sha256="",
                     key_usage=[],
-                    extended_key_usage=[]
+                    extended_key_usage=[],
                 ),
                 expires_at=datetime.utcnow(),
-                message=f"Trust establishment error: {str(e)}"
+                message=f"Trust establishment error: {e!s}",
             )
 
     async def verify_trust(
-        self,
-        request: TrustVerificationRequest,
-        db: AsyncSession
+        self, request: TrustVerificationRequest, db: AsyncSession
     ) -> TrustVerificationResponse:
         """
         Verify trust with a federation node.
@@ -405,15 +370,13 @@ class TrustService:
         self.logger.info(
             "verifying_trust",
             node_id=request.node_id,
-            fingerprint=request.certificate_fingerprint[:16]
+            fingerprint=request.certificate_fingerprint[:16],
         )
 
         try:
             # Get federation node from database
             result = await db.execute(
-                select(FederationNode).where(
-                    FederationNode.node_id == request.node_id
-                )
+                select(FederationNode).where(FederationNode.node_id == request.node_id)
             )
             node = result.scalar_one_or_none()
 
@@ -422,7 +385,7 @@ class TrustService:
                     verified=False,
                     node_id=request.node_id,
                     trust_level=TrustLevel.UNTRUSTED,
-                    error="Node not found"
+                    error="Node not found",
                 )
 
             # Parse stored certificate
@@ -436,13 +399,13 @@ class TrustService:
                     "fingerprint_mismatch",
                     node_id=request.node_id,
                     expected=stored_fingerprint[:16],
-                    got=request.certificate_fingerprint[:16]
+                    got=request.certificate_fingerprint[:16],
                 )
                 return TrustVerificationResponse(
                     verified=False,
                     node_id=request.node_id,
                     trust_level=TrustLevel.UNTRUSTED,
-                    error="Certificate fingerprint mismatch"
+                    error="Certificate fingerprint mismatch",
                 )
 
             # Validate certificate is still valid
@@ -453,7 +416,7 @@ class TrustService:
                     node_id=request.node_id,
                     trust_level=TrustLevel.REVOKED,
                     certificate_info=cert_info,
-                    error=f"Certificate invalid: {error}"
+                    error=f"Certificate invalid: {error}",
                 )
 
             # Check if node is enabled
@@ -463,39 +426,28 @@ class TrustService:
                     node_id=request.node_id,
                     trust_level=TrustLevel.REVOKED,
                     certificate_info=cert_info,
-                    error="Node is disabled"
+                    error="Node is disabled",
                 )
 
-            self.logger.info(
-                "trust_verified",
-                node_id=request.node_id
-            )
+            self.logger.info("trust_verified", node_id=request.node_id)
 
             return TrustVerificationResponse(
                 verified=True,
                 node_id=request.node_id,
                 trust_level=TrustLevel.TRUSTED,
-                certificate_info=cert_info
+                certificate_info=cert_info,
             )
 
         except Exception as e:
-            self.logger.error(
-                "trust_verification_failed",
-                node_id=request.node_id,
-                error=str(e)
-            )
+            self.logger.error("trust_verification_failed", node_id=request.node_id, error=str(e))
             return TrustVerificationResponse(
                 verified=False,
                 node_id=request.node_id,
                 trust_level=TrustLevel.UNKNOWN,
-                error=f"Verification error: {str(e)}"
+                error=f"Verification error: {e!s}",
             )
 
-    async def revoke_trust(
-        self,
-        node_id: str,
-        db: AsyncSession
-    ) -> bool:
+    async def revoke_trust(self, node_id: str, db: AsyncSession) -> bool:
         """
         Revoke trust for a federation node.
 
@@ -524,11 +476,7 @@ class TrustService:
                 return False
 
         except Exception as e:
-            self.logger.error(
-                "trust_revocation_failed",
-                node_id=node_id,
-                error=str(e)
-            )
+            self.logger.error("trust_revocation_failed", node_id=node_id, error=str(e))
             await db.rollback()
             return False
 
@@ -547,11 +495,7 @@ class TrustService:
 
         self._active_challenges[node_id] = (challenge, expires)
 
-        self.logger.debug(
-            "challenge_generated",
-            node_id=node_id,
-            expires_at=expires
-        )
+        self.logger.debug("challenge_generated", node_id=node_id, expires_at=expires)
 
         return challenge
 
@@ -597,18 +541,12 @@ class TrustService:
         """
         # Simple HMAC-based response
         # In production, sign with private key
-        response = hashlib.sha256(
-            f"{challenge}:sark-federation".encode()
-        ).hexdigest()
+        response = hashlib.sha256(f"{challenge}:sark-federation".encode()).hexdigest()
 
         return response
 
     async def _get_or_create_node(
-        self,
-        db: AsyncSession,
-        node_id: str,
-        cert_pem: str,
-        cert_info: CertificateInfo
+        self, db: AsyncSession, node_id: str, cert_pem: str, cert_info: CertificateInfo
     ) -> FederationNode:
         """
         Get or create federation node in database.
@@ -623,9 +561,7 @@ class TrustService:
             FederationNode instance
         """
         # Try to get existing node
-        result = await db.execute(
-            select(FederationNode).where(FederationNode.node_id == node_id)
-        )
+        result = await db.execute(select(FederationNode).where(FederationNode.node_id == node_id))
         node = result.scalar_one_or_none()
 
         if node:
@@ -645,7 +581,7 @@ class TrustService:
                 endpoint=endpoint,
                 trust_anchor_cert=cert_pem,
                 enabled=True,
-                trusted_since=datetime.utcnow()
+                trusted_since=datetime.utcnow(),
             )
             db.add(node)
             self.logger.info("node_created", node_id=node_id)
@@ -653,10 +589,7 @@ class TrustService:
         await db.commit()
         return node
 
-    def create_ssl_context(
-        self,
-        purpose: ssl.Purpose = ssl.Purpose.CLIENT_AUTH
-    ) -> ssl.SSLContext:
+    def create_ssl_context(self, purpose: ssl.Purpose = ssl.Purpose.CLIENT_AUTH) -> ssl.SSLContext:
         """
         Create SSL context for mTLS connections.
 
@@ -679,13 +612,10 @@ class TrustService:
         # Load client/server certificate if available
         if self.cert_path and self.key_path:
             if self.cert_path.exists() and self.key_path.exists():
-                context.load_cert_chain(
-                    certfile=str(self.cert_path),
-                    keyfile=str(self.key_path)
-                )
+                context.load_cert_chain(certfile=str(self.cert_path), keyfile=str(self.key_path))
 
         # Strong cipher suites only
-        context.set_ciphers('ECDHE+AESGCM:ECDHE+CHACHA20:DHE+AESGCM:DHE+CHACHA20:!aNULL:!MD5:!DSS')
+        context.set_ciphers("ECDHE+AESGCM:ECDHE+CHACHA20:DHE+AESGCM:DHE+CHACHA20:!aNULL:!MD5:!DSS")
 
         # Minimum TLS 1.2
         context.minimum_version = ssl.TLSVersion.TLSv1_2
@@ -693,4 +623,4 @@ class TrustService:
         return context
 
 
-__all__ = ["TrustService", "CertificateValidator"]
+__all__ = ["CertificateValidator", "TrustService"]

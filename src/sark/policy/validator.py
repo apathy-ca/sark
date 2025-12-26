@@ -7,13 +7,13 @@ This module provides comprehensive validation for OPA Rego policies including:
 - Sample input testing
 """
 
+from dataclasses import dataclass, field
+from enum import Enum
 import json
+from pathlib import Path
 import re
 import subprocess
 import tempfile
-from dataclasses import dataclass, field
-from enum import Enum
-from pathlib import Path
 from typing import Any
 
 import structlog
@@ -108,7 +108,7 @@ FORBIDDEN_PATTERNS = [
         "suggestion": "Remove opa.runtime() calls",
     },
     {
-        "pattern": r'file\.(read|write|remove)',
+        "pattern": r"file\.(read|write|remove)",
         "code": "FORBIDDEN_FILE_ACCESS",
         "severity": Severity.CRITICAL,
         "message": "File system access detected - policies should not read/write files",
@@ -294,9 +294,7 @@ class PolicyValidator:
 
         try:
             # Write policy to temporary file
-            with tempfile.NamedTemporaryFile(
-                mode="w", suffix=".rego", delete=False
-            ) as tmp_file:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".rego", delete=False) as tmp_file:
                 tmp_file.write(policy_content)
                 tmp_file.flush()
                 tmp_path = Path(tmp_file.name)
@@ -349,7 +347,7 @@ class PolicyValidator:
                 ValidationIssue(
                     severity=Severity.CRITICAL,
                     code="VALIDATION_ERROR",
-                    message=f"Unexpected error during syntax validation: {str(e)}",
+                    message=f"Unexpected error during syntax validation: {e!s}",
                 )
             )
 
@@ -372,9 +370,7 @@ class PolicyValidator:
         issues = []
 
         # Check for allow rule
-        has_allow = bool(
-            re.search(r"^(default\s+)?allow\s*(:=|if)", policy_content, re.MULTILINE)
-        )
+        has_allow = bool(re.search(r"^(default\s+)?allow\s*(:=|if)", policy_content, re.MULTILINE))
 
         # Check for deny rule
         has_deny = bool(
@@ -459,13 +455,13 @@ class PolicyValidator:
 
             # Also search whole content for multi-line patterns (like empty braces)
             # Use a separate search for patterns that might span lines
-            if any(char in pattern for char in [r'\s*\{', r'\}']):
+            if any(char in pattern for char in [r"\s*\{", r"\}"]):
                 whole_matches = regex.finditer(policy_content)
                 for match in whole_matches:
                     # Calculate line number
-                    line_num = policy_content[:match.start()].count('\n') + 1
+                    line_num = policy_content[: match.start()].count("\n") + 1
                     # Get context (the matched text)
-                    context = match.group().replace('\n', ' ').strip()
+                    context = match.group().replace("\n", " ").strip()
 
                     # Skip if we already found this on a single line
                     if not any(
@@ -502,9 +498,7 @@ class PolicyValidator:
 
         try:
             # Write policy to temporary file
-            with tempfile.NamedTemporaryFile(
-                mode="w", suffix=".rego", delete=False
-            ) as policy_file:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".rego", delete=False) as policy_file:
                 policy_file.write(policy_content)
                 policy_file.flush()
                 policy_path = Path(policy_file.name)
@@ -569,7 +563,7 @@ class PolicyValidator:
                 ValidationIssue(
                     severity=Severity.MEDIUM,
                     code="SAMPLE_TEST_ERROR",
-                    message=f"Error testing sample inputs: {str(e)}",
+                    message=f"Error testing sample inputs: {e!s}",
                 )
             )
 
@@ -601,7 +595,7 @@ class PolicyValidator:
                 ValidationIssue(
                     severity=Severity.CRITICAL,
                     code="FILE_READ_ERROR",
-                    message=f"Failed to read policy file: {str(e)}",
+                    message=f"Failed to read policy file: {e!s}",
                 )
             )
             return result

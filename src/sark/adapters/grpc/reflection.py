@@ -9,16 +9,13 @@ Version: 2.0.0
 Engineer: ENGINEER-3
 """
 
-import asyncio
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-import grpc
 from google.protobuf import descriptor_pb2, descriptor_pool, symbol_database
-from google.protobuf.descriptor import MethodDescriptor, ServiceDescriptor
+import grpc
 from grpc import aio
 from grpc_reflection.v1alpha import reflection_pb2, reflection_pb2_grpc
-
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -42,7 +39,7 @@ class ServiceInfo:
 
     name: str
     full_name: str
-    methods: List[MethodInfo]
+    methods: list[MethodInfo]
     file_descriptor: Any = None
 
 
@@ -78,7 +75,7 @@ class GRPCReflectionClient:
 
         logger.debug("grpc_reflection_client_initialized")
 
-    async def list_services(self) -> List[str]:
+    async def list_services(self) -> list[str]:
         """
         List all services available on the server.
 
@@ -109,14 +106,10 @@ class GRPCReflectionClient:
 
             if response.HasField("error_response"):
                 error = response.error_response
-                raise grpc.RpcError(
-                    f"Reflection error: {error.error_code} - {error.error_message}"
-                )
+                raise grpc.RpcError(f"Reflection error: {error.error_code} - {error.error_message}")
 
             # Extract service names
-            services = [
-                service.name for service in response.list_services_response.service
-            ]
+            services = [service.name for service in response.list_services_response.service]
 
             logger.info("grpc_services_listed", count=len(services), services=services)
 
@@ -151,18 +144,14 @@ class GRPCReflectionClient:
 
         try:
             # Request file containing service
-            request = reflection_pb2.ServerReflectionRequest(
-                file_containing_symbol=service_name
-            )
+            request = reflection_pb2.ServerReflectionRequest(file_containing_symbol=service_name)
 
             response_stream = self._stub.ServerReflectionInfo(iter([request]))
             response = await response_stream.__anext__()
 
             if response.HasField("error_response"):
                 error = response.error_response
-                raise ValueError(
-                    f"Service {service_name} not found: {error.error_message}"
-                )
+                raise ValueError(f"Service {service_name} not found: {error.error_message}")
 
             # Parse file descriptor
             file_descriptor_protos = response.file_descriptor_response.file_descriptor_proto
@@ -238,9 +227,7 @@ class GRPCReflectionClient:
             return service_info
 
         except Exception as e:
-            logger.error(
-                "service_descriptor_failed", service=service_name, error=str(e)
-            )
+            logger.error("service_descriptor_failed", service=service_name, error=str(e))
             raise
 
     async def get_message_descriptor(self, message_type: str) -> Any:
@@ -260,18 +247,14 @@ class GRPCReflectionClient:
 
         try:
             # Request file containing symbol
-            request = reflection_pb2.ServerReflectionRequest(
-                file_containing_symbol=message_type
-            )
+            request = reflection_pb2.ServerReflectionRequest(file_containing_symbol=message_type)
 
             response_stream = self._stub.ServerReflectionInfo(iter([request]))
             response = await response_stream.__anext__()
 
             if response.HasField("error_response"):
                 error = response.error_response
-                raise ValueError(
-                    f"Message type {message_type} not found: {error.error_message}"
-                )
+                raise ValueError(f"Message type {message_type} not found: {error.error_message}")
 
             # Parse and add file descriptor
             file_descriptor_protos = response.file_descriptor_response.file_descriptor_proto
@@ -287,21 +270,17 @@ class GRPCReflectionClient:
                     pass  # Already added
 
             # Find message descriptor
-            message_descriptor = self._descriptor_pool.FindMessageTypeByName(
-                message_type
-            )
+            message_descriptor = self._descriptor_pool.FindMessageTypeByName(message_type)
 
             logger.debug("message_descriptor_retrieved", message_type=message_type)
 
             return message_descriptor
 
         except Exception as e:
-            logger.error(
-                "message_descriptor_failed", message_type=message_type, error=str(e)
-            )
+            logger.error("message_descriptor_failed", message_type=message_type, error=str(e))
             raise
 
-    async def get_all_service_info(self) -> Dict[str, ServiceInfo]:
+    async def get_all_service_info(self) -> dict[str, ServiceInfo]:
         """
         Get detailed information for all services.
 
@@ -327,14 +306,10 @@ class GRPCReflectionClient:
                 service_info = await self.get_service_descriptor(service_name)
                 result[service_name] = service_info
             except Exception as e:
-                logger.warning(
-                    "failed_to_get_service_info", service=service_name, error=str(e)
-                )
+                logger.warning("failed_to_get_service_info", service=service_name, error=str(e))
                 continue
 
-        logger.info(
-            "all_service_info_retrieved", total_services=len(result)
-        )
+        logger.info("all_service_info_retrieved", total_services=len(result))
 
         return result
 
@@ -350,9 +325,7 @@ class GRPCReflectionClient:
         """
         logger.debug("loading_file_descriptor", file=file_name)
 
-        request = reflection_pb2.ServerReflectionRequest(
-            file_by_filename=file_name
-        )
+        request = reflection_pb2.ServerReflectionRequest(file_by_filename=file_name)
 
         response_stream = self._stub.ServerReflectionInfo(iter([request]))
         response = await response_stream.__anext__()
@@ -382,9 +355,7 @@ class GRPCReflectionClient:
 
         logger.debug("file_descriptor_loaded", file=file_name)
 
-    def create_request_message(
-        self, message_type: str, data: Dict[str, Any]
-    ) -> Any:
+    def create_request_message(self, message_type: str, data: dict[str, Any]) -> Any:
         """
         Create a protobuf message from a dictionary.
 
@@ -417,7 +388,7 @@ class GRPCReflectionClient:
             )
             raise
 
-    def message_to_dict(self, message: Any) -> Dict[str, Any]:
+    def message_to_dict(self, message: Any) -> dict[str, Any]:
         """
         Convert a protobuf message to a dictionary.
 
@@ -442,6 +413,6 @@ class GRPCReflectionClient:
 
 __all__ = [
     "GRPCReflectionClient",
-    "ServiceInfo",
     "MethodInfo",
+    "ServiceInfo",
 ]

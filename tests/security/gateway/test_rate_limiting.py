@@ -1,7 +1,8 @@
 """Rate Limiting Security Tests."""
 
-import pytest
 import asyncio
+
+import pytest
 
 pytestmark = pytest.mark.security
 

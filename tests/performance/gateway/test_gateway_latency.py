@@ -1,8 +1,8 @@
 """Gateway Latency Testing - Detailed P50/P95/P99 Analysis."""
 
-import pytest
 import time
-import statistics
+
+import pytest
 
 pytestmark = pytest.mark.performance
 
@@ -31,7 +31,7 @@ async def test_tool_invocation_latency_distribution(app_client, mock_user_token)
     p95 = latencies[int(len(latencies) * 0.95)]
     p99 = latencies[int(len(latencies) * 0.99)]
 
-    print(f"\nTool Invocation Latency:")
+    print("\nTool Invocation Latency:")
     print(f"  P50: {p50:.2f}ms")
     print(f"  P95: {p95:.2f}ms")
     print(f"  P99: {p99:.2f}ms")

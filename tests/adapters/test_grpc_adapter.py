@@ -13,16 +13,13 @@ Version: 2.0.0
 Engineer: ENGINEER-3
 """
 
-import asyncio
 from datetime import datetime
-from typing import AsyncIterator, Dict, List
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import grpc
-import pytest
 from grpc import aio
+import pytest
 
-from sark.adapters.grpc_adapter import GRPCAdapter
 from sark.adapters.grpc.auth import (
     AuthenticationHelper,
     MetadataInjectorInterceptor,
@@ -31,12 +28,10 @@ from sark.adapters.grpc.auth import (
 )
 from sark.adapters.grpc.reflection import (
     GRPCReflectionClient,
-    MethodInfo,
-    ServiceInfo,
 )
 from sark.adapters.grpc.streaming import GRPCStreamHandler
+from sark.adapters.grpc_adapter import GRPCAdapter
 from sark.models.base import (
-    CapabilitySchema,
     InvocationRequest,
     ResourceSchema,
 )
@@ -396,9 +391,7 @@ class TestGRPCAuth:
 
     def test_authentication_helper_bearer_token(self):
         """Test creating bearer token interceptor."""
-        interceptor = AuthenticationHelper.create_bearer_token_interceptor(
-            "test-bearer-token"
-        )
+        interceptor = AuthenticationHelper.create_bearer_token_interceptor("test-bearer-token")
 
         assert isinstance(interceptor, TokenAuthInterceptor)
         assert interceptor._scheme == "bearer"
