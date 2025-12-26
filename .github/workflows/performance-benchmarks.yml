@@ -159,6 +159,7 @@ jobs:
         continue-on-error: true
 
       - name: Compare results
+        continue-on-error: true  # May not have baseline on first run
         run: |
           python scripts/compare_performance.py ./baseline ./current > comparison.md
 
