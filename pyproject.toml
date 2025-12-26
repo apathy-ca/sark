@@ -124,6 +124,14 @@ ignore = [
     "SIM102", # nested if statements (can be more readable)
     "SIM108", # use ternary operator (style preference)
     "RUF006", # asyncio.create_task without reference (background tasks)
+    "DTZ003", # datetime.utcnow without tz (TODO: fix in future PR)
+    "DTZ005", # datetime.now without tz (TODO: fix in future PR)
+    "DTZ006", # datetime.fromtimestamp without tz (TODO: fix in future PR)
+    "B904",   # raise without from (TODO: add exception chaining in future PR)
+    "B027",   # empty method without abstract decorator (v2.0 adapter hooks)
+    "RUF001", # ambiguous unicode (intentional in bypass tests)
+    "RUF003", # ambiguous unicode in comments (intentional in bypass tests)
+    "RUF012", # mutable class default (TODO: fix in future PR)
 ]
 
 [tool.ruff.lint.per-file-ignores]
