@@ -292,13 +292,20 @@ class TestComprehensiveSecurityBenchmarks:
 
 
 @pytest.mark.performance
-def test_generate_full_report(tmp_path):
+def test_generate_full_report():
     """Generate complete benchmark report with all metrics"""
     print("\n" + "=" * 80)
     print("Running comprehensive security performance benchmarks...")
     print("=" * 80 + "\n")
 
-    reporter = BenchmarkReporter(output_dir=str(tmp_path / "performance"))
+    # Use reports/performance for CI compatibility
+    import os
+    from pathlib import Path
+
+    output_dir = Path("reports/performance")
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    reporter = BenchmarkReporter(output_dir=str(output_dir))
     results = []
 
     # Run all benchmarks and collect results
@@ -350,7 +357,7 @@ def test_generate_full_report(tmp_path):
     # Generate HTML
     html_path = reporter.generate_html_report(suite)
     print(f"\n📄 HTML report generated: {html_path}")
-    print(f"📄 JSON report: {tmp_path / 'performance' / 'latest_benchmark.json'}")
+    print(f"📄 JSON report: {output_dir / 'latest_benchmark.json'}")
 
     # Verify all passed
     failed = [r for r in results if not r.passed]
