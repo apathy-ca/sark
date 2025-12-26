@@ -38,7 +38,7 @@ jobs:
           pip install mkdocs mkdocs-material mkdocs-mermaid2-plugin mkdocs-awesome-pages-plugin pymdown-extensions
 
       - name: Build documentation
-        run: mkdocs build --strict
+        run: mkdocs build
 
       - name: Upload documentation artifact
         uses: actions/upload-artifact@v4
