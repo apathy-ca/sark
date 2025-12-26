@@ -60,11 +60,16 @@ docker compose --profile full up -d
 - **gRPC** - Reflection-based, mTLS support
 - **Custom** - Plugin system for any protocol
 
-### Enterprise Security
+### Enterprise Security (v1.3.0 Enhanced)
 - **Authentication** - OIDC, LDAP, SAML, API Keys
 - **Authorization** - OPA policy engine, ReBAC+ABAC
 - **Audit** - Immutable logs, SIEM integration (Splunk, Datadog)
 - **Federation** - Cross-organization governance with mTLS
+- **🆕 Prompt Injection Detection** - 20+ patterns, entropy analysis, 30x faster
+- **🆕 Anomaly Detection** - Behavioral baselines, real-time alerts
+- **🆕 Secret Scanning** - 25+ patterns, automatic redaction, 50x faster
+- **🆕 MFA** - TOTP/SMS/Push/Email for critical actions
+- **🆕 Network Controls** - Kubernetes policies, egress filtering
 
 ### Production Ready
 - ✅ 64% test coverage (improving to 85%), 0 known P0/P1 vulnerabilities
@@ -148,24 +153,25 @@ kubectl apply -f k8s/
 
 ## Project Status
 
-🚀 **v1.1.0 - Current Release** (Working toward v1.2.0)
+🚀 **v1.3.0 - Current Release** (Released Dec 26, 2025)
 
-**Completed (v1.1.0):**
+**Completed (v1.3.0):**
 - ✅ Enterprise authentication (OIDC, LDAP, SAML, API Keys)
 - ✅ Policy-based authorization (OPA)
 - ✅ MCP Gateway integration (opt-in)
 - ✅ SIEM integration (Splunk, Datadog)
-- ✅ Comprehensive documentation (100+ pages)
+- ✅ **Prompt injection detection** (20+ patterns, 30x faster than target)
+- ✅ **Behavioral anomaly detection** (30-day baseline, real-time alerts)
+- ✅ **Secret scanning & redaction** (25+ patterns, 50x faster than target)
+- ✅ **MFA for critical actions** (TOTP, SMS, Push, Email)
+- ✅ **Network security controls** (NetworkPolicies, egress filtering)
+- ✅ Comprehensive testing (350+ unit, 530+ integration, 2200+ performance)
+- ✅ Complete documentation (100+ pages)
 - ✅ Production deployment guides
 
-**In Progress (v1.2.0):**
-- ⏳ Gateway client (HTTP, SSE, stdio transports)
-- ⏳ Policy validation framework
-- ⏳ Test coverage improvements (targeting 85%+)
-
 **Future Roadmap:**
-- **v1.3.0** - Advanced security features
-- **v1.4.0** - Rust core optimization
+- **v1.4.0** - Rust core optimization (5-10x performance)
+- **v1.5.0** - Rust detection (10-100x performance)
 - **v2.0.0** - Production-ready after security audit
 
 📖 **[Roadmap](docs/ROADMAP.md)** | **[Changelog](CHANGELOG.md)**
@@ -213,7 +219,7 @@ We welcome contributions! See **[CONTRIBUTING.md](CONTRIBUTING.md)** for:
 
 MIT License - see **[LICENSE](LICENSE)** file for details.
 
-**Copyright** © 2024 James R. A. Henry. All rights reserved.
+**Copyright** © 2025 James Henry. All rights reserved.
 
 ---
 

@@ -276,7 +276,7 @@ GRID Protocol Specification v0.1 was reverse-engineered from the SARK (Secure Au
 - Secure (zero-trust, immutable audit)
 - Operational (SIEM integration, observability)
 
-Special thanks to James R. A. Henry for creating SARK and proving the viability of this governance model at enterprise scale.
+Special thanks to James Henry for creating SARK and proving the viability of this governance model at enterprise scale.
 
 ---
 
