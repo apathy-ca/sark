@@ -17,11 +17,11 @@ class TextNormalizer:
 
     # Zero-width characters that should be removed
     ZERO_WIDTH_CHARS = [
-        "\u200B",  # Zero-width space
-        "\u200C",  # Zero-width non-joiner
-        "\u200D",  # Zero-width joiner
+        "\u200b",  # Zero-width space
+        "\u200c",  # Zero-width non-joiner
+        "\u200d",  # Zero-width joiner
         "\u2060",  # Word joiner
-        "\uFEFF",  # Zero-width no-break space
+        "\ufeff",  # Zero-width no-break space
     ]
 
     # Homoglyph mapping (visually similar Unicode -> ASCII)
