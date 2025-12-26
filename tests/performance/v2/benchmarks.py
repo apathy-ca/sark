@@ -247,7 +247,7 @@ class BenchmarkRunner:
         self,
         adapter: ProtocolAdapter,
         request: InvocationRequest,
-        concurrency_levels: list[int] = [1, 10, 50, 100, 200],
+        concurrency_levels: list[int] | None = None,
         iterations_per_level: int = 100,
         benchmark_name: str = "scalability_test",
     ) -> list[BenchmarkResult]:
@@ -264,6 +264,8 @@ class BenchmarkRunner:
         Returns:
             List of benchmark results for each concurrency level
         """
+        if concurrency_levels is None:
+            concurrency_levels = [1, 10, 50, 100, 200]
         results = []
 
         for concurrency in concurrency_levels:

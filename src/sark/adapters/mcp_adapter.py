@@ -582,8 +582,7 @@ class MCPAdapter(ProtocolAdapter):
 
             # Get the resource (we'd need to fetch from DB in real implementation)
             # For now, we'll use cached capabilities to determine transport
-            transport = None
-            for cached_resource_id, capabilities in self._capability_cache.items():
+            for cached_resource_id, _capabilities in self._capability_cache.items():
                 if cached_resource_id == resource_id:
                     # We'd need resource metadata here
                     # For now, raise an error indicating we need the resource
@@ -683,7 +682,7 @@ class MCPAdapter(ProtocolAdapter):
         """
         # Extract resource info
         parts = request.capability_id.rsplit("-", 1)
-        resource_id = parts[0]
+        parts[0]
 
         # In real implementation, we'd look up the resource and check transport
         # For now, this is a stub

@@ -109,7 +109,7 @@ class TestAuthenticationBypass:
         """Test that requests without principal are rejected."""
         from sark.models.base import InvocationRequest
 
-        request = InvocationRequest(
+        InvocationRequest(
             capability_id="test.admin",
             principal_id=None,  # Missing principal
             arguments={},
@@ -124,10 +124,6 @@ class TestAuthenticationBypass:
     async def test_token_forgery(self):
         """Test resistance to forged authentication tokens."""
         # Attempt to create fake JWT tokens
-        fake_tokens = [
-            "eyJhbGciOiJub25lIn0.eyJzdWIiOiJhZG1pbiJ9.",  # "none" algorithm
-            "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiJ9.fake",  # Invalid signature
-        ]
 
         # Tokens should be validated and rejected
         # TODO: Implement when token validation is in place
@@ -259,7 +255,7 @@ class TestDenialOfService:
 
         # Should timeout or reject, not hang indefinitely
         try:
-            result = await asyncio.wait_for(mock_adapter.invoke(request), timeout=5.0)
+            await asyncio.wait_for(mock_adapter.invoke(request), timeout=5.0)
         except TimeoutError:
             pytest.fail("Service vulnerable to ReDoS attack")
 
@@ -422,12 +418,6 @@ class TestSecurityMisconfiguration:
     async def test_default_credentials(self):
         """Test that no default credentials are in use."""
         # Check for common default passwords
-        default_creds = [
-            ("admin", "admin"),
-            ("admin", "password"),
-            ("root", "root"),
-            ("sark", "sark"),
-        ]
 
         # Should all be rejected
         # TODO: Test against authentication system

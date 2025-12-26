@@ -206,7 +206,7 @@ class TestDiscoveryService:
 
         # Clear cache and call again
         discovery_service.clear_cache()
-        response3 = await discovery_service.discover(query)
+        await discovery_service.discover(query)
 
         assert response1.total_found == response2.total_found
 
@@ -228,7 +228,7 @@ class TestTrustService:
 
         response = await trust_service.establish_trust(request, db_session)
 
-        assert response.success == True
+        assert response.success
         assert response.node_id == "test-node-2"
         assert response.trust_level == TrustLevel.TRUSTED
         assert response.certificate_info is not None
@@ -247,7 +247,7 @@ class TestTrustService:
 
         response = await trust_service.establish_trust(request, db_session)
 
-        assert response.success == True
+        assert response.success
         assert response.challenge_response is not None
 
     @pytest.mark.asyncio
@@ -267,7 +267,7 @@ class TestTrustService:
 
         verify_resp = await trust_service.verify_trust(verify_req, db_session)
 
-        assert verify_resp.verified == True
+        assert verify_resp.verified
         assert verify_resp.trust_level == TrustLevel.TRUSTED
 
     @pytest.mark.asyncio
@@ -288,7 +288,7 @@ class TestTrustService:
 
         verify_resp = await trust_service.verify_trust(verify_req, db_session)
 
-        assert verify_resp.verified == False
+        assert not verify_resp.verified
         assert verify_resp.error is not None
 
     @pytest.mark.asyncio
@@ -302,7 +302,7 @@ class TestTrustService:
 
         # Revoke trust
         result = await trust_service.revoke_trust("test-node-5", db_session)
-        assert result == True
+        assert result
 
         # Verify trust is revoked
         verify_req = TrustVerificationRequest(
@@ -310,7 +310,7 @@ class TestTrustService:
         )
         verify_resp = await trust_service.verify_trust(verify_req, db_session)
 
-        assert verify_resp.verified == False
+        assert not verify_resp.verified
 
 
 # ============================================================================
@@ -355,7 +355,7 @@ class TestRoutingService:
 
         # Circuit should be open
         assert cb.get_state(node_id) == "open"
-        assert cb.is_available(node_id) == False
+        assert not cb.is_available(node_id)
 
     @pytest.mark.asyncio
     async def test_circuit_breaker_half_open(self, routing_service):
@@ -374,7 +374,7 @@ class TestRoutingService:
         await asyncio.sleep(0.1)
 
         # Should transition to half-open
-        assert cb.is_available(node_id) == True
+        assert cb.is_available(node_id)
         assert cb.get_state(node_id) == "half-open"
 
     @pytest.mark.asyncio
@@ -410,7 +410,7 @@ class TestRoutingService:
 
         response = await routing_service.invoke_federated(request, db_session)
 
-        assert response.success == False
+        assert not response.success
         assert "not found" in response.error.lower()
 
     @pytest.mark.asyncio
@@ -478,7 +478,7 @@ class TestFederationFlow:
             node_id="test-federated-node", client_cert=test_certificate["pem"]
         )
         trust_response = await trust_service.establish_trust(trust_request, db_session)
-        assert trust_response.success == True
+        assert trust_response.success
 
         # Step 3: Create a local resource
         resource = Resource(
@@ -532,8 +532,8 @@ class TestFederationFlow:
         assert routing_service.circuit_breaker.get_state("test-node-0") == "open"
 
         # But other nodes should be available
-        assert routing_service.circuit_breaker.is_available("test-node-1") == True
-        assert routing_service.circuit_breaker.is_available("test-node-2") == True
+        assert routing_service.circuit_breaker.is_available("test-node-1")
+        assert routing_service.circuit_breaker.is_available("test-node-2")
 
 
 if __name__ == "__main__":

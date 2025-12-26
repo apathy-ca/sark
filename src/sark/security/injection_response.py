@@ -8,12 +8,15 @@ Handles responses to detected prompt injection attempts:
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
 from src.sark.models.audit import AuditEventType, SeverityLevel
 from src.sark.security.injection_detector import InjectionDetectionResult
 import structlog
+
+if TYPE_CHECKING:
+    from src.sark.security.config import InjectionDetectionConfig
 
 logger = structlog.get_logger()
 

@@ -43,7 +43,7 @@ class ResourceLimits:
 class SandboxViolation(Exception):
     """Raised when a plugin violates sandbox constraints."""
 
-    def __init__(self, message: str, violation_type: str = None, **kwargs):
+    def __init__(self, message: str, violation_type: str | None = None, **kwargs):
         super().__init__(message)
         self.violation_type = violation_type
         self.metadata = kwargs

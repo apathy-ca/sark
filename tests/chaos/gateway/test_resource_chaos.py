@@ -68,7 +68,7 @@ async def test_thread_pool_saturation(app_client, mock_user_token):
         for _ in range(200)
     ]
 
-    start_times = [asyncio.get_event_loop().time() for _ in tasks]
+    [asyncio.get_event_loop().time() for _ in tasks]
     results = await asyncio.gather(*tasks, return_exceptions=True)
 
     # Should handle gracefully

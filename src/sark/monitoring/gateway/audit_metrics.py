@@ -119,7 +119,7 @@ class AuditMetricsCollector:
         destination: str,
         duration: float,
         success: bool = True,
-        error_type: Optional[str] = None,
+        error_type: str | None = None,
     ):
         """
         Record an audit event write.
@@ -266,7 +266,7 @@ def record_audit_write(
     destination: str,
     duration: float,
     success: bool = True,
-    error_type: Optional[str] = None,
+    error_type: str | None = None,
 ):
     """Record an audit write."""
     _collector.record_audit_write(event_type, destination, duration, success, error_type)

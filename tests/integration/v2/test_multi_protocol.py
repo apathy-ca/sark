@@ -484,9 +484,9 @@ class TestMultiProtocolPerformance:
         """Test concurrent requests across multiple protocols."""
         import asyncio
 
-        mcp_adapter = populated_registry.get("mcp")
-        http_adapter = populated_registry.get("http")
-        grpc_adapter = populated_registry.get("grpc")
+        populated_registry.get("mcp")
+        populated_registry.get("http")
+        populated_registry.get("grpc")
 
         principal_id = str(uuid4())
         num_requests = 10

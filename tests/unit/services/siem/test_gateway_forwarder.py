@@ -203,7 +203,7 @@ async def test_circuit_breaker_opens_after_failures(sample_event):
             mock_settings.splunk_hec_token = "test_token"
 
             # Trigger 5 failures (threshold)
-            for i in range(5):
+            for _i in range(5):
                 await _forward_to_splunk(events)
 
             # Circuit breaker should now be open

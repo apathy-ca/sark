@@ -639,7 +639,7 @@ class GRPCAdapter(ProtocolAdapter):
         """
         use_tls = config.get("use_tls", False)
         auth_config = config.get("auth", {})
-        max_connections = config.get("max_connections", 10)
+        config.get("max_connections", 10)
 
         # Channel options
         options = [

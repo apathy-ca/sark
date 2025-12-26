@@ -34,14 +34,14 @@ except ImportError:
     _grpc_available = False
 
 __all__ = [
-    # Core interface
-    "ProtocolAdapter",
     # Registry
     "AdapterRegistry",
-    "get_registry",
-    "reset_registry",
+    # Core interface
+    "ProtocolAdapter",
     # Exceptions module (import with: from sark.adapters.exceptions import ...)
     "exceptions",
+    "get_registry",
+    "reset_registry",
 ]
 
 # Conditionally export adapters

@@ -97,7 +97,7 @@ async def test_policy_cache_invalidation(app_client, admin_token):
         headers={"Authorization": f"Bearer {admin_token}"},
     )
 
-    initial_result = response1.json()["allow"]
+    response1.json()["allow"]
 
     # Invalidate cache
     cache_response = await app_client.post(

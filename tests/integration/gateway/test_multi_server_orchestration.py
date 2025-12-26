@@ -86,7 +86,7 @@ async def test_server_deregistration_during_active_operations(app_client, mock_u
     )
 
     # Gather all results
-    all_tasks = operation_tasks + [deregister_task]
+    all_tasks = [*operation_tasks, deregister_task]
     results = await asyncio.gather(*all_tasks, return_exceptions=True)
 
     # Deregistration should succeed

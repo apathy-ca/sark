@@ -11,9 +11,12 @@ from enum import Enum
 from functools import lru_cache
 import math
 import re
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import structlog
+
+if TYPE_CHECKING:
+    from sark.security.config import InjectionDetectionConfig
 
 logger = structlog.get_logger()
 

@@ -35,7 +35,7 @@ async def main():
 
     # Note: gRPC benchmarks require a test server
     # For now, we'll create a mock request structure
-    sample_request = InvocationRequest(
+    InvocationRequest(
         capability_id="grpc.test.TestService.UnaryCall",
         principal_id="benchmark-principal",
         arguments={"message": "benchmark"},

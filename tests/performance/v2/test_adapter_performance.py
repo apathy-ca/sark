@@ -211,7 +211,7 @@ class TestLatencyDistribution:
 
         for _ in range(iterations):
             start = time.perf_counter()
-            result = await mock_adapter.invoke(sample_invocation_request)
+            await mock_adapter.invoke(sample_invocation_request)
             elapsed_ms = (time.perf_counter() - start) * 1000
             latencies.append(elapsed_ms)
 
@@ -268,7 +268,7 @@ class TestStreamingPerformance:
 
         # Test regular invocation
         start = time.perf_counter()
-        regular_result = await mock_adapter.invoke(sample_invocation_request)
+        await mock_adapter.invoke(sample_invocation_request)
         regular_time = (time.perf_counter() - start) * 1000
 
         # Test streaming invocation
@@ -300,7 +300,7 @@ class TestAdapterBenchmarks:
         discovery_times = []
         for _ in range(50):
             start = time.perf_counter()
-            resources = await mock_adapter.discover_resources({"test": True})
+            await mock_adapter.discover_resources({"test": True})
             elapsed_ms = (time.perf_counter() - start) * 1000
             discovery_times.append(elapsed_ms)
 
@@ -321,7 +321,7 @@ class TestAdapterBenchmarks:
         invocation_times = []
         for _ in range(benchmark_config["benchmark_iterations"]):
             start = time.perf_counter()
-            result = await mock_adapter.invoke(request)
+            await mock_adapter.invoke(request)
             elapsed_ms = (time.perf_counter() - start) * 1000
             invocation_times.append(elapsed_ms)
 

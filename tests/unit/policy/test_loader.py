@@ -139,7 +139,7 @@ reason := "test" if { true }
             {"user": {"role": "user"}},
         ]
 
-        content, validation = loader.load_policy(policy_file, sample_inputs=sample_inputs)
+        _content, validation = loader.load_policy(policy_file, sample_inputs=sample_inputs)
 
         assert validation is not None
         assert validation.valid is True
@@ -176,7 +176,7 @@ reason := "test" if { true }
         assert "two.rego" in policies
 
         # Check each policy was loaded
-        for name, (content, validation) in policies.items():
+        for _name, (content, validation) in policies.items():
             assert isinstance(content, str)
             assert validation is not None
             assert validation.valid is True
@@ -367,7 +367,7 @@ reason := "test" if { true }
         policy_file.write_text(policy)
 
         # Should not raise in lenient mode
-        content, validation = lenient_loader.load_policy(policy_file)
+        _content, validation = lenient_loader.load_policy(policy_file)
 
         assert validation is not None
         assert validation.valid is True  # No CRITICAL/HIGH issues
@@ -434,7 +434,7 @@ reason := "test" if { true }
         """Test load_and_validate_policy with sample inputs."""
         sample_inputs = [{"valid": True}, {"valid": False}]
 
-        content, validation = load_and_validate_policy(
+        _content, validation = load_and_validate_policy(
             valid_policy, sample_inputs=sample_inputs, strict=True
         )
 

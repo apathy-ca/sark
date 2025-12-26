@@ -68,7 +68,7 @@ class TestAdapterRegistry:
         """Test getting registry information."""
         info = populated_registry.get_info()
 
-        assert info["initialized"] == False  # Not explicitly initialized
+        assert not info["initialized"]  # Not explicitly initialized
         assert info["adapter_count"] == 3
         assert len(info["protocols"]) == 3
 

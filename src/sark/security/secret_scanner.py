@@ -308,10 +308,7 @@ class SecretScanner:
 
     def _is_false_positive(self, value: str) -> bool:
         """Check if value matches false positive patterns"""
-        for pattern in self.compiled_fp_patterns:
-            if pattern.search(value):
-                return True
-        return False
+        return any(pattern.search(value) for pattern in self.compiled_fp_patterns)
 
     def _truncate_secret(self, secret: str, show_chars: int = 10) -> str:
         """Truncate secret for logging (show first N chars only)"""

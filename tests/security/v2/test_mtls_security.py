@@ -100,20 +100,8 @@ class TestMTLSConnectionSecurity:
         # Avoid weak ciphers like RC4, 3DES, MD5
 
         # Example secure ciphers
-        secure_ciphers = [
-            "ECDHE-RSA-AES256-GCM-SHA384",
-            "ECDHE-RSA-AES128-GCM-SHA256",
-            "ECDHE-ECDSA-AES256-GCM-SHA384",
-        ]
 
         # Weak ciphers that should NOT be used
-        weak_ciphers = [
-            "RC4",
-            "3DES",
-            "MD5",
-            "NULL",
-            "EXPORT",
-        ]
 
         # TODO: Integrate with actual TLS configuration
         pytest.skip("Pending TLS cipher suite configuration")
@@ -276,7 +264,6 @@ class TestMTLSPerformance:
         """Test that mTLS handshake completes within acceptable time."""
         # TLS handshake should complete in < 500ms
         # Subsequent connections can use session resumption for speed
-        max_handshake_ms = 500
 
         # TODO: Measure actual handshake time
         pytest.skip("Pending mTLS performance testing")

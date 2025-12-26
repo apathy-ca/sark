@@ -94,7 +94,7 @@ class TestPostgreSQLIntegration:
                     pass
 
             # Verify no data was committed
-            count = await conn.fetchval("SELECT COUNT(*) FROM test_rollback")
+            await conn.fetchval("SELECT COUNT(*) FROM test_rollback")
             # Due to exception, this should be 0
             # (Note: in real test, you'd use proper transaction context)
 

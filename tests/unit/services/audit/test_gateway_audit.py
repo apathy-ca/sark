@@ -171,7 +171,7 @@ async def test_log_gateway_event_triggers_siem_forwarding(sample_gateway_event):
             with patch(
                 "sark.services.siem.gateway_forwarder.forward_gateway_event"
             ) as mock_forward:
-                audit_id = await log_gateway_event(sample_gateway_event)
+                await log_gateway_event(sample_gateway_event)
 
                 # SIEM forwarding should be triggered asynchronously
                 assert mock_create_task.called or mock_forward.called

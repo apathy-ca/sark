@@ -11,6 +11,7 @@ Provides subprocess-based MCP communication via stdin/stdout with:
 
 import asyncio
 from asyncio import StreamReader, StreamWriter
+import contextlib
 from dataclasses import dataclass
 from datetime import UTC, datetime
 import json
@@ -527,18 +528,14 @@ class StdioTransport:
         # Cancel health check task
         if self._health_check_task and not self._health_check_task.done():
             self._health_check_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._health_check_task
-            except asyncio.CancelledError:
-                pass
 
         # Cancel stderr reader task
         if self._stderr_reader_task and not self._stderr_reader_task.done():
             self._stderr_reader_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._stderr_reader_task
-            except asyncio.CancelledError:
-                pass
 
         # Fail pending requests
         for future in self._pending_requests.values():
@@ -549,10 +546,8 @@ class StdioTransport:
         # Close streams
         if self._stdin and not self._stdin.is_closing():
             self._stdin.close()
-            try:
+            with contextlib.suppress(Exception):
                 await self._stdin.wait_closed()
-            except Exception:
-                pass
 
         # Reset state
         self._process = None

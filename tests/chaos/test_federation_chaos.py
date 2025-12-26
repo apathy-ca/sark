@@ -455,7 +455,7 @@ class TestFederationRecovery:
         circuit_state = {"status": "closed", "failure_count": 0, "threshold": 3}
 
         # Simulate failures
-        for i in range(5):
+        for _i in range(5):
             mock_federation_service.query_remote_authorization = AsyncMock(
                 side_effect=ConnectionError("Failed")
             )
@@ -517,7 +517,7 @@ class TestFederationRecovery:
 
         for _ in range(5):
             mock_federation_node.is_healthy = AsyncMock(return_value=await health_gen.__anext__())
-            status = await mock_federation_node.is_healthy()
+            await mock_federation_node.is_healthy()
 
         # Should detect recovery (transition from False to True)
         assert health_checks == [False, False, True, True, True]

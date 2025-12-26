@@ -198,7 +198,7 @@ class FixedCostEstimator(CostEstimator):
 class CostEstimationError(Exception):
     """Raised when cost estimation fails."""
 
-    def __init__(self, message: str, provider: str = None, **kwargs):
+    def __init__(self, message: str, provider: str | None = None, **kwargs):
         super().__init__(message)
         self.provider = provider
         self.metadata = kwargs

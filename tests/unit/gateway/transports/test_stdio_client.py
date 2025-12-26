@@ -244,7 +244,7 @@ class TestStdioTransportMessaging:
                 await asyncio.sleep(0.05)
                 # Trigger response handling
                 if transport._pending_requests:
-                    request_id = list(transport._pending_requests.keys())[0]
+                    request_id = next(iter(transport._pending_requests.keys()))
                     transport._pending_requests[request_id].set_result({"status": "ok"})
 
             asyncio.create_task(simulate_response())
@@ -314,7 +314,7 @@ class TestStdioTransportMessaging:
             async def simulate_error():
                 await asyncio.sleep(0.05)
                 if transport._pending_requests:
-                    request_id = list(transport._pending_requests.keys())[0]
+                    request_id = next(iter(transport._pending_requests.keys()))
                     transport._pending_requests[request_id].set_exception(
                         StdioTransportError("JSON-RPC error: Method not found")
                     )
@@ -366,7 +366,7 @@ class TestStdioTransportHealthChecks:
         with (
             patch("asyncio.create_subprocess_exec", return_value=mock_process),
             patch("psutil.Process", return_value=mock_psutil_process),
-            patch("asyncio.create_task") as mock_create_task,
+            patch("asyncio.create_task"),
         ):
             await transport.start()
 
@@ -490,7 +490,7 @@ class TestStdioTransportErrorHandling:
         with (
             patch("asyncio.create_subprocess_exec", return_value=mock_process),
             patch("psutil.Process", return_value=mock_psutil_process),
-            patch("asyncio.create_task") as mock_create_task,
+            patch("asyncio.create_task"),
         ):
             await transport.start()
 

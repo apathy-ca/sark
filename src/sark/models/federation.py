@@ -367,38 +367,38 @@ class FederationHealthResponse(BaseModel):
 # ============================================================================
 
 __all__ = [
-    # Enums
-    "TrustLevel",
-    "NodeStatus",
-    "DiscoveryMethod",
-    # Federation Node
-    "FederationNodeBase",
-    "FederationNodeCreate",
-    "FederationNodeUpdate",
-    "FederationNodeResponse",
-    # Service Discovery
-    "ServiceDiscoveryRecord",
-    "DiscoveryQuery",
-    "DiscoveryResponse",
+    "AuditCorrelationQuery",
+    "AuditCorrelationResponse",
     # mTLS Trust
     "CertificateInfo",
-    "TrustEstablishmentRequest",
-    "TrustEstablishmentResponse",
-    "TrustVerificationRequest",
-    "TrustVerificationResponse",
+    "DiscoveryMethod",
+    "DiscoveryQuery",
+    "DiscoveryResponse",
+    # Audit Correlation
+    "FederatedAuditEvent",
     # Federated Resource Access
     "FederatedResourceRequest",
     "FederatedResourceResponse",
-    # Routing
-    "RouteEntry",
-    "RoutingTable",
-    "RouteQuery",
-    "RouteResponse",
-    # Audit Correlation
-    "FederatedAuditEvent",
-    "AuditCorrelationQuery",
-    "AuditCorrelationResponse",
+    "FederationHealthResponse",
+    # Federation Node
+    "FederationNodeBase",
+    "FederationNodeCreate",
+    "FederationNodeResponse",
+    "FederationNodeUpdate",
     # Health
     "NodeHealthCheck",
-    "FederationHealthResponse",
+    "NodeStatus",
+    # Routing
+    "RouteEntry",
+    "RouteQuery",
+    "RouteResponse",
+    "RoutingTable",
+    # Service Discovery
+    "ServiceDiscoveryRecord",
+    "TrustEstablishmentRequest",
+    "TrustEstablishmentResponse",
+    # Enums
+    "TrustLevel",
+    "TrustVerificationRequest",
+    "TrustVerificationResponse",
 ]

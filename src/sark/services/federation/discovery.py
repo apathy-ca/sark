@@ -525,7 +525,7 @@ class DiscoveryService:
         responses = await asyncio.gather(*tasks, return_exceptions=True)
 
         # Collect results
-        for method, response in zip(methods, responses):
+        for method, response in zip(methods, responses, strict=False):
             if isinstance(response, Exception):
                 self.logger.error("discovery_method_failed", method=method, error=str(response))
                 results[method] = []

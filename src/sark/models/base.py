@@ -348,18 +348,18 @@ class PrincipalBudget(Base):
 # ============================================================================
 
 __all__ = [
-    # Legacy mixin classes (for backward compatibility)
-    "ResourceBase",
-    "CapabilityBase",
-    # v2.0 SQLAlchemy models
-    "Resource",
     "Capability",
-    "FederationNode",
-    "CostTracking",
-    "PrincipalBudget",
-    # Pydantic schemas
-    "ResourceSchema",
+    "CapabilityBase",
     "CapabilitySchema",
+    "CostTracking",
+    "FederationNode",
     "InvocationRequest",
     "InvocationResult",
+    "PrincipalBudget",
+    # v2.0 SQLAlchemy models
+    "Resource",
+    # Legacy mixin classes (for backward compatibility)
+    "ResourceBase",
+    # Pydantic schemas
+    "ResourceSchema",
 ]

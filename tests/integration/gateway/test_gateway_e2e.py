@@ -622,7 +622,7 @@ class TestSSETransportE2E:
                 GatewaySSEClient, "stream_events", side_effect=mock_stream_with_error
             ):
                 with pytest.raises(httpx.ReadTimeout):
-                    async for event in client.stream_events():
+                    async for _event in client.stream_events():
                         pass
 
     @pytest.mark.asyncio
@@ -653,7 +653,7 @@ class TestSSETransportE2E:
 
     async def _collect_events(self, client):
         """Helper to collect events."""
-        async for event in client.stream_events():
+        async for _event in client.stream_events():
             pass
 
     @pytest.mark.asyncio
@@ -774,7 +774,7 @@ class TestStdioTransportE2E:
         with patch("asyncio.create_subprocess_exec", return_value=mock_process):
             with patch("psutil.Process"):
                 async with GatewayClient(transport_mode=TransportMode.STDIO_ONLY) as client:
-                    local_server = await client.connect_local_server(
+                    await client.connect_local_server(
                         command=["python", "server.py"],
                         server_id="health_test",
                     )
@@ -804,11 +804,11 @@ class TestStdioTransportE2E:
         with patch("asyncio.create_subprocess_exec", side_effect=[mock_process1, mock_process2]):
             with patch("psutil.Process"):
                 async with GatewayClient(transport_mode=TransportMode.STDIO_ONLY) as client:
-                    server1 = await client.connect_local_server(
+                    await client.connect_local_server(
                         command=["python", "server1.py"],
                         server_id="server1",
                     )
-                    server2 = await client.connect_local_server(
+                    await client.connect_local_server(
                         command=["python", "server2.py"],
                         server_id="server2",
                     )
@@ -1383,7 +1383,7 @@ class TestAuthorizationSecurityE2E:
             gateway_url="http://gateway:8080",
             opa_client=mock_opa_client,
         ) as client:
-            result = await client.invoke_tool(
+            await client.invoke_tool(
                 server_name="postgres-mcp",
                 tool_name="execute_query",
                 parameters={"query": "SELECT 1", "password": "secret"},
@@ -1619,7 +1619,7 @@ class TestPerformanceBenchmarksE2E:
     @pytest.mark.asyncio
     async def test_connection_pool_efficiency_e2e(self, httpx_mock: HTTPXMock):
         """E2E: Connection pool reuse efficiency."""
-        for i in range(50):
+        for _i in range(50):
             httpx_mock.add_response(
                 url="http://gateway:8080/api/v1/servers?offset=0&limit=100",
                 json=[],

@@ -10,6 +10,8 @@ Deliverable: tests/security/v2/test_federation_security.py
 
 import pytest
 
+from sark.models.base import InvocationRequest
+
 
 class TestFederationAuthentication:
     """Test federation authentication security."""
@@ -286,7 +288,7 @@ class TestAdapterSecurityBaseline:
         )
 
         # Verify no data mixing/bleeding between requests
-        for i, result in enumerate(results):
+        for _i, result in enumerate(results):
             if isinstance(result, Exception):
                 continue  # Some failures are OK
 

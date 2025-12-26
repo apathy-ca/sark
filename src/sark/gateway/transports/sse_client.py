@@ -12,6 +12,7 @@ communication with MCP Gateway servers, including:
 
 import asyncio
 from collections.abc import AsyncGenerator
+import contextlib
 from enum import Enum
 from typing import Any
 
@@ -236,10 +237,8 @@ class GatewaySSEClient:
                 event.event_id = value
                 self.last_event_id = value
             elif field == "retry":
-                try:
+                with contextlib.suppress(ValueError):
                     event.retry = int(value)
-                except ValueError:
-                    pass
 
         return None
 

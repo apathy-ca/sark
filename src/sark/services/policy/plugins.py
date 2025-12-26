@@ -390,7 +390,7 @@ class PolicyPluginManager:
 
         # Find PolicyPlugin subclass
         plugin_class = None
-        for name, obj in inspect.getmembers(module, inspect.isclass):
+        for _name, obj in inspect.getmembers(module, inspect.isclass):
             if (
                 issubclass(obj, PolicyPlugin)
                 and obj is not PolicyPlugin
@@ -417,7 +417,7 @@ class PolicyPluginManager:
 class PolicyEvaluationError(Exception):
     """Raised when policy evaluation fails."""
 
-    def __init__(self, message: str, plugin_name: str = None, **kwargs):
+    def __init__(self, message: str, plugin_name: str | None = None, **kwargs):
         super().__init__(message)
         self.plugin_name = plugin_name
         self.metadata = kwargs

@@ -495,7 +495,7 @@ class TestPromptInjectionDetector:
         }
 
         start_time = time.perf_counter()
-        result = detector.detect(params)
+        detector.detect(params)
         end_time = time.perf_counter()
 
         detection_time_ms = (end_time - start_time) * 1000
@@ -510,7 +510,7 @@ class TestPromptInjectionDetector:
         }
 
         start_time = time.perf_counter()
-        result = detector.detect(params)
+        detector.detect(params)
         end_time = time.perf_counter()
 
         detection_time_ms = (end_time - start_time) * 1000

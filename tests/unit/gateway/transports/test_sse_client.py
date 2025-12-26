@@ -369,7 +369,7 @@ class TestGatewaySSEClient:
         client.client.stream = mock_stream
 
         with pytest.raises(RuntimeError, match="Connection pool exhausted"):
-            async for event in client.stream_events(endpoint="/test"):
+            async for _event in client.stream_events(endpoint="/test"):
                 break
 
         await client.close()
@@ -437,7 +437,7 @@ class TestGatewaySSEClient:
         client_no_reconnect.client.stream = mock_stream
 
         with pytest.raises(httpx.RequestError):
-            async for event in client_no_reconnect.stream_events(endpoint="/test"):
+            async for _event in client_no_reconnect.stream_events(endpoint="/test"):
                 pass
 
         await client_no_reconnect.close()
@@ -467,7 +467,7 @@ class TestGatewaySSEClient:
         client.reconnect_initial_delay = 0.01
 
         with pytest.raises(RuntimeError, match="max retries exceeded"):
-            async for event in client.stream_events(endpoint="/test"):
+            async for _event in client.stream_events(endpoint="/test"):
                 pass
 
         await client.close()
@@ -497,7 +497,7 @@ class TestGatewaySSEClient:
         client.client.stream = mock_stream
 
         with pytest.raises(httpx.HTTPStatusError):
-            async for event in client.stream_events(endpoint="/test"):
+            async for _event in client.stream_events(endpoint="/test"):
                 pass
 
         await client.close()

@@ -567,9 +567,7 @@ class RoutingService:
             routes.append(route)
 
         # Query federation nodes
-        federation_result = await db.execute(
-            select(FederationNode).where(FederationNode.enabled == True)
-        )
+        federation_result = await db.execute(select(FederationNode).where(FederationNode.enabled))
         nodes = federation_result.scalars().all()
 
         # Query each node for the resource

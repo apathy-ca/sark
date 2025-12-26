@@ -307,9 +307,7 @@ class TrustService:
                     )
 
             # Update or create federation node
-            node = await self._get_or_create_node(
-                db, request.node_id, request.client_cert, cert_info
-            )
+            await self._get_or_create_node(db, request.node_id, request.client_cert, cert_info)
 
             # Generate challenge response
             challenge_response = None

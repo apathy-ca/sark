@@ -15,6 +15,7 @@ Tests include:
 - Multi-policy evaluation
 """
 
+import asyncio
 import time
 from uuid import uuid4
 

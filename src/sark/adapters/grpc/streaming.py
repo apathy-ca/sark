@@ -482,7 +482,7 @@ class ProtobufMessageHandler:
         """
         try:
             # Get message descriptor
-            descriptor = await self._reflection_client.get_message_descriptor(message_type)
+            await self._reflection_client.get_message_descriptor(message_type)
 
             # Create message instance
             message = self._reflection_client.create_request_message(message_type, data)
