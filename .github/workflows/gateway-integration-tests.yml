@@ -54,7 +54,8 @@ jobs:
           --health-retries=5
         ports:
           - 8181:8181
-        # Note: OPA image default CMD is already "run --server --addr=0.0.0.0:8181"
+        # Start OPA in server mode explicitly
+        cmd: ["run", "--server", "--addr=0.0.0.0:8181"]
 
     steps:
       - uses: actions/checkout@v4
