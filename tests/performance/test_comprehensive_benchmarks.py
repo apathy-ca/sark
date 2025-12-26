@@ -299,7 +299,6 @@ def test_generate_full_report():
     print("=" * 80 + "\n")
 
     # Use reports/performance for CI compatibility
-    import os
     from pathlib import Path
 
     output_dir = Path("reports/performance")
