@@ -3,12 +3,10 @@ name: SARK v2.0 Integration Tests
 on:
   push:
     branches:
-      - main
       - 'feat/v2*'
       - 'release/v2*'
   pull_request:
     branches:
-      - main
       - 'feat/v2*'
   workflow_dispatch:
     inputs:
