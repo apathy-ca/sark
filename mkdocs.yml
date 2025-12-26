@@ -1,6 +1,6 @@
 site_name: SARK - Security Audit and Resource Kontroler
 site_description: Enterprise-Grade MCP Governance System
-site_author: James R. A. Henry
+site_author: James Henry
 site_url: https://sark.example.com
 
 repo_url: https://github.com/apathy-ca/sark
@@ -170,4 +170,4 @@ nav:
     - Security Audit: SECURITY_AUDIT.md
     - Production Handoff: PRODUCTION_HANDOFF.md
 
-copyright: Copyright &copy; 2024 James R. A. Henry. All rights reserved.
+copyright: Copyright &copy; 2025 James Henry. All rights reserved.

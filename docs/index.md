@@ -155,4 +155,4 @@ MIT License - see [LICENSE](https://github.com/apathy-ca/sark/blob/main/LICENSE)
 
 ## Copyright
 
-Copyright 2024 James R. A. Henry. All rights reserved.
+Copyright 2025 James Henry. All rights reserved.
