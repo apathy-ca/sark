@@ -1,32 +1,68 @@
 """Database models and schemas."""
 
-from sark.models.audit import AuditEvent
-
-# v2.0 base classes for protocol abstraction
-from sark.models.base import (
-    CapabilityBase,
-    CapabilitySchema,
-    InvocationRequest,
-    InvocationResult,
-    ResourceBase,
-    ResourceSchema,
-)
-from sark.models.gateway import (
-    A2AAuthorizationRequest,
-    AgentContext,
-    AgentType,
-    GatewayAuditEvent,
-    GatewayAuthorizationRequest,
-    GatewayAuthorizationResponse,
-    GatewayServerInfo,
-    GatewayToolInfo,
-    SensitivityLevel,
-    TrustLevel,
-)
-from sark.models.mcp_server import MCPServer, MCPTool
-from sark.models.policy import Policy, PolicyVersion
-from sark.models.session import Session, SessionCreateRequest, SessionListResponse, SessionResponse
-from sark.models.user import Team, User
+# Handle both installed package (sark) and test environment (src.sark) imports
+try:
+    from sark.models.audit import AuditEvent
+    from sark.models.base import (
+        CapabilityBase,
+        CapabilitySchema,
+        InvocationRequest,
+        InvocationResult,
+        ResourceBase,
+        ResourceSchema,
+    )
+    from sark.models.gateway import (
+        A2AAuthorizationRequest,
+        AgentContext,
+        AgentType,
+        GatewayAuditEvent,
+        GatewayAuthorizationRequest,
+        GatewayAuthorizationResponse,
+        GatewayServerInfo,
+        GatewayToolInfo,
+        SensitivityLevel,
+        TrustLevel,
+    )
+    from sark.models.mcp_server import MCPServer, MCPTool
+    from sark.models.policy import Policy, PolicyVersion
+    from sark.models.session import (
+        Session,
+        SessionCreateRequest,
+        SessionListResponse,
+        SessionResponse,
+    )
+    from sark.models.user import Team, User
+except ModuleNotFoundError:
+    from .audit import AuditEvent  # type: ignore
+    from .base import (  # type: ignore
+        CapabilityBase,
+        CapabilitySchema,
+        InvocationRequest,
+        InvocationResult,
+        ResourceBase,
+        ResourceSchema,
+    )
+    from .gateway import (  # type: ignore
+        A2AAuthorizationRequest,
+        AgentContext,
+        AgentType,
+        GatewayAuditEvent,
+        GatewayAuthorizationRequest,
+        GatewayAuthorizationResponse,
+        GatewayServerInfo,
+        GatewayToolInfo,
+        SensitivityLevel,
+        TrustLevel,
+    )
+    from .mcp_server import MCPServer, MCPTool  # type: ignore
+    from .policy import Policy, PolicyVersion  # type: ignore
+    from .session import (  # type: ignore
+        Session,
+        SessionCreateRequest,
+        SessionListResponse,
+        SessionResponse,
+    )
+    from .user import Team, User  # type: ignore
 
 # v2.0 type aliases - gradual terminology migration
 # In v2.0, these will become actual base classes
