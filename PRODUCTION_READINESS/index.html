@@ -1,0 +1,6740 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Enterprise-Grade MCP Governance System">
+      
+      
+        <meta name="author" content="James R. A. Henry">
+      
+      
+        <link rel="canonical" href="https://sark.example.com/PRODUCTION_READINESS/">
+      
+      
+        <link rel="prev" href="../PRODUCTION_CONFIG/">
+      
+      
+        <link rel="next" href="../DEPLOYMENT_CHECKLIST/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Production Readiness - SARK - Security Audit and Resource Kontroler</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config",""),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#sark-production-readiness-checklist" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="SARK - Security Audit and Resource Kontroler" class="md-header__button md-logo" aria-label="SARK - Security Audit and Resource Kontroler" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SARK - Security Audit and Resource Kontroler
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Production Readiness
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/apathy-ca/sark" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    apathy-ca/sark
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../QUICK_START/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../ARCHITECTURE/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../DEPLOYMENT/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Deployment
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../AUTHENTICATION/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Authentication & Authorization
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../OPA_POLICY_GUIDE/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Policies
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../MONITORING/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Operations
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../DATABASE_MIGRATIONS/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Database
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../PERFORMANCE_TESTING/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Performance
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../API_REFERENCE/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../DEVELOPMENT/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../EXECUTIVE_SUMMARY/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Reports
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../REPOSITORY_IMPROVEMENT_PLAN/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Planning
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../GLOSSARY/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="SARK - Security Audit and Resource Kontroler" class="md-nav__button md-logo" aria-label="SARK - Security Audit and Resource Kontroler" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    SARK - Security Audit and Resource Kontroler
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/apathy-ca/sark" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    apathy-ca/sark
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../QUICK_START/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../QUICK_REFERENCE_SESSIONS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SECURITY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PERFORMANCE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEPLOYMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DOCKER_DEPLOYMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PRODUCTION_DEPLOYMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PRODUCTION_CONFIG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production Config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production Readiness
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production Readiness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-use-this-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to Use This Checklist
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-security-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Security &amp; Authentication
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Security &amp; Authentication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-authorization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 Authorization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-security-controls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 Security Controls
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#14-compliance-audit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4 Compliance &amp; Audit
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-infrastructure-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Infrastructure &amp; Operations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Infrastructure &amp; Operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-database" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Database
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-caching-redis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Caching (Redis)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-message-queue-kafka" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Message Queue (Kafka)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-service-discovery-consul" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4 Service Discovery (Consul)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25-secrets-management-vault" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5 Secrets Management (Vault)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#26-api-gateway-kong" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.6 API Gateway (Kong)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#27-policy-engine-opa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.7 Policy Engine (OPA)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#28-kubernetes-infrastructure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.8 Kubernetes Infrastructure
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-monitoring-observability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Monitoring &amp; Observability
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Monitoring &amp; Observability">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-metrics-prometheus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Metrics (Prometheus)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-dashboards-grafana" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Dashboards (Grafana)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Logging
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-tracing-opentelemetry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 Tracing (OpenTelemetry)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35-alerting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5 Alerting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#36-health-checks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.6 Health Checks
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-application-quality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Application Quality
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Application Quality">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-code-quality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Code Quality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Testing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-api-stability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 API Stability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#44-database-migrations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4 Database Migrations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-deployment-release" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Deployment &amp; Release
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Deployment &amp; Release">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-deployment-infrastructure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 Deployment Infrastructure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-deployment-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Deployment Strategy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-disaster-recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 Disaster Recovery
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54-incident-response" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 Incident Response
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#55-capacity-planning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5 Capacity Planning
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-documentation-training" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Documentation &amp; Training
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Documentation &amp; Training">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-user-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1 User Documentation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-operational-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2 Operational Documentation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#63-developer-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.3 Developer Documentation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#64-training-materials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.4 Training Materials
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#65-communication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.5 Communication
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-pilot-program" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Pilot Program
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Pilot Program">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-pilot-preparation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 Pilot Preparation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-pilot-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.2 Pilot Execution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73-pilot-success-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.3 Pilot Success Criteria
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-production-launch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Production Launch
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Production Launch">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#81-pre-launch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.1 Pre-Launch
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#82-launch-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.2 Launch Execution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#83-post-launch-first-72-hours" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.3 Post-Launch (First 72 Hours)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#84-post-launch-first-month" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.4 Post-Launch (First Month)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#final-sign-off" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Final Sign-off
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Final Sign-off">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#approvals-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Approvals Required
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sign-off" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sign-off
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#appendix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Appendix
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Appendix">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-performance-benchmarks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A. Performance Benchmarks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-test-coverage-report" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B. Test Coverage Report
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c-security-scan-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C. Security Scan Results
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d-capacity-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D. Capacity Metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEPLOYMENT_CHECKLIST/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment Checklist
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DISASTER_RECOVERY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Disaster Recovery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ROLLBACK_PROCEDURES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rollback Procedures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication & Authorization
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Authentication & Authorization
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AUTHENTICATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AUTHORIZATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authorization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../OIDC_SETUP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OIDC Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../LDAP_SETUP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LDAP Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SAML_SETUP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SAML Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../API_KEYS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Keys
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policies
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Policies
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../OPA_POLICY_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OPA Policy Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ADVANCED_OPA_POLICIES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced OPA Policies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../POLICY_OPTIMIZATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../POLICY_CACHING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Caching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../POLICY_AUDIT_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Audit Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../POLICY_AUDIT_TRAIL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Audit Trail
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Operations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MONITORING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MONITORING_SETUP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monitoring Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../OPERATIONAL_RUNBOOK/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operational Runbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../OPERATIONS_RUNBOOK/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations Runbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../INCIDENT_RESPONSE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incident Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../TROUBLESHOOTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Database
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DATABASE_MIGRATIONS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database Migrations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DATABASE_OPTIMIZATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../REDIS_OPTIMIZATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Redis Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Performance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PERFORMANCE_TESTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PERFORMANCE_TUNING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PERFORMANCE_OPTIMIZATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PERFORMANCE_REPORT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../POLICY_PERFORMANCE_REPORT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../API_REFERENCE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../API_INTEGRATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_11" id="__nav_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEVELOPMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MIGRATION_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migration Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEVELOPMENT_LOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../TESTING_STRATEGY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing Strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../INTEGRATION_TESTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integration Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reports
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reports
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../EXECUTIVE_SUMMARY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Executive Summary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../IMPLEMENTATION_PLAN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../GAP_ANALYSIS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gap Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PHASE2_COMPLETION_REPORT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 2 Completion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../RELEASE_NOTES_v0.2.0/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release Notes v0.2.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../FINAL_TEST_REPORT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Final Test Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../TEST_COVERAGE_REPORT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Test Coverage Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../KNOWN_ISSUES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Known Issues
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../LESSONS_LEARNED/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lessons Learned
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_13" id="__nav_13_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Planning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../REPOSITORY_IMPROVEMENT_PLAN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Repository Improvement Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WORK_BREAKDOWN_SESSIONS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Work Breakdown Sessions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WORK_TASKS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Work Tasks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PHASE2_3WEEK_PLAN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 2 3-Week Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WEEK_2_SUMMARY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Week 2 Summary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WEEK_3_SUMMARY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Week 3 Summary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_14" >
+        
+          
+          <label class="md-nav__link" for="__nav_14" id="__nav_14_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../GLOSSARY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../FAQ/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FAQ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SECURITY_BEST_PRACTICES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Best Practices
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SECURITY_HARDENING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Hardening
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SECURITY_AUDIT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PRODUCTION_HANDOFF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production Handoff
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-use-this-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to Use This Checklist
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-security-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Security &amp; Authentication
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Security &amp; Authentication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-authorization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 Authorization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-security-controls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 Security Controls
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#14-compliance-audit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4 Compliance &amp; Audit
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-infrastructure-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Infrastructure &amp; Operations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Infrastructure &amp; Operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-database" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Database
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-caching-redis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Caching (Redis)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-message-queue-kafka" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Message Queue (Kafka)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-service-discovery-consul" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4 Service Discovery (Consul)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25-secrets-management-vault" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5 Secrets Management (Vault)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#26-api-gateway-kong" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.6 API Gateway (Kong)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#27-policy-engine-opa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.7 Policy Engine (OPA)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#28-kubernetes-infrastructure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.8 Kubernetes Infrastructure
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-monitoring-observability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Monitoring &amp; Observability
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Monitoring &amp; Observability">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-metrics-prometheus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Metrics (Prometheus)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-dashboards-grafana" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Dashboards (Grafana)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Logging
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-tracing-opentelemetry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 Tracing (OpenTelemetry)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35-alerting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5 Alerting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#36-health-checks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.6 Health Checks
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-application-quality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Application Quality
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Application Quality">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-code-quality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Code Quality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Testing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-api-stability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 API Stability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#44-database-migrations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4 Database Migrations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-deployment-release" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Deployment &amp; Release
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Deployment &amp; Release">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-deployment-infrastructure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 Deployment Infrastructure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-deployment-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Deployment Strategy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-disaster-recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 Disaster Recovery
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54-incident-response" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 Incident Response
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#55-capacity-planning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5 Capacity Planning
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-documentation-training" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Documentation &amp; Training
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Documentation &amp; Training">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-user-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1 User Documentation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-operational-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2 Operational Documentation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#63-developer-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.3 Developer Documentation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#64-training-materials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.4 Training Materials
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#65-communication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.5 Communication
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-pilot-program" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Pilot Program
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Pilot Program">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-pilot-preparation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 Pilot Preparation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-pilot-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.2 Pilot Execution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73-pilot-success-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.3 Pilot Success Criteria
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-production-launch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Production Launch
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Production Launch">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#81-pre-launch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.1 Pre-Launch
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#82-launch-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.2 Launch Execution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#83-post-launch-first-72-hours" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.3 Post-Launch (First 72 Hours)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#84-post-launch-first-month" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.4 Post-Launch (First Month)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#final-sign-off" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Final Sign-off
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Final Sign-off">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#approvals-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Approvals Required
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sign-off" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sign-off
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#appendix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Appendix
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Appendix">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-performance-benchmarks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A. Performance Benchmarks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-test-coverage-report" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B. Test Coverage Report
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c-security-scan-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C. Security Scan Results
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d-capacity-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D. Capacity Metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href=".." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    Home
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../DEPLOYMENT/" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Deployment
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="sark-production-readiness-checklist">SARK Production Readiness Checklist<a class="headerlink" href="#sark-production-readiness-checklist" title="Permanent link">&para;</a></h1>
+<p><strong>Document Version:</strong> 1.0
+<strong>Last Updated:</strong> 2025-11-20
+<strong>Purpose:</strong> Comprehensive checklist to ensure SARK is production-ready before go-live</p>
+<hr />
+<h2 id="how-to-use-this-checklist">How to Use This Checklist<a class="headerlink" href="#how-to-use-this-checklist" title="Permanent link">&para;</a></h2>
+<p>This document serves as a gate for production deployment. Each section must be 100% complete before proceeding to production launch.</p>
+<p><strong>Checklist Status:</strong>
+- ✅ Complete
+- ⏳ In Progress
+- ❌ Not Started
+- 🚫 Blocked
+- ⚠️ At Risk</p>
+<p><strong>Sign-off Required:</strong> Each major section requires approval from the designated owner.</p>
+<hr />
+<h2 id="1-security-authentication">1. Security &amp; Authentication<a class="headerlink" href="#1-security-authentication" title="Permanent link">&para;</a></h2>
+<p><strong>Owner:</strong> Security Team Lead
+<strong>Target Completion:</strong> End of Week 3
+<strong>Status:</strong> ❌ Not Started</p>
+<h3 id="11-authentication">1.1 Authentication<a class="headerlink" href="#11-authentication" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> JWT token validation implemented</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Token expiry and refresh mechanism working</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Support for RS256 and HS256 algorithms</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> LDAP/Active Directory integration tested</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> SAML 2.0 authentication flow functional</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> OIDC (OpenID Connect) integration working</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Multi-provider configuration tested</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> API key generation and management system operational</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> API key rotation procedures documented</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Session management with Redis working</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Session timeout properly configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Concurrent session limits enforced</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Authentication middleware applied to all endpoints</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Unauthenticated access properly rejected (401 responses)</li>
+</ul>
+<p><strong>Test Evidence Required:</strong>
+- [ ] Authentication integration test suite passing (100%)
+- [ ] Load test with 1000 concurrent authenticated sessions
+- [ ] Token expiry test results
+- [ ] Multi-provider failover test results</p>
+<p><strong>Documentation:</strong>
+- [ ] Authentication configuration guide completed
+- [ ] Identity provider integration guide for each provider
+- [ ] API key management procedures documented
+- [ ] Troubleshooting guide for common auth issues</p>
+<hr />
+<h3 id="12-authorization">1.2 Authorization<a class="headerlink" href="#12-authorization" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> OPA policy evaluation on all protected endpoints</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Policy evaluation for server registration working</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Policy evaluation for tool access working</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Policy evaluation for audit log access working</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> User role extraction from identity provider</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Team membership resolution working</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Permission aggregation logic tested</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Tool sensitivity classification implemented</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Automatic sensitivity detection working</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Manual sensitivity override functionality</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Policy decision caching functional (Redis)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Cache invalidation on policy updates</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Default policy library deployed</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Environment-specific policies (dev/staging/prod)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Policy versioning system operational</li>
+</ul>
+<p><strong>Test Evidence Required:</strong>
+- [ ] Authorization integration tests passing (100%)
+- [ ] Policy evaluation performance &lt;50ms (p95)
+- [ ] Policy denial logging verified
+- [ ] Negative test cases (unauthorized access attempts)
+- [ ] Policy cache hit rate &gt;80%</p>
+<p><strong>Documentation:</strong>
+- [ ] OPA policy authoring guide updated
+- [ ] Default policy library documented
+- [ ] Policy testing procedures documented
+- [ ] Policy rollback procedures documented</p>
+<hr />
+<h3 id="13-security-controls">1.3 Security Controls<a class="headerlink" href="#13-security-controls" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> All dependencies scanned for vulnerabilities (Snyk/Trivy)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Zero P0/P1 vulnerabilities in production</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> P2/P3 vulnerabilities documented with mitigation plans</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Secrets scanning completed (TruffleHog)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> No secrets in codebase or git history</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Secrets stored in HashiCorp Vault</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Vault unsealing procedures documented</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> SQL injection testing completed</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> XSS (Cross-Site Scripting) testing completed</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> CSRF protection enabled</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Command injection testing completed</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> OWASP Top 10 testing completed</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Penetration test scheduled and completed</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Penetration test findings remediated</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Security audit report approved</li>
+</ul>
+<p><strong>Security Scan Reports:</strong>
+- [ ] Bandit security scan (Python) - Clean
+- [ ] Trivy container scan - No HIGH/CRITICAL
+- [ ] Snyk dependency scan - Acceptable risk level
+- [ ] OWASP ZAP dynamic scan - Clean
+- [ ] TruffleHog secrets scan - Clean</p>
+<p><strong>Documentation:</strong>
+- [ ] Security controls documented in SECURITY.md
+- [ ] Vulnerability disclosure policy published
+- [ ] Incident response plan documented
+- [ ] Security contact information published</p>
+<hr />
+<h3 id="14-compliance-audit">1.4 Compliance &amp; Audit<a class="headerlink" href="#14-compliance-audit" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Audit event logging for all security events</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Immutable audit trail verified (TimescaleDB)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Audit log retention policy defined (default: 13 months)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Audit log backup procedures tested</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> SIEM integration functional (Splunk/Datadog)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Audit event forwarding tested</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Failed SIEM forwarding retry logic working</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Audit log tampering detection enabled</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Compliance reporting capability verified</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> GDPR data retention policies implemented</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> PII handling procedures documented</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Data deletion procedures implemented</li>
+</ul>
+<p><strong>Compliance Requirements:</strong>
+- [ ] SOC 2 Type II controls mapped
+- [ ] ISO 27001 controls mapped
+- [ ] GDPR compliance verified
+- [ ] Data residency requirements met
+- [ ] Audit log format meets compliance standards</p>
+<p><strong>Documentation:</strong>
+- [ ] Compliance matrix documented
+- [ ] Audit log schema documented
+- [ ] Data retention policies published
+- [ ] Privacy policy published</p>
+<hr />
+<p><strong>Section 1 Sign-off:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Name</th>
+<th>Date</th>
+<th>Signature</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Security Team Lead</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Compliance Officer</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>CISO</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="2-infrastructure-operations">2. Infrastructure &amp; Operations<a class="headerlink" href="#2-infrastructure-operations" title="Permanent link">&para;</a></h2>
+<p><strong>Owner:</strong> DevOps Team Lead
+<strong>Target Completion:</strong> End of Week 6
+<strong>Status:</strong> ❌ Not Started</p>
+<h3 id="21-database">2.1 Database<a class="headerlink" href="#21-database" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> PostgreSQL 15+ deployed in HA configuration</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Primary-replica replication working</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Automatic failover tested</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Connection pooling configured (PgBouncer)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Database backup running (daily full, hourly incremental)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Backup restoration tested successfully</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Point-in-time recovery (PITR) tested</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Database encryption at rest enabled</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> SSL/TLS for database connections enforced</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Database query performance optimized</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Slow query logging enabled (&lt;20ms threshold)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Database indexes created for critical queries</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Database migration procedures tested</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Rollback procedures tested</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Database maintenance windows scheduled</li>
+</ul>
+<p><strong>TimescaleDB Configuration:</strong>
+- [ ] TimescaleDB extension installed
+- [ ] Audit log hypertable created
+- [ ] Retention policy configured (13 months)
+- [ ] Compression policy enabled (data &gt;7 days old)
+- [ ] Continuous aggregates for common queries
+- [ ] TimescaleDB backup verified</p>
+<p><strong>Performance Benchmarks:</strong>
+- [ ] Database supports 1000+ concurrent connections
+- [ ] Query response time &lt;20ms (p95)
+- [ ] Write throughput &gt;10,000 events/second
+- [ ] Replication lag &lt;1 second</p>
+<p><strong>Documentation:</strong>
+- [ ] Database architecture diagram
+- [ ] Backup and restore procedures
+- [ ] Database maintenance runbook
+- [ ] Connection string configuration guide</p>
+<hr />
+<h3 id="22-caching-redis">2.2 Caching (Redis)<a class="headerlink" href="#22-caching-redis" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Redis 7+ deployed</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Redis Sentinel HA configuration (if applicable)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Redis password authentication enabled</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> SSL/TLS for Redis connections enabled</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Redis persistence configured (AOF + RDB)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Redis backup tested</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Cache eviction policies configured (LRU)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Cache key TTL policies set</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Redis monitoring configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Redis failover tested</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Maximum memory limits configured</li>
+</ul>
+<p><strong>Performance Benchmarks:</strong>
+- [ ] Cache hit rate &gt;80% for policy decisions
+- [ ] Cache response time &lt;5ms (p95)
+- [ ] Supports 10,000+ operations/second</p>
+<p><strong>Documentation:</strong>
+- [ ] Redis configuration guide
+- [ ] Cache invalidation procedures
+- [ ] Redis troubleshooting guide</p>
+<hr />
+<h3 id="23-message-queue-kafka">2.3 Message Queue (Kafka)<a class="headerlink" href="#23-message-queue-kafka" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Kafka cluster deployed (3+ brokers)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Topic replication factor ≥2</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Producer acknowledgment configured (all replicas)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Consumer group offsets managed</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Kafka monitoring configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Kafka retention policies set (audit events: 30 days)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Dead letter queue configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Kafka SSL/TLS enabled</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Kafka SASL authentication enabled</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Kafka disk space monitoring</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Kafka backup strategy defined</li>
+</ul>
+<p><strong>Topics Created:</strong>
+- [ ] <code>audit-events</code> - Audit event stream
+- [ ] <code>audit-events-dlq</code> - Dead letter queue
+- [ ] <code>policy-updates</code> - Policy change notifications</p>
+<p><strong>Performance Benchmarks:</strong>
+- [ ] Kafka throughput &gt;10,000 messages/second
+- [ ] End-to-end latency &lt;100ms (p95)
+- [ ] Zero message loss under normal operations</p>
+<p><strong>Documentation:</strong>
+- [ ] Kafka architecture diagram
+- [ ] Topic configuration guide
+- [ ] Consumer group management</p>
+<hr />
+<h3 id="24-service-discovery-consul">2.4 Service Discovery (Consul)<a class="headerlink" href="#24-service-discovery-consul" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Consul cluster deployed (3+ servers)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Consul ACL enabled</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Service registration working</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Health checks configured for all services</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Consul backup procedures tested</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Consul monitoring configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> DNS interface working</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Consul UI access controlled</li>
+</ul>
+<p><strong>Documentation:</strong>
+- [ ] Consul service registration guide
+- [ ] Health check configuration guide</p>
+<hr />
+<h3 id="25-secrets-management-vault">2.5 Secrets Management (Vault)<a class="headerlink" href="#25-secrets-management-vault" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> HashiCorp Vault deployed</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Vault HA configuration (3+ nodes)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Vault unsealing procedures automated</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Vault backup procedures tested</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Database dynamic secrets configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> API key storage configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> TLS certificate management configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Vault audit logging enabled</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Vault access policies defined</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Vault token rotation configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Emergency seal procedures documented</li>
+</ul>
+<p><strong>Documentation:</strong>
+- [ ] Vault operations runbook
+- [ ] Unsealing emergency procedures
+- [ ] Secret rotation procedures</p>
+<hr />
+<h3 id="26-api-gateway-kong">2.6 API Gateway (Kong)<a class="headerlink" href="#26-api-gateway-kong" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Kong 3.8+ deployed</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Kong database (PostgreSQL) configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Kong HA deployment (3+ nodes)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Kong Admin API secured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Rate limiting configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Authentication plugins configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> MCP security plugin deployed</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Request/response logging enabled</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Kong monitoring configured (Prometheus)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Kong backup procedures tested</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> SSL/TLS termination configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> CORS policies configured</li>
+</ul>
+<p><strong>Kong Plugins Configured:</strong>
+- [ ] <code>mcp-security</code> - MCP-specific security checks
+- [ ] <code>rate-limiting</code> - API rate limits (1000 req/min per user)
+- [ ] <code>request-logging</code> - Request audit trail
+- [ ] <code>cors</code> - Cross-origin resource sharing
+- [ ] <code>jwt</code> - JWT validation
+- [ ] <code>prometheus</code> - Metrics export</p>
+<p><strong>Documentation:</strong>
+- [ ] Kong configuration guide
+- [ ] Plugin development guide
+- [ ] Rate limit policy documentation</p>
+<hr />
+<h3 id="27-policy-engine-opa">2.7 Policy Engine (OPA)<a class="headerlink" href="#27-policy-engine-opa" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Open Policy Agent deployed</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> OPA HA configuration (3+ replicas)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Policy bundle distribution configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Policy versioning system working</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Policy testing framework operational</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> OPA monitoring configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Policy decision logging enabled</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Policy performance optimization complete</li>
+</ul>
+<p><strong>OPA Policies Deployed:</strong>
+- [ ] Server registration authorization
+- [ ] Tool access authorization
+- [ ] Audit log access authorization
+- [ ] Admin operation authorization
+- [ ] Team-based access control</p>
+<p><strong>Performance Benchmarks:</strong>
+- [ ] Policy evaluation &lt;50ms (p95)
+- [ ] Policy bundle load time &lt;5 seconds
+- [ ] Supports 1000+ policy evaluations/second</p>
+<p><strong>Documentation:</strong>
+- [ ] OPA policy guide updated
+- [ ] Policy testing procedures
+- [ ] Policy deployment procedures</p>
+<hr />
+<h3 id="28-kubernetes-infrastructure">2.8 Kubernetes Infrastructure<a class="headerlink" href="#28-kubernetes-infrastructure" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Kubernetes cluster 1.28+ deployed</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Node autoscaling configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Pod security policies enforced</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Network policies configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Resource quotas defined per namespace</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> RBAC policies configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Ingress controller deployed (NGINX/Traefik)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Certificate management (cert-manager)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Persistent volume provisioning working</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> StatefulSets for databases configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> ConfigMaps and Secrets management</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Pod disruption budgets configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Horizontal Pod Autoscaler (HPA) configured</li>
+</ul>
+<p><strong>SARK Application Deployment:</strong>
+- [ ] Deployment manifest applied
+- [ ] Service manifest applied
+- [ ] Ingress manifest applied
+- [ ] ConfigMap for configuration applied
+- [ ] Secrets for sensitive data applied
+- [ ] HPA configured (min: 3, max: 10)
+- [ ] PodDisruptionBudget configured (minAvailable: 2)
+- [ ] Liveness probe configured
+- [ ] Readiness probe configured
+- [ ] Startup probe configured
+- [ ] Resource requests and limits set</p>
+<p><strong>Documentation:</strong>
+- [ ] Kubernetes architecture diagram
+- [ ] Deployment procedures
+- [ ] Scaling procedures
+- [ ] Troubleshooting guide</p>
+<hr />
+<p><strong>Section 2 Sign-off:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Name</th>
+<th>Date</th>
+<th>Signature</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DevOps Team Lead</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>SRE Lead</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Infrastructure Manager</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-monitoring-observability">3. Monitoring &amp; Observability<a class="headerlink" href="#3-monitoring-observability" title="Permanent link">&para;</a></h2>
+<p><strong>Owner:</strong> SRE Team Lead
+<strong>Target Completion:</strong> End of Week 9
+<strong>Status:</strong> ❌ Not Started</p>
+<h3 id="31-metrics-prometheus">3.1 Metrics (Prometheus)<a class="headerlink" href="#31-metrics-prometheus" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Prometheus server deployed</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Prometheus scraping SARK metrics endpoint</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Metric retention configured (90 days)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Prometheus HA configuration (2+ replicas)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Prometheus backup configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Alert rules configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Recording rules for common queries</li>
+</ul>
+<p><strong>Key Metrics Collected:</strong>
+- [ ] HTTP request rate (by endpoint, status code)
+- [ ] HTTP request duration (p50, p95, p99)
+- [ ] Database query duration
+- [ ] Policy evaluation duration
+- [ ] Cache hit/miss rate
+- [ ] Error rate by type
+- [ ] Active connections (database, Redis, Kafka)
+- [ ] CPU and memory usage
+- [ ] Disk usage
+- [ ] Network I/O</p>
+<p><strong>Documentation:</strong>
+- [ ] Metrics catalog published
+- [ ] Prometheus query examples
+- [ ] Metric naming conventions</p>
+<hr />
+<h3 id="32-dashboards-grafana">3.2 Dashboards (Grafana)<a class="headerlink" href="#32-dashboards-grafana" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Grafana deployed</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Prometheus data source configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Authentication enabled (SSO)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Role-based access control configured</li>
+</ul>
+<p><strong>Dashboards Created:</strong>
+- [ ] <strong>System Overview</strong> - High-level health metrics
+- [ ] <strong>API Performance</strong> - Request rates, latency, errors
+- [ ] <strong>Database Performance</strong> - Query times, connections, replication lag
+- [ ] <strong>Policy Engine</strong> - Evaluation times, decision distribution
+- [ ] <strong>Audit Events</strong> - Event volume, types, anomalies
+- [ ] <strong>Infrastructure</strong> - Resource usage, node health
+- [ ] <strong>Business Metrics</strong> - Server registrations, user activity
+- [ ] <strong>SIEM Integration</strong> - Event forwarding status</p>
+<p><strong>Dashboard Features:</strong>
+- [ ] Alerts configured on dashboards
+- [ ] Time range selectors
+- [ ] Drill-down capabilities
+- [ ] Export capabilities</p>
+<p><strong>Documentation:</strong>
+- [ ] Dashboard user guide
+- [ ] Dashboard maintenance procedures</p>
+<hr />
+<h3 id="33-logging">3.3 Logging<a class="headerlink" href="#33-logging" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Structured JSON logging enabled</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Log aggregation configured (ELK/Splunk)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Log retention policy configured (30 days app logs, 13 months audit)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Log rotation configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Log levels properly configured (INFO in prod)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Request ID correlation working</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> User ID logged on all requests</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Sensitive data redaction enabled</li>
+</ul>
+<p><strong>Log Categories:</strong>
+- [ ] Application logs (errors, warnings, info)
+- [ ] Access logs (HTTP requests)
+- [ ] Audit logs (security events)
+- [ ] Database logs (slow queries)
+- [ ] OPA decision logs</p>
+<p><strong>Documentation:</strong>
+- [ ] Log format specification
+- [ ] Log analysis guide
+- [ ] Common log queries</p>
+<hr />
+<h3 id="34-tracing-opentelemetry">3.4 Tracing (OpenTelemetry)<a class="headerlink" href="#34-tracing-opentelemetry" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> OpenTelemetry instrumentation added</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Trace export configured (Jaeger/Tempo)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Sampling rate configured (10% in prod)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Trace context propagation working</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Service dependencies visible in traces</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Database query tracing enabled</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> External API call tracing enabled</li>
+</ul>
+<p><strong>Documentation:</strong>
+- [ ] Tracing architecture diagram
+- [ ] Trace analysis guide</p>
+<hr />
+<h3 id="35-alerting">3.5 Alerting<a class="headerlink" href="#35-alerting" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> AlertManager deployed</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Alert routing configured (email, Slack, PagerDuty)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Alert severity levels defined (P0-P4)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> On-call rotation configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Alert escalation policies defined</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Alert runbooks linked</li>
+</ul>
+<p><strong>Critical Alerts Configured:</strong>
+- [ ] <strong>P0 - Service Down</strong> - Health check failures
+- [ ] <strong>P0 - Database Unavailable</strong> - Cannot connect to database
+- [ ] <strong>P1 - High Error Rate</strong> - &gt;5% error rate for 5 minutes
+- [ ] <strong>P1 - High Latency</strong> - p95 &gt;500ms for 10 minutes
+- [ ] <strong>P1 - SIEM Forwarding Failed</strong> - Audit events not forwarding
+- [ ] <strong>P2 - Disk Space Low</strong> - &lt;20% disk space remaining
+- [ ] <strong>P2 - Memory High</strong> - &gt;80% memory usage
+- [ ] <strong>P2 - Policy Evaluation Slow</strong> - p95 &gt;100ms
+- [ ] <strong>P3 - Cache Hit Rate Low</strong> - &lt;50% hit rate
+- [ ] <strong>P3 - Unusual Traffic Pattern</strong> - Traffic anomaly detected</p>
+<p><strong>Alert Testing:</strong>
+- [ ] All critical alerts tested manually
+- [ ] Alert fatigue analysis completed
+- [ ] False positive rate &lt;5%</p>
+<p><strong>Documentation:</strong>
+- [ ] Alert runbook for each P0/P1 alert
+- [ ] Alert escalation procedures
+- [ ] Alert acknowledgment procedures</p>
+<hr />
+<h3 id="36-health-checks">3.6 Health Checks<a class="headerlink" href="#36-health-checks" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>/health</code> endpoint - Basic health check</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>/ready</code> endpoint - Readiness probe</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>/live</code> endpoint - Liveness probe</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>/startup</code> endpoint - Startup probe</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Dependency checks implemented (PostgreSQL, Redis, OPA, Consul, Vault)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Health check timeout configured (&lt;1 second)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Kubernetes probes configured correctly</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> External health monitoring configured (Pingdom/UptimeRobot)</li>
+</ul>
+<p><strong>Health Check Coverage:</strong>
+- [ ] Database connectivity
+- [ ] Redis connectivity
+- [ ] Kafka connectivity
+- [ ] OPA availability
+- [ ] Consul service discovery
+- [ ] Vault availability
+- [ ] Kong gateway status</p>
+<p><strong>Documentation:</strong>
+- [ ] Health endpoint specifications
+- [ ] Health monitoring runbook</p>
+<hr />
+<p><strong>Section 3 Sign-off:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Name</th>
+<th>Date</th>
+<th>Signature</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SRE Team Lead</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Monitoring Engineer</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>On-Call Lead</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-application-quality">4. Application Quality<a class="headerlink" href="#4-application-quality" title="Permanent link">&para;</a></h2>
+<p><strong>Owner:</strong> Engineering Lead
+<strong>Target Completion:</strong> End of Week 6
+<strong>Status:</strong> ❌ Not Started</p>
+<h3 id="41-code-quality">4.1 Code Quality<a class="headerlink" href="#41-code-quality" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Code coverage ≥85%</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> All critical paths have unit tests</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> All API endpoints have integration tests</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Linting passing (Ruff) - zero errors</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Code formatting standardized (Black)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Type checking passing (MyPy) - strict mode</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> No code smells (SonarQube analysis)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Technical debt documented and prioritized</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Code review process enforced (2+ approvals)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Pre-commit hooks enforced</li>
+</ul>
+<p><strong>Test Coverage by Module:</strong>
+- [ ] <code>api/</code> - 90%+
+- [ ] <code>services/</code> - 85%+
+- [ ] <code>models/</code> - 100%
+- [ ] <code>db/</code> - 80%+
+- [ ] <code>config/</code> - 90%+</p>
+<p><strong>Documentation:</strong>
+- [ ] Code style guide published
+- [ ] Contributing guide updated
+- [ ] Testing guide published</p>
+<hr />
+<h3 id="42-testing">4.2 Testing<a class="headerlink" href="#42-testing" title="Permanent link">&para;</a></h3>
+<p><strong>Unit Tests:</strong>
+- [ ] All business logic unit tested
+- [ ] Mock external dependencies (database, OPA, SIEM)
+- [ ] Edge cases covered
+- [ ] Error handling tested
+- [ ] Unit test suite runs in &lt;60 seconds</p>
+<p><strong>Integration Tests:</strong>
+- [ ] End-to-end API tests with real database
+- [ ] Authentication flow tests
+- [ ] Authorization flow tests
+- [ ] Audit logging integration tests
+- [ ] OPA policy evaluation tests
+- [ ] SIEM forwarding tests
+- [ ] Database migration tests
+- [ ] Integration test suite runs in &lt;5 minutes</p>
+<p><strong>Performance Tests:</strong>
+- [ ] Load test: 1000 requests/second sustained
+- [ ] Stress test: Maximum capacity identified
+- [ ] Spike test: Handles sudden traffic increases
+- [ ] Endurance test: 24 hour stability test
+- [ ] Scalability test: Performance with 10,000+ servers</p>
+<p><strong>Performance Targets Met:</strong>
+- [ ] API response time (p95): &lt;100ms ✅
+- [ ] Server registration: &lt;200ms ✅
+- [ ] Policy evaluation: &lt;50ms ✅
+- [ ] Database queries: &lt;20ms ✅
+- [ ] Concurrent users: 1000+ ✅
+- [ ] Throughput: 10,000 events/second ✅</p>
+<p><strong>Security Tests:</strong>
+- [ ] SQL injection tests passed
+- [ ] XSS tests passed
+- [ ] CSRF tests passed
+- [ ] Command injection tests passed
+- [ ] Authentication bypass tests passed
+- [ ] Authorization bypass tests passed
+- [ ] Rate limiting tests passed</p>
+<p><strong>Chaos Engineering:</strong>
+- [ ] Database failure simulation
+- [ ] Redis failure simulation
+- [ ] Network partition simulation
+- [ ] Pod eviction simulation
+- [ ] High CPU simulation
+- [ ] High memory simulation</p>
+<p><strong>Documentation:</strong>
+- [ ] Test plan published
+- [ ] Test coverage report published
+- [ ] Performance benchmark report published</p>
+<hr />
+<h3 id="43-api-stability">4.3 API Stability<a class="headerlink" href="#43-api-stability" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> API versioning implemented (v1)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Backward compatibility guaranteed</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> API deprecation policy defined</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> OpenAPI/Swagger spec published</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> API documentation complete</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Code examples provided (Python, curl, JavaScript)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Postman collection published</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Rate limiting documented</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Error response format standardized</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Pagination on all list endpoints</li>
+</ul>
+<p><strong>API Endpoints Verified:</strong>
+- [ ] <code>POST /api/v1/servers/</code> - Register server
+- [ ] <code>GET /api/v1/servers/</code> - List servers (with pagination)
+- [ ] <code>GET /api/v1/servers/{id}</code> - Get server details
+- [ ] <code>PUT /api/v1/servers/{id}</code> - Update server
+- [ ] <code>DELETE /api/v1/servers/{id}</code> - Delete server
+- [ ] <code>POST /api/v1/policy/evaluate</code> - Evaluate policy
+- [ ] <code>POST /api/v1/policy/test</code> - Test policy
+- [ ] <code>GET /api/v1/audit/events</code> - Query audit events
+- [ ] <code>GET /health</code> - Health check
+- [ ] <code>GET /ready</code> - Readiness probe
+- [ ] <code>GET /metrics</code> - Prometheus metrics</p>
+<p><strong>Documentation:</strong>
+- [ ] API reference documentation
+- [ ] API client libraries (Python)
+- [ ] API changelog</p>
+<hr />
+<h3 id="44-database-migrations">4.4 Database Migrations<a class="headerlink" href="#44-database-migrations" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Alembic migrations tested</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Forward migration tested on staging</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Rollback migration tested</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Zero-downtime migration strategy</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Migration testing on production-size dataset</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Migration runbook documented</li>
+</ul>
+<p><strong>Migrations Verified:</strong>
+- [ ] Initial schema creation
+- [ ] TimescaleDB hypertable setup
+- [ ] Indexes created for performance
+- [ ] Foreign key constraints
+- [ ] Data type migrations (if any)</p>
+<p><strong>Documentation:</strong>
+- [ ] Migration procedures
+- [ ] Rollback procedures
+- [ ] Data backup before migration</p>
+<hr />
+<p><strong>Section 4 Sign-off:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Name</th>
+<th>Date</th>
+<th>Signature</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Engineering Lead</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>QA Lead</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Technical Architect</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5-deployment-release">5. Deployment &amp; Release<a class="headerlink" href="#5-deployment-release" title="Permanent link">&para;</a></h2>
+<p><strong>Owner:</strong> DevOps Team Lead
+<strong>Target Completion:</strong> End of Week 11
+<strong>Status:</strong> ❌ Not Started</p>
+<h3 id="51-deployment-infrastructure">5.1 Deployment Infrastructure<a class="headerlink" href="#51-deployment-infrastructure" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> CI/CD pipeline configured (GitHub Actions/Jenkins)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Automated build on every commit</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Automated tests on every PR</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Docker image build automated</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Docker image scanning (Trivy)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Container registry configured (secure)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Helm chart versioning automated</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Artifact signing configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Deployment to staging automated</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Production deployment requires manual approval</li>
+</ul>
+<p><strong>Environments:</strong>
+- [ ] <strong>Development</strong> - Deployed on every commit to main
+- [ ] <strong>Staging</strong> - Production-like environment for testing
+- [ ] <strong>Production</strong> - Live environment</p>
+<p><strong>Documentation:</strong>
+- [ ] CI/CD pipeline documentation
+- [ ] Deployment architecture diagram
+- [ ] Environment configuration guide</p>
+<hr />
+<h3 id="52-deployment-strategy">5.2 Deployment Strategy<a class="headerlink" href="#52-deployment-strategy" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Blue-green deployment strategy documented</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Canary deployment capability configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Rolling update strategy tested</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Rollback procedures tested</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Database migration during deployment tested</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Zero-downtime deployment verified</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Traffic shifting mechanism configured (10% → 50% → 100%)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Smoke tests after deployment automated</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Deployment notification configured (Slack)</li>
+</ul>
+<p><strong>Deployment Runbook:</strong>
+- [ ] Pre-deployment checklist
+- [ ] Deployment steps documented
+- [ ] Post-deployment verification steps
+- [ ] Rollback trigger criteria
+- [ ] Communication plan during deployment</p>
+<p><strong>Documentation:</strong>
+- [ ] Deployment runbook
+- [ ] Rollback procedures
+- [ ] Emergency contact list</p>
+<hr />
+<h3 id="53-disaster-recovery">5.3 Disaster Recovery<a class="headerlink" href="#53-disaster-recovery" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Disaster recovery plan documented</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Recovery Time Objective (RTO): &lt;4 hours</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Recovery Point Objective (RPO): &lt;1 hour</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Full system backup tested</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Restore from backup tested (database, Vault, Consul)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Backup retention policy: 30 days</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Off-site backup configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Backup encryption enabled</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Disaster recovery drill completed</li>
+</ul>
+<p><strong>Backup Coverage:</strong>
+- [ ] PostgreSQL database (daily full, hourly incremental)
+- [ ] TimescaleDB audit logs (daily full)
+- [ ] Redis persistence snapshots (hourly)
+- [ ] Vault data (daily)
+- [ ] Consul data (daily)
+- [ ] OPA policy bundles (on change)
+- [ ] Application configuration (version controlled)</p>
+<p><strong>Documentation:</strong>
+- [ ] Disaster recovery plan
+- [ ] Backup and restore procedures
+- [ ] RTO/RPO documentation</p>
+<hr />
+<h3 id="54-incident-response">5.4 Incident Response<a class="headerlink" href="#54-incident-response" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Incident response plan documented</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> On-call rotation schedule published</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Escalation matrix defined</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Incident severity levels defined (P0-P4)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Incident communication templates</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Post-mortem template created</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> War room procedures documented</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Status page configured (StatusPage.io)</li>
+</ul>
+<p><strong>Incident Response Team:</strong>
+- [ ] Primary on-call engineer assigned
+- [ ] Secondary on-call engineer assigned
+- [ ] Engineering manager contact
+- [ ] Security team contact
+- [ ] Communications lead assigned</p>
+<p><strong>Documentation:</strong>
+- [ ] Incident response playbook
+- [ ] Escalation procedures
+- [ ] Communication templates
+- [ ] Post-mortem template</p>
+<hr />
+<h3 id="55-capacity-planning">5.5 Capacity Planning<a class="headerlink" href="#55-capacity-planning" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Current capacity baseline established</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Growth projections documented (6 months, 1 year)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Scaling triggers identified</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Resource limits configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Auto-scaling tested under load</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Cost projections documented</li>
+</ul>
+<p><strong>Capacity Targets:</strong>
+- [ ] Support 100 MCP servers (Pilot)
+- [ ] Support 500 MCP servers (Month 3)
+- [ ] Support 1,000 MCP servers (Month 6)
+- [ ] Support 10,000 MCP servers (Year 1)</p>
+<p><strong>Resource Planning:</strong>
+- [ ] Database storage growth rate tracked
+- [ ] Kafka retention vs. throughput optimized
+- [ ] Redis memory limits appropriate
+- [ ] Kubernetes node scaling plan</p>
+<p><strong>Documentation:</strong>
+- [ ] Capacity planning spreadsheet
+- [ ] Scaling playbook
+- [ ] Cost optimization guide</p>
+<hr />
+<p><strong>Section 5 Sign-off:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Name</th>
+<th>Date</th>
+<th>Signature</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DevOps Team Lead</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>SRE Lead</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Engineering Manager</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="6-documentation-training">6. Documentation &amp; Training<a class="headerlink" href="#6-documentation-training" title="Permanent link">&para;</a></h2>
+<p><strong>Owner:</strong> Product Manager
+<strong>Target Completion:</strong> End of Week 9
+<strong>Status:</strong> ❌ Not Started</p>
+<h3 id="61-user-documentation">6.1 User Documentation<a class="headerlink" href="#61-user-documentation" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Administrator guide published</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Policy author guide published</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> API reference documentation complete</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Quick start guide tested</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Troubleshooting guide complete</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> FAQ updated with pilot feedback</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Glossary complete</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Video tutorials recorded (optional)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Documentation hosted (docs.sark.io)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Documentation search functional</li>
+</ul>
+<p><strong>Documentation Coverage:</strong>
+- [ ] Getting started / onboarding
+- [ ] Server registration workflow
+- [ ] Policy management workflow
+- [ ] Audit log querying
+- [ ] Web UI usage
+- [ ] CLI tool usage
+- [ ] API integration examples
+- [ ] Common error messages and solutions</p>
+<p><strong>Documentation:</strong>
+- [ ] User documentation site live
+- [ ] Feedback mechanism for docs</p>
+<hr />
+<h3 id="62-operational-documentation">6.2 Operational Documentation<a class="headerlink" href="#62-operational-documentation" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Architecture diagrams published</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Data flow diagrams published</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Network topology diagram</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Deployment architecture diagram</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Runbooks for all critical operations</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Runbooks for all P0/P1 alerts</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Database maintenance procedures</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Security incident response procedures</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Backup and restore procedures</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Disaster recovery procedures</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> On-call playbook</li>
+</ul>
+<p><strong>Runbook Coverage:</strong>
+- [ ] Service not responding
+- [ ] Database connection failures
+- [ ] High error rate
+- [ ] High latency
+- [ ] SIEM forwarding failures
+- [ ] OPA policy evaluation failures
+- [ ] Authentication failures
+- [ ] Out of disk space
+- [ ] Out of memory
+- [ ] Certificate expiration</p>
+<p><strong>Documentation:</strong>
+- [ ] Runbook library organized
+- [ ] Runbook template standardized</p>
+<hr />
+<h3 id="63-developer-documentation">6.3 Developer Documentation<a class="headerlink" href="#63-developer-documentation" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> API documentation (OpenAPI spec)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Code contribution guide</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Development environment setup guide</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Code style guide</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Git workflow documentation</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Testing guide</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> CI/CD documentation</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Plugin development guide (Kong, OPA)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Architecture decision records (ADRs)</li>
+</ul>
+<p><strong>Documentation:</strong>
+- [ ] Developer portal published
+- [ ] Code examples repository</p>
+<hr />
+<h3 id="64-training-materials">6.4 Training Materials<a class="headerlink" href="#64-training-materials" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Administrator training deck</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Policy author training deck</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Developer training materials</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Training video recordings (optional)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Training lab environment</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Training certification quiz (optional)</li>
+</ul>
+<p><strong>Training Sessions Scheduled:</strong>
+- [ ] Administrator training session 1
+- [ ] Administrator training session 2 (repeat)
+- [ ] Policy author workshop
+- [ ] Developer onboarding session</p>
+<p><strong>Documentation:</strong>
+- [ ] Training schedule published
+- [ ] Training materials repository
+- [ ] Training feedback survey</p>
+<hr />
+<h3 id="65-communication">6.5 Communication<a class="headerlink" href="#65-communication" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Launch announcement drafted</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Internal stakeholder communication plan</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> User onboarding email templates</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Support channel setup (Slack, email)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> FAQ for common questions</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Feedback collection mechanism</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Roadmap published</li>
+</ul>
+<p><strong>Communication Channels:</strong>
+- [ ] Slack channel: #sark-support
+- [ ] Email: sark-support@company.com
+- [ ] Documentation: docs.sark.io
+- [ ] Status page: status.sark.io</p>
+<p><strong>Documentation:</strong>
+- [ ] Communication plan
+- [ ] Support escalation procedures</p>
+<hr />
+<p><strong>Section 6 Sign-off:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Name</th>
+<th>Date</th>
+<th>Signature</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Product Manager</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Technical Writer</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Training Lead</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-pilot-program">7. Pilot Program<a class="headerlink" href="#7-pilot-program" title="Permanent link">&para;</a></h2>
+<p><strong>Owner:</strong> Pilot Program Manager
+<strong>Target Completion:</strong> End of Week 10
+<strong>Status:</strong> ❌ Not Started</p>
+<h3 id="71-pilot-preparation">7.1 Pilot Preparation<a class="headerlink" href="#71-pilot-preparation" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Pilot environment deployed (staging)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> 100 MCP servers identified for pilot</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> 50 pilot users identified</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Pilot user list compiled with contact info</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Pilot kickoff meeting scheduled</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Pilot timeline communicated</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Pilot success criteria defined</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Pilot feedback mechanism setup</li>
+</ul>
+<p><strong>Pilot Participants:</strong>
+- [ ] 10 early adopters (high engagement expected)
+- [ ] 20 power users (high usage expected)
+- [ ] 20 representative users (average usage)</p>
+<p><strong>Documentation:</strong>
+- [ ] Pilot program overview
+- [ ] Pilot participant guide</p>
+<hr />
+<h3 id="72-pilot-execution">7.2 Pilot Execution<a class="headerlink" href="#72-pilot-execution" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Pilot kickoff meeting completed</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Training sessions delivered</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Server onboarding support provided</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Daily check-ins with pilot users</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Bug reports triaged within 24 hours</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> User feedback collected daily</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Performance metrics tracked</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Security monitoring active</li>
+</ul>
+<p><strong>Pilot Duration:</strong> 2 weeks</p>
+<p><strong>Key Activities:</strong>
+- [ ] Week 1: Onboarding and initial usage
+- [ ] Week 2: Full workflow testing and feedback</p>
+<p><strong>Documentation:</strong>
+- [ ] Daily pilot status reports
+- [ ] Bug tracking spreadsheet</p>
+<hr />
+<h3 id="73-pilot-success-criteria">7.3 Pilot Success Criteria<a class="headerlink" href="#73-pilot-success-criteria" title="Permanent link">&para;</a></h3>
+<p><strong>Quantitative Metrics:</strong>
+- [ ] 95%+ user satisfaction score
+- [ ] Zero P0 incidents
+- [ ] &lt;3 P1 incidents
+- [ ] API response time &lt;100ms (p95)
+- [ ] 99.9%+ uptime
+- [ ] &lt;5% error rate
+- [ ] All 100 pilot servers registered successfully
+- [ ] 90%+ daily active users</p>
+<p><strong>Qualitative Feedback:</strong>
+- [ ] Ease of use rating ≥4/5
+- [ ] Documentation quality rating ≥4/5
+- [ ] Support responsiveness rating ≥4/5
+- [ ] Feature completeness rating ≥4/5</p>
+<p><strong>Go/No-Go Criteria for Production:</strong>
+- [ ] All P0 bugs resolved
+- [ ] All P1 bugs resolved or mitigated
+- [ ] User satisfaction ≥90%
+- [ ] No security vulnerabilities
+- [ ] Performance targets met</p>
+<p><strong>Documentation:</strong>
+- [ ] Pilot results report
+- [ ] Go/no-go decision document</p>
+<hr />
+<p><strong>Section 7 Sign-off:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Name</th>
+<th>Date</th>
+<th>Signature</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pilot Program Manager</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Product Manager</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Engineering Lead</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-production-launch">8. Production Launch<a class="headerlink" href="#8-production-launch" title="Permanent link">&para;</a></h2>
+<p><strong>Owner:</strong> Engineering Manager
+<strong>Target Completion:</strong> End of Week 12
+<strong>Status:</strong> ❌ Not Started</p>
+<h3 id="81-pre-launch">8.1 Pre-Launch<a class="headerlink" href="#81-pre-launch" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Pilot program successfully completed</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Go/no-go decision: GO ✅</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Production environment provisioned</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> SSL/TLS certificates configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> DNS records configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Production database migrated</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Production data verified</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Secrets configured in Vault</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> All monitoring and alerting configured</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> On-call rotation active</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Launch communication drafted</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Support team trained and ready</li>
+</ul>
+<p><strong>Pre-Launch Checklist:</strong>
+- [ ] All sections of this checklist 100% complete
+- [ ] Security audit passed
+- [ ] Performance benchmarks met
+- [ ] Disaster recovery tested
+- [ ] Incident response team ready
+- [ ] Stakeholder approvals obtained</p>
+<p><strong>Documentation:</strong>
+- [ ] Launch plan
+- [ ] Go-live checklist</p>
+<hr />
+<h3 id="82-launch-execution">8.2 Launch Execution<a class="headerlink" href="#82-launch-execution" title="Permanent link">&para;</a></h3>
+<p><strong>Launch Strategy:</strong> Blue-green deployment with gradual traffic shift</p>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Blue environment (current): Ready for rollback</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Green environment (new): Deployed and smoke tested</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Traffic at 0% green / 100% blue (baseline)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Traffic at 10% green / 90% blue (15 minutes monitoring)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Traffic at 50% green / 50% blue (30 minutes monitoring)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Traffic at 100% green / 0% blue (full cutover)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Blue environment kept alive for 24 hours (rollback option)</li>
+</ul>
+<p><strong>Launch Timeline:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Time</th>
+<th>Activity</th>
+<th>Owner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T-24h</td>
+<td>Final production readiness review</td>
+<td>Engineering Manager</td>
+</tr>
+<tr>
+<td>T-12h</td>
+<td>On-call team briefing</td>
+<td>SRE Lead</td>
+</tr>
+<tr>
+<td>T-4h</td>
+<td>Deploy to green environment</td>
+<td>DevOps Engineer</td>
+</tr>
+<tr>
+<td>T-2h</td>
+<td>Smoke tests on green</td>
+<td>QA Engineer</td>
+</tr>
+<tr>
+<td>T-1h</td>
+<td>Launch go/no-go meeting</td>
+<td>All stakeholders</td>
+</tr>
+<tr>
+<td>T+0</td>
+<td>Begin traffic shift (10%)</td>
+<td>DevOps Engineer</td>
+</tr>
+<tr>
+<td>T+15min</td>
+<td>Increase to 50%</td>
+<td>DevOps Engineer</td>
+</tr>
+<tr>
+<td>T+45min</td>
+<td>Increase to 100%</td>
+<td>DevOps Engineer</td>
+</tr>
+<tr>
+<td>T+2h</td>
+<td>Post-launch review</td>
+<td>Engineering Manager</td>
+</tr>
+<tr>
+<td>T+24h</td>
+<td>Blue environment shutdown</td>
+<td>DevOps Engineer</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Launch Monitoring:</strong>
+- [ ] Real-time dashboard monitoring
+- [ ] Error rate monitoring (&lt;5% threshold for rollback)
+- [ ] Latency monitoring (p95 &lt;200ms threshold for rollback)
+- [ ] On-call engineer monitoring alerts
+- [ ] War room active for first 2 hours</p>
+<p><strong>Rollback Criteria:</strong>
+- [ ] Error rate &gt;10% for 5+ minutes → Immediate rollback
+- [ ] p95 latency &gt;500ms for 10+ minutes → Rollback
+- [ ] P0 incident → Immediate rollback
+- [ ] Critical security issue discovered → Immediate rollback</p>
+<p><strong>Documentation:</strong>
+- [ ] Launch timeline
+- [ ] Rollback procedures
+- [ ] War room notes</p>
+<hr />
+<h3 id="83-post-launch-first-72-hours">8.3 Post-Launch (First 72 Hours)<a class="headerlink" href="#83-post-launch-first-72-hours" title="Permanent link">&para;</a></h3>
+<p><strong>Monitoring Intensity:</strong>
+- [ ] 24/7 on-call coverage for first 72 hours
+- [ ] Hourly health checks by on-call engineer
+- [ ] Daily status reports to stakeholders
+- [ ] User feedback monitoring</p>
+<p><strong>Success Metrics:</strong>
+- [ ] Zero P0 incidents in first 72 hours
+- [ ] &lt;2 P1 incidents in first 72 hours
+- [ ] 99.9%+ uptime in first 72 hours
+- [ ] API response time &lt;100ms (p95)
+- [ ] User satisfaction ≥90%</p>
+<p><strong>Daily Activities:</strong>
+- [ ] Day 1: Hourly health checks, incident response ready
+- [ ] Day 2: 4-hourly health checks, monitor user feedback
+- [ ] Day 3: 8-hourly health checks, prepare first week report</p>
+<p><strong>Documentation:</strong>
+- [ ] Daily launch reports
+- [ ] Incident reports (if any)
+- [ ] User feedback summary</p>
+<hr />
+<h3 id="84-post-launch-first-month">8.4 Post-Launch (First Month)<a class="headerlink" href="#84-post-launch-first-month" title="Permanent link">&para;</a></h3>
+<p><strong>Monitoring:</strong>
+- [ ] Weekly performance review meetings
+- [ ] Monthly capacity review
+- [ ] User feedback analysis
+- [ ] Bug prioritization and resolution</p>
+<p><strong>Success Metrics:</strong>
+- [ ] 99.9%+ uptime for first month
+- [ ] 500+ active users
+- [ ] 1000+ servers registered
+- [ ] &lt;1% error rate
+- [ ] User satisfaction ≥95%</p>
+<p><strong>Activities:</strong>
+- [ ] Week 1: Daily monitoring and support
+- [ ] Week 2: Identify quick wins and improvements
+- [ ] Week 3: Implement high-priority fixes
+- [ ] Week 4: Month 1 retrospective and planning</p>
+<p><strong>Documentation:</strong>
+- [ ] Month 1 launch report
+- [ ] Lessons learned document
+- [ ] Post-launch retrospective notes</p>
+<hr />
+<p><strong>Section 8 Sign-off:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Name</th>
+<th>Date</th>
+<th>Signature</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Engineering Manager</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Product Manager</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>CTO / VP Engineering</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="final-sign-off">Final Sign-off<a class="headerlink" href="#final-sign-off" title="Permanent link">&para;</a></h2>
+<p><strong>Production Launch Authorization</strong></p>
+<p>This section confirms that all prerequisites have been met and SARK is approved for production deployment.</p>
+<h3 id="approvals-required">Approvals Required<a class="headerlink" href="#approvals-required" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <strong>Engineering Lead</strong> - All technical requirements met</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <strong>Security Team Lead</strong> - Security controls validated</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <strong>DevOps Team Lead</strong> - Infrastructure ready</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <strong>QA Lead</strong> - Quality standards met</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <strong>Product Manager</strong> - Business requirements met</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <strong>SRE Lead</strong> - Operational readiness confirmed</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <strong>Compliance Officer</strong> - Compliance requirements met</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <strong>CTO / VP Engineering</strong> - Final executive approval</li>
+</ul>
+<h3 id="sign-off">Sign-off<a class="headerlink" href="#sign-off" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Name</th>
+<th>Date</th>
+<th>Signature</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Engineering Lead</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Security Team Lead</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>DevOps Team Lead</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>QA Lead</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Product Manager</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>SRE Lead</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Compliance Officer</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>CTO / VP Engineering</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="appendix">Appendix<a class="headerlink" href="#appendix" title="Permanent link">&para;</a></h2>
+<h3 id="a-performance-benchmarks">A. Performance Benchmarks<a class="headerlink" href="#a-performance-benchmarks" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Target</th>
+<th>Actual</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API Response Time (p95)</td>
+<td>&lt;100ms</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>API Response Time (p99)</td>
+<td>&lt;200ms</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Server Registration</td>
+<td>&lt;200ms</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Policy Evaluation</td>
+<td>&lt;50ms</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Database Query (p95)</td>
+<td>&lt;20ms</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Concurrent Users</td>
+<td>1000+</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Throughput (req/sec)</td>
+<td>1000+</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Uptime</td>
+<td>99.9%</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Error Rate</td>
+<td>&lt;1%</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="b-test-coverage-report">B. Test Coverage Report<a class="headerlink" href="#b-test-coverage-report" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Coverage</th>
+<th>Target</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>api/</code></td>
+<td></td>
+<td>90%</td>
+<td></td>
+</tr>
+<tr>
+<td><code>services/</code></td>
+<td></td>
+<td>85%</td>
+<td></td>
+</tr>
+<tr>
+<td><code>models/</code></td>
+<td></td>
+<td>100%</td>
+<td></td>
+</tr>
+<tr>
+<td><code>db/</code></td>
+<td></td>
+<td>80%</td>
+<td></td>
+</tr>
+<tr>
+<td><code>config/</code></td>
+<td></td>
+<td>90%</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Overall</strong></td>
+<td></td>
+<td><strong>85%</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="c-security-scan-results">C. Security Scan Results<a class="headerlink" href="#c-security-scan-results" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Scan Type</th>
+<th>Vulnerabilities</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bandit</td>
+<td>SAST (Python)</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Trivy</td>
+<td>Container</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Snyk</td>
+<td>Dependencies</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>OWASP ZAP</td>
+<td>DAST</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>TruffleHog</td>
+<td>Secrets</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="d-capacity-metrics">D. Capacity Metrics<a class="headerlink" href="#d-capacity-metrics" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>Current</th>
+<th>Projected (Month 3)</th>
+<th>Projected (Year 1)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Servers</td>
+<td>100 (Pilot)</td>
+<td>500</td>
+<td>10,000</td>
+</tr>
+<tr>
+<td>Users</td>
+<td>50 (Pilot)</td>
+<td>500</td>
+<td>5,000</td>
+</tr>
+<tr>
+<td>Audit Events/Day</td>
+<td>10,000</td>
+<td>100,000</td>
+<td>1,000,000</td>
+</tr>
+<tr>
+<td>Database Size</td>
+<td>10 GB</td>
+<td>50 GB</td>
+<td>500 GB</td>
+</tr>
+<tr>
+<td>Kafka Throughput</td>
+<td>1,000 msg/sec</td>
+<td>5,000 msg/sec</td>
+<td>50,000 msg/sec</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><strong>Document Control</strong></p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Date</th>
+<th>Author</th>
+<th>Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.0</td>
+<td>2025-11-20</td>
+<td>SARK Team</td>
+<td>Initial production readiness checklist</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Next Review:</strong> Weekly during implementation, daily during pilot and launch</p>
+<hr />
+<p><strong>End of Production Readiness Checklist</strong></p>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2024 James R. A. Henry. All rights reserved.
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/apathy-ca/sark" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.path", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

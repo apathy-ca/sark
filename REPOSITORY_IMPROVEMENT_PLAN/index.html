@@ -1,0 +1,3717 @@
+
+<!DOCTYPE html>
+
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="Enterprise-Grade MCP Governance System" name="description"/>
+<meta content="James R. A. Henry" name="author"/>
+<link href="https://sark.example.com/REPOSITORY_IMPROVEMENT_PLAN/" rel="canonical"/>
+<link href="../LESSONS_LEARNED/" rel="prev"/>
+<link href="../WORK_BREAKDOWN_SESSIONS/" rel="next"/>
+<link href="../assets/images/favicon.png" rel="icon"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-9.7.1" name="generator"/>
+<title>Repository Improvement Plan - SARK - Security Audit and Resource Kontroler</title>
+<link href="../assets/stylesheets/main.484c7ddc.min.css" rel="stylesheet"/>
+<link href="../assets/stylesheets/palette.ab4e12ef.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config",""),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+<script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+</head>
+<body data-md-color-accent="indigo" data-md-color-primary="indigo" data-md-color-scheme="default" dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#sark-repository-improvement-plan">
+          Skip to content
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<div data-md-color-scheme="default" data-md-component="outdated" hidden="">
+</div>
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="SARK - Security Audit and Resource Kontroler" class="md-header__button md-logo" data-md-component="logo" href=".." title="SARK - Security Audit and Resource Kontroler">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            SARK - Security Audit and Resource Kontroler
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              Repository Improvement Plan
+            
+          </span>
+</div>
+</div>
+</div>
+<form class="md-header__option" data-md-component="palette">
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="" data-md-color-primary="indigo" data-md-color-scheme="default" id="__palette_0" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="" data-md-color-primary="indigo" data-md-color-scheme="slate" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_0" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+</form>
+<script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<a aria-label="Share" class="md-search__icon md-icon" data-clipboard="" data-clipboard-text="" data-md-component="search-share" href="javascript:void(0)" tabindex="-1" title="Share">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"></path></svg>
+</a>
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+</button>
+</nav>
+<div class="md-search__suggest" data-md-component="search-suggest"></div>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="" tabindex="0">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initializing search
+          </div>
+<ol class="md-search-result__list" role="presentation"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="md-header__source">
+<a class="md-source" data-md-component="source" href="https://github.com/apathy-ca/sark" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+</div>
+<div class="md-source__repository">
+    apathy-ca/sark
+  </div>
+</a>
+</div>
+</nav>
+<nav aria-label="Tabs" class="md-tabs" data-md-component="tabs">
+<div class="md-grid">
+<ul class="md-tabs__list">
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="..">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../QUICK_START/">
+          
+  
+  
+    
+  
+  Getting Started
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../ARCHITECTURE/">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../DEPLOYMENT/">
+          
+  
+  
+    
+  
+  Deployment
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../AUTHENTICATION/">
+          
+  
+  
+    
+  
+  Authentication &amp; Authorization
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../OPA_POLICY_GUIDE/">
+          
+  
+  
+    
+  
+  Policies
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../MONITORING/">
+          
+  
+  
+    
+  
+  Operations
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../DATABASE_MIGRATIONS/">
+          
+  
+  
+    
+  
+  Database
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../PERFORMANCE_TESTING/">
+          
+  
+  
+    
+  
+  Performance
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../API_REFERENCE/">
+          
+  
+  
+    
+  
+  API Reference
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../DEVELOPMENT/">
+          
+  
+  
+    
+  
+  Development
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../EXECUTIVE_SUMMARY/">
+          
+  
+  
+    
+  
+  Reports
+
+        </a>
+</li>
+<li class="md-tabs__item md-tabs__item--active">
+<a class="md-tabs__link" href="./">
+          
+  
+  
+    
+  
+  Planning
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../GLOSSARY/">
+          
+  
+  
+    
+  
+  Reference
+
+        </a>
+</li>
+</ul>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary md-nav--lifted" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="SARK - Security Audit and Resource Kontroler" class="md-nav__button md-logo" data-md-component="logo" href=".." title="SARK - Security Audit and Resource Kontroler">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+    SARK - Security Audit and Resource Kontroler
+  </label>
+<div class="md-nav__source">
+<a class="md-source" data-md-component="source" href="https://github.com/apathy-ca/sark" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+</div>
+<div class="md-source__repository">
+    apathy-ca/sark
+  </div>
+</a>
+</div>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="..">
+<span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../QUICK_START/">
+<span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../QUICK_REFERENCE_SESSIONS/">
+<span class="md-ellipsis">
+    
+  
+    Quick Reference
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../installation/">
+<span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../ARCHITECTURE/">
+<span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../SECURITY/">
+<span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../PERFORMANCE/">
+<span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_4">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../DEPLOYMENT/">
+<span class="md-ellipsis">
+    
+  
+    Deployment Guide
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../DOCKER_DEPLOYMENT/">
+<span class="md-ellipsis">
+    
+  
+    Docker Deployment
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../PRODUCTION_DEPLOYMENT/">
+<span class="md-ellipsis">
+    
+  
+    Production Deployment
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../PRODUCTION_CONFIG/">
+<span class="md-ellipsis">
+    
+  
+    Production Config
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../PRODUCTION_READINESS/">
+<span class="md-ellipsis">
+    
+  
+    Production Readiness
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../DEPLOYMENT_CHECKLIST/">
+<span class="md-ellipsis">
+    
+  
+    Deployment Checklist
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../DISASTER_RECOVERY/">
+<span class="md-ellipsis">
+    
+  
+    Disaster Recovery
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../ROLLBACK_PROCEDURES/">
+<span class="md-ellipsis">
+    
+  
+    Rollback Procedures
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_5" type="checkbox"/>
+<label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Authentication &amp; Authorization
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_5_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_5">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Authentication &amp; Authorization
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../AUTHENTICATION/">
+<span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../AUTHORIZATION/">
+<span class="md-ellipsis">
+    
+  
+    Authorization
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../OIDC_SETUP/">
+<span class="md-ellipsis">
+    
+  
+    OIDC Setup
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../LDAP_SETUP/">
+<span class="md-ellipsis">
+    
+  
+    LDAP Setup
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../SAML_SETUP/">
+<span class="md-ellipsis">
+    
+  
+    SAML Setup
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../API_KEYS/">
+<span class="md-ellipsis">
+    
+  
+    API Keys
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_6" type="checkbox"/>
+<label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Policies
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_6_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_6">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Policies
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../OPA_POLICY_GUIDE/">
+<span class="md-ellipsis">
+    
+  
+    OPA Policy Guide
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../ADVANCED_OPA_POLICIES/">
+<span class="md-ellipsis">
+    
+  
+    Advanced OPA Policies
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../POLICY_OPTIMIZATION/">
+<span class="md-ellipsis">
+    
+  
+    Policy Optimization
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../POLICY_CACHING/">
+<span class="md-ellipsis">
+    
+  
+    Policy Caching
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../POLICY_AUDIT_GUIDE/">
+<span class="md-ellipsis">
+    
+  
+    Policy Audit Guide
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../POLICY_AUDIT_TRAIL/">
+<span class="md-ellipsis">
+    
+  
+    Policy Audit Trail
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_7" type="checkbox"/>
+<label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Operations
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_7_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_7">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Operations
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../MONITORING/">
+<span class="md-ellipsis">
+    
+  
+    Monitoring
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../MONITORING_SETUP/">
+<span class="md-ellipsis">
+    
+  
+    Monitoring Setup
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../OPERATIONAL_RUNBOOK/">
+<span class="md-ellipsis">
+    
+  
+    Operational Runbook
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../OPERATIONS_RUNBOOK/">
+<span class="md-ellipsis">
+    
+  
+    Operations Runbook
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../INCIDENT_RESPONSE/">
+<span class="md-ellipsis">
+    
+  
+    Incident Response
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../TROUBLESHOOTING/">
+<span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_8" type="checkbox"/>
+<label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Database
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_8_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_8">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Database
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../DATABASE_MIGRATIONS/">
+<span class="md-ellipsis">
+    
+  
+    Database Migrations
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../DATABASE_OPTIMIZATION/">
+<span class="md-ellipsis">
+    
+  
+    Database Optimization
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../REDIS_OPTIMIZATION/">
+<span class="md-ellipsis">
+    
+  
+    Redis Optimization
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_9" type="checkbox"/>
+<label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_9_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_9">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Performance
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../PERFORMANCE_TESTING/">
+<span class="md-ellipsis">
+    
+  
+    Performance Testing
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../PERFORMANCE_TUNING/">
+<span class="md-ellipsis">
+    
+  
+    Performance Tuning
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../PERFORMANCE_OPTIMIZATION/">
+<span class="md-ellipsis">
+    
+  
+    Performance Optimization
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../PERFORMANCE_REPORT/">
+<span class="md-ellipsis">
+    
+  
+    Performance Report
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../POLICY_PERFORMANCE_REPORT/">
+<span class="md-ellipsis">
+    
+  
+    Policy Performance
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_10" type="checkbox"/>
+<label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_10_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_10">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../API_REFERENCE/">
+<span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../API_INTEGRATION/">
+<span class="md-ellipsis">
+    
+  
+    API Integration
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_11" type="checkbox"/>
+<label class="md-nav__link" for="__nav_11" id="__nav_11_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_11_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_11">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../DEVELOPMENT/">
+<span class="md-ellipsis">
+    
+  
+    Development Guide
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../MIGRATION_GUIDE/">
+<span class="md-ellipsis">
+    
+  
+    Migration Guide
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../DEVELOPMENT_LOG/">
+<span class="md-ellipsis">
+    
+  
+    Development Log
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../TESTING_STRATEGY/">
+<span class="md-ellipsis">
+    
+  
+    Testing Strategy
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../INTEGRATION_TESTING/">
+<span class="md-ellipsis">
+    
+  
+    Integration Testing
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_12" type="checkbox"/>
+<label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Reports
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_12_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_12">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Reports
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../EXECUTIVE_SUMMARY/">
+<span class="md-ellipsis">
+    
+  
+    Executive Summary
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../ROADMAP/">
+<span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../IMPLEMENTATION_PLAN/">
+<span class="md-ellipsis">
+    
+  
+    Implementation Plan
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../GAP_ANALYSIS/">
+<span class="md-ellipsis">
+    
+  
+    Gap Analysis
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../PHASE2_COMPLETION_REPORT/">
+<span class="md-ellipsis">
+    
+  
+    Phase 2 Completion
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../RELEASE_NOTES_v0.2.0/">
+<span class="md-ellipsis">
+    
+  
+    Release Notes v0.2.0
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../FINAL_TEST_REPORT/">
+<span class="md-ellipsis">
+    
+  
+    Final Test Report
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../TEST_COVERAGE_REPORT/">
+<span class="md-ellipsis">
+    
+  
+    Test Coverage Report
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../KNOWN_ISSUES/">
+<span class="md-ellipsis">
+    
+  
+    Known Issues
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../LESSONS_LEARNED/">
+<span class="md-ellipsis">
+    
+  
+    Lessons Learned
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_13" type="checkbox"/>
+<label class="md-nav__link" for="__nav_13" id="__nav_13_label" tabindex="">
+<span class="md-ellipsis">
+    
+  
+    Planning
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="true" aria-labelledby="__nav_13_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_13">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Planning
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
+<span class="md-ellipsis">
+    
+  
+    Repository Improvement Plan
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<a class="md-nav__link md-nav__link--active" href="./">
+<span class="md-ellipsis">
+    
+  
+    Repository Improvement Plan
+  
+
+    
+  </span>
+</a>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#executive-summary">
+<span class="md-ellipsis">
+      
+        Executive Summary
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#feedback-analysis">
+<span class="md-ellipsis">
+      
+        Feedback Analysis
+      
+    </span>
+</a>
+<nav aria-label="Feedback Analysis" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#strengths-build-on-these">
+<span class="md-ellipsis">
+      
+        Strengths (Build On These)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#weaknesses-must-address">
+<span class="md-ellipsis">
+      
+        Weaknesses (Must Address)
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#improvement-initiatives">
+<span class="md-ellipsis">
+      
+        Improvement Initiatives
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#initiative-1-define-mcp-clearly-and-prominently">
+<span class="md-ellipsis">
+      
+        Initiative 1: Define MCP Clearly and Prominently
+      
+    </span>
+</a>
+<nav aria-label="Initiative 1: Define MCP Clearly and Prominently" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#objectives">
+<span class="md-ellipsis">
+      
+        Objectives
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deliverables">
+<span class="md-ellipsis">
+      
+        Deliverables
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#2-verify-its-running-1-minute">
+<span class="md-ellipsis">
+      
+        2. Verify It's Running (1 minute)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#3-register-your-first-mcp-server-2-minutes">
+<span class="md-ellipsis">
+      
+        3. Register Your First MCP Server (2 minutes)
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#what-just-happened">
+<span class="md-ellipsis">
+      
+        What Just Happened?
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#next-steps">
+<span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+</a>
+<nav aria-label="Next Steps" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#success-metrics">
+<span class="md-ellipsis">
+      
+        Success Metrics
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#initiative-3-develop-user-interface">
+<span class="md-ellipsis">
+      
+        Initiative 3: Develop User Interface
+      
+    </span>
+</a>
+<nav aria-label="Initiative 3: Develop User Interface" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#objectives_1">
+<span class="md-ellipsis">
+      
+        Objectives
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#phase-31-ui-design-and-planning-week-3">
+<span class="md-ellipsis">
+      
+        Phase 3.1: UI Design and Planning (Week 3)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#phase-32-core-implementation-week-4-6">
+<span class="md-ellipsis">
+      
+        Phase 3.2: Core Implementation (Week 4-6)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#phase-33-polish-and-integration-week-7-8">
+<span class="md-ellipsis">
+      
+        Phase 3.3: Polish and Integration (Week 7-8)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ui-feature-priority">
+<span class="md-ellipsis">
+      
+        UI Feature Priority
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#success-metrics_1">
+<span class="md-ellipsis">
+      
+        Success Metrics
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#initiative-4-enhance-strengths">
+<span class="md-ellipsis">
+      
+        Initiative 4: Enhance Strengths
+      
+    </span>
+</a>
+<nav aria-label="Initiative 4: Enhance Strengths" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#objectives_2">
+<span class="md-ellipsis">
+      
+        Objectives
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#41-showcase-technology-stack">
+<span class="md-ellipsis">
+      
+        4.1 Showcase Technology Stack
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#42-add-quality-badges">
+<span class="md-ellipsis">
+      
+        4.2 Add Quality Badges
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#43-create-security-highlights-section">
+<span class="md-ellipsis">
+      
+        4.3 Create Security Highlights Section
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#44-add-deployment-success-section">
+<span class="md-ellipsis">
+      
+        4.4 Add Deployment Success Section
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#implementation-roadmap">
+<span class="md-ellipsis">
+      
+        Implementation Roadmap
+      
+    </span>
+</a>
+<nav aria-label="Implementation Roadmap" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#week-1-mcp-definition-initiative-1">
+<span class="md-ellipsis">
+      
+        Week 1: MCP Definition (Initiative 1)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#week-2-simplified-onboarding-initiative-2-part-1">
+<span class="md-ellipsis">
+      
+        Week 2: Simplified Onboarding (Initiative 2 - Part 1)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#week-3-onboarding-ui-planning-initiative-2-part-2-initiative-31">
+<span class="md-ellipsis">
+      
+        Week 3: Onboarding + UI Planning (Initiative 2 - Part 2 + Initiative 3.1)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#week-4-ui-foundation-initiative-321">
+<span class="md-ellipsis">
+      
+        Week 4: UI Foundation (Initiative 3.2.1)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#week-5-ui-core-features-initiative-322">
+<span class="md-ellipsis">
+      
+        Week 5: UI Core Features (Initiative 3.2.2)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#week-6-ui-advanced-features-initiative-323">
+<span class="md-ellipsis">
+      
+        Week 6: UI Advanced Features (Initiative 3.2.3)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#week-7-ui-polish-initiative-331">
+<span class="md-ellipsis">
+      
+        Week 7: UI Polish (Initiative 3.3.1)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#week-8-ui-integration-launch-initiative-332">
+<span class="md-ellipsis">
+      
+        Week 8: UI Integration &amp; Launch (Initiative 3.3.2)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ongoing-enhance-strengths-initiative-4">
+<span class="md-ellipsis">
+      
+        Ongoing: Enhance Strengths (Initiative 4)
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#success-criteria">
+<span class="md-ellipsis">
+      
+        Success Criteria
+      
+    </span>
+</a>
+<nav aria-label="Success Criteria" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#initiative-1-mcp-definition">
+<span class="md-ellipsis">
+      
+        Initiative 1: MCP Definition
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#initiative-2-simplified-onboarding">
+<span class="md-ellipsis">
+      
+        Initiative 2: Simplified Onboarding
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#initiative-3-user-interface">
+<span class="md-ellipsis">
+      
+        Initiative 3: User Interface
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#initiative-4-enhanced-strengths">
+<span class="md-ellipsis">
+      
+        Initiative 4: Enhanced Strengths
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#resource-requirements">
+<span class="md-ellipsis">
+      
+        Resource Requirements
+      
+    </span>
+</a>
+<nav aria-label="Resource Requirements" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#people">
+<span class="md-ellipsis">
+      
+        People
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#tools-services">
+<span class="md-ellipsis">
+      
+        Tools &amp; Services
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#budget-estimate">
+<span class="md-ellipsis">
+      
+        Budget Estimate
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#risk-mitigation">
+<span class="md-ellipsis">
+      
+        Risk Mitigation
+      
+    </span>
+</a>
+<nav aria-label="Risk Mitigation" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#risk-1-ui-development-delay">
+<span class="md-ellipsis">
+      
+        Risk 1: UI Development Delay
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#risk-2-technology-stack-issues">
+<span class="md-ellipsis">
+      
+        Risk 2: Technology Stack Issues
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#risk-3-complexity-not-reduced-enough">
+<span class="md-ellipsis">
+      
+        Risk 3: Complexity Not Reduced Enough
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#risk-4-ui-doesnt-meet-user-needs">
+<span class="md-ellipsis">
+      
+        Risk 4: UI Doesn't Meet User Needs
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#measuring-success">
+<span class="md-ellipsis">
+      
+        Measuring Success
+      
+    </span>
+</a>
+<nav aria-label="Measuring Success" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#quantitative-metrics">
+<span class="md-ellipsis">
+      
+        Quantitative Metrics
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#qualitative-metrics">
+<span class="md-ellipsis">
+      
+        Qualitative Metrics
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#next-steps_1">
+<span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+</a>
+<nav aria-label="Next Steps" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#immediate-actions-this-week">
+<span class="md-ellipsis">
+      
+        Immediate Actions (This Week)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#communication-plan">
+<span class="md-ellipsis">
+      
+        Communication Plan
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#appendix">
+<span class="md-ellipsis">
+      
+        Appendix
+      
+    </span>
+</a>
+<nav aria-label="Appendix" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#a-documentation-structure-proposed">
+<span class="md-ellipsis">
+      
+        A. Documentation Structure (Proposed)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#b-ui-technology-alternatives">
+<span class="md-ellipsis">
+      
+        B. UI Technology Alternatives
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#c-related-initiatives">
+<span class="md-ellipsis">
+      
+        C. Related Initiatives
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../WORK_BREAKDOWN_SESSIONS/">
+<span class="md-ellipsis">
+    
+  
+    Work Breakdown Sessions
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../WORK_TASKS/">
+<span class="md-ellipsis">
+    
+  
+    Work Tasks
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../PHASE2_3WEEK_PLAN/">
+<span class="md-ellipsis">
+    
+  
+    Phase 2 3-Week Plan
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../WEEK_2_SUMMARY/">
+<span class="md-ellipsis">
+    
+  
+    Week 2 Summary
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../WEEK_3_SUMMARY/">
+<span class="md-ellipsis">
+    
+  
+    Week 3 Summary
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_14" type="checkbox"/>
+<label class="md-nav__link" for="__nav_14" id="__nav_14_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_14_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_14">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../GLOSSARY/">
+<span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../FAQ/">
+<span class="md-ellipsis">
+    
+  
+    FAQ
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../SECURITY_BEST_PRACTICES/">
+<span class="md-ellipsis">
+    
+  
+    Security Best Practices
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../SECURITY_HARDENING/">
+<span class="md-ellipsis">
+    
+  
+    Security Hardening
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../SECURITY_AUDIT/">
+<span class="md-ellipsis">
+    
+  
+    Security Audit
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../PRODUCTION_HANDOFF/">
+<span class="md-ellipsis">
+    
+  
+    Production Handoff
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#executive-summary">
+<span class="md-ellipsis">
+      
+        Executive Summary
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#feedback-analysis">
+<span class="md-ellipsis">
+      
+        Feedback Analysis
+      
+    </span>
+</a>
+<nav aria-label="Feedback Analysis" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#strengths-build-on-these">
+<span class="md-ellipsis">
+      
+        Strengths (Build On These)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#weaknesses-must-address">
+<span class="md-ellipsis">
+      
+        Weaknesses (Must Address)
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#improvement-initiatives">
+<span class="md-ellipsis">
+      
+        Improvement Initiatives
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#initiative-1-define-mcp-clearly-and-prominently">
+<span class="md-ellipsis">
+      
+        Initiative 1: Define MCP Clearly and Prominently
+      
+    </span>
+</a>
+<nav aria-label="Initiative 1: Define MCP Clearly and Prominently" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#objectives">
+<span class="md-ellipsis">
+      
+        Objectives
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deliverables">
+<span class="md-ellipsis">
+      
+        Deliverables
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#2-verify-its-running-1-minute">
+<span class="md-ellipsis">
+      
+        2. Verify It's Running (1 minute)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#3-register-your-first-mcp-server-2-minutes">
+<span class="md-ellipsis">
+      
+        3. Register Your First MCP Server (2 minutes)
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#what-just-happened">
+<span class="md-ellipsis">
+      
+        What Just Happened?
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#next-steps">
+<span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+</a>
+<nav aria-label="Next Steps" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#success-metrics">
+<span class="md-ellipsis">
+      
+        Success Metrics
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#initiative-3-develop-user-interface">
+<span class="md-ellipsis">
+      
+        Initiative 3: Develop User Interface
+      
+    </span>
+</a>
+<nav aria-label="Initiative 3: Develop User Interface" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#objectives_1">
+<span class="md-ellipsis">
+      
+        Objectives
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#phase-31-ui-design-and-planning-week-3">
+<span class="md-ellipsis">
+      
+        Phase 3.1: UI Design and Planning (Week 3)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#phase-32-core-implementation-week-4-6">
+<span class="md-ellipsis">
+      
+        Phase 3.2: Core Implementation (Week 4-6)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#phase-33-polish-and-integration-week-7-8">
+<span class="md-ellipsis">
+      
+        Phase 3.3: Polish and Integration (Week 7-8)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ui-feature-priority">
+<span class="md-ellipsis">
+      
+        UI Feature Priority
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#success-metrics_1">
+<span class="md-ellipsis">
+      
+        Success Metrics
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#initiative-4-enhance-strengths">
+<span class="md-ellipsis">
+      
+        Initiative 4: Enhance Strengths
+      
+    </span>
+</a>
+<nav aria-label="Initiative 4: Enhance Strengths" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#objectives_2">
+<span class="md-ellipsis">
+      
+        Objectives
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#41-showcase-technology-stack">
+<span class="md-ellipsis">
+      
+        4.1 Showcase Technology Stack
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#42-add-quality-badges">
+<span class="md-ellipsis">
+      
+        4.2 Add Quality Badges
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#43-create-security-highlights-section">
+<span class="md-ellipsis">
+      
+        4.3 Create Security Highlights Section
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#44-add-deployment-success-section">
+<span class="md-ellipsis">
+      
+        4.4 Add Deployment Success Section
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#implementation-roadmap">
+<span class="md-ellipsis">
+      
+        Implementation Roadmap
+      
+    </span>
+</a>
+<nav aria-label="Implementation Roadmap" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#week-1-mcp-definition-initiative-1">
+<span class="md-ellipsis">
+      
+        Week 1: MCP Definition (Initiative 1)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#week-2-simplified-onboarding-initiative-2-part-1">
+<span class="md-ellipsis">
+      
+        Week 2: Simplified Onboarding (Initiative 2 - Part 1)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#week-3-onboarding-ui-planning-initiative-2-part-2-initiative-31">
+<span class="md-ellipsis">
+      
+        Week 3: Onboarding + UI Planning (Initiative 2 - Part 2 + Initiative 3.1)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#week-4-ui-foundation-initiative-321">
+<span class="md-ellipsis">
+      
+        Week 4: UI Foundation (Initiative 3.2.1)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#week-5-ui-core-features-initiative-322">
+<span class="md-ellipsis">
+      
+        Week 5: UI Core Features (Initiative 3.2.2)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#week-6-ui-advanced-features-initiative-323">
+<span class="md-ellipsis">
+      
+        Week 6: UI Advanced Features (Initiative 3.2.3)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#week-7-ui-polish-initiative-331">
+<span class="md-ellipsis">
+      
+        Week 7: UI Polish (Initiative 3.3.1)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#week-8-ui-integration-launch-initiative-332">
+<span class="md-ellipsis">
+      
+        Week 8: UI Integration &amp; Launch (Initiative 3.3.2)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#ongoing-enhance-strengths-initiative-4">
+<span class="md-ellipsis">
+      
+        Ongoing: Enhance Strengths (Initiative 4)
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#success-criteria">
+<span class="md-ellipsis">
+      
+        Success Criteria
+      
+    </span>
+</a>
+<nav aria-label="Success Criteria" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#initiative-1-mcp-definition">
+<span class="md-ellipsis">
+      
+        Initiative 1: MCP Definition
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#initiative-2-simplified-onboarding">
+<span class="md-ellipsis">
+      
+        Initiative 2: Simplified Onboarding
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#initiative-3-user-interface">
+<span class="md-ellipsis">
+      
+        Initiative 3: User Interface
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#initiative-4-enhanced-strengths">
+<span class="md-ellipsis">
+      
+        Initiative 4: Enhanced Strengths
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#resource-requirements">
+<span class="md-ellipsis">
+      
+        Resource Requirements
+      
+    </span>
+</a>
+<nav aria-label="Resource Requirements" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#people">
+<span class="md-ellipsis">
+      
+        People
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#tools-services">
+<span class="md-ellipsis">
+      
+        Tools &amp; Services
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#budget-estimate">
+<span class="md-ellipsis">
+      
+        Budget Estimate
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#risk-mitigation">
+<span class="md-ellipsis">
+      
+        Risk Mitigation
+      
+    </span>
+</a>
+<nav aria-label="Risk Mitigation" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#risk-1-ui-development-delay">
+<span class="md-ellipsis">
+      
+        Risk 1: UI Development Delay
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#risk-2-technology-stack-issues">
+<span class="md-ellipsis">
+      
+        Risk 2: Technology Stack Issues
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#risk-3-complexity-not-reduced-enough">
+<span class="md-ellipsis">
+      
+        Risk 3: Complexity Not Reduced Enough
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#risk-4-ui-doesnt-meet-user-needs">
+<span class="md-ellipsis">
+      
+        Risk 4: UI Doesn't Meet User Needs
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#measuring-success">
+<span class="md-ellipsis">
+      
+        Measuring Success
+      
+    </span>
+</a>
+<nav aria-label="Measuring Success" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#quantitative-metrics">
+<span class="md-ellipsis">
+      
+        Quantitative Metrics
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#qualitative-metrics">
+<span class="md-ellipsis">
+      
+        Qualitative Metrics
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#next-steps_1">
+<span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+</a>
+<nav aria-label="Next Steps" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#immediate-actions-this-week">
+<span class="md-ellipsis">
+      
+        Immediate Actions (This Week)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#communication-plan">
+<span class="md-ellipsis">
+      
+        Communication Plan
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#appendix">
+<span class="md-ellipsis">
+      
+        Appendix
+      
+    </span>
+</a>
+<nav aria-label="Appendix" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#a-documentation-structure-proposed">
+<span class="md-ellipsis">
+      
+        A. Documentation Structure (Proposed)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#b-ui-technology-alternatives">
+<span class="md-ellipsis">
+      
+        B. UI Technology Alternatives
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#c-related-initiatives">
+<span class="md-ellipsis">
+      
+        C. Related Initiatives
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<nav aria-label="Navigation" class="md-path">
+<ol class="md-path__list">
+<li class="md-path__item">
+<a class="md-path__link" href="..">
+<span class="md-ellipsis">
+    Home
+  </span>
+</a>
+</li>
+<li class="md-path__item">
+<a class="md-path__link" href="./">
+<span class="md-ellipsis">
+    Planning
+  </span>
+</a>
+</li>
+</ol>
+</nav>
+<article class="md-content__inner md-typeset">
+<h1 id="sark-repository-improvement-plan">SARK Repository Improvement Plan<a class="headerlink" href="#sark-repository-improvement-plan" title="Permanent link">¶</a></h1>
+<p><strong>Created:</strong> 2025-11-27
+<strong>Status:</strong> Proposed
+<strong>Owner:</strong> Development Team</p>
+<hr/>
+<h2 id="executive-summary">Executive Summary<a class="headerlink" href="#executive-summary" title="Permanent link">¶</a></h2>
+<p>This plan addresses critical feedback on the SARK repository while building on its exceptional strengths. The repository demonstrates world-class development practices, security-first design, and production-ready deployment capabilities. However, three key areas need attention: <strong>MCP definition clarity</strong>, <strong>simplified onboarding</strong>, and <strong>user interface development</strong>.</p>
+<p><strong>Timeline:</strong> 6-8 weeks
+<strong>Priority:</strong> High
+<strong>Expected Impact:</strong> 50% reduction in onboarding time, 80% improvement in accessibility</p>
+<hr/>
+<h2 id="feedback-analysis">Feedback Analysis<a class="headerlink" href="#feedback-analysis" title="Permanent link">¶</a></h2>
+<h3 id="strengths-build-on-these">Strengths (Build On These)<a class="headerlink" href="#strengths-build-on-these" title="Permanent link">¶</a></h3>
+<p>✅ <strong>Modern, Robust Technology Stack</strong>
+- FastAPI, SQLAlchemy, Redis, OPA, Docker, Kubernetes, Helm
+- <strong>Action:</strong> Showcase this in clearer architectural diagrams</p>
+<p>✅ <strong>Security-First Design</strong>
+- Multi-layered auth/authz, OPA policies, detailed security considerations
+- <strong>Action:</strong> Create security highlights section in main README</p>
+<p>✅ <strong>Excellent Development Practices</strong>
+- Automated linting, formatting, type checking, comprehensive tests
+- <strong>Action:</strong> Add badges and metrics to README to showcase quality</p>
+<p>✅ <strong>Production-Ready Deployment</strong>
+- Multi-stage Dockerfile, Docker Compose, Kustomize/Helm
+- <strong>Action:</strong> Create deployment success stories/case studies</p>
+<p>✅ <strong>Innovative Core Concept</strong>
+- MCP Server abstraction for unified control plane
+- <strong>Action:</strong> Make this the hero message of the documentation</p>
+<h3 id="weaknesses-must-address">Weaknesses (Must Address)<a class="headerlink" href="#weaknesses-must-address" title="Permanent link">¶</a></h3>
+<p>❌ <strong>MCP is Undefined</strong>
+- Documentation assumes MCP knowledge without defining it
+- <strong>Impact:</strong> Significant barrier to understanding and adoption
+- <strong>Priority:</strong> P0 - Critical</p>
+<p>❌ <strong>Complexity</strong>
+- Many moving parts make contributor onboarding difficult
+- <strong>Impact:</strong> Slows down team growth and contribution
+- <strong>Priority:</strong> P1 - High</p>
+<p>❌ <strong>Lack of User Interface</strong>
+- No web UI limits adoption and usability
+- <strong>Impact:</strong> Reduces accessibility for non-technical stakeholders
+- <strong>Priority:</strong> P1 - High</p>
+<hr/>
+<h2 id="improvement-initiatives">Improvement Initiatives<a class="headerlink" href="#improvement-initiatives" title="Permanent link">¶</a></h2>
+<h2 id="initiative-1-define-mcp-clearly-and-prominently">Initiative 1: Define MCP Clearly and Prominently<a class="headerlink" href="#initiative-1-define-mcp-clearly-and-prominently" title="Permanent link">¶</a></h2>
+<p><strong>Priority:</strong> P0 (Critical)
+<strong>Timeline:</strong> Week 1
+<strong>Effort:</strong> 8-12 hours</p>
+<h3 id="objectives">Objectives<a class="headerlink" href="#objectives" title="Permanent link">¶</a></h3>
+<ol>
+<li>Add comprehensive MCP definition to main README</li>
+<li>Create dedicated MCP introduction document</li>
+<li>Add visual diagrams showing MCP concepts</li>
+<li>Include real-world examples and use cases</li>
+</ol>
+<h3 id="deliverables">Deliverables<a class="headerlink" href="#deliverables" title="Permanent link">¶</a></h3>
+<h4 id="11-enhanced-readme-introduction">1.1 Enhanced README Introduction<a class="headerlink" href="#11-enhanced-readme-introduction" title="Permanent link">¶</a></h4>
+<p>Add to <code>README.md</code> immediately after the title:</p>
+<div class="language-markdown highlight"><pre><span></span><code><span id="__span-0-1"><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="gu">## What is MCP?</span>
+</span><span id="__span-0-2"><a href="#__codelineno-0-2" id="__codelineno-0-2" name="__codelineno-0-2"></a>
+</span><span id="__span-0-3"><a href="#__codelineno-0-3" id="__codelineno-0-3" name="__codelineno-0-3"></a><span class="gs">**Model Context Protocol (MCP)**</span> is an open protocol that enables AI assistants and
+</span><span id="__span-0-4"><a href="#__codelineno-0-4" id="__codelineno-0-4" name="__codelineno-0-4"></a>language models to securely interact with external tools, data sources, and services.
+</span><span id="__span-0-5"><a href="#__codelineno-0-5" id="__codelineno-0-5" name="__codelineno-0-5"></a>Think of it as a standardized "plugin system" for AI.
+</span><span id="__span-0-6"><a href="#__codelineno-0-6" id="__codelineno-0-6" name="__codelineno-0-6"></a>
+</span><span id="__span-0-7"><a href="#__codelineno-0-7" id="__codelineno-0-7" name="__codelineno-0-7"></a><span class="gu">### Why MCP Matters</span>
+</span><span id="__span-0-8"><a href="#__codelineno-0-8" id="__codelineno-0-8" name="__codelineno-0-8"></a>
+</span><span id="__span-0-9"><a href="#__codelineno-0-9" id="__codelineno-0-9" name="__codelineno-0-9"></a>Without MCP governance, AI assistants in your organization could:
+</span><span id="__span-0-10"><a href="#__codelineno-0-10" id="__codelineno-0-10" name="__codelineno-0-10"></a><span class="k">-</span><span class="w"> </span>Access sensitive data without proper authorization
+</span><span id="__span-0-11"><a href="#__codelineno-0-11" id="__codelineno-0-11" name="__codelineno-0-11"></a><span class="k">-</span><span class="w"> </span>Execute privileged operations without audit trails
+</span><span id="__span-0-12"><a href="#__codelineno-0-12" id="__codelineno-0-12" name="__codelineno-0-12"></a><span class="k">-</span><span class="w"> </span>Create security vulnerabilities through prompt injection
+</span><span id="__span-0-13"><a href="#__codelineno-0-13" id="__codelineno-0-13" name="__codelineno-0-13"></a><span class="k">-</span><span class="w"> </span>Proliferate as ungoverned "shadow IT"
+</span><span id="__span-0-14"><a href="#__codelineno-0-14" id="__codelineno-0-14" name="__codelineno-0-14"></a>
+</span><span id="__span-0-15"><a href="#__codelineno-0-15" id="__codelineno-0-15" name="__codelineno-0-15"></a><span class="gs">**SARK provides enterprise-grade governance**</span> for MCP at massive scale.
+</span><span id="__span-0-16"><a href="#__codelineno-0-16" id="__codelineno-0-16" name="__codelineno-0-16"></a>
+</span><span id="__span-0-17"><a href="#__codelineno-0-17" id="__codelineno-0-17" name="__codelineno-0-17"></a><span class="gu">### MCP in Action</span>
+</span><span id="__span-0-18"><a href="#__codelineno-0-18" id="__codelineno-0-18" name="__codelineno-0-18"></a>
+</span><span id="__span-0-19"><a href="#__codelineno-0-19" id="__codelineno-0-19" name="__codelineno-0-19"></a>```mermaid
+</span><span id="__span-0-20"><a href="#__codelineno-0-20" id="__codelineno-0-20" name="__codelineno-0-20"></a>graph LR
+</span><span id="__span-0-21"><a href="#__codelineno-0-21" id="__codelineno-0-21" name="__codelineno-0-21"></a>    AI[AI Assistant] --&gt;|MCP Protocol| SARK[SARK Gateway]
+</span><span id="__span-0-22"><a href="#__codelineno-0-22" id="__codelineno-0-22" name="__codelineno-0-22"></a>    SARK --&gt;|Authorized Request| DB[Database Server]
+</span><span id="__span-0-23"><a href="#__codelineno-0-23" id="__codelineno-0-23" name="__codelineno-0-23"></a>    SARK --&gt;|Authorized Request| JIRA[Jira Server]
+</span><span id="__span-0-24"><a href="#__codelineno-0-24" id="__codelineno-0-24" name="__codelineno-0-24"></a>    SARK --&gt;|Authorized Request| SLACK[Slack Server]
+</span><span id="__span-0-25"><a href="#__codelineno-0-25" id="__codelineno-0-25" name="__codelineno-0-25"></a>
+</span><span id="__span-0-26"><a href="#__codelineno-0-26" id="__codelineno-0-26" name="__codelineno-0-26"></a>    SARK --&gt;|Audit| AUDIT[Audit Log]
+</span><span id="__span-0-27"><a href="#__codelineno-0-27" id="__codelineno-0-27" name="__codelineno-0-27"></a>    SARK --&gt;|Policy Check| OPA[Policy Engine]
+</span></code></pre></div>
+<p><strong>Example Use Case:</strong>
+- Developer asks AI: "Show me all P0 bugs assigned to my team"
+- AI uses MCP to invoke <code>jira.query</code> tool
+- SARK validates: Is user authorized? Is request safe?
+- If allowed: Query executes, result returned
+- All actions logged for compliance
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a href="#__codelineno-1-1" id="__codelineno-1-1" name="__codelineno-1-1"></a>#### 1.2 Create `docs/MCP_INTRODUCTION.md`
+</span><span id="__span-1-2"><a href="#__codelineno-1-2" id="__codelineno-1-2" name="__codelineno-1-2"></a>
+</span><span id="__span-1-3"><a href="#__codelineno-1-3" id="__codelineno-1-3" name="__codelineno-1-3"></a>New comprehensive introduction document:
+</span><span id="__span-1-4"><a href="#__codelineno-1-4" id="__codelineno-1-4" name="__codelineno-1-4"></a>
+</span><span id="__span-1-5"><a href="#__codelineno-1-5" id="__codelineno-1-5" name="__codelineno-1-5"></a>**Sections:**
+</span><span id="__span-1-6"><a href="#__codelineno-1-6" id="__codelineno-1-6" name="__codelineno-1-6"></a>- What is MCP? (Protocol overview)
+</span><span id="__span-1-7"><a href="#__codelineno-1-7" id="__codelineno-1-7" name="__codelineno-1-7"></a>- Why MCP Exists (Problem statement)
+</span><span id="__span-1-8"><a href="#__codelineno-1-8" id="__codelineno-1-8" name="__codelineno-1-8"></a>- MCP Components (Servers, Tools, Resources, Prompts)
+</span><span id="__span-1-9"><a href="#__codelineno-1-9" id="__codelineno-1-9" name="__codelineno-1-9"></a>- MCP Security Challenges (Why governance is needed)
+</span><span id="__span-1-10"><a href="#__codelineno-1-10" id="__codelineno-1-10" name="__codelineno-1-10"></a>- How SARK Solves These Challenges
+</span><span id="__span-1-11"><a href="#__codelineno-1-11" id="__codelineno-1-11" name="__codelineno-1-11"></a>- Real-World MCP Use Cases
+</span><span id="__span-1-12"><a href="#__codelineno-1-12" id="__codelineno-1-12" name="__codelineno-1-12"></a>- MCP Protocol Specification Reference
+</span><span id="__span-1-13"><a href="#__codelineno-1-13" id="__codelineno-1-13" name="__codelineno-1-13"></a>
+</span><span id="__span-1-14"><a href="#__codelineno-1-14" id="__codelineno-1-14" name="__codelineno-1-14"></a>#### 1.3 Visual MCP Concepts Guide
+</span><span id="__span-1-15"><a href="#__codelineno-1-15" id="__codelineno-1-15" name="__codelineno-1-15"></a>
+</span><span id="__span-1-16"><a href="#__codelineno-1-16" id="__codelineno-1-16" name="__codelineno-1-16"></a>Create `docs/diagrams/mcp-concepts/`:
+</span><span id="__span-1-17"><a href="#__codelineno-1-17" id="__codelineno-1-17" name="__codelineno-1-17"></a>- `01-basic-mcp-flow.svg` - Simple MCP interaction
+</span><span id="__span-1-18"><a href="#__codelineno-1-18" id="__codelineno-1-18" name="__codelineno-1-18"></a>- `02-ungoverned-mcp-risks.svg` - Security risks without governance
+</span><span id="__span-1-19"><a href="#__codelineno-1-19" id="__codelineno-1-19" name="__codelineno-1-19"></a>- `03-sark-governance-layer.svg` - How SARK adds control
+</span><span id="__span-1-20"><a href="#__codelineno-1-20" id="__codelineno-1-20" name="__codelineno-1-20"></a>- `04-enterprise-mcp-architecture.svg` - Full enterprise deployment
+</span><span id="__span-1-21"><a href="#__codelineno-1-21" id="__codelineno-1-21" name="__codelineno-1-21"></a>
+</span><span id="__span-1-22"><a href="#__codelineno-1-22" id="__codelineno-1-22" name="__codelineno-1-22"></a>#### 1.4 Update Quick Start
+</span><span id="__span-1-23"><a href="#__codelineno-1-23" id="__codelineno-1-23" name="__codelineno-1-23"></a>
+</span><span id="__span-1-24"><a href="#__codelineno-1-24" id="__codelineno-1-24" name="__codelineno-1-24"></a>Enhance `docs/QUICKSTART.md` to include:
+</span><span id="__span-1-25"><a href="#__codelineno-1-25" id="__codelineno-1-25" name="__codelineno-1-25"></a>- 2-minute "What is MCP?" section at the top
+</span><span id="__span-1-26"><a href="#__codelineno-1-26" id="__codelineno-1-26" name="__codelineno-1-26"></a>- Link to MCP specification
+</span><span id="__span-1-27"><a href="#__codelineno-1-27" id="__codelineno-1-27" name="__codelineno-1-27"></a>- Simple MCP server example
+</span><span id="__span-1-28"><a href="#__codelineno-1-28" id="__codelineno-1-28" name="__codelineno-1-28"></a>- Before/after comparison (with and without SARK)
+</span><span id="__span-1-29"><a href="#__codelineno-1-29" id="__codelineno-1-29" name="__codelineno-1-29"></a>
+</span><span id="__span-1-30"><a href="#__codelineno-1-30" id="__codelineno-1-30" name="__codelineno-1-30"></a>### Success Metrics
+</span><span id="__span-1-31"><a href="#__codelineno-1-31" id="__codelineno-1-31" name="__codelineno-1-31"></a>
+</span><span id="__span-1-32"><a href="#__codelineno-1-32" id="__codelineno-1-32" name="__codelineno-1-32"></a>- ✅ New users understand "What is MCP?" in &lt; 5 minutes
+</span><span id="__span-1-33"><a href="#__codelineno-1-33" id="__codelineno-1-33" name="__codelineno-1-33"></a>- ✅ MCP definition appears in first 100 lines of README
+</span><span id="__span-1-34"><a href="#__codelineno-1-34" id="__codelineno-1-34" name="__codelineno-1-34"></a>- ✅ Zero assumptions of prior MCP knowledge
+</span><span id="__span-1-35"><a href="#__codelineno-1-35" id="__codelineno-1-35" name="__codelineno-1-35"></a>- ✅ Clear visual diagrams for visual learners
+</span><span id="__span-1-36"><a href="#__codelineno-1-36" id="__codelineno-1-36" name="__codelineno-1-36"></a>
+</span><span id="__span-1-37"><a href="#__codelineno-1-37" id="__codelineno-1-37" name="__codelineno-1-37"></a>---
+</span><span id="__span-1-38"><a href="#__codelineno-1-38" id="__codelineno-1-38" name="__codelineno-1-38"></a>
+</span><span id="__span-1-39"><a href="#__codelineno-1-39" id="__codelineno-1-39" name="__codelineno-1-39"></a>## Initiative 2: Simplify Onboarding Process
+</span><span id="__span-1-40"><a href="#__codelineno-1-40" id="__codelineno-1-40" name="__codelineno-1-40"></a>
+</span><span id="__span-1-41"><a href="#__codelineno-1-41" id="__codelineno-1-41" name="__codelineno-1-41"></a>**Priority:** P1 (High)
+</span><span id="__span-1-42"><a href="#__codelineno-1-42" id="__codelineno-1-42" name="__codelineno-1-42"></a>**Timeline:** Week 2-3
+</span><span id="__span-1-43"><a href="#__codelineno-1-43" id="__codelineno-1-43" name="__codelineno-1-43"></a>**Effort:** 20-30 hours
+</span><span id="__span-1-44"><a href="#__codelineno-1-44" id="__codelineno-1-44" name="__codelineno-1-44"></a>
+</span><span id="__span-1-45"><a href="#__codelineno-1-45" id="__codelineno-1-45" name="__codelineno-1-45"></a>### Objectives
+</span><span id="__span-1-46"><a href="#__codelineno-1-46" id="__codelineno-1-46" name="__codelineno-1-46"></a>
+</span><span id="__span-1-47"><a href="#__codelineno-1-47" id="__codelineno-1-47" name="__codelineno-1-47"></a>1. Create a "Getting Started in 5 Minutes" ultra-simple guide
+</span><span id="__span-1-48"><a href="#__codelineno-1-48" id="__codelineno-1-48" name="__codelineno-1-48"></a>2. Develop progressive complexity documentation path
+</span><span id="__span-1-49"><a href="#__codelineno-1-49" id="__codelineno-1-49" name="__codelineno-1-49"></a>3. Add interactive tutorials
+</span><span id="__span-1-50"><a href="#__codelineno-1-50" id="__codelineno-1-50" name="__codelineno-1-50"></a>4. Create onboarding checklist
+</span><span id="__span-1-51"><a href="#__codelineno-1-51" id="__codelineno-1-51" name="__codelineno-1-51"></a>
+</span><span id="__span-1-52"><a href="#__codelineno-1-52" id="__codelineno-1-52" name="__codelineno-1-52"></a>### Deliverables
+</span><span id="__span-1-53"><a href="#__codelineno-1-53" id="__codelineno-1-53" name="__codelineno-1-53"></a>
+</span><span id="__span-1-54"><a href="#__codelineno-1-54" id="__codelineno-1-54" name="__codelineno-1-54"></a>#### 2.1 Create `docs/GETTING_STARTED_5MIN.md`
+</span><span id="__span-1-55"><a href="#__codelineno-1-55" id="__codelineno-1-55" name="__codelineno-1-55"></a>
+</span><span id="__span-1-56"><a href="#__codelineno-1-56" id="__codelineno-1-56" name="__codelineno-1-56"></a>**Ultra-simplified guide:**
+</span><span id="__span-1-57"><a href="#__codelineno-1-57" id="__codelineno-1-57" name="__codelineno-1-57"></a>
+</span><span id="__span-1-58"><a href="#__codelineno-1-58" id="__codelineno-1-58" name="__codelineno-1-58"></a>```markdown
+</span><span id="__span-1-59"><a href="#__codelineno-1-59" id="__codelineno-1-59" name="__codelineno-1-59"></a># Get Started in 5 Minutes
+</span><span id="__span-1-60"><a href="#__codelineno-1-60" id="__codelineno-1-60" name="__codelineno-1-60"></a>
+</span><span id="__span-1-61"><a href="#__codelineno-1-61" id="__codelineno-1-61" name="__codelineno-1-61"></a>## Prerequisites
+</span><span id="__span-1-62"><a href="#__codelineno-1-62" id="__codelineno-1-62" name="__codelineno-1-62"></a>- Docker installed
+</span><span id="__span-1-63"><a href="#__codelineno-1-63" id="__codelineno-1-63" name="__codelineno-1-63"></a>- 4GB RAM available
+</span><span id="__span-1-64"><a href="#__codelineno-1-64" id="__codelineno-1-64" name="__codelineno-1-64"></a>
+</span><span id="__span-1-65"><a href="#__codelineno-1-65" id="__codelineno-1-65" name="__codelineno-1-65"></a>## Three Commands to Success
+</span><span id="__span-1-66"><a href="#__codelineno-1-66" id="__codelineno-1-66" name="__codelineno-1-66"></a>
+</span><span id="__span-1-67"><a href="#__codelineno-1-67" id="__codelineno-1-67" name="__codelineno-1-67"></a>### 1. Clone and Start (2 minutes)
+</span><span id="__span-1-68"><a href="#__codelineno-1-68" id="__codelineno-1-68" name="__codelineno-1-68"></a>```bash
+</span><span id="__span-1-69"><a href="#__codelineno-1-69" id="__codelineno-1-69" name="__codelineno-1-69"></a>git clone https://github.com/apathy-ca/sark.git
+</span><span id="__span-1-70"><a href="#__codelineno-1-70" id="__codelineno-1-70" name="__codelineno-1-70"></a>cd sark
+</span><span id="__span-1-71"><a href="#__codelineno-1-71" id="__codelineno-1-71" name="__codelineno-1-71"></a>docker compose --profile minimal up -d
+</span></code></pre></div></p>
+<h3 id="2-verify-its-running-1-minute">2. Verify It's Running (1 minute)<a class="headerlink" href="#2-verify-its-running-1-minute" title="Permanent link">¶</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a href="#__codelineno-2-1" id="__codelineno-2-1" name="__codelineno-2-1"></a>curl<span class="w"> </span>http://localhost:8000/health
+</span><span id="__span-2-2"><a href="#__codelineno-2-2" id="__codelineno-2-2" name="__codelineno-2-2"></a><span class="c1"># Should return: {"status":"healthy"}</span>
+</span></code></pre></div>
+<h3 id="3-register-your-first-mcp-server-2-minutes">3. Register Your First MCP Server (2 minutes)<a class="headerlink" href="#3-register-your-first-mcp-server-2-minutes" title="Permanent link">¶</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a href="#__codelineno-3-1" id="__codelineno-3-1" name="__codelineno-3-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8000/api/v1/servers<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-2"><a href="#__codelineno-3-2" id="__codelineno-3-2" name="__codelineno-3-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">"Content-Type: application/json"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-3"><a href="#__codelineno-3-3" id="__codelineno-3-3" name="__codelineno-3-3"></a><span class="w">  </span>-d<span class="w"> </span>@examples/minimal-server.json
+</span><span id="__span-3-4"><a href="#__codelineno-3-4" id="__codelineno-3-4" name="__codelineno-3-4"></a>
+</span><span id="__span-3-5"><a href="#__codelineno-3-5" id="__codelineno-3-5" name="__codelineno-3-5"></a><span class="c1"># View at: http://localhost:8000/docs</span>
+</span></code></pre></div>
+<h2 id="what-just-happened">What Just Happened?<a class="headerlink" href="#what-just-happened" title="Permanent link">¶</a></h2>
+<p>You now have:
+- ✅ SARK API running
+- ✅ PostgreSQL for data storage
+- ✅ Redis for caching
+- ✅ OPA for policy enforcement
+- ✅ One registered MCP server</p>
+<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">¶</a></h2>
+<ul>
+<li><a href="../MCP_INTRODUCTION/">Understand MCP Concepts</a> (10 min)</li>
+<li><a href="../AUTHENTICATION/">Configure Authentication</a> (15 min)</li>
+<li><a href="../OPA_POLICY_GUIDE/">Write Your First Policy</a> (20 min)
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a href="#__codelineno-4-1" id="__codelineno-4-1" name="__codelineno-4-1"></a>#### 2.2 Progressive Learning Path
+</span><span id="__span-4-2"><a href="#__codelineno-4-2" id="__codelineno-4-2" name="__codelineno-4-2"></a>
+</span><span id="__span-4-3"><a href="#__codelineno-4-3" id="__codelineno-4-3" name="__codelineno-4-3"></a>Create `docs/LEARNING_PATH.md`:
+</span><span id="__span-4-4"><a href="#__codelineno-4-4" id="__codelineno-4-4" name="__codelineno-4-4"></a>
+</span><span id="__span-4-5"><a href="#__codelineno-4-5" id="__codelineno-4-5" name="__codelineno-4-5"></a>```markdown
+</span><span id="__span-4-6"><a href="#__codelineno-4-6" id="__codelineno-4-6" name="__codelineno-4-6"></a># SARK Learning Path
+</span><span id="__span-4-7"><a href="#__codelineno-4-7" id="__codelineno-4-7" name="__codelineno-4-7"></a>
+</span><span id="__span-4-8"><a href="#__codelineno-4-8" id="__codelineno-4-8" name="__codelineno-4-8"></a>## Level 1: Beginner (30 minutes)
+</span><span id="__span-4-9"><a href="#__codelineno-4-9" id="__codelineno-4-9" name="__codelineno-4-9"></a>**Goal:** Understand what SARK is and run it locally
+</span><span id="__span-4-10"><a href="#__codelineno-4-10" id="__codelineno-4-10" name="__codelineno-4-10"></a>
+</span><span id="__span-4-11"><a href="#__codelineno-4-11" id="__codelineno-4-11" name="__codelineno-4-11"></a>- [ ] Read [MCP Introduction](MCP_INTRODUCTION.md) (5 min)
+</span><span id="__span-4-12"><a href="#__codelineno-4-12" id="__codelineno-4-12" name="__codelineno-4-12"></a>- [ ] Complete [5-Minute Quickstart](GETTING_STARTED_5MIN.md) (5 min)
+</span><span id="__span-4-13"><a href="#__codelineno-4-13" id="__codelineno-4-13" name="__codelineno-4-13"></a>- [ ] Explore [Interactive API Docs](http://localhost:8000/docs) (10 min)
+</span><span id="__span-4-14"><a href="#__codelineno-4-14" id="__codelineno-4-14" name="__codelineno-4-14"></a>- [ ] Register 2-3 sample MCP servers (10 min)
+</span><span id="__span-4-15"><a href="#__codelineno-4-15" id="__codelineno-4-15" name="__codelineno-4-15"></a>
+</span><span id="__span-4-16"><a href="#__codelineno-4-16" id="__codelineno-4-16" name="__codelineno-4-16"></a>**You'll know:** What MCP is, why SARK exists, basic API usage
+</span><span id="__span-4-17"><a href="#__codelineno-4-17" id="__codelineno-4-17" name="__codelineno-4-17"></a>
+</span><span id="__span-4-18"><a href="#__codelineno-4-18" id="__codelineno-4-18" name="__codelineno-4-18"></a>## Level 2: Intermediate (2 hours)
+</span><span id="__span-4-19"><a href="#__codelineno-4-19" id="__codelineno-4-19" name="__codelineno-4-19"></a>**Goal:** Configure authentication and basic policies
+</span><span id="__span-4-20"><a href="#__codelineno-4-20" id="__codelineno-4-20" name="__codelineno-4-20"></a>
+</span><span id="__span-4-21"><a href="#__codelineno-4-21" id="__codelineno-4-21" name="__codelineno-4-21"></a>- [ ] Set up [LDAP Authentication](LDAP_SETUP.md) (30 min)
+</span><span id="__span-4-22"><a href="#__codelineno-4-22" id="__codelineno-4-22" name="__codelineno-4-22"></a>- [ ] Write your [First OPA Policy](OPA_POLICY_GUIDE.md#your-first-policy) (30 min)
+</span><span id="__span-4-23"><a href="#__codelineno-4-23" id="__codelineno-4-23" name="__codelineno-4-23"></a>- [ ] Test [Authorization Decisions](API_REFERENCE.md#policy-evaluation) (20 min)
+</span><span id="__span-4-24"><a href="#__codelineno-4-24" id="__codelineno-4-24" name="__codelineno-4-24"></a>- [ ] Review [Audit Logs](QUICKSTART.md#step-7-view-audit-logs) (10 min)
+</span><span id="__span-4-25"><a href="#__codelineno-4-25" id="__codelineno-4-25" name="__codelineno-4-25"></a>- [ ] Configure [Basic Monitoring](MONITORING_SETUP.md#quick-setup) (30 min)
+</span><span id="__span-4-26"><a href="#__codelineno-4-26" id="__codelineno-4-26" name="__codelineno-4-26"></a>
+</span><span id="__span-4-27"><a href="#__codelineno-4-27" id="__codelineno-4-27" name="__codelineno-4-27"></a>**You'll know:** How to authenticate users, write policies, view audits
+</span><span id="__span-4-28"><a href="#__codelineno-4-28" id="__codelineno-4-28" name="__codelineno-4-28"></a>
+</span><span id="__span-4-29"><a href="#__codelineno-4-29" id="__codelineno-4-29" name="__codelineno-4-29"></a>## Level 3: Advanced (1 day)
+</span><span id="__span-4-30"><a href="#__codelineno-4-30" id="__codelineno-4-30" name="__codelineno-4-30"></a>**Goal:** Production deployment planning
+</span><span id="__span-4-31"><a href="#__codelineno-4-31" id="__codelineno-4-31" name="__codelineno-4-31"></a>
+</span><span id="__span-4-32"><a href="#__codelineno-4-32" id="__codelineno-4-32" name="__codelineno-4-32"></a>- [ ] Study [Architecture](ARCHITECTURE.md) (1 hour)
+</span><span id="__span-4-33"><a href="#__codelineno-4-33" id="__codelineno-4-33" name="__codelineno-4-33"></a>- [ ] Plan [Production Deployment](DEPLOYMENT.md) (2 hours)
+</span><span id="__span-4-34"><a href="#__codelineno-4-34" id="__codelineno-4-34" name="__codelineno-4-34"></a>- [ ] Design [Custom Policies](ADVANCED_OPA_POLICIES.md) (2 hours)
+</span><span id="__span-4-35"><a href="#__codelineno-4-35" id="__codelineno-4-35" name="__codelineno-4-35"></a>- [ ] Set up [SIEM Integration](siem/INTEGRATION_GUIDE.md) (1 hour)
+</span><span id="__span-4-36"><a href="#__codelineno-4-36" id="__codelineno-4-36" name="__codelineno-4-36"></a>- [ ] Review [Security Hardening](SECURITY_HARDENING.md) (1 hour)
+</span><span id="__span-4-37"><a href="#__codelineno-4-37" id="__codelineno-4-37" name="__codelineno-4-37"></a>- [ ] Test [Disaster Recovery](DISASTER_RECOVERY.md) (1 hour)
+</span><span id="__span-4-38"><a href="#__codelineno-4-38" id="__codelineno-4-38" name="__codelineno-4-38"></a>
+</span><span id="__span-4-39"><a href="#__codelineno-4-39" id="__codelineno-4-39" name="__codelineno-4-39"></a>**You'll know:** Production deployment, advanced policies, operations
+</span><span id="__span-4-40"><a href="#__codelineno-4-40" id="__codelineno-4-40" name="__codelineno-4-40"></a>
+</span><span id="__span-4-41"><a href="#__codelineno-4-41" id="__codelineno-4-41" name="__codelineno-4-41"></a>## Level 4: Expert (Ongoing)
+</span><span id="__span-4-42"><a href="#__codelineno-4-42" id="__codelineno-4-42" name="__codelineno-4-42"></a>**Goal:** Optimize and scale SARK
+</span><span id="__span-4-43"><a href="#__codelineno-4-43" id="__codelineno-4-43" name="__codelineno-4-43"></a>
+</span><span id="__span-4-44"><a href="#__codelineno-4-44" id="__codelineno-4-44" name="__codelineno-4-44"></a>- [ ] Optimize [Performance](PERFORMANCE_TUNING.md)
+</span><span id="__span-4-45"><a href="#__codelineno-4-45" id="__codelineno-4-45" name="__codelineno-4-45"></a>- [ ] Scale to [10,000+ servers](ROADMAP.md#phase-4)
+</span><span id="__span-4-46"><a href="#__codelineno-4-46" id="__codelineno-4-46" name="__codelineno-4-46"></a>- [ ] Implement [Multi-region Deployment](ROADMAP.md#multi-region)
+</span><span id="__span-4-47"><a href="#__codelineno-4-47" id="__codelineno-4-47" name="__codelineno-4-47"></a>- [ ] Contribute to SARK development
+</span><span id="__span-4-48"><a href="#__codelineno-4-48" id="__codelineno-4-48" name="__codelineno-4-48"></a>
+</span><span id="__span-4-49"><a href="#__codelineno-4-49" id="__codelineno-4-49" name="__codelineno-4-49"></a>**You'll know:** Everything about SARK
+</span></code></pre></div></li>
+</ul>
+<h4 id="23-interactive-tutorials">2.3 Interactive Tutorials<a class="headerlink" href="#23-interactive-tutorials" title="Permanent link">¶</a></h4>
+<p>Create <code>examples/tutorials/</code> directory:</p>
+<ol>
+<li><strong><code>tutorial-01-basic-setup/</code></strong></li>
+<li><code>README.md</code> - Step-by-step guide</li>
+<li><code>docker-compose.yml</code> - Minimal setup</li>
+<li><code>sample-server.json</code> - Example MCP server</li>
+<li>
+<p><code>test-policy.rego</code> - Simple policy</p>
+</li>
+<li>
+<p><strong><code>tutorial-02-authentication/</code></strong></p>
+</li>
+<li>LDAP integration walkthrough</li>
+<li>Sample users and groups</li>
+<li>
+<p>Test scripts</p>
+</li>
+<li>
+<p><strong><code>tutorial-03-policies/</code></strong></p>
+</li>
+<li>Policy writing workshop</li>
+<li>5 example policies with tests</li>
+<li>Common patterns</li>
+</ol>
+<h4 id="24-onboarding-checklist">2.4 Onboarding Checklist<a class="headerlink" href="#24-onboarding-checklist" title="Permanent link">¶</a></h4>
+<p>Create <code>docs/ONBOARDING_CHECKLIST.md</code>:</p>
+<div class="language-markdown highlight"><pre><span></span><code><span id="__span-5-1"><a href="#__codelineno-5-1" id="__codelineno-5-1" name="__codelineno-5-1"></a><span class="gh"># New User Onboarding Checklist</span>
+</span><span id="__span-5-2"><a href="#__codelineno-5-2" id="__codelineno-5-2" name="__codelineno-5-2"></a>
+</span><span id="__span-5-3"><a href="#__codelineno-5-3" id="__codelineno-5-3" name="__codelineno-5-3"></a><span class="gu">## Day 1: Understanding (2 hours)</span>
+</span><span id="__span-5-4"><a href="#__codelineno-5-4" id="__codelineno-5-4" name="__codelineno-5-4"></a><span class="k">- [ ]</span> Read "What is MCP?" in README
+</span><span id="__span-5-5"><a href="#__codelineno-5-5" id="__codelineno-5-5" name="__codelineno-5-5"></a><span class="k">- [ ]</span> Review MCP Introduction guide
+</span><span id="__span-5-6"><a href="#__codelineno-5-6" id="__codelineno-5-6" name="__codelineno-5-6"></a><span class="k">- [ ]</span> Watch overview video (if available)
+</span><span id="__span-5-7"><a href="#__codelineno-5-7" id="__codelineno-5-7" name="__codelineno-5-7"></a><span class="k">- [ ]</span> Join Slack/Discord community
+</span><span id="__span-5-8"><a href="#__codelineno-5-8" id="__codelineno-5-8" name="__codelineno-5-8"></a>
+</span><span id="__span-5-9"><a href="#__codelineno-5-9" id="__codelineno-5-9" name="__codelineno-5-9"></a><span class="gu">## Day 2: Hands-On (4 hours)</span>
+</span><span id="__span-5-10"><a href="#__codelineno-5-10" id="__codelineno-5-10" name="__codelineno-5-10"></a><span class="k">- [ ]</span> Complete 5-minute quickstart
+</span><span id="__span-5-11"><a href="#__codelineno-5-11" id="__codelineno-5-11" name="__codelineno-5-11"></a><span class="k">- [ ]</span> Explore API documentation
+</span><span id="__span-5-12"><a href="#__codelineno-5-12" id="__codelineno-5-12" name="__codelineno-5-12"></a><span class="k">- [ ]</span> Register 3 test MCP servers
+</span><span id="__span-5-13"><a href="#__codelineno-5-13" id="__codelineno-5-13" name="__codelineno-5-13"></a><span class="k">- [ ]</span> Test a policy evaluation
+</span><span id="__span-5-14"><a href="#__codelineno-5-14" id="__codelineno-5-14" name="__codelineno-5-14"></a>
+</span><span id="__span-5-15"><a href="#__codelineno-5-15" id="__codelineno-5-15" name="__codelineno-5-15"></a><span class="gu">## Week 1: Deep Dive (8 hours)</span>
+</span><span id="__span-5-16"><a href="#__codelineno-5-16" id="__codelineno-5-16" name="__codelineno-5-16"></a><span class="k">- [ ]</span> Set up authentication
+</span><span id="__span-5-17"><a href="#__codelineno-5-17" id="__codelineno-5-17" name="__codelineno-5-17"></a><span class="k">- [ ]</span> Write custom policies
+</span><span id="__span-5-18"><a href="#__codelineno-5-18" id="__codelineno-5-18" name="__codelineno-5-18"></a><span class="k">- [ ]</span> Configure monitoring
+</span><span id="__span-5-19"><a href="#__codelineno-5-19" id="__codelineno-5-19" name="__codelineno-5-19"></a><span class="k">- [ ]</span> Review audit logs
+</span><span id="__span-5-20"><a href="#__codelineno-5-20" id="__codelineno-5-20" name="__codelineno-5-20"></a><span class="k">- [ ]</span> Read architecture docs
+</span><span id="__span-5-21"><a href="#__codelineno-5-21" id="__codelineno-5-21" name="__codelineno-5-21"></a>
+</span><span id="__span-5-22"><a href="#__codelineno-5-22" id="__codelineno-5-22" name="__codelineno-5-22"></a><span class="gu">## Week 2: Production Planning (16 hours)</span>
+</span><span id="__span-5-23"><a href="#__codelineno-5-23" id="__codelineno-5-23" name="__codelineno-5-23"></a><span class="k">- [ ]</span> Design production architecture
+</span><span id="__span-5-24"><a href="#__codelineno-5-24" id="__codelineno-5-24" name="__codelineno-5-24"></a><span class="k">- [ ]</span> Plan deployment strategy
+</span><span id="__span-5-25"><a href="#__codelineno-5-25" id="__codelineno-5-25" name="__codelineno-5-25"></a><span class="k">- [ ]</span> Write production policies
+</span><span id="__span-5-26"><a href="#__codelineno-5-26" id="__codelineno-5-26" name="__codelineno-5-26"></a><span class="k">- [ ]</span> Set up CI/CD integration
+</span><span id="__span-5-27"><a href="#__codelineno-5-27" id="__codelineno-5-27" name="__codelineno-5-27"></a><span class="k">- [ ]</span> Test disaster recovery
+</span><span id="__span-5-28"><a href="#__codelineno-5-28" id="__codelineno-5-28" name="__codelineno-5-28"></a>
+</span><span id="__span-5-29"><a href="#__codelineno-5-29" id="__codelineno-5-29" name="__codelineno-5-29"></a><span class="gu">## Week 3: Go Live (variable)</span>
+</span><span id="__span-5-30"><a href="#__codelineno-5-30" id="__codelineno-5-30" name="__codelineno-5-30"></a><span class="k">- [ ]</span> Deploy to staging
+</span><span id="__span-5-31"><a href="#__codelineno-5-31" id="__codelineno-5-31" name="__codelineno-5-31"></a><span class="k">- [ ]</span> Load testing
+</span><span id="__span-5-32"><a href="#__codelineno-5-32" id="__codelineno-5-32" name="__codelineno-5-32"></a><span class="k">- [ ]</span> Security review
+</span><span id="__span-5-33"><a href="#__codelineno-5-33" id="__codelineno-5-33" name="__codelineno-5-33"></a><span class="k">- [ ]</span> Deploy to production
+</span><span id="__span-5-34"><a href="#__codelineno-5-34" id="__codelineno-5-34" name="__codelineno-5-34"></a><span class="k">- [ ]</span> Monitor and optimize
+</span></code></pre></div>
+<h4 id="25-docker-compose-profiles">2.5 Docker Compose Profiles<a class="headerlink" href="#25-docker-compose-profiles" title="Permanent link">¶</a></h4>
+<p>Simplify Docker Compose with clear profiles:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-6-1"><a href="#__codelineno-6-1" id="__codelineno-6-1" name="__codelineno-6-1"></a><span class="c1"># docker-compose.yml additions</span>
+</span><span id="__span-6-2"><a href="#__codelineno-6-2" id="__codelineno-6-2" name="__codelineno-6-2"></a>
+</span><span id="__span-6-3"><a href="#__codelineno-6-3" id="__codelineno-6-3" name="__codelineno-6-3"></a><span class="c1"># Minimal profile: Just API + Database (fastest startup)</span>
+</span><span id="__span-6-4"><a href="#__codelineno-6-4" id="__codelineno-6-4" name="__codelineno-6-4"></a><span class="nt">services</span><span class="p">:</span>
+</span><span id="__span-6-5"><a href="#__codelineno-6-5" id="__codelineno-6-5" name="__codelineno-6-5"></a><span class="w">  </span><span class="nt">api</span><span class="p">:</span>
+</span><span id="__span-6-6"><a href="#__codelineno-6-6" id="__codelineno-6-6" name="__codelineno-6-6"></a><span class="w">    </span><span class="nt">profiles</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"minimal"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"standard"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"full"</span><span class="p p-Indicator">]</span>
+</span><span id="__span-6-7"><a href="#__codelineno-6-7" id="__codelineno-6-7" name="__codelineno-6-7"></a><span class="w">  </span><span class="nt">postgres</span><span class="p">:</span>
+</span><span id="__span-6-8"><a href="#__codelineno-6-8" id="__codelineno-6-8" name="__codelineno-6-8"></a><span class="w">    </span><span class="nt">profiles</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"minimal"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"standard"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"full"</span><span class="p p-Indicator">]</span>
+</span><span id="__span-6-9"><a href="#__codelineno-6-9" id="__codelineno-6-9" name="__codelineno-6-9"></a><span class="w">  </span><span class="nt">redis</span><span class="p">:</span>
+</span><span id="__span-6-10"><a href="#__codelineno-6-10" id="__codelineno-6-10" name="__codelineno-6-10"></a><span class="w">    </span><span class="nt">profiles</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"minimal"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"standard"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"full"</span><span class="p p-Indicator">]</span>
+</span><span id="__span-6-11"><a href="#__codelineno-6-11" id="__codelineno-6-11" name="__codelineno-6-11"></a><span class="w">  </span><span class="nt">opa</span><span class="p">:</span>
+</span><span id="__span-6-12"><a href="#__codelineno-6-12" id="__codelineno-6-12" name="__codelineno-6-12"></a><span class="w">    </span><span class="nt">profiles</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"minimal"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"standard"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"full"</span><span class="p p-Indicator">]</span>
+</span><span id="__span-6-13"><a href="#__codelineno-6-13" id="__codelineno-6-13" name="__codelineno-6-13"></a>
+</span><span id="__span-6-14"><a href="#__codelineno-6-14" id="__codelineno-6-14" name="__codelineno-6-14"></a><span class="w">  </span><span class="c1"># Standard profile: + Auth + Monitoring</span>
+</span><span id="__span-6-15"><a href="#__codelineno-6-15" id="__codelineno-6-15" name="__codelineno-6-15"></a><span class="w">  </span><span class="nt">ldap</span><span class="p">:</span>
+</span><span id="__span-6-16"><a href="#__codelineno-6-16" id="__codelineno-6-16" name="__codelineno-6-16"></a><span class="w">    </span><span class="nt">profiles</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"standard"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"full"</span><span class="p p-Indicator">]</span>
+</span><span id="__span-6-17"><a href="#__codelineno-6-17" id="__codelineno-6-17" name="__codelineno-6-17"></a><span class="w">  </span><span class="nt">prometheus</span><span class="p">:</span>
+</span><span id="__span-6-18"><a href="#__codelineno-6-18" id="__codelineno-6-18" name="__codelineno-6-18"></a><span class="w">    </span><span class="nt">profiles</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"standard"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"full"</span><span class="p p-Indicator">]</span>
+</span><span id="__span-6-19"><a href="#__codelineno-6-19" id="__codelineno-6-19" name="__codelineno-6-19"></a><span class="w">  </span><span class="nt">grafana</span><span class="p">:</span>
+</span><span id="__span-6-20"><a href="#__codelineno-6-20" id="__codelineno-6-20" name="__codelineno-6-20"></a><span class="w">    </span><span class="nt">profiles</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"standard"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"full"</span><span class="p p-Indicator">]</span>
+</span><span id="__span-6-21"><a href="#__codelineno-6-21" id="__codelineno-6-21" name="__codelineno-6-21"></a>
+</span><span id="__span-6-22"><a href="#__codelineno-6-22" id="__codelineno-6-22" name="__codelineno-6-22"></a><span class="w">  </span><span class="c1"># Full profile: Everything</span>
+</span><span id="__span-6-23"><a href="#__codelineno-6-23" id="__codelineno-6-23" name="__codelineno-6-23"></a><span class="w">  </span><span class="nt">vault</span><span class="p">:</span>
+</span><span id="__span-6-24"><a href="#__codelineno-6-24" id="__codelineno-6-24" name="__codelineno-6-24"></a><span class="w">    </span><span class="nt">profiles</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"full"</span><span class="p p-Indicator">]</span>
+</span><span id="__span-6-25"><a href="#__codelineno-6-25" id="__codelineno-6-25" name="__codelineno-6-25"></a><span class="w">  </span><span class="nt">consul</span><span class="p">:</span>
+</span><span id="__span-6-26"><a href="#__codelineno-6-26" id="__codelineno-6-26" name="__codelineno-6-26"></a><span class="w">    </span><span class="nt">profiles</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"full"</span><span class="p p-Indicator">]</span>
+</span><span id="__span-6-27"><a href="#__codelineno-6-27" id="__codelineno-6-27" name="__codelineno-6-27"></a><span class="w">  </span><span class="nt">kong</span><span class="p">:</span>
+</span><span id="__span-6-28"><a href="#__codelineno-6-28" id="__codelineno-6-28" name="__codelineno-6-28"></a><span class="w">    </span><span class="nt">profiles</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"full"</span><span class="p p-Indicator">]</span>
+</span></code></pre></div>
+<h3 id="success-metrics">Success Metrics<a class="headerlink" href="#success-metrics" title="Permanent link">¶</a></h3>
+<ul>
+<li>✅ New users can run SARK in &lt; 5 minutes</li>
+<li>✅ Clear progression from beginner to expert</li>
+<li>✅ 50% reduction in "getting started" questions</li>
+<li>✅ Onboarding time: 1 week → 2 days</li>
+</ul>
+<hr/>
+<h2 id="initiative-3-develop-user-interface">Initiative 3: Develop User Interface<a class="headerlink" href="#initiative-3-develop-user-interface" title="Permanent link">¶</a></h2>
+<p><strong>Priority:</strong> P1 (High)
+<strong>Timeline:</strong> Week 3-8
+<strong>Effort:</strong> 120-160 hours</p>
+<h3 id="objectives_1">Objectives<a class="headerlink" href="#objectives_1" title="Permanent link">¶</a></h3>
+<ol>
+<li>Design modern, intuitive web UI</li>
+<li>Implement core functionality</li>
+<li>Ensure accessibility and security</li>
+<li>Deploy as part of SARK stack</li>
+</ol>
+<h3 id="phase-31-ui-design-and-planning-week-3">Phase 3.1: UI Design and Planning (Week 3)<a class="headerlink" href="#phase-31-ui-design-and-planning-week-3" title="Permanent link">¶</a></h3>
+<h4 id="311-technology-selection">3.1.1 Technology Selection<a class="headerlink" href="#311-technology-selection" title="Permanent link">¶</a></h4>
+<p><strong>Recommended Stack:</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a href="#__codelineno-7-1" id="__codelineno-7-1" name="__codelineno-7-1"></a>Frontend Framework: React 18+ with TypeScript
+</span><span id="__span-7-2"><a href="#__codelineno-7-2" id="__codelineno-7-2" name="__codelineno-7-2"></a>UI Component Library: shadcn/ui (Tailwind CSS based)
+</span><span id="__span-7-3"><a href="#__codelineno-7-3" id="__codelineno-7-3" name="__codelineno-7-3"></a>State Management: TanStack Query (React Query) + Zustand
+</span><span id="__span-7-4"><a href="#__codelineno-7-4" id="__codelineno-7-4" name="__codelineno-7-4"></a>Forms: React Hook Form + Zod validation
+</span><span id="__span-7-5"><a href="#__codelineno-7-5" id="__codelineno-7-5" name="__codelineno-7-5"></a>Charts/Graphs: Recharts or Apache ECharts
+</span><span id="__span-7-6"><a href="#__codelineno-7-6" id="__codelineno-7-6" name="__codelineno-7-6"></a>Table: TanStack Table
+</span><span id="__span-7-7"><a href="#__codelineno-7-7" id="__codelineno-7-7" name="__codelineno-7-7"></a>API Client: Auto-generated from OpenAPI spec
+</span><span id="__span-7-8"><a href="#__codelineno-7-8" id="__codelineno-7-8" name="__codelineno-7-8"></a>Build Tool: Vite
+</span><span id="__span-7-9"><a href="#__codelineno-7-9" id="__codelineno-7-9" name="__codelineno-7-9"></a>Testing: Vitest + React Testing Library
+</span></code></pre></div></p>
+<p><strong>Rationale:</strong>
+- Modern, type-safe, excellent DX
+- Lightweight and performant
+- Easy to maintain and extend
+- Large community support</p>
+<h4 id="312-ui-architecture">3.1.2 UI Architecture<a class="headerlink" href="#312-ui-architecture" title="Permanent link">¶</a></h4>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a href="#__codelineno-8-1" id="__codelineno-8-1" name="__codelineno-8-1"></a>ui/
+</span><span id="__span-8-2"><a href="#__codelineno-8-2" id="__codelineno-8-2" name="__codelineno-8-2"></a>├── public/              # Static assets
+</span><span id="__span-8-3"><a href="#__codelineno-8-3" id="__codelineno-8-3" name="__codelineno-8-3"></a>├── src/
+</span><span id="__span-8-4"><a href="#__codelineno-8-4" id="__codelineno-8-4" name="__codelineno-8-4"></a>│   ├── components/      # Reusable components
+</span><span id="__span-8-5"><a href="#__codelineno-8-5" id="__codelineno-8-5" name="__codelineno-8-5"></a>│   │   ├── ui/         # shadcn/ui components
+</span><span id="__span-8-6"><a href="#__codelineno-8-6" id="__codelineno-8-6" name="__codelineno-8-6"></a>│   │   ├── layout/     # Layout components
+</span><span id="__span-8-7"><a href="#__codelineno-8-7" id="__codelineno-8-7" name="__codelineno-8-7"></a>│   │   ├── features/   # Feature-specific components
+</span><span id="__span-8-8"><a href="#__codelineno-8-8" id="__codelineno-8-8" name="__codelineno-8-8"></a>│   │   └── charts/     # Visualization components
+</span><span id="__span-8-9"><a href="#__codelineno-8-9" id="__codelineno-8-9" name="__codelineno-8-9"></a>│   ├── pages/          # Page components (routing)
+</span><span id="__span-8-10"><a href="#__codelineno-8-10" id="__codelineno-8-10" name="__codelineno-8-10"></a>│   ├── hooks/          # Custom React hooks
+</span><span id="__span-8-11"><a href="#__codelineno-8-11" id="__codelineno-8-11" name="__codelineno-8-11"></a>│   ├── lib/            # Utilities and helpers
+</span><span id="__span-8-12"><a href="#__codelineno-8-12" id="__codelineno-8-12" name="__codelineno-8-12"></a>│   ├── api/            # API client (auto-generated)
+</span><span id="__span-8-13"><a href="#__codelineno-8-13" id="__codelineno-8-13" name="__codelineno-8-13"></a>│   ├── types/          # TypeScript types
+</span><span id="__span-8-14"><a href="#__codelineno-8-14" id="__codelineno-8-14" name="__codelineno-8-14"></a>│   ├── stores/         # Zustand stores
+</span><span id="__span-8-15"><a href="#__codelineno-8-15" id="__codelineno-8-15" name="__codelineno-8-15"></a>│   └── App.tsx         # Root component
+</span><span id="__span-8-16"><a href="#__codelineno-8-16" id="__codelineno-8-16" name="__codelineno-8-16"></a>├── tests/              # Test files
+</span><span id="__span-8-17"><a href="#__codelineno-8-17" id="__codelineno-8-17" name="__codelineno-8-17"></a>├── package.json
+</span><span id="__span-8-18"><a href="#__codelineno-8-18" id="__codelineno-8-18" name="__codelineno-8-18"></a>├── tsconfig.json
+</span><span id="__span-8-19"><a href="#__codelineno-8-19" id="__codelineno-8-19" name="__codelineno-8-19"></a>├── vite.config.ts
+</span><span id="__span-8-20"><a href="#__codelineno-8-20" id="__codelineno-8-20" name="__codelineno-8-20"></a>└── tailwind.config.js
+</span></code></pre></div>
+<h4 id="313-key-ui-pagesviews">3.1.3 Key UI Pages/Views<a class="headerlink" href="#313-key-ui-pagesviews" title="Permanent link">¶</a></h4>
+<p><strong>Dashboard (Home)</strong>
+- System health overview
+- Recent activity
+- Key metrics (servers, policies, users)
+- Quick actions</p>
+<p><strong>MCP Servers</strong>
+- Server list with search/filter
+- Server details view
+- Register new server form
+- Server health status
+- Tools/resources/prompts tabs</p>
+<p><strong>Policies</strong>
+- Policy list
+- Policy editor (Monaco editor with Rego syntax)
+- Policy testing playground
+- Policy decision logs
+- Template library</p>
+<p><strong>Users &amp; Teams</strong>
+- User management
+- Team hierarchy
+- Role assignment
+- Permission matrix</p>
+<p><strong>Audit Logs</strong>
+- Searchable event log
+- Advanced filters
+- Event details
+- Export functionality</p>
+<p><strong>Settings</strong>
+- Authentication configuration
+- SIEM integration
+- System settings
+- API keys</p>
+<p><strong>Monitoring</strong>
+- Real-time metrics
+- Performance charts
+- Alert configuration
+- System status</p>
+<h3 id="phase-32-core-implementation-week-4-6">Phase 3.2: Core Implementation (Week 4-6)<a class="headerlink" href="#phase-32-core-implementation-week-4-6" title="Permanent link">¶</a></h3>
+<h4 id="321-week-4-foundation">3.2.1 Week 4: Foundation<a class="headerlink" href="#321-week-4-foundation" title="Permanent link">¶</a></h4>
+<p><strong>Deliverables:</strong>
+- [ ] Set up React + TypeScript + Vite project
+- [ ] Install and configure shadcn/ui
+- [ ] Set up routing (React Router)
+- [ ] Create layout components (Header, Sidebar, Footer)
+- [ ] Implement authentication flow (OIDC/OAuth)
+- [ ] Auto-generate API client from OpenAPI spec
+- [ ] Set up TanStack Query for API calls
+- [ ] Create reusable form components</p>
+<p><strong>Example: Layout Structure</strong></p>
+<div class="language-typescript highlight"><pre><span></span><code><span id="__span-9-1"><a href="#__codelineno-9-1" id="__codelineno-9-1" name="__codelineno-9-1"></a><span class="c1">// src/components/layout/AppLayout.tsx</span>
+</span><span id="__span-9-2"><a href="#__codelineno-9-2" id="__codelineno-9-2" name="__codelineno-9-2"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Sidebar</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'./Sidebar'</span>
+</span><span id="__span-9-3"><a href="#__codelineno-9-3" id="__codelineno-9-3" name="__codelineno-9-3"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Header</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'./Header'</span>
+</span><span id="__span-9-4"><a href="#__codelineno-9-4" id="__codelineno-9-4" name="__codelineno-9-4"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Outlet</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'react-router-dom'</span>
+</span><span id="__span-9-5"><a href="#__codelineno-9-5" id="__codelineno-9-5" name="__codelineno-9-5"></a>
+</span><span id="__span-9-6"><a href="#__codelineno-9-6" id="__codelineno-9-6" name="__codelineno-9-6"></a><span class="k">export</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">AppLayout</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-7"><a href="#__codelineno-9-7" id="__codelineno-9-7" name="__codelineno-9-7"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-9-8"><a href="#__codelineno-9-8" id="__codelineno-9-8" name="__codelineno-9-8"></a><span class="w">    </span><span class="o">&lt;</span><span class="nx">div</span><span class="w"> </span><span class="nx">className</span><span class="o">=</span><span class="s2">"flex h-screen bg-gray-50"</span><span class="o">&gt;</span>
+</span><span id="__span-9-9"><a href="#__codelineno-9-9" id="__codelineno-9-9" name="__codelineno-9-9"></a><span class="w">      </span><span class="o">&lt;</span><span class="nx">Sidebar</span><span class="w"> </span><span class="o">/&gt;</span>
+</span><span id="__span-9-10"><a href="#__codelineno-9-10" id="__codelineno-9-10" name="__codelineno-9-10"></a><span class="w">      </span><span class="o">&lt;</span><span class="nx">div</span><span class="w"> </span><span class="nx">className</span><span class="o">=</span><span class="s2">"flex-1 flex flex-col overflow-hidden"</span><span class="o">&gt;</span>
+</span><span id="__span-9-11"><a href="#__codelineno-9-11" id="__codelineno-9-11" name="__codelineno-9-11"></a><span class="w">        </span><span class="o">&lt;</span><span class="nx">Header</span><span class="w"> </span><span class="o">/&gt;</span>
+</span><span id="__span-9-12"><a href="#__codelineno-9-12" id="__codelineno-9-12" name="__codelineno-9-12"></a><span class="w">        </span><span class="o">&lt;</span><span class="nx">main</span><span class="w"> </span><span class="nx">className</span><span class="o">=</span><span class="s2">"flex-1 overflow-auto p-6"</span><span class="o">&gt;</span>
+</span><span id="__span-9-13"><a href="#__codelineno-9-13" id="__codelineno-9-13" name="__codelineno-9-13"></a><span class="w">          </span><span class="o">&lt;</span><span class="nx">Outlet</span><span class="w"> </span><span class="o">/&gt;</span>
+</span><span id="__span-9-14"><a href="#__codelineno-9-14" id="__codelineno-9-14" name="__codelineno-9-14"></a><span class="w">        </span><span class="o">&lt;</span><span class="err">/main&gt;</span>
+</span><span id="__span-9-15"><a href="#__codelineno-9-15" id="__codelineno-9-15" name="__codelineno-9-15"></a><span class="w">      </span><span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span><span id="__span-9-16"><a href="#__codelineno-9-16" id="__codelineno-9-16" name="__codelineno-9-16"></a><span class="w">    </span><span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span><span id="__span-9-17"><a href="#__codelineno-9-17" id="__codelineno-9-17" name="__codelineno-9-17"></a><span class="w">  </span><span class="p">)</span>
+</span><span id="__span-9-18"><a href="#__codelineno-9-18" id="__codelineno-9-18" name="__codelineno-9-18"></a><span class="p">}</span>
+</span></code></pre></div>
+<h4 id="322-week-5-core-features">3.2.2 Week 5: Core Features<a class="headerlink" href="#322-week-5-core-features" title="Permanent link">¶</a></h4>
+<p><strong>Deliverables:</strong>
+- [ ] Dashboard with metrics
+- [ ] MCP Servers list/detail views
+- [ ] Server registration form
+- [ ] Basic policy viewer
+- [ ] User list view
+- [ ] Audit log viewer with filters</p>
+<p><strong>Example: MCP Servers List</strong></p>
+<div class="language-typescript highlight"><pre><span></span><code><span id="__span-10-1"><a href="#__codelineno-10-1" id="__codelineno-10-1" name="__codelineno-10-1"></a><span class="c1">// src/pages/Servers.tsx</span>
+</span><span id="__span-10-2"><a href="#__codelineno-10-2" id="__codelineno-10-2" name="__codelineno-10-2"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">useQuery</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@tanstack/react-query'</span>
+</span><span id="__span-10-3"><a href="#__codelineno-10-3" id="__codelineno-10-3" name="__codelineno-10-3"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">api</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@/lib/api'</span>
+</span><span id="__span-10-4"><a href="#__codelineno-10-4" id="__codelineno-10-4" name="__codelineno-10-4"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">ServerCard</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@/components/features/ServerCard'</span>
+</span><span id="__span-10-5"><a href="#__codelineno-10-5" id="__codelineno-10-5" name="__codelineno-10-5"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Button</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@/components/ui/button'</span>
+</span><span id="__span-10-6"><a href="#__codelineno-10-6" id="__codelineno-10-6" name="__codelineno-10-6"></a>
+</span><span id="__span-10-7"><a href="#__codelineno-10-7" id="__codelineno-10-7" name="__codelineno-10-7"></a><span class="k">export</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">ServersPage</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-8"><a href="#__codelineno-10-8" id="__codelineno-10-8" name="__codelineno-10-8"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">data</span><span class="o">:</span><span class="w"> </span><span class="kt">servers</span><span class="p">,</span><span class="w"> </span><span class="nx">isLoading</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useQuery</span><span class="p">({</span>
+</span><span id="__span-10-9"><a href="#__codelineno-10-9" id="__codelineno-10-9" name="__codelineno-10-9"></a><span class="w">    </span><span class="nx">queryKey</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'servers'</span><span class="p">],</span>
+</span><span id="__span-10-10"><a href="#__codelineno-10-10" id="__codelineno-10-10" name="__codelineno-10-10"></a><span class="w">    </span><span class="nx">queryFn</span><span class="o">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">api</span><span class="p">.</span><span class="nx">servers</span><span class="p">.</span><span class="nx">list</span><span class="p">()</span>
+</span><span id="__span-10-11"><a href="#__codelineno-10-11" id="__codelineno-10-11" name="__codelineno-10-11"></a><span class="w">  </span><span class="p">})</span>
+</span><span id="__span-10-12"><a href="#__codelineno-10-12" id="__codelineno-10-12" name="__codelineno-10-12"></a>
+</span><span id="__span-10-13"><a href="#__codelineno-10-13" id="__codelineno-10-13" name="__codelineno-10-13"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">isLoading</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="o">&lt;</span><span class="nx">LoadingSpinner</span><span class="w"> </span><span class="o">/&gt;</span>
+</span><span id="__span-10-14"><a href="#__codelineno-10-14" id="__codelineno-10-14" name="__codelineno-10-14"></a>
+</span><span id="__span-10-15"><a href="#__codelineno-10-15" id="__codelineno-10-15" name="__codelineno-10-15"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-10-16"><a href="#__codelineno-10-16" id="__codelineno-10-16" name="__codelineno-10-16"></a><span class="w">    </span><span class="o">&lt;</span><span class="nx">div</span><span class="w"> </span><span class="nx">className</span><span class="o">=</span><span class="s2">"space-y-6"</span><span class="o">&gt;</span>
+</span><span id="__span-10-17"><a href="#__codelineno-10-17" id="__codelineno-10-17" name="__codelineno-10-17"></a><span class="w">      </span><span class="o">&lt;</span><span class="nx">div</span><span class="w"> </span><span class="nx">className</span><span class="o">=</span><span class="s2">"flex justify-between items-center"</span><span class="o">&gt;</span>
+</span><span id="__span-10-18"><a href="#__codelineno-10-18" id="__codelineno-10-18" name="__codelineno-10-18"></a><span class="w">        </span><span class="o">&lt;</span><span class="nx">h1</span><span class="w"> </span><span class="nx">className</span><span class="o">=</span><span class="s2">"text-3xl font-bold"</span><span class="o">&gt;</span><span class="nx">MCP</span><span class="w"> </span><span class="nx">Servers</span><span class="o">&lt;</span><span class="err">/h1&gt;</span>
+</span><span id="__span-10-19"><a href="#__codelineno-10-19" id="__codelineno-10-19" name="__codelineno-10-19"></a><span class="w">        </span><span class="o">&lt;</span><span class="nx">Button</span><span class="w"> </span><span class="nx">onClick</span><span class="o">=</span><span class="p">{()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">navigate</span><span class="p">(</span><span class="s1">'/servers/new'</span><span class="p">)}</span><span class="o">&gt;</span>
+</span><span id="__span-10-20"><a href="#__codelineno-10-20" id="__codelineno-10-20" name="__codelineno-10-20"></a><span class="w">          </span><span class="nx">Register</span><span class="w"> </span><span class="nx">Server</span>
+</span><span id="__span-10-21"><a href="#__codelineno-10-21" id="__codelineno-10-21" name="__codelineno-10-21"></a><span class="w">        </span><span class="o">&lt;</span><span class="err">/Button&gt;</span>
+</span><span id="__span-10-22"><a href="#__codelineno-10-22" id="__codelineno-10-22" name="__codelineno-10-22"></a><span class="w">      </span><span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span><span id="__span-10-23"><a href="#__codelineno-10-23" id="__codelineno-10-23" name="__codelineno-10-23"></a>
+</span><span id="__span-10-24"><a href="#__codelineno-10-24" id="__codelineno-10-24" name="__codelineno-10-24"></a><span class="w">      </span><span class="o">&lt;</span><span class="nx">div</span><span class="w"> </span><span class="nx">className</span><span class="o">=</span><span class="s2">"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"</span><span class="o">&gt;</span>
+</span><span id="__span-10-25"><a href="#__codelineno-10-25" id="__codelineno-10-25" name="__codelineno-10-25"></a><span class="w">        </span><span class="p">{</span><span class="nx">servers</span><span class="o">?</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">server</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-10-26"><a href="#__codelineno-10-26" id="__codelineno-10-26" name="__codelineno-10-26"></a><span class="w">          </span><span class="o">&lt;</span><span class="nx">ServerCard</span><span class="w"> </span><span class="nx">key</span><span class="o">=</span><span class="p">{</span><span class="nx">server</span><span class="p">.</span><span class="nx">id</span><span class="p">}</span><span class="w"> </span><span class="nx">server</span><span class="o">=</span><span class="p">{</span><span class="nx">server</span><span class="p">}</span><span class="w"> </span><span class="o">/&gt;</span>
+</span><span id="__span-10-27"><a href="#__codelineno-10-27" id="__codelineno-10-27" name="__codelineno-10-27"></a><span class="w">        </span><span class="p">))}</span>
+</span><span id="__span-10-28"><a href="#__codelineno-10-28" id="__codelineno-10-28" name="__codelineno-10-28"></a><span class="w">      </span><span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span><span id="__span-10-29"><a href="#__codelineno-10-29" id="__codelineno-10-29" name="__codelineno-10-29"></a><span class="w">    </span><span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span><span id="__span-10-30"><a href="#__codelineno-10-30" id="__codelineno-10-30" name="__codelineno-10-30"></a><span class="w">  </span><span class="p">)</span>
+</span><span id="__span-10-31"><a href="#__codelineno-10-31" id="__codelineno-10-31" name="__codelineno-10-31"></a><span class="p">}</span>
+</span></code></pre></div>
+<h4 id="323-week-6-advanced-features">3.2.3 Week 6: Advanced Features<a class="headerlink" href="#323-week-6-advanced-features" title="Permanent link">¶</a></h4>
+<p><strong>Deliverables:</strong>
+- [ ] Policy editor with syntax highlighting
+- [ ] Policy testing playground
+- [ ] Advanced audit log search
+- [ ] Real-time metrics dashboard
+- [ ] Settings pages
+- [ ] API key management UI</p>
+<p><strong>Example: Policy Editor</strong></p>
+<div class="language-typescript highlight"><pre><span></span><code><span id="__span-11-1"><a href="#__codelineno-11-1" id="__codelineno-11-1" name="__codelineno-11-1"></a><span class="c1">// src/pages/PolicyEditor.tsx</span>
+</span><span id="__span-11-2"><a href="#__codelineno-11-2" id="__codelineno-11-2" name="__codelineno-11-2"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">useState</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'react'</span>
+</span><span id="__span-11-3"><a href="#__codelineno-11-3" id="__codelineno-11-3" name="__codelineno-11-3"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Monaco</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@monaco-editor/react'</span>
+</span><span id="__span-11-4"><a href="#__codelineno-11-4" id="__codelineno-11-4" name="__codelineno-11-4"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Button</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@/components/ui/button'</span>
+</span><span id="__span-11-5"><a href="#__codelineno-11-5" id="__codelineno-11-5" name="__codelineno-11-5"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">useMutation</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@tanstack/react-query'</span>
+</span><span id="__span-11-6"><a href="#__codelineno-11-6" id="__codelineno-11-6" name="__codelineno-11-6"></a>
+</span><span id="__span-11-7"><a href="#__codelineno-11-7" id="__codelineno-11-7" name="__codelineno-11-7"></a><span class="k">export</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">PolicyEditor</span><span class="p">({</span><span class="w"> </span><span class="nx">policyId</span><span class="w"> </span><span class="p">}</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">policyId</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-11-8"><a href="#__codelineno-11-8" id="__codelineno-11-8" name="__codelineno-11-8"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">code</span><span class="p">,</span><span class="w"> </span><span class="nx">setCode</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useState</span><span class="p">(</span><span class="s1">''</span><span class="p">)</span>
+</span><span id="__span-11-9"><a href="#__codelineno-11-9" id="__codelineno-11-9" name="__codelineno-11-9"></a>
+</span><span id="__span-11-10"><a href="#__codelineno-11-10" id="__codelineno-11-10" name="__codelineno-11-10"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">testPolicy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">useMutation</span><span class="p">({</span>
+</span><span id="__span-11-11"><a href="#__codelineno-11-11" id="__codelineno-11-11" name="__codelineno-11-11"></a><span class="w">    </span><span class="nx">mutationFn</span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="nx">testInput</span><span class="o">:</span><span class="w"> </span><span class="kt">unknown</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span>
+</span><span id="__span-11-12"><a href="#__codelineno-11-12" id="__codelineno-11-12" name="__codelineno-11-12"></a><span class="w">      </span><span class="nx">api</span><span class="p">.</span><span class="nx">policies</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">policyId</span><span class="p">,</span><span class="w"> </span><span class="nx">code</span><span class="p">,</span><span class="w"> </span><span class="nx">testInput</span><span class="p">)</span>
+</span><span id="__span-11-13"><a href="#__codelineno-11-13" id="__codelineno-11-13" name="__codelineno-11-13"></a><span class="w">  </span><span class="p">})</span>
+</span><span id="__span-11-14"><a href="#__codelineno-11-14" id="__codelineno-11-14" name="__codelineno-11-14"></a>
+</span><span id="__span-11-15"><a href="#__codelineno-11-15" id="__codelineno-11-15" name="__codelineno-11-15"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-11-16"><a href="#__codelineno-11-16" id="__codelineno-11-16" name="__codelineno-11-16"></a><span class="w">    </span><span class="o">&lt;</span><span class="nx">div</span><span class="w"> </span><span class="nx">className</span><span class="o">=</span><span class="s2">"h-full flex flex-col"</span><span class="o">&gt;</span>
+</span><span id="__span-11-17"><a href="#__codelineno-11-17" id="__codelineno-11-17" name="__codelineno-11-17"></a><span class="w">      </span><span class="o">&lt;</span><span class="nx">div</span><span class="w"> </span><span class="nx">className</span><span class="o">=</span><span class="s2">"flex-1"</span><span class="o">&gt;</span>
+</span><span id="__span-11-18"><a href="#__codelineno-11-18" id="__codelineno-11-18" name="__codelineno-11-18"></a><span class="w">        </span><span class="o">&lt;</span><span class="nx">Monaco</span>
+</span><span id="__span-11-19"><a href="#__codelineno-11-19" id="__codelineno-11-19" name="__codelineno-11-19"></a><span class="w">          </span><span class="nx">language</span><span class="o">=</span><span class="s2">"rego"</span>
+</span><span id="__span-11-20"><a href="#__codelineno-11-20" id="__codelineno-11-20" name="__codelineno-11-20"></a><span class="w">          </span><span class="nx">value</span><span class="o">=</span><span class="p">{</span><span class="nx">code</span><span class="p">}</span>
+</span><span id="__span-11-21"><a href="#__codelineno-11-21" id="__codelineno-11-21" name="__codelineno-11-21"></a><span class="w">          </span><span class="nx">onChange</span><span class="o">=</span><span class="p">{</span><span class="nx">setCode</span><span class="p">}</span>
+</span><span id="__span-11-22"><a href="#__codelineno-11-22" id="__codelineno-11-22" name="__codelineno-11-22"></a><span class="w">          </span><span class="nx">theme</span><span class="o">=</span><span class="s2">"vs-dark"</span>
+</span><span id="__span-11-23"><a href="#__codelineno-11-23" id="__codelineno-11-23" name="__codelineno-11-23"></a><span class="w">          </span><span class="nx">options</span><span class="o">=</span><span class="p">{{</span>
+</span><span id="__span-11-24"><a href="#__codelineno-11-24" id="__codelineno-11-24" name="__codelineno-11-24"></a><span class="w">            </span><span class="nx">minimap</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">enabled</span><span class="o">:</span><span class="w"> </span><span class="kt">false</span><span class="w"> </span><span class="p">},</span>
+</span><span id="__span-11-25"><a href="#__codelineno-11-25" id="__codelineno-11-25" name="__codelineno-11-25"></a><span class="w">            </span><span class="nx">fontSize</span><span class="o">:</span><span class="w"> </span><span class="kt">14</span><span class="p">,</span>
+</span><span id="__span-11-26"><a href="#__codelineno-11-26" id="__codelineno-11-26" name="__codelineno-11-26"></a><span class="w">          </span><span class="p">}}</span>
+</span><span id="__span-11-27"><a href="#__codelineno-11-27" id="__codelineno-11-27" name="__codelineno-11-27"></a><span class="w">        </span><span class="o">/&gt;</span>
+</span><span id="__span-11-28"><a href="#__codelineno-11-28" id="__codelineno-11-28" name="__codelineno-11-28"></a><span class="w">      </span><span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span><span id="__span-11-29"><a href="#__codelineno-11-29" id="__codelineno-11-29" name="__codelineno-11-29"></a>
+</span><span id="__span-11-30"><a href="#__codelineno-11-30" id="__codelineno-11-30" name="__codelineno-11-30"></a><span class="w">      </span><span class="o">&lt;</span><span class="nx">div</span><span class="w"> </span><span class="nx">className</span><span class="o">=</span><span class="s2">"border-t p-4 flex gap-2"</span><span class="o">&gt;</span>
+</span><span id="__span-11-31"><a href="#__codelineno-11-31" id="__codelineno-11-31" name="__codelineno-11-31"></a><span class="w">        </span><span class="o">&lt;</span><span class="nx">Button</span><span class="w"> </span><span class="nx">onClick</span><span class="o">=</span><span class="p">{()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">testPolicy</span><span class="p">.</span><span class="nx">mutate</span><span class="p">({})}</span><span class="o">&gt;</span>
+</span><span id="__span-11-32"><a href="#__codelineno-11-32" id="__codelineno-11-32" name="__codelineno-11-32"></a><span class="w">          </span><span class="nx">Test</span><span class="w"> </span><span class="nx">Policy</span>
+</span><span id="__span-11-33"><a href="#__codelineno-11-33" id="__codelineno-11-33" name="__codelineno-11-33"></a><span class="w">        </span><span class="o">&lt;</span><span class="err">/Button&gt;</span>
+</span><span id="__span-11-34"><a href="#__codelineno-11-34" id="__codelineno-11-34" name="__codelineno-11-34"></a><span class="w">        </span><span class="o">&lt;</span><span class="nx">Button</span><span class="w"> </span><span class="nx">variant</span><span class="o">=</span><span class="s2">"outline"</span><span class="o">&gt;</span><span class="nx">Save</span><span class="o">&lt;</span><span class="err">/Button&gt;</span>
+</span><span id="__span-11-35"><a href="#__codelineno-11-35" id="__codelineno-11-35" name="__codelineno-11-35"></a><span class="w">      </span><span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span><span id="__span-11-36"><a href="#__codelineno-11-36" id="__codelineno-11-36" name="__codelineno-11-36"></a>
+</span><span id="__span-11-37"><a href="#__codelineno-11-37" id="__codelineno-11-37" name="__codelineno-11-37"></a><span class="w">      </span><span class="p">{</span><span class="nx">testPolicy</span><span class="p">.</span><span class="nx">data</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-11-38"><a href="#__codelineno-11-38" id="__codelineno-11-38" name="__codelineno-11-38"></a><span class="w">        </span><span class="o">&lt;</span><span class="nx">PolicyTestResults</span><span class="w"> </span><span class="nx">results</span><span class="o">=</span><span class="p">{</span><span class="nx">testPolicy</span><span class="p">.</span><span class="nx">data</span><span class="p">}</span><span class="w"> </span><span class="o">/&gt;</span>
+</span><span id="__span-11-39"><a href="#__codelineno-11-39" id="__codelineno-11-39" name="__codelineno-11-39"></a><span class="w">      </span><span class="p">)}</span>
+</span><span id="__span-11-40"><a href="#__codelineno-11-40" id="__codelineno-11-40" name="__codelineno-11-40"></a><span class="w">    </span><span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span><span id="__span-11-41"><a href="#__codelineno-11-41" id="__codelineno-11-41" name="__codelineno-11-41"></a><span class="w">  </span><span class="p">)</span>
+</span><span id="__span-11-42"><a href="#__codelineno-11-42" id="__codelineno-11-42" name="__codelineno-11-42"></a><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="phase-33-polish-and-integration-week-7-8">Phase 3.3: Polish and Integration (Week 7-8)<a class="headerlink" href="#phase-33-polish-and-integration-week-7-8" title="Permanent link">¶</a></h3>
+<h4 id="331-week-7-polish">3.3.1 Week 7: Polish<a class="headerlink" href="#331-week-7-polish" title="Permanent link">¶</a></h4>
+<p><strong>Deliverables:</strong>
+- [ ] Responsive design (mobile/tablet)
+- [ ] Dark mode support
+- [ ] Accessibility improvements (WCAG 2.1 AA)
+- [ ] Error handling and loading states
+- [ ] Toast notifications
+- [ ] Help text and tooltips
+- [ ] Keyboard shortcuts</p>
+<h4 id="332-week-8-integration-deployment">3.3.2 Week 8: Integration &amp; Deployment<a class="headerlink" href="#332-week-8-integration-deployment" title="Permanent link">¶</a></h4>
+<p><strong>Deliverables:</strong>
+- [ ] Docker image for UI
+- [ ] Update docker-compose.yml
+- [ ] Nginx configuration for SPA
+- [ ] Environment-based config
+- [ ] Production build optimization
+- [ ] E2E tests (Playwright)
+- [ ] Documentation update</p>
+<p><strong>Docker Integration:</strong></p>
+<div class="language-dockerfile highlight"><pre><span></span><code><span id="__span-12-1"><a href="#__codelineno-12-1" id="__codelineno-12-1" name="__codelineno-12-1"></a><span class="c"># ui/Dockerfile</span>
+</span><span id="__span-12-2"><a href="#__codelineno-12-2" id="__codelineno-12-2" name="__codelineno-12-2"></a><span class="k">FROM</span><span class="w"> </span><span class="s">node:20-alpine</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">builder</span>
+</span><span id="__span-12-3"><a href="#__codelineno-12-3" id="__codelineno-12-3" name="__codelineno-12-3"></a>
+</span><span id="__span-12-4"><a href="#__codelineno-12-4" id="__codelineno-12-4" name="__codelineno-12-4"></a><span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app</span>
+</span><span id="__span-12-5"><a href="#__codelineno-12-5" id="__codelineno-12-5" name="__codelineno-12-5"></a><span class="k">COPY</span><span class="w"> </span>package*.json<span class="w"> </span>./
+</span><span id="__span-12-6"><a href="#__codelineno-12-6" id="__codelineno-12-6" name="__codelineno-12-6"></a><span class="k">RUN</span><span class="w"> </span>npm<span class="w"> </span>ci
+</span><span id="__span-12-7"><a href="#__codelineno-12-7" id="__codelineno-12-7" name="__codelineno-12-7"></a>
+</span><span id="__span-12-8"><a href="#__codelineno-12-8" id="__codelineno-12-8" name="__codelineno-12-8"></a><span class="k">COPY</span><span class="w"> </span>.<span class="w"> </span>.
+</span><span id="__span-12-9"><a href="#__codelineno-12-9" id="__codelineno-12-9" name="__codelineno-12-9"></a><span class="k">RUN</span><span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>build
+</span><span id="__span-12-10"><a href="#__codelineno-12-10" id="__codelineno-12-10" name="__codelineno-12-10"></a>
+</span><span id="__span-12-11"><a href="#__codelineno-12-11" id="__codelineno-12-11" name="__codelineno-12-11"></a><span class="k">FROM</span><span class="w"> </span><span class="s">nginx:alpine</span>
+</span><span id="__span-12-12"><a href="#__codelineno-12-12" id="__codelineno-12-12" name="__codelineno-12-12"></a><span class="k">COPY</span><span class="w"> </span>--from<span class="o">=</span>builder<span class="w"> </span>/app/dist<span class="w"> </span>/usr/share/nginx/html
+</span><span id="__span-12-13"><a href="#__codelineno-12-13" id="__codelineno-12-13" name="__codelineno-12-13"></a><span class="k">COPY</span><span class="w"> </span>nginx.conf<span class="w"> </span>/etc/nginx/conf.d/default.conf
+</span><span id="__span-12-14"><a href="#__codelineno-12-14" id="__codelineno-12-14" name="__codelineno-12-14"></a>
+</span><span id="__span-12-15"><a href="#__codelineno-12-15" id="__codelineno-12-15" name="__codelineno-12-15"></a><span class="k">EXPOSE</span><span class="w"> </span><span class="s">80</span>
+</span><span id="__span-12-16"><a href="#__codelineno-12-16" id="__codelineno-12-16" name="__codelineno-12-16"></a><span class="k">CMD</span><span class="w"> </span><span class="p">[</span><span class="s2">"nginx"</span><span class="p">,</span><span class="w"> </span><span class="s2">"-g"</span><span class="p">,</span><span class="w"> </span><span class="s2">"daemon off;"</span><span class="p">]</span>
+</span></code></pre></div>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-13-1"><a href="#__codelineno-13-1" id="__codelineno-13-1" name="__codelineno-13-1"></a><span class="c1"># Add to docker-compose.yml</span>
+</span><span id="__span-13-2"><a href="#__codelineno-13-2" id="__codelineno-13-2" name="__codelineno-13-2"></a><span class="nt">services</span><span class="p">:</span>
+</span><span id="__span-13-3"><a href="#__codelineno-13-3" id="__codelineno-13-3" name="__codelineno-13-3"></a><span class="w">  </span><span class="nt">ui</span><span class="p">:</span>
+</span><span id="__span-13-4"><a href="#__codelineno-13-4" id="__codelineno-13-4" name="__codelineno-13-4"></a><span class="w">    </span><span class="nt">build</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./ui</span>
+</span><span id="__span-13-5"><a href="#__codelineno-13-5" id="__codelineno-13-5" name="__codelineno-13-5"></a><span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+</span><span id="__span-13-6"><a href="#__codelineno-13-6" id="__codelineno-13-6" name="__codelineno-13-6"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"3000:80"</span>
+</span><span id="__span-13-7"><a href="#__codelineno-13-7" id="__codelineno-13-7" name="__codelineno-13-7"></a><span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+</span><span id="__span-13-8"><a href="#__codelineno-13-8" id="__codelineno-13-8" name="__codelineno-13-8"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">VITE_API_URL=http://localhost:8000</span>
+</span><span id="__span-13-9"><a href="#__codelineno-13-9" id="__codelineno-13-9" name="__codelineno-13-9"></a><span class="w">    </span><span class="nt">depends_on</span><span class="p">:</span>
+</span><span id="__span-13-10"><a href="#__codelineno-13-10" id="__codelineno-13-10" name="__codelineno-13-10"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">api</span>
+</span><span id="__span-13-11"><a href="#__codelineno-13-11" id="__codelineno-13-11" name="__codelineno-13-11"></a><span class="w">    </span><span class="nt">profiles</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"standard"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"full"</span><span class="p p-Indicator">]</span>
+</span></code></pre></div>
+<h3 id="ui-feature-priority">UI Feature Priority<a class="headerlink" href="#ui-feature-priority" title="Permanent link">¶</a></h3>
+<p><strong>P0 - Must Have (MVP)</strong>
+- [ ] Authentication
+- [ ] Dashboard
+- [ ] Server list/detail
+- [ ] Server registration
+- [ ] Audit logs
+- [ ] Basic policy viewer</p>
+<p><strong>P1 - Should Have</strong>
+- [ ] Policy editor
+- [ ] User management
+- [ ] Team management
+- [ ] Settings
+- [ ] API key management</p>
+<p><strong>P2 - Nice to Have</strong>
+- [ ] Policy testing playground
+- [ ] Real-time monitoring
+- [ ] Advanced charts
+- [ ] Dark mode
+- [ ] Keyboard shortcuts</p>
+<h3 id="success-metrics_1">Success Metrics<a class="headerlink" href="#success-metrics_1" title="Permanent link">¶</a></h3>
+<ul>
+<li>✅ Non-technical users can manage MCP servers</li>
+<li>✅ Policy editing without terminal access</li>
+<li>✅ &lt; 500ms page load time (p95)</li>
+<li>✅ WCAG 2.1 AA compliance</li>
+<li>✅ 90%+ positive user feedback</li>
+</ul>
+<hr/>
+<h2 id="initiative-4-enhance-strengths">Initiative 4: Enhance Strengths<a class="headerlink" href="#initiative-4-enhance-strengths" title="Permanent link">¶</a></h2>
+<p><strong>Priority:</strong> P2 (Medium)
+<strong>Timeline:</strong> Ongoing
+<strong>Effort:</strong> 10-20 hours</p>
+<h3 id="objectives_2">Objectives<a class="headerlink" href="#objectives_2" title="Permanent link">¶</a></h3>
+<p>Build on existing strengths to maximize impact.</p>
+<h3 id="41-showcase-technology-stack">4.1 Showcase Technology Stack<a class="headerlink" href="#41-showcase-technology-stack" title="Permanent link">¶</a></h3>
+<p><strong>Update README.md:</strong></p>
+<div class="language-markdown highlight"><pre><span></span><code><span id="__span-14-1"><a href="#__codelineno-14-1" id="__codelineno-14-1" name="__codelineno-14-1"></a><span class="gu">## Technology Stack</span>
+</span><span id="__span-14-2"><a href="#__codelineno-14-2" id="__codelineno-14-2" name="__codelineno-14-2"></a>
+</span><span id="__span-14-3"><a href="#__codelineno-14-3" id="__codelineno-14-3" name="__codelineno-14-3"></a><span class="gu">### Backend</span>
+</span><span id="__span-14-4"><a href="#__codelineno-14-4" id="__codelineno-14-4" name="__codelineno-14-4"></a>![<span class="nt">Python</span>](<span class="na">https://img.shields.io/badge/Python-3.11+-blue?logo=python</span>)
+</span><span id="__span-14-5"><a href="#__codelineno-14-5" id="__codelineno-14-5" name="__codelineno-14-5"></a>![<span class="nt">FastAPI</span>](<span class="na">https://img.shields.io/badge/FastAPI-Latest-green?logo=fastapi</span>)
+</span><span id="__span-14-6"><a href="#__codelineno-14-6" id="__codelineno-14-6" name="__codelineno-14-6"></a>![<span class="nt">SQLAlchemy</span>](<span class="na">https://img.shields.io/badge/SQLAlchemy-2.0+-red?logo=postgresql</span>)
+</span><span id="__span-14-7"><a href="#__codelineno-14-7" id="__codelineno-14-7" name="__codelineno-14-7"></a>
+</span><span id="__span-14-8"><a href="#__codelineno-14-8" id="__codelineno-14-8" name="__codelineno-14-8"></a><span class="gu">### Infrastructure</span>
+</span><span id="__span-14-9"><a href="#__codelineno-14-9" id="__codelineno-14-9" name="__codelineno-14-9"></a>![<span class="nt">Docker</span>](<span class="na">https://img.shields.io/badge/Docker-Latest-blue?logo=docker</span>)
+</span><span id="__span-14-10"><a href="#__codelineno-14-10" id="__codelineno-14-10" name="__codelineno-14-10"></a>![<span class="nt">Kubernetes</span>](<span class="na">https://img.shields.io/badge/Kubernetes-1.28+-blue?logo=kubernetes</span>)
+</span><span id="__span-14-11"><a href="#__codelineno-14-11" id="__codelineno-14-11" name="__codelineno-14-11"></a>![<span class="nt">Helm</span>](<span class="na">https://img.shields.io/badge/Helm-3.0+-blue?logo=helm</span>)
+</span><span id="__span-14-12"><a href="#__codelineno-14-12" id="__codelineno-14-12" name="__codelineno-14-12"></a>
+</span><span id="__span-14-13"><a href="#__codelineno-14-13" id="__codelineno-14-13" name="__codelineno-14-13"></a><span class="gu">### Security &amp; Policy</span>
+</span><span id="__span-14-14"><a href="#__codelineno-14-14" id="__codelineno-14-14" name="__codelineno-14-14"></a>![<span class="nt">OPA</span>](<span class="na">https://img.shields.io/badge/OPA-0.60+-blue?logo=openpolicyagent</span>)
+</span><span id="__span-14-15"><a href="#__codelineno-14-15" id="__codelineno-14-15" name="__codelineno-14-15"></a>![<span class="nt">Vault</span>](<span class="na">https://img.shields.io/badge/Vault-Latest-black?logo=vault</span>)
+</span><span id="__span-14-16"><a href="#__codelineno-14-16" id="__codelineno-14-16" name="__codelineno-14-16"></a>![<span class="nt">Kong</span>](<span class="na">https://img.shields.io/badge/Kong-3.8+-green?logo=kong</span>)
+</span><span id="__span-14-17"><a href="#__codelineno-14-17" id="__codelineno-14-17" name="__codelineno-14-17"></a>
+</span><span id="__span-14-18"><a href="#__codelineno-14-18" id="__codelineno-14-18" name="__codelineno-14-18"></a><span class="gu">### Data &amp; Caching</span>
+</span><span id="__span-14-19"><a href="#__codelineno-14-19" id="__codelineno-14-19" name="__codelineno-14-19"></a>![<span class="nt">PostgreSQL</span>](<span class="na">https://img.shields.io/badge/PostgreSQL-15+-blue?logo=postgresql</span>)
+</span><span id="__span-14-20"><a href="#__codelineno-14-20" id="__codelineno-14-20" name="__codelineno-14-20"></a>![<span class="nt">Redis</span>](<span class="na">https://img.shields.io/badge/Redis-7+-red?logo=redis</span>)
+</span><span id="__span-14-21"><a href="#__codelineno-14-21" id="__codelineno-14-21" name="__codelineno-14-21"></a>![<span class="nt">TimescaleDB</span>](<span class="na">https://img.shields.io/badge/TimescaleDB-Latest-orange</span>)
+</span></code></pre></div>
+<h3 id="42-add-quality-badges">4.2 Add Quality Badges<a class="headerlink" href="#42-add-quality-badges" title="Permanent link">¶</a></h3>
+<div class="language-markdown highlight"><pre><span></span><code><span id="__span-15-1"><a href="#__codelineno-15-1" id="__codelineno-15-1" name="__codelineno-15-1"></a><span class="gu">## Code Quality</span>
+</span><span id="__span-15-2"><a href="#__codelineno-15-2" id="__codelineno-15-2" name="__codelineno-15-2"></a>
+</span><span id="__span-15-3"><a href="#__codelineno-15-3" id="__codelineno-15-3" name="__codelineno-15-3"></a>![<span class="nt">Build Status</span>](<span class="na">https://img.shields.io/github/actions/workflow/status/apathy-ca/sark/ci.yml</span>)
+</span><span id="__span-15-4"><a href="#__codelineno-15-4" id="__codelineno-15-4" name="__codelineno-15-4"></a>![<span class="nt">Coverage</span>](<span class="na">https://img.shields.io/badge/coverage-87%25-green</span>)
+</span><span id="__span-15-5"><a href="#__codelineno-15-5" id="__codelineno-15-5" name="__codelineno-15-5"></a>![<span class="nt">Code Style</span>](<span class="na">https://img.shields.io/badge/code%20style-black-000000.svg</span>)
+</span><span id="__span-15-6"><a href="#__codelineno-15-6" id="__codelineno-15-6" name="__codelineno-15-6"></a>![<span class="nt">Type Checking</span>](<span class="na">https://img.shields.io/badge/type%20checking-mypy-blue</span>)
+</span><span id="__span-15-7"><a href="#__codelineno-15-7" id="__codelineno-15-7" name="__codelineno-15-7"></a>![<span class="nt">License</span>](<span class="na">https://img.shields.io/badge/license-MIT-blue.svg</span>)
+</span></code></pre></div>
+<h3 id="43-create-security-highlights-section">4.3 Create Security Highlights Section<a class="headerlink" href="#43-create-security-highlights-section" title="Permanent link">¶</a></h3>
+<p>Add to README.md after "What is MCP?":</p>
+<div class="language-markdown highlight"><pre><span></span><code><span id="__span-16-1"><a href="#__codelineno-16-1" id="__codelineno-16-1" name="__codelineno-16-1"></a><span class="gu">## Security-First Architecture</span>
+</span><span id="__span-16-2"><a href="#__codelineno-16-2" id="__codelineno-16-2" name="__codelineno-16-2"></a>
+</span><span id="__span-16-3"><a href="#__codelineno-16-3" id="__codelineno-16-3" name="__codelineno-16-3"></a>SARK implements defense-in-depth security:
+</span><span id="__span-16-4"><a href="#__codelineno-16-4" id="__codelineno-16-4" name="__codelineno-16-4"></a>
+</span><span id="__span-16-5"><a href="#__codelineno-16-5" id="__codelineno-16-5" name="__codelineno-16-5"></a>🔐 <span class="gs">**Multi-Protocol Authentication**</span>
+</span><span id="__span-16-6"><a href="#__codelineno-16-6" id="__codelineno-16-6" name="__codelineno-16-6"></a><span class="k">-</span><span class="w"> </span>OIDC, SAML 2.0, LDAP/AD, API Keys
+</span><span id="__span-16-7"><a href="#__codelineno-16-7" id="__codelineno-16-7" name="__codelineno-16-7"></a><span class="k">-</span><span class="w"> </span>Support for Okta, Azure AD, Google Workspace
+</span><span id="__span-16-8"><a href="#__codelineno-16-8" id="__codelineno-16-8" name="__codelineno-16-8"></a>
+</span><span id="__span-16-9"><a href="#__codelineno-16-9" id="__codelineno-16-9" name="__codelineno-16-9"></a>🛡️ <span class="gs">**Zero-Trust Authorization**</span>
+</span><span id="__span-16-10"><a href="#__codelineno-16-10" id="__codelineno-16-10" name="__codelineno-16-10"></a><span class="k">-</span><span class="w"> </span>Policy-based access control (OPA/Rego)
+</span><span id="__span-16-11"><a href="#__codelineno-16-11" id="__codelineno-16-11" name="__codelineno-16-11"></a><span class="k">-</span><span class="w"> </span>Fine-grained permissions (RBAC + ABAC + ReBAC)
+</span><span id="__span-16-12"><a href="#__codelineno-16-12" id="__codelineno-16-12" name="__codelineno-16-12"></a><span class="k">-</span><span class="w"> </span>Deny-by-default security model
+</span><span id="__span-16-13"><a href="#__codelineno-16-13" id="__codelineno-16-13" name="__codelineno-16-13"></a>
+</span><span id="__span-16-14"><a href="#__codelineno-16-14" id="__codelineno-16-14" name="__codelineno-16-14"></a>📝 <span class="gs">**Immutable Audit Trail**</span>
+</span><span id="__span-16-15"><a href="#__codelineno-16-15" id="__codelineno-16-15" name="__codelineno-16-15"></a><span class="k">-</span><span class="w"> </span>Every action logged to TimescaleDB
+</span><span id="__span-16-16"><a href="#__codelineno-16-16" id="__codelineno-16-16" name="__codelineno-16-16"></a><span class="k">-</span><span class="w"> </span>Tamper-proof audit logs
+</span><span id="__span-16-17"><a href="#__codelineno-16-17" id="__codelineno-16-17" name="__codelineno-16-17"></a><span class="k">-</span><span class="w"> </span>90-day retention (configurable)
+</span><span id="__span-16-18"><a href="#__codelineno-16-18" id="__codelineno-16-18" name="__codelineno-16-18"></a>
+</span><span id="__span-16-19"><a href="#__codelineno-16-19" id="__codelineno-16-19" name="__codelineno-16-19"></a>🔒 <span class="gs">**Secrets Management**</span>
+</span><span id="__span-16-20"><a href="#__codelineno-16-20" id="__codelineno-16-20" name="__codelineno-16-20"></a><span class="k">-</span><span class="w"> </span>HashiCorp Vault integration
+</span><span id="__span-16-21"><a href="#__codelineno-16-21" id="__codelineno-16-21" name="__codelineno-16-21"></a><span class="k">-</span><span class="w"> </span>Dynamic credential generation
+</span><span id="__span-16-22"><a href="#__codelineno-16-22" id="__codelineno-16-22" name="__codelineno-16-22"></a><span class="k">-</span><span class="w"> </span>Automatic rotation
+</span><span id="__span-16-23"><a href="#__codelineno-16-23" id="__codelineno-16-23" name="__codelineno-16-23"></a>
+</span><span id="__span-16-24"><a href="#__codelineno-16-24" id="__codelineno-16-24" name="__codelineno-16-24"></a>🌐 <span class="gs">**Edge Security**</span>
+</span><span id="__span-16-25"><a href="#__codelineno-16-25" id="__codelineno-16-25" name="__codelineno-16-25"></a><span class="k">-</span><span class="w"> </span>Kong Gateway integration
+</span><span id="__span-16-26"><a href="#__codelineno-16-26" id="__codelineno-16-26" name="__codelineno-16-26"></a><span class="k">-</span><span class="w"> </span>Rate limiting and DDoS protection
+</span><span id="__span-16-27"><a href="#__codelineno-16-27" id="__codelineno-16-27" name="__codelineno-16-27"></a><span class="k">-</span><span class="w"> </span>MCP protocol validation
+</span><span id="__span-16-28"><a href="#__codelineno-16-28" id="__codelineno-16-28" name="__codelineno-16-28"></a>
+</span><span id="__span-16-29"><a href="#__codelineno-16-29" id="__codelineno-16-29" name="__codelineno-16-29"></a><span class="gs">**Compliance:**</span> SOC 2, ISO 27001, GDPR, HIPAA, PCI-DSS ready
+</span></code></pre></div>
+<h3 id="44-add-deployment-success-section">4.4 Add Deployment Success Section<a class="headerlink" href="#44-add-deployment-success-section" title="Permanent link">¶</a></h3>
+<div class="language-markdown highlight"><pre><span></span><code><span id="__span-17-1"><a href="#__codelineno-17-1" id="__codelineno-17-1" name="__codelineno-17-1"></a><span class="gu">## Proven at Scale</span>
+</span><span id="__span-17-2"><a href="#__codelineno-17-2" id="__codelineno-17-2" name="__codelineno-17-2"></a>
+</span><span id="__span-17-3"><a href="#__codelineno-17-3" id="__codelineno-17-3" name="__codelineno-17-3"></a>SARK is designed for enterprise deployment:
+</span><span id="__span-17-4"><a href="#__codelineno-17-4" id="__codelineno-17-4" name="__codelineno-17-4"></a>
+</span><span id="__span-17-5"><a href="#__codelineno-17-5" id="__codelineno-17-5" name="__codelineno-17-5"></a><span class="k">-</span><span class="w"> </span><span class="gs">**Target Scale:**</span> 50,000+ employees, 10,000+ MCP servers
+</span><span id="__span-17-6"><a href="#__codelineno-17-6" id="__codelineno-17-6" name="__codelineno-17-6"></a><span class="k">-</span><span class="w"> </span><span class="gs">**Performance:**</span> &lt;5ms policy evaluation (p99), 10,000+ req/s
+</span><span id="__span-17-7"><a href="#__codelineno-17-7" id="__codelineno-17-7" name="__codelineno-17-7"></a><span class="k">-</span><span class="w"> </span><span class="gs">**Availability:**</span> 99.95% uptime SLA
+</span><span id="__span-17-8"><a href="#__codelineno-17-8" id="__codelineno-17-8" name="__codelineno-17-8"></a><span class="k">-</span><span class="w"> </span><span class="gs">**Multi-Region:**</span> Active-active deployment support
+</span><span id="__span-17-9"><a href="#__codelineno-17-9" id="__codelineno-17-9" name="__codelineno-17-9"></a>
+</span><span id="__span-17-10"><a href="#__codelineno-17-10" id="__codelineno-17-10" name="__codelineno-17-10"></a><span class="gs">**Cloud Providers:**</span>
+</span><span id="__span-17-11"><a href="#__codelineno-17-11" id="__codelineno-17-11" name="__codelineno-17-11"></a><span class="k">-</span><span class="w"> </span>✅ AWS (EKS + RDS + ElastiCache)
+</span><span id="__span-17-12"><a href="#__codelineno-17-12" id="__codelineno-17-12" name="__codelineno-17-12"></a><span class="k">-</span><span class="w"> </span>✅ Google Cloud (GKE + Cloud SQL + Memorystore)
+</span><span id="__span-17-13"><a href="#__codelineno-17-13" id="__codelineno-17-13" name="__codelineno-17-13"></a><span class="k">-</span><span class="w"> </span>✅ Azure (AKS + Azure Database + Azure Cache)
+</span><span id="__span-17-14"><a href="#__codelineno-17-14" id="__codelineno-17-14" name="__codelineno-17-14"></a><span class="k">-</span><span class="w"> </span>✅ On-premises / Hybrid / Air-gapped
+</span></code></pre></div>
+<hr/>
+<h2 id="implementation-roadmap">Implementation Roadmap<a class="headerlink" href="#implementation-roadmap" title="Permanent link">¶</a></h2>
+<h3 id="week-1-mcp-definition-initiative-1">Week 1: MCP Definition (Initiative 1)<a class="headerlink" href="#week-1-mcp-definition-initiative-1" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>Days 1-2:</strong> Update README with MCP definition</li>
+<li><strong>Days 3-4:</strong> Create MCP_INTRODUCTION.md</li>
+<li><strong>Day 5:</strong> Create visual diagrams</li>
+<li><strong>Review &amp; Publish</strong></li>
+</ul>
+<h3 id="week-2-simplified-onboarding-initiative-2-part-1">Week 2: Simplified Onboarding (Initiative 2 - Part 1)<a class="headerlink" href="#week-2-simplified-onboarding-initiative-2-part-1" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>Days 1-2:</strong> Create GETTING_STARTED_5MIN.md</li>
+<li><strong>Days 3-4:</strong> Create LEARNING_PATH.md</li>
+<li><strong>Day 5:</strong> Create ONBOARDING_CHECKLIST.md</li>
+</ul>
+<h3 id="week-3-onboarding-ui-planning-initiative-2-part-2-initiative-31">Week 3: Onboarding + UI Planning (Initiative 2 - Part 2 + Initiative 3.1)<a class="headerlink" href="#week-3-onboarding-ui-planning-initiative-2-part-2-initiative-31" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>Days 1-2:</strong> Create interactive tutorials</li>
+<li><strong>Days 3-5:</strong> UI design and technology selection</li>
+</ul>
+<h3 id="week-4-ui-foundation-initiative-321">Week 4: UI Foundation (Initiative 3.2.1)<a class="headerlink" href="#week-4-ui-foundation-initiative-321" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>Full week:</strong> Set up React project, auth, API client</li>
+</ul>
+<h3 id="week-5-ui-core-features-initiative-322">Week 5: UI Core Features (Initiative 3.2.2)<a class="headerlink" href="#week-5-ui-core-features-initiative-322" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>Full week:</strong> Dashboard, servers, basic policy viewer</li>
+</ul>
+<h3 id="week-6-ui-advanced-features-initiative-323">Week 6: UI Advanced Features (Initiative 3.2.3)<a class="headerlink" href="#week-6-ui-advanced-features-initiative-323" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>Full week:</strong> Policy editor, advanced features</li>
+</ul>
+<h3 id="week-7-ui-polish-initiative-331">Week 7: UI Polish (Initiative 3.3.1)<a class="headerlink" href="#week-7-ui-polish-initiative-331" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>Full week:</strong> Responsive design, accessibility, UX improvements</li>
+</ul>
+<h3 id="week-8-ui-integration-launch-initiative-332">Week 8: UI Integration &amp; Launch (Initiative 3.3.2)<a class="headerlink" href="#week-8-ui-integration-launch-initiative-332" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>Days 1-3:</strong> Docker integration, deployment setup</li>
+<li><strong>Days 4-5:</strong> Testing, documentation, launch</li>
+</ul>
+<h3 id="ongoing-enhance-strengths-initiative-4">Ongoing: Enhance Strengths (Initiative 4)<a class="headerlink" href="#ongoing-enhance-strengths-initiative-4" title="Permanent link">¶</a></h3>
+<ul>
+<li>Update badges, highlights, showcase features</li>
+</ul>
+<hr/>
+<h2 id="success-criteria">Success Criteria<a class="headerlink" href="#success-criteria" title="Permanent link">¶</a></h2>
+<h3 id="initiative-1-mcp-definition">Initiative 1: MCP Definition<a class="headerlink" href="#initiative-1-mcp-definition" title="Permanent link">¶</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input checked="" disabled="" type="checkbox"><span class="task-list-indicator"></span></input></label> MCP defined in first 100 lines of README</li>
+<li class="task-list-item"><label class="task-list-control"><input disabled="" type="checkbox"><span class="task-list-indicator"></span></input></label> Dedicated MCP introduction document created</li>
+<li class="task-list-item"><label class="task-list-control"><input disabled="" type="checkbox"><span class="task-list-indicator"></span></input></label> Visual diagrams added</li>
+<li class="task-list-item"><label class="task-list-control"><input disabled="" type="checkbox"><span class="task-list-indicator"></span></input></label> Zero assumptions of prior MCP knowledge</li>
+<li><strong>Metric:</strong> 90% of new users understand MCP within 5 minutes</li>
+</ul>
+<h3 id="initiative-2-simplified-onboarding">Initiative 2: Simplified Onboarding<a class="headerlink" href="#initiative-2-simplified-onboarding" title="Permanent link">¶</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input disabled="" type="checkbox"><span class="task-list-indicator"></span></input></label> 5-minute quickstart guide created</li>
+<li class="task-list-item"><label class="task-list-control"><input disabled="" type="checkbox"><span class="task-list-indicator"></span></input></label> Learning path documented</li>
+<li class="task-list-item"><label class="task-list-control"><input disabled="" type="checkbox"><span class="task-list-indicator"></span></input></label> Interactive tutorials available</li>
+<li class="task-list-item"><label class="task-list-control"><input disabled="" type="checkbox"><span class="task-list-indicator"></span></input></label> Onboarding checklist published</li>
+<li><strong>Metric:</strong> Onboarding time reduced from 1 week to 2 days</li>
+</ul>
+<h3 id="initiative-3-user-interface">Initiative 3: User Interface<a class="headerlink" href="#initiative-3-user-interface" title="Permanent link">¶</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input disabled="" type="checkbox"><span class="task-list-indicator"></span></input></label> React UI built and deployed</li>
+<li class="task-list-item"><label class="task-list-control"><input disabled="" type="checkbox"><span class="task-list-indicator"></span></input></label> Core features implemented (servers, policies, audit)</li>
+<li class="task-list-item"><label class="task-list-control"><input disabled="" type="checkbox"><span class="task-list-indicator"></span></input></label> WCAG 2.1 AA compliant</li>
+<li class="task-list-item"><label class="task-list-control"><input disabled="" type="checkbox"><span class="task-list-indicator"></span></input></label> Integrated into Docker Compose</li>
+<li><strong>Metric:</strong> 80% of users prefer UI over CLI/API</li>
+</ul>
+<h3 id="initiative-4-enhanced-strengths">Initiative 4: Enhanced Strengths<a class="headerlink" href="#initiative-4-enhanced-strengths" title="Permanent link">¶</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input disabled="" type="checkbox"><span class="task-list-indicator"></span></input></label> Technology badges added</li>
+<li class="task-list-item"><label class="task-list-control"><input disabled="" type="checkbox"><span class="task-list-indicator"></span></input></label> Security highlights section created</li>
+<li class="task-list-item"><label class="task-list-control"><input disabled="" type="checkbox"><span class="task-list-indicator"></span></input></label> Deployment success stories added</li>
+<li><strong>Metric:</strong> 30% increase in GitHub stars/interest</li>
+</ul>
+<hr/>
+<h2 id="resource-requirements">Resource Requirements<a class="headerlink" href="#resource-requirements" title="Permanent link">¶</a></h2>
+<h3 id="people">People<a class="headerlink" href="#people" title="Permanent link">¶</a></h3>
+<p><strong>Week 1-3 (Documentation):</strong>
+- 1 Technical Writer (full-time)
+- 1 Developer (25% - review/feedback)
+- 1 Designer (25% - diagrams)</p>
+<p><strong>Week 4-8 (UI Development):</strong>
+- 2 Frontend Developers (full-time)
+- 1 Backend Developer (25% - API updates)
+- 1 Designer (50% - UI/UX)
+- 1 QA Engineer (50% - testing)</p>
+<h3 id="tools-services">Tools &amp; Services<a class="headerlink" href="#tools-services" title="Permanent link">¶</a></h3>
+<ul>
+<li>Figma (UI design)</li>
+<li>React + TypeScript + Vite</li>
+<li>Vercel/Netlify (UI deployment previews)</li>
+<li>Playwright (E2E testing)</li>
+</ul>
+<h3 id="budget-estimate">Budget Estimate<a class="headerlink" href="#budget-estimate" title="Permanent link">¶</a></h3>
+<p><strong>Total Effort:</strong> ~200 hours
+- Documentation: 40 hours
+- UI Development: 140 hours
+- Design: 20 hours</p>
+<p><strong>Timeline:</strong> 6-8 weeks (with parallel work)</p>
+<hr/>
+<h2 id="risk-mitigation">Risk Mitigation<a class="headerlink" href="#risk-mitigation" title="Permanent link">¶</a></h2>
+<h3 id="risk-1-ui-development-delay">Risk 1: UI Development Delay<a class="headerlink" href="#risk-1-ui-development-delay" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>Mitigation:</strong> Start with MVP (P0 features only)</li>
+<li><strong>Fallback:</strong> Launch UI in phases (Week 6 = MVP, Week 8 = Full)</li>
+</ul>
+<h3 id="risk-2-technology-stack-issues">Risk 2: Technology Stack Issues<a class="headerlink" href="#risk-2-technology-stack-issues" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>Mitigation:</strong> Prototype in Week 3 before committing</li>
+<li><strong>Fallback:</strong> Use proven template (e.g., shadcn-admin)</li>
+</ul>
+<h3 id="risk-3-complexity-not-reduced-enough">Risk 3: Complexity Not Reduced Enough<a class="headerlink" href="#risk-3-complexity-not-reduced-enough" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>Mitigation:</strong> User testing with new contributors</li>
+<li><strong>Adjustment:</strong> Iterate on documentation based on feedback</li>
+</ul>
+<h3 id="risk-4-ui-doesnt-meet-user-needs">Risk 4: UI Doesn't Meet User Needs<a class="headerlink" href="#risk-4-ui-doesnt-meet-user-needs" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>Mitigation:</strong> User research and feedback sessions</li>
+<li><strong>Adjustment:</strong> Prioritize features based on actual usage</li>
+</ul>
+<hr/>
+<h2 id="measuring-success">Measuring Success<a class="headerlink" href="#measuring-success" title="Permanent link">¶</a></h2>
+<h3 id="quantitative-metrics">Quantitative Metrics<a class="headerlink" href="#quantitative-metrics" title="Permanent link">¶</a></h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Current</th>
+<th>Target</th>
+<th>Measure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Time to understand MCP</td>
+<td>Unknown</td>
+<td>&lt; 5 min</td>
+<td>User survey</td>
+</tr>
+<tr>
+<td>Onboarding time</td>
+<td>~1 week</td>
+<td>2 days</td>
+<td>Time tracking</td>
+</tr>
+<tr>
+<td>New contributor PRs/month</td>
+<td>Baseline</td>
+<td>+100%</td>
+<td>GitHub stats</td>
+</tr>
+<tr>
+<td>UI adoption rate</td>
+<td>0%</td>
+<td>80%</td>
+<td>Usage analytics</td>
+</tr>
+<tr>
+<td>Documentation clarity rating</td>
+<td>Unknown</td>
+<td>4.5/5</td>
+<td>User feedback</td>
+</tr>
+</tbody>
+</table>
+<h3 id="qualitative-metrics">Qualitative Metrics<a class="headerlink" href="#qualitative-metrics" title="Permanent link">¶</a></h3>
+<ul>
+<li>User testimonials</li>
+<li>Community feedback</li>
+<li>Support ticket reduction</li>
+<li>Contributor satisfaction survey</li>
+</ul>
+<hr/>
+<h2 id="next-steps_1">Next Steps<a class="headerlink" href="#next-steps_1" title="Permanent link">¶</a></h2>
+<h3 id="immediate-actions-this-week">Immediate Actions (This Week)<a class="headerlink" href="#immediate-actions-this-week" title="Permanent link">¶</a></h3>
+<ol>
+<li><strong>Review and approve this plan</strong></li>
+<li><strong>Assign team members to initiatives</strong></li>
+<li><strong>Set up project tracking (GitHub Project)</strong></li>
+<li><strong>Begin Initiative 1 (MCP Definition)</strong></li>
+</ol>
+<h3 id="communication-plan">Communication Plan<a class="headerlink" href="#communication-plan" title="Permanent link">¶</a></h3>
+<ul>
+<li>Weekly status updates</li>
+<li>Bi-weekly demo sessions</li>
+<li>Monthly retrospectives</li>
+<li>Launch announcement preparation</li>
+</ul>
+<hr/>
+<h2 id="appendix">Appendix<a class="headerlink" href="#appendix" title="Permanent link">¶</a></h2>
+<h3 id="a-documentation-structure-proposed">A. Documentation Structure (Proposed)<a class="headerlink" href="#a-documentation-structure-proposed" title="Permanent link">¶</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-18-1"><a href="#__codelineno-18-1" id="__codelineno-18-1" name="__codelineno-18-1"></a>docs/
+</span><span id="__span-18-2"><a href="#__codelineno-18-2" id="__codelineno-18-2" name="__codelineno-18-2"></a>├── README.md (Documentation index)
+</span><span id="__span-18-3"><a href="#__codelineno-18-3" id="__codelineno-18-3" name="__codelineno-18-3"></a>├── GETTING_STARTED_5MIN.md (NEW)
+</span><span id="__span-18-4"><a href="#__codelineno-18-4" id="__codelineno-18-4" name="__codelineno-18-4"></a>├── MCP_INTRODUCTION.md (NEW)
+</span><span id="__span-18-5"><a href="#__codelineno-18-5" id="__codelineno-18-5" name="__codelineno-18-5"></a>├── LEARNING_PATH.md (NEW)
+</span><span id="__span-18-6"><a href="#__codelineno-18-6" id="__codelineno-18-6" name="__codelineno-18-6"></a>├── ONBOARDING_CHECKLIST.md (NEW)
+</span><span id="__span-18-7"><a href="#__codelineno-18-7" id="__codelineno-18-7" name="__codelineno-18-7"></a>├── QUICKSTART.md (enhanced)
+</span><span id="__span-18-8"><a href="#__codelineno-18-8" id="__codelineno-18-8" name="__codelineno-18-8"></a>├── GLOSSARY.md (updated with prominent MCP entry)
+</span><span id="__span-18-9"><a href="#__codelineno-18-9" id="__codelineno-18-9" name="__codelineno-18-9"></a>├── FAQ.md (updated)
+</span><span id="__span-18-10"><a href="#__codelineno-18-10" id="__codelineno-18-10" name="__codelineno-18-10"></a>├── ARCHITECTURE.md
+</span><span id="__span-18-11"><a href="#__codelineno-18-11" id="__codelineno-18-11" name="__codelineno-18-11"></a>├── API_REFERENCE.md
+</span><span id="__span-18-12"><a href="#__codelineno-18-12" id="__codelineno-18-12" name="__codelineno-18-12"></a>├── OPA_POLICY_GUIDE.md
+</span><span id="__span-18-13"><a href="#__codelineno-18-13" id="__codelineno-18-13" name="__codelineno-18-13"></a>├── DEPLOYMENT.md
+</span><span id="__span-18-14"><a href="#__codelineno-18-14" id="__codelineno-18-14" name="__codelineno-18-14"></a>├── ... (existing docs)
+</span><span id="__span-18-15"><a href="#__codelineno-18-15" id="__codelineno-18-15" name="__codelineno-18-15"></a>└── diagrams/
+</span><span id="__span-18-16"><a href="#__codelineno-18-16" id="__codelineno-18-16" name="__codelineno-18-16"></a>    └── mcp-concepts/ (NEW)
+</span><span id="__span-18-17"><a href="#__codelineno-18-17" id="__codelineno-18-17" name="__codelineno-18-17"></a>        ├── 01-basic-mcp-flow.svg
+</span><span id="__span-18-18"><a href="#__codelineno-18-18" id="__codelineno-18-18" name="__codelineno-18-18"></a>        ├── 02-ungoverned-mcp-risks.svg
+</span><span id="__span-18-19"><a href="#__codelineno-18-19" id="__codelineno-18-19" name="__codelineno-18-19"></a>        ├── 03-sark-governance-layer.svg
+</span><span id="__span-18-20"><a href="#__codelineno-18-20" id="__codelineno-18-20" name="__codelineno-18-20"></a>        └── 04-enterprise-mcp-architecture.svg
+</span></code></pre></div>
+<h3 id="b-ui-technology-alternatives">B. UI Technology Alternatives<a class="headerlink" href="#b-ui-technology-alternatives" title="Permanent link">¶</a></h3>
+<p>If React is not preferred:</p>
+<p><strong>Option 2: Vue.js</strong>
+- Framework: Vue 3 + TypeScript
+- UI: Vuetify or PrimeVue
+- State: Pinia
+- Similar timeline and effort</p>
+<p><strong>Option 3: Svelte</strong>
+- Framework: SvelteKit
+- UI: Custom components
+- Lighter weight, steeper learning curve
+- +1 week timeline</p>
+<p><strong>Option 4: Server-Side (Python)</strong>
+- Framework: FastAPI + Jinja2 templates + HTMX
+- Simpler deployment, less interactivity
+- -2 weeks timeline, limited UX</p>
+<p><strong>Recommendation:</strong> Stick with React (industry standard, large talent pool)</p>
+<h3 id="c-related-initiatives">C. Related Initiatives<a class="headerlink" href="#c-related-initiatives" title="Permanent link">¶</a></h3>
+<p><strong>Future Enhancements (Beyond This Plan):</strong>
+- Video tutorials and demos
+- Interactive sandbox environment
+- CLI improvements (autocomplete, better UX)
+- VS Code extension for policy editing
+- ChatGPT plugin for SARK management
+- Mobile app (admin dashboard)</p>
+<hr/>
+<p><strong>Document Owner:</strong> Development Team
+<strong>Last Updated:</strong> 2025-11-27
+<strong>Next Review:</strong> After Week 4 (UI Foundation complete)</p>
+</article>
+</div>
+<script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+</div>
+<button class="md-top md-icon" data-md-component="top" hidden="" type="button">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"></path></svg>
+  Back to top
+</button>
+</main>
+<footer class="md-footer">
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+<div class="md-copyright__highlight">
+      Copyright © 2024 James R. A. Henry. All rights reserved.
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
+      Material for MkDocs
+    </a>
+</div>
+<div class="md-social">
+<a class="md-social__link" href="https://github.com/apathy-ca/sark" rel="noopener" target="_blank" title="github.com">
+<svg viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"></path></svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.path", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+<script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+</body>
+</html>

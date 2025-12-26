@@ -1,0 +1,6086 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Enterprise-Grade MCP Governance System">
+      
+      
+        <meta name="author" content="James R. A. Henry">
+      
+      
+        <link rel="canonical" href="https://sark.example.com/ROADMAP/">
+      
+      
+        <link rel="prev" href="../EXECUTIVE_SUMMARY/">
+      
+      
+        <link rel="next" href="../IMPLEMENTATION_PLAN/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Roadmap - SARK - Security Audit and Resource Kontroler</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config",""),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#sark-path-to-production-roadmap" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="SARK - Security Audit and Resource Kontroler" class="md-header__button md-logo" aria-label="SARK - Security Audit and Resource Kontroler" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SARK - Security Audit and Resource Kontroler
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Roadmap
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/apathy-ca/sark" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    apathy-ca/sark
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../QUICK_START/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../ARCHITECTURE/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../DEPLOYMENT/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Deployment
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../AUTHENTICATION/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Authentication & Authorization
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../OPA_POLICY_GUIDE/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Policies
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../MONITORING/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Operations
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../DATABASE_MIGRATIONS/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Database
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../PERFORMANCE_TESTING/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Performance
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../API_REFERENCE/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../DEVELOPMENT/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../EXECUTIVE_SUMMARY/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Reports
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../REPOSITORY_IMPROVEMENT_PLAN/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Planning
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../GLOSSARY/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="SARK - Security Audit and Resource Kontroler" class="md-nav__button md-logo" aria-label="SARK - Security Audit and Resource Kontroler" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    SARK - Security Audit and Resource Kontroler
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/apathy-ca/sark" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    apathy-ca/sark
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../QUICK_START/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../QUICK_REFERENCE_SESSIONS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SECURITY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PERFORMANCE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEPLOYMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DOCKER_DEPLOYMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PRODUCTION_DEPLOYMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PRODUCTION_CONFIG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production Config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PRODUCTION_READINESS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production Readiness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEPLOYMENT_CHECKLIST/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment Checklist
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DISASTER_RECOVERY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Disaster Recovery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ROLLBACK_PROCEDURES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rollback Procedures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication & Authorization
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Authentication & Authorization
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AUTHENTICATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AUTHORIZATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authorization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../OIDC_SETUP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OIDC Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../LDAP_SETUP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LDAP Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SAML_SETUP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SAML Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../API_KEYS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Keys
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policies
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Policies
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../OPA_POLICY_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OPA Policy Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ADVANCED_OPA_POLICIES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced OPA Policies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../POLICY_OPTIMIZATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../POLICY_CACHING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Caching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../POLICY_AUDIT_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Audit Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../POLICY_AUDIT_TRAIL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Audit Trail
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Operations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MONITORING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MONITORING_SETUP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monitoring Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../OPERATIONAL_RUNBOOK/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operational Runbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../OPERATIONS_RUNBOOK/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations Runbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../INCIDENT_RESPONSE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incident Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../TROUBLESHOOTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Database
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DATABASE_MIGRATIONS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database Migrations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DATABASE_OPTIMIZATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../REDIS_OPTIMIZATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Redis Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Performance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PERFORMANCE_TESTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PERFORMANCE_TUNING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PERFORMANCE_OPTIMIZATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PERFORMANCE_REPORT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../POLICY_PERFORMANCE_REPORT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../API_REFERENCE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../API_INTEGRATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_11" id="__nav_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEVELOPMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MIGRATION_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migration Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEVELOPMENT_LOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../TESTING_STRATEGY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing Strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../INTEGRATION_TESTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integration Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reports
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reports
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../EXECUTIVE_SUMMARY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Executive Summary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#executive-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Executive Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-version-timeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Version Timeline
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Complete Version Timeline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#v120-gateway-policy-tests-8-weeks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.2.0: Gateway + Policy + Tests (8 weeks)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#v130-advanced-security-8-weeks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.3.0: Advanced Security (8 weeks)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#v140-rust-foundation-6-8-weeks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.4.0: Rust Foundation (6-8 weeks)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#v150-rust-detection-4-5-weeks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.5.0: Rust Detection (4-5 weeks)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#v200-production-release-after-security-audit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v2.0.0: Production Release (After Security Audit)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#total-timeline-to-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Total Timeline to Production
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v120-detailed-timeline-next-phase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.2.0 Detailed Timeline (Next Phase)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-1-complete-gateway-client-implementation-weeks-1-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1: Complete Gateway Client Implementation (Weeks 1-4)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 1: Complete Gateway Client Implementation (Weeks 1-4)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-state-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current State Analysis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#week-1-http-transport-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Week 1: HTTP Transport Implementation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#week-2-sse-server-sent-events-transport" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Week 2: SSE (Server-Sent Events) Transport
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#week-3-stdio-transport-subprocess-based" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Week 3: stdio Transport (Subprocess-based)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#week-4-integration-error-handling-polish" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Week 4: Integration, Error Handling &amp; Polish
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-2-policy-validation-framework-weeks-5-6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2: Policy Validation Framework (Weeks 5-6)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 2: Policy Validation Framework (Weeks 5-6)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-risk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current Risk
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#week-5-policy-validator-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Week 5: Policy Validator Implementation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#week-6-integration-policy-migration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Week 6: Integration &amp; Policy Migration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-3-fix-failing-tests-improve-coverage-weeks-7-8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3: Fix Failing Tests &amp; Improve Coverage (Weeks 7-8)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 3: Fix Failing Tests &amp; Improve Coverage (Weeks 7-8)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current State
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#week-7-fix-auth-provider-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Week 7: Fix Auth Provider Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#week-8-improve-test-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Week 8: Improve Test Coverage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-4-security-audit-preparation-execution-weeks-9-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4: Security Audit Preparation &amp; Execution (Weeks 9-10)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 4: Security Audit Preparation &amp; Execution (Weeks 9-10)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#week-9-pre-audit-preparation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Week 9: Pre-Audit Preparation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#week-10-internal-security-review" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Week 10: Internal Security Review
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weeks-11-12-external-security-testing-vendor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Weeks 11-12: External Security Testing (Vendor)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-5-lethal-trifecta-advanced-mitigations-v130" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 5: Lethal Trifecta Advanced Mitigations (v1.3.0)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 5: Lethal Trifecta Advanced Mitigations (v1.3.0)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#advanced-security-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Security Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#production-deployment-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Production Deployment Strategy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Production Deployment Strategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pre-production-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pre-Production Checklist
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deployment-timeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deployment Timeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rollback-plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rollback Plan
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#success-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Success Metrics
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Success Metrics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phase-completion-gates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase Completion Gates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#production-readiness-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Production Readiness Metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#risk-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Risk Management
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Risk Management">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#critical-risks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Critical Risks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contingency-plans" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contingency Plans
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resource-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resource Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Resource Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#engineering-team-10-weeks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Engineering Team (10 weeks)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#external-vendor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        External Vendor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#infrastructure-costs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Infrastructure Costs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#timeline-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Timeline Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shelved-items-post-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shelved Items (Post-Production)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Shelved Items (Post-Production)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cicd-improvements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CI/CD Improvements
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advanced-lethal-trifecta-mitigations-v130" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Lethal Trifecta Mitigations (v1.3.0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#web-ui-enhancements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Web UI Enhancements
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#document-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Document Control
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Documentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#appendix-version-strategy-critical-findings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Appendix: Version Strategy &amp; Critical Findings
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../IMPLEMENTATION_PLAN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../GAP_ANALYSIS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gap Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PHASE2_COMPLETION_REPORT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 2 Completion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../RELEASE_NOTES_v0.2.0/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release Notes v0.2.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../FINAL_TEST_REPORT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Final Test Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../TEST_COVERAGE_REPORT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Test Coverage Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../KNOWN_ISSUES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Known Issues
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../LESSONS_LEARNED/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lessons Learned
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_13" id="__nav_13_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Planning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../REPOSITORY_IMPROVEMENT_PLAN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Repository Improvement Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WORK_BREAKDOWN_SESSIONS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Work Breakdown Sessions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WORK_TASKS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Work Tasks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PHASE2_3WEEK_PLAN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 2 3-Week Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WEEK_2_SUMMARY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Week 2 Summary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WEEK_3_SUMMARY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Week 3 Summary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_14" >
+        
+          
+          <label class="md-nav__link" for="__nav_14" id="__nav_14_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../GLOSSARY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../FAQ/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FAQ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SECURITY_BEST_PRACTICES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Best Practices
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SECURITY_HARDENING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Hardening
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SECURITY_AUDIT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PRODUCTION_HANDOFF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production Handoff
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#executive-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Executive Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-version-timeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Version Timeline
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Complete Version Timeline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#v120-gateway-policy-tests-8-weeks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.2.0: Gateway + Policy + Tests (8 weeks)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#v130-advanced-security-8-weeks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.3.0: Advanced Security (8 weeks)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#v140-rust-foundation-6-8-weeks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.4.0: Rust Foundation (6-8 weeks)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#v150-rust-detection-4-5-weeks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.5.0: Rust Detection (4-5 weeks)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#v200-production-release-after-security-audit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v2.0.0: Production Release (After Security Audit)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#total-timeline-to-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Total Timeline to Production
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v120-detailed-timeline-next-phase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.2.0 Detailed Timeline (Next Phase)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-1-complete-gateway-client-implementation-weeks-1-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1: Complete Gateway Client Implementation (Weeks 1-4)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 1: Complete Gateway Client Implementation (Weeks 1-4)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-state-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current State Analysis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#week-1-http-transport-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Week 1: HTTP Transport Implementation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#week-2-sse-server-sent-events-transport" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Week 2: SSE (Server-Sent Events) Transport
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#week-3-stdio-transport-subprocess-based" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Week 3: stdio Transport (Subprocess-based)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#week-4-integration-error-handling-polish" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Week 4: Integration, Error Handling &amp; Polish
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-2-policy-validation-framework-weeks-5-6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2: Policy Validation Framework (Weeks 5-6)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 2: Policy Validation Framework (Weeks 5-6)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-risk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current Risk
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#week-5-policy-validator-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Week 5: Policy Validator Implementation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#week-6-integration-policy-migration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Week 6: Integration &amp; Policy Migration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-3-fix-failing-tests-improve-coverage-weeks-7-8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3: Fix Failing Tests &amp; Improve Coverage (Weeks 7-8)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 3: Fix Failing Tests &amp; Improve Coverage (Weeks 7-8)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current State
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#week-7-fix-auth-provider-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Week 7: Fix Auth Provider Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#week-8-improve-test-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Week 8: Improve Test Coverage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-4-security-audit-preparation-execution-weeks-9-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4: Security Audit Preparation &amp; Execution (Weeks 9-10)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 4: Security Audit Preparation &amp; Execution (Weeks 9-10)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#week-9-pre-audit-preparation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Week 9: Pre-Audit Preparation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#week-10-internal-security-review" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Week 10: Internal Security Review
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weeks-11-12-external-security-testing-vendor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Weeks 11-12: External Security Testing (Vendor)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#phase-5-lethal-trifecta-advanced-mitigations-v130" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 5: Lethal Trifecta Advanced Mitigations (v1.3.0)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Phase 5: Lethal Trifecta Advanced Mitigations (v1.3.0)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#advanced-security-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Security Features
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#production-deployment-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Production Deployment Strategy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Production Deployment Strategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pre-production-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pre-Production Checklist
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deployment-timeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deployment Timeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rollback-plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rollback Plan
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#success-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Success Metrics
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Success Metrics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phase-completion-gates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase Completion Gates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#production-readiness-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Production Readiness Metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#risk-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Risk Management
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Risk Management">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#critical-risks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Critical Risks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contingency-plans" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contingency Plans
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resource-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resource Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Resource Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#engineering-team-10-weeks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Engineering Team (10 weeks)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#external-vendor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        External Vendor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#infrastructure-costs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Infrastructure Costs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#timeline-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Timeline Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shelved-items-post-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shelved Items (Post-Production)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Shelved Items (Post-Production)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cicd-improvements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CI/CD Improvements
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advanced-lethal-trifecta-mitigations-v130" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Lethal Trifecta Mitigations (v1.3.0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#web-ui-enhancements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Web UI Enhancements
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#document-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Document Control
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Documentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#appendix-version-strategy-critical-findings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Appendix: Version Strategy &amp; Critical Findings
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href=".." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    Home
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../EXECUTIVE_SUMMARY/" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Reports
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="sark-path-to-production-roadmap">SARK Path to Production Roadmap<a class="headerlink" href="#sark-path-to-production-roadmap" title="Permanent link">&para;</a></h1>
+<p><strong>Document Version:</strong> 2.0
+<strong>Last Updated:</strong> 2025-12-09
+<strong>Current Release:</strong> v1.1.0 (Gateway infrastructure merged but stubbed)
+<strong>Target Release:</strong> v1.2.0 (Gateway implementation + policy validation + test fixes)
+<strong>Target Production:</strong> v2.0.0 (Q1 2026 - after security audit)</p>
+<hr />
+<h2 id="executive-summary">Executive Summary<a class="headerlink" href="#executive-summary" title="Permanent link">&para;</a></h2>
+<p><strong>Current Situation:</strong>
+Critical analysis revealed that while v1.1.0 has excellent architecture, the Gateway client is stubbed and several critical security features are missing. Rather than rush to v2.0.0, we're taking an incremental approach with v1.2.0. The <strong>Lethal Trifecta Analysis</strong> (Dec 8, 2025) identified specific gaps blocking production readiness.</p>
+<p><strong>What We Have (v1.1.0):</strong>
+- ✅ Strong architectural foundation (multi-layer auth/authz)
+- ✅ Gateway infrastructure merged (models, tests, docs)
+- ✅ Advanced features (adapters, federation, GRID protocol)
+- ✅ Comprehensive audit logging and SIEM integration</p>
+<p><strong>What's Missing (Blocking Production):</strong>
+- ❌ Gateway client is stubbed (returns empty lists, NotImplementedError)
+- ❌ No policy validation framework (risk of policy injection attacks)
+- ❌ 154 failing auth provider tests (77.8% pass rate)
+- ❌ No external security audit completed</p>
+<p><strong>Revised Strategy:</strong>
+<strong>v1.2.0</strong> will complete the production-critical implementation work (Gateway, policy validation, test fixes). <strong>v2.0.0</strong> will be released only after external security audit passes. This roadmap reflects incremental, honest versioning based on the Implementation Plan and Lethal Trifecta Analysis.</p>
+<p><strong>Version Plan:</strong>
+- <strong>v1.1.0</strong> (Current): Gateway infrastructure merged but stubbed
+- <strong>v1.2.0</strong> (Weeks 1-8): Gateway working + policy validation + tests passing
+- <strong>v1.3.0</strong> (8 weeks): Lethal Trifecta mitigations (prompt injection, anomaly, network, secrets, MFA)
+- <strong>v1.4.0</strong> (6-8 weeks): Rust foundation (OPA engine + fast cache) - 5-10x performance
+- <strong>v1.5.0</strong> (4-5 weeks): Rust detection (injection, anomaly, MCP parsing) - 10-100x performance
+- <strong>v2.0.0</strong> (Production): Security audit passed + production deployment</p>
+<hr />
+<h2 id="complete-version-timeline">Complete Version Timeline<a class="headerlink" href="#complete-version-timeline" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>v1.1.0 ──► v1.2.0 ──► v1.3.0 ──► v1.4.0 ──► v1.5.0 ──► v2.0.0
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>(NOW)    (8 wks)   (8 wks)   (6-8 wks) (4-5 wks) (Production)
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  │         │         │          │         │         │
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Gateway  Gateway   Advanced   Rust      Rust    Security
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>Stubbed  Working   Security   Core      Fast    Audit
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>                   Features   (5-10x)   (10-100x) Passed
+</span></code></pre></div>
+<h3 id="v120-gateway-policy-tests-8-weeks">v1.2.0: Gateway + Policy + Tests (8 weeks)<a class="headerlink" href="#v120-gateway-policy-tests-8-weeks" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>┌─────────────┬─────────────┬─────────────┬─────────────┐
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>│   Week 1-4  │   Week 5-6  │   Week 7-8  │             │
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>├─────────────┼─────────────┼─────────────┤             │
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>│   Gateway   │   Policy    │  Fix Tests  │   Release   │
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>│ HTTP/SSE/   │  Validation │  Auth Tests │   v1.2.0    │
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>│  stdio      │  Framework  │  Coverage   │             │
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>└─────────────┴─────────────┴─────────────┴─────────────┘
+</span></code></pre></div>
+<p><strong>Deliverables:</strong>
+- Real MCP communication (HTTP, SSE, stdio)
+- Policy validation prevents injection
+- 100% test pass rate, 85%+ coverage</p>
+<p><strong>See:</strong> <code>docs/v1.2.0/IMPLEMENTATION_PLAN.md</code></p>
+<h3 id="v130-advanced-security-8-weeks">v1.3.0: Advanced Security (8 weeks)<a class="headerlink" href="#v130-advanced-security-8-weeks" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>┌──────────┬──────────┬──────────┬──────────┬──────────┬──────────┬──────────┬──────────┐
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>│  Week 1-2│  Week 3-4│  Week 5  │  Week 6  │  Week 7  │  Week 8  │          │          │
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>├──────────┼──────────┼──────────┼──────────┼──────────┼──────────┤          │          │
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>│ Prompt   │ Anomaly  │ Network  │  Secret  │   MFA    │  E2E     │ Release  │          │
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>│Injection │Detection │ Controls │ Scanning │  System  │   Test   │  v1.3.0  │          │
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>└──────────┴──────────┴──────────┴──────────┴──────────┴──────────┴──────────┴──────────┘
+</span></code></pre></div>
+<p><strong>Deliverables:</strong>
+- Prompt injection detection (95%+ rate)
+- Anomaly detection (80%+ rate)
+- Network policies + egress filtering
+- Secret scanning + redaction
+- MFA for critical actions</p>
+<p><strong>See:</strong> <code>docs/v1.3.0/IMPLEMENTATION_PLAN.md</code></p>
+<h3 id="v140-rust-foundation-6-8-weeks">v1.4.0: Rust Foundation (6-8 weeks)<a class="headerlink" href="#v140-rust-foundation-6-8-weeks" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>┌──────────┬──────────┬──────────┬──────────┬──────────┬──────────┐
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>│  Week 1-3│  Week 2-3│  Week 4-5│  Week 5-6│  Week 6  │          │
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>├──────────┼──────────┼──────────┼──────────┼──────────┤          │
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>│   Rust   │   Rust   │   A/B    │ Perf     │   Docs   │ Release  │
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>│  OPA     │  Cache   │  Testing │ Testing  │          │  v1.4.0  │
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>│  Engine  │          │          │          │          │          │
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>└──────────┴──────────┴──────────┴──────────┴──────────┴──────────┘
+</span></code></pre></div>
+<p><strong>Deliverables:</strong>
+- Embedded Rust OPA engine (4-10x faster)
+- Rust in-memory cache (10-50x faster)
+- Build system (maturin + PyO3)
+- 2,000+ req/s throughput</p>
+<p><strong>Performance Gains:</strong>
+- Authorization: 20-50ms → &lt;5ms
+- Cache ops: 1-5ms → &lt;0.5ms
+- Throughput: 850 → 2,000+ req/s</p>
+<p><strong>See:</strong> <code>docs/v1.4.0/IMPLEMENTATION_PLAN.md</code></p>
+<h3 id="v150-rust-detection-4-5-weeks">v1.5.0: Rust Detection (4-5 weeks)<a class="headerlink" href="#v150-rust-detection-4-5-weeks" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>┌──────────┬──────────┬──────────┬──────────┬──────────┐
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>│  Week 1-2│  Week 2-3│  Week 3  │  Week 4-5│          │
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>├──────────┼──────────┼──────────┼──────────┤          │
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>│ Injection│ Anomaly  │   MCP    │   E2E    │ Release  │
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>│ Detector │ Detector │  Parser  │   Test   │  v1.5.0  │
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>│  (Rust)  │  (Rust)  │  (Rust)  │          │          │
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>└──────────┴──────────┴──────────┴──────────┴──────────┘
+</span></code></pre></div>
+<p><strong>Deliverables:</strong>
+- Rust injection detector (10-50x faster)
+- Rust anomaly detector (5-10x faster)
+- Rust MCP parser (5-10x faster)
+- 5,000+ req/s throughput</p>
+<p><strong>Performance Gains:</strong>
+- Injection detection: 10-50ms → &lt;1ms
+- Anomaly detection: 5-20ms → &lt;1ms
+- MCP parsing: 5-10ms → &lt;1ms
+- Throughput: 2,000 → 5,000+ req/s</p>
+<p><strong>See:</strong> <code>docs/v1.5.0/IMPLEMENTATION_PLAN.md</code></p>
+<h3 id="v200-production-release-after-security-audit">v2.0.0: Production Release (After Security Audit)<a class="headerlink" href="#v200-production-release-after-security-audit" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>┌──────────┬──────────┬──────────┬──────────┬──────────┐
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>│  Week 1-2│  Week 3-4│  Week 5-6│  Week 7  │          │
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>├──────────┼──────────┼──────────┼──────────┤          │
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>│  Audit   │ External │Remediate │  Deploy  │ Release  │
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>│   Prep   │ Pen Test │  &amp; Test  │ Staging  │  v2.0.0  │
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>│          │          │          │  to Prod │          │
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>└──────────┴──────────┴──────────┴──────────┴──────────┘
+</span></code></pre></div>
+<p><strong>Deliverables:</strong>
+- Zero critical/high vulnerabilities
+- External security certification
+- Production deployment successful
+- 99.9% uptime target</p>
+<p><strong>See:</strong> Phases 4 (Security Audit) below</p>
+<hr />
+<h2 id="total-timeline-to-production">Total Timeline to Production<a class="headerlink" href="#total-timeline-to-production" title="Permanent link">&para;</a></h2>
+<p><strong>Path 1: Minimum Viable (v1.2.0 → v2.0.0):</strong>
+- v1.2.0: 8 weeks (Gateway + Policy + Tests)
+- Security Audit: 6-7 weeks
+- <strong>Total: 14-15 weeks</strong> to basic production</p>
+<p><strong>Path 2: Enhanced Security (v1.2.0 → v1.3.0 → v2.0.0):</strong>
+- v1.2.0: 8 weeks
+- v1.3.0: 8 weeks (Advanced security)
+- Security Audit: 6-7 weeks
+- <strong>Total: 22-23 weeks</strong> to production with advanced features</p>
+<p><strong>Path 3: Full Performance (v1.2.0 → v1.3.0 → v1.4.0 → v1.5.0 → v2.0.0):</strong>
+- v1.2.0: 8 weeks
+- v1.3.0: 8 weeks
+- v1.4.0: 6-8 weeks (Rust foundation)
+- v1.5.0: 4-5 weeks (Rust detection)
+- Security Audit: 6-7 weeks
+- <strong>Total: 32-36 weeks</strong> to production with maximum performance</p>
+<p><strong>Recommended:</strong> Path 2 (Enhanced Security) - Balance of security and time-to-market</p>
+<hr />
+<h2 id="v120-detailed-timeline-next-phase">v1.2.0 Detailed Timeline (Next Phase)<a class="headerlink" href="#v120-detailed-timeline-next-phase" title="Permanent link">&para;</a></h2>
+<p><strong>Critical Path:</strong> Gateway (4 weeks) → Policy Validation (2 weeks) → Fix Tests (2 weeks)</p>
+<p><strong>Shelved Until Post-Production:</strong>
+- CI/CD improvements (defer until core development complete)
+- Web UI enhancements (already functional)</p>
+<p><strong>Note:</strong> Advanced Lethal Trifecta security mitigations (v1.3.0) are part of the recommended Path 2 and will proceed after v1.2.0 completion.</p>
+<hr />
+<h2 id="phase-1-complete-gateway-client-implementation-weeks-1-4">Phase 1: Complete Gateway Client Implementation (Weeks 1-4)<a class="headerlink" href="#phase-1-complete-gateway-client-implementation-weeks-1-4" title="Permanent link">&para;</a></h2>
+<p><strong>Priority:</strong> 🔴 P1 - CRITICAL BLOCKER
+<strong>Goal:</strong> Replace stubbed Gateway client with fully functional MCP transport implementation
+<strong>Duration:</strong> 4 weeks
+<strong>Team:</strong> 1 senior engineer
+<strong>Status:</strong> Not Started</p>
+<h3 id="current-state-analysis">Current State Analysis<a class="headerlink" href="#current-state-analysis" title="Permanent link">&para;</a></h3>
+<p><strong>Problem:</strong>
+The Gateway client in <code>src/sark/api/routers/gateway.py</code> and <code>src/sark/models/gateway.py</code> returns stubbed responses:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_servers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">GatewayServerInfo</span><span class="p">]:</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="k">return</span> <span class="p">[]</span>  <span class="c1"># STUBBED!</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_server_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GatewayServerInfo</span><span class="p">]:</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Gateway client not fully implemented&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<p>This means:
+- No actual MCP server communication happens
+- Authorization/filtering can't be tested end-to-end
+- Production usage impossible</p>
+<p><strong>Impact:</strong>
+- SARK cannot govern real AI agents
+- Security controls unverified in practice
+- All Gateway v1.1.0 work theoretical only</p>
+<h3 id="week-1-http-transport-implementation">Week 1: HTTP Transport Implementation<a class="headerlink" href="#week-1-http-transport-implementation" title="Permanent link">&para;</a></h3>
+<p><strong>Tasks:</strong></p>
+<ol>
+<li><strong>Implement <code>list_servers()</code> - MCP Server Discovery</strong> (2 days)</li>
+<li>Query MCP registry or configured server list via HTTP</li>
+<li>Parse MCP server discovery endpoint response</li>
+<li>Handle pagination (max 100 servers per page)</li>
+<li>Cache results with 5-minute TTL</li>
+<li>Filter by user permissions</li>
+<li>
+<p><strong>File:</strong> <code>src/sark/gateway/http_client.py</code></p>
+</li>
+<li>
+<p><strong>Implement <code>get_server_info()</code> - Server Metadata</strong> (1 day)</p>
+</li>
+<li>Fetch detailed server information via HTTP</li>
+<li>Handle 404 responses gracefully</li>
+<li>Cache server metadata</li>
+<li>
+<p><strong>File:</strong> <code>src/sark/gateway/http_client.py</code></p>
+</li>
+<li>
+<p><strong>Implement <code>list_tools()</code> - Tool Discovery</strong> (2 days)</p>
+</li>
+<li>MCP <code>tools/list</code> endpoint integration</li>
+<li>Parse tool schemas and metadata</li>
+<li>Cache tool lists per server</li>
+<li>
+<p><strong>File:</strong> <code>src/sark/gateway/http_client.py</code></p>
+</li>
+<li>
+<p><strong>Implement <code>invoke_tool()</code> - Core Tool Execution</strong> (3 days)</p>
+</li>
+<li>Full authorization flow integration</li>
+<li>Parameter filtering based on OPA decision</li>
+<li>Tool invocation via MCP protocol</li>
+<li>Result processing and validation</li>
+<li>Audit logging of all invocations</li>
+<li><strong>File:</strong> <code>src/sark/gateway/http_client.py</code></li>
+</ol>
+<p><strong>Deliverables:</strong>
+- ✅ HTTP transport fully functional
+- ✅ Integration with OPA authorization working end-to-end
+- ✅ Cache implementation with configurable TTLs
+- ✅ Error handling with retry logic
+- ✅ 20+ unit tests for HTTP client</p>
+<h3 id="week-2-sse-server-sent-events-transport">Week 2: SSE (Server-Sent Events) Transport<a class="headerlink" href="#week-2-sse-server-sent-events-transport" title="Permanent link">&para;</a></h3>
+<p><strong>Tasks:</strong></p>
+<ol>
+<li><strong>SSE Client Infrastructure</strong> (2 days)</li>
+<li>Implement async SSE client for streaming responses</li>
+<li>Connection management and reconnection logic</li>
+<li>Event parsing and deserialization</li>
+<li>
+<p><strong>File:</strong> <code>src/sark/gateway/sse_client.py</code></p>
+</li>
+<li>
+<p><strong>Streaming Tool Invocation</strong> (2 days)</p>
+</li>
+<li><code>invoke_tool_streaming()</code> for real-time results</li>
+<li>Async iteration over SSE events</li>
+<li>Partial result handling</li>
+<li>Stream cancellation on timeout/error</li>
+<li>
+<p><strong>File:</strong> <code>src/sark/gateway/sse_client.py</code></p>
+</li>
+<li>
+<p><strong>SSE Connection Management</strong> (2 days)</p>
+</li>
+<li>Connection pooling (max 50 concurrent)</li>
+<li>Automatic reconnection with exponential backoff</li>
+<li>Heartbeat/keepalive handling</li>
+<li>Resource cleanup on connection close</li>
+<li><strong>File:</strong> <code>src/sark/gateway/sse_client.py</code></li>
+</ol>
+<p><strong>Deliverables:</strong>
+- ✅ SSE transport working for streaming responses
+- ✅ Connection pooling implemented
+- ✅ Reconnection logic tested under failure scenarios
+- ✅ 15+ unit tests for SSE client</p>
+<h3 id="week-3-stdio-transport-subprocess-based">Week 3: stdio Transport (Subprocess-based)<a class="headerlink" href="#week-3-stdio-transport-subprocess-based" title="Permanent link">&para;</a></h3>
+<p><strong>Tasks:</strong></p>
+<ol>
+<li><strong>Stdio MCP Client Foundation</strong> (2 days)</li>
+<li>Subprocess management for MCP servers</li>
+<li>JSON-RPC message handling over stdin/stdout</li>
+<li>Process lifecycle management (start, stop, restart)</li>
+<li>
+<p><strong>File:</strong> <code>src/sark/gateway/stdio_client.py</code></p>
+</li>
+<li>
+<p><strong>Tool Invocation via stdio</strong> (2 days)</p>
+</li>
+<li>JSON-RPC request/response handling</li>
+<li>Timeout management (30s default)</li>
+<li>Error handling for crashed processes</li>
+<li>
+<p><strong>File:</strong> <code>src/sark/gateway/stdio_client.py</code></p>
+</li>
+<li>
+<p><strong>Process Health &amp; Resource Management</strong> (2 days)</p>
+</li>
+<li>Process health checks (heartbeat)</li>
+<li>Resource limits (memory, CPU, file descriptors)</li>
+<li>Graceful shutdown handling</li>
+<li>Zombie process prevention</li>
+<li><strong>File:</strong> <code>src/sark/gateway/stdio_client.py</code></li>
+</ol>
+<p><strong>Deliverables:</strong>
+- ✅ stdio transport functional for local MCP servers
+- ✅ Process management robust (no leaks, zombies)
+- ✅ Resource limits enforced
+- ✅ 15+ unit tests for stdio client</p>
+<h3 id="week-4-integration-error-handling-polish">Week 4: Integration, Error Handling &amp; Polish<a class="headerlink" href="#week-4-integration-error-handling-polish" title="Permanent link">&para;</a></h3>
+<p><strong>Tasks:</strong></p>
+<ol>
+<li><strong>Unified Gateway Client Interface</strong> (2 days)</li>
+<li>Abstract transport interface</li>
+<li>Automatic transport selection based on server config</li>
+<li>Transport-agnostic error handling</li>
+<li>
+<p><strong>File:</strong> <code>src/sark/gateway/client.py</code></p>
+</li>
+<li>
+<p><strong>Comprehensive Error Handling</strong> (2 days)</p>
+</li>
+<li>Timeout handling with exponential backoff</li>
+<li>Network error retry logic</li>
+<li>Authorization failure handling</li>
+<li>Circuit breaker pattern (fail-fast after 5 consecutive errors)</li>
+<li>
+<p><strong>File:</strong> <code>src/sark/gateway/error_handler.py</code></p>
+</li>
+<li>
+<p><strong>End-to-End Integration Tests</strong> (3 days)</p>
+</li>
+<li>Real MCP server testing (mock or local)</li>
+<li>Authorization flow validation</li>
+<li>Parameter filtering verification</li>
+<li>Audit logging confirmation</li>
+<li>Performance benchmarks (&lt;100ms p95 latency)</li>
+<li><strong>File:</strong> <code>tests/integration/test_gateway_e2e.py</code></li>
+</ol>
+<p><strong>Deliverables:</strong>
+- ✅ All 3 transports (HTTP, SSE, stdio) working
+- ✅ Gateway client fully functional end-to-end
+- ✅ 50+ integration tests covering happy path and failures
+- ✅ Performance: &lt;100ms p95 latency for tool invocations
+- ✅ Documentation: API reference and usage examples
+- ✅ <strong>Gateway Implementation Complete - UNBLOCKED FOR PRODUCTION</strong></p>
+<p><strong>Acceptance Criteria:</strong>
+- [ ] All Gateway methods implemented (no stubs)
+- [ ] End-to-end test with real MCP server passes
+- [ ] Authorization + filtering verified in practice
+- [ ] Performance targets met (&lt;100ms p95)
+- [ ] 85%+ code coverage for gateway module
+- [ ] Documentation complete with examples
+- [ ] Security review passed (internal)</p>
+<hr />
+<h2 id="phase-2-policy-validation-framework-weeks-5-6">Phase 2: Policy Validation Framework (Weeks 5-6)<a class="headerlink" href="#phase-2-policy-validation-framework-weeks-5-6" title="Permanent link">&para;</a></h2>
+<p><strong>Priority:</strong> 🔴 P2 - CRITICAL
+<strong>Goal:</strong> Prevent policy injection attacks by validating OPA policies before loading
+<strong>Duration:</strong> 2 weeks
+<strong>Team:</strong> 1 engineer
+<strong>Status:</strong> Not Started</p>
+<h3 id="current-risk">Current Risk<a class="headerlink" href="#current-risk" title="Permanent link">&para;</a></h3>
+<p><strong>Problem:</strong>
+Policies loaded from files/API without validation. Rego is Turing-complete, allowing arbitrary logic:</p>
+<div class="language-rego highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># MALICIOUS POLICY EXAMPLE</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">package</span><span class="w"> </span><span class="n">gateway</span><span class="p">.</span><span class="n">authorization</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="k">default</span><span class="w"> </span><span class="n">allow</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="k">true</span><span class="w">  </span><span class="c1"># Approve everything!</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">filtered_params</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">input</span><span class="p">.</span><span class="n">params</span><span class="w">  </span><span class="c1"># Don&#39;t filter anything!</span>
+</span></code></pre></div>
+<p><strong>Impact:</strong>
+- Single malicious policy bypasses all security
+- Policy misconfiguration undetected until breach
+- No safety net for policy authors</p>
+<h3 id="week-5-policy-validator-implementation">Week 5: Policy Validator Implementation<a class="headerlink" href="#week-5-policy-validator-implementation" title="Permanent link">&para;</a></h3>
+<p><strong>Tasks:</strong></p>
+<ol>
+<li><strong>Policy Validation Engine</strong> (3 days)</li>
+<li>Syntax validation via OPA CLI (<code>opa check</code>)</li>
+<li>Required rule verification (must have <code>allow</code> and <code>deny</code>)</li>
+<li>Forbidden pattern detection (blanket allows, system imports)</li>
+<li>Safety checks (no external HTTP, no data exfiltration)</li>
+<li>
+<p><strong>File:</strong> <code>src/sark/policy/validator.py</code></p>
+</li>
+<li>
+<p><strong>Policy Testing Framework</strong> (2 days)</p>
+</li>
+<li>Run unit tests for policies (YAML test suites)</li>
+<li>Evaluate policy with sample inputs</li>
+<li>Verify expected allow/deny decisions</li>
+<li><strong>File:</strong> <code>src/sark/policy/test_runner.py</code></li>
+</ol>
+<p><strong>Deliverables:</strong>
+- ✅ Policy validator with syntax and safety checks
+- ✅ Forbidden pattern detection (10+ patterns)
+- ✅ 20+ unit tests for validator</p>
+<h3 id="week-6-integration-policy-migration">Week 6: Integration &amp; Policy Migration<a class="headerlink" href="#week-6-integration-policy-migration" title="Permanent link">&para;</a></h3>
+<p><strong>Tasks:</strong></p>
+<ol>
+<li><strong>Integrate Validator into Loading Pipeline</strong> (2 days)</li>
+<li>Validate all policies before loading into OPA</li>
+<li>Reject invalid policies with detailed errors</li>
+<li>Log validation warnings (non-fatal issues)</li>
+<li>
+<p><strong>File:</strong> <code>src/sark/policy/loader.py</code></p>
+</li>
+<li>
+<p><strong>Validate Existing Policies</strong> (2 days)</p>
+</li>
+<li>Run validator against all current policies</li>
+<li>Fix policies that fail validation</li>
+<li>Create test suites for all policies</li>
+<li>
+<p><strong>Files:</strong> <code>opa_policies/*.rego</code>, <code>opa_policies/tests/*.yaml</code></p>
+</li>
+<li>
+<p><strong>Documentation &amp; Best Practices</strong> (1 day)</p>
+</li>
+<li>Policy authoring guide with safety requirements</li>
+<li>Common mistakes and how to avoid them</li>
+<li>Example safe policies</li>
+<li><strong>File:</strong> <code>docs/POLICY_AUTHORING_GUIDE.md</code></li>
+</ol>
+<p><strong>Deliverables:</strong>
+- ✅ All policies validated before loading
+- ✅ 100% of existing policies pass validation
+- ✅ Policy test suites created
+- ✅ Documentation for policy authors
+- ✅ <strong>Policy Injection Risk Mitigated</strong></p>
+<p><strong>Acceptance Criteria:</strong>
+- [ ] Validator rejects malicious policy examples
+- [ ] All existing policies validated and tested
+- [ ] Invalid policy upload returns clear error
+- [ ] Documentation reviewed and approved
+- [ ] Security team sign-off</p>
+<hr />
+<h2 id="phase-3-fix-failing-tests-improve-coverage-weeks-7-8">Phase 3: Fix Failing Tests &amp; Improve Coverage (Weeks 7-8)<a class="headerlink" href="#phase-3-fix-failing-tests-improve-coverage-weeks-7-8" title="Permanent link">&para;</a></h2>
+<p><strong>Priority:</strong> 🟠 P3 - HIGH
+<strong>Goal:</strong> Achieve 85%+ test coverage with 100% pass rate
+<strong>Duration:</strong> 2 weeks
+<strong>Team:</strong> 1 engineer
+<strong>Status:</strong> Not Started</p>
+<h3 id="current-state">Current State<a class="headerlink" href="#current-state" title="Permanent link">&para;</a></h3>
+<p><strong>Problem:</strong>
+- 77.8% test pass rate (154 auth provider tests erroring)
+- Gaps in test coverage for critical paths
+- No end-to-end scenario tests</p>
+<h3 id="week-7-fix-auth-provider-tests">Week 7: Fix Auth Provider Tests<a class="headerlink" href="#week-7-fix-auth-provider-tests" title="Permanent link">&para;</a></h3>
+<p><strong>Tasks:</strong></p>
+<ol>
+<li><strong>Debug LDAP Auth Provider Tests</strong> (2 days)</li>
+<li>Issue: Mock LDAP server not starting correctly</li>
+<li>Fix: Use <code>pytest-docker</code> for real LDAP container</li>
+<li>Resolve 52 LDAP test failures</li>
+<li>
+<p><strong>File:</strong> <code>tests/test_auth_providers.py</code></p>
+</li>
+<li>
+<p><strong>Debug SAML Auth Provider Tests</strong> (2 days)</p>
+</li>
+<li>Issue: XML signature validation failing</li>
+<li>Fix: Correct certificate format in test fixtures</li>
+<li>Resolve 48 SAML test failures</li>
+<li>
+<p><strong>File:</strong> <code>tests/test_auth_providers.py</code></p>
+</li>
+<li>
+<p><strong>Debug OIDC Auth Provider Tests</strong> (1 day)</p>
+</li>
+<li>Issue: Token expiry validation off by 1 second</li>
+<li>Fix: Use <code>freezegun</code> for time mocking</li>
+<li>Resolve 54 OIDC test failures</li>
+<li><strong>File:</strong> <code>tests/test_auth_providers.py</code></li>
+</ol>
+<p><strong>Deliverables:</strong>
+- ✅ 100% test pass rate
+- ✅ All 154 erroring tests fixed
+- ✅ Docker-based test infrastructure for LDAP</p>
+<h3 id="week-8-improve-test-coverage">Week 8: Improve Test Coverage<a class="headerlink" href="#week-8-improve-test-coverage" title="Permanent link">&para;</a></h3>
+<p><strong>Tasks:</strong></p>
+<ol>
+<li><strong>Add Missing Unit Tests</strong> (2 days)</li>
+<li>Gateway authorization logic</li>
+<li>Parameter filtering edge cases</li>
+<li>Cache TTL calculations</li>
+<li>Rate limiting enforcement</li>
+<li>
+<p><strong>Files:</strong> <code>tests/unit/test_*.py</code></p>
+</li>
+<li>
+<p><strong>Add End-to-End Scenario Tests</strong> (3 days)</p>
+</li>
+<li>Sensitive data access workflows</li>
+<li>Prompt injection blocking scenarios</li>
+<li>Multi-layer authorization flows</li>
+<li>Audit log verification</li>
+<li><strong>File:</strong> <code>tests/e2e/test_scenarios.py</code></li>
+</ol>
+<p><strong>Deliverables:</strong>
+- ✅ 85%+ code coverage
+- ✅ 200+ total tests (unit + integration + e2e)
+- ✅ CI/CD pipeline green
+- ✅ Coverage report published
+- ✅ <strong>Test Quality Gate Met</strong></p>
+<p><strong>Acceptance Criteria:</strong>
+- [ ] 100% test pass rate achieved
+- [ ] 85%+ overall code coverage
+- [ ] All critical paths have tests
+- [ ] E2E scenarios cover major workflows
+- [ ] Performance tests pass (&lt;100ms p95)</p>
+<hr />
+<h2 id="phase-4-security-audit-preparation-execution-weeks-9-10">Phase 4: Security Audit Preparation &amp; Execution (Weeks 9-10)<a class="headerlink" href="#phase-4-security-audit-preparation-execution-weeks-9-10" title="Permanent link">&para;</a></h2>
+<p><strong>Priority:</strong> 🔴 P1 - CRITICAL GATE
+<strong>Goal:</strong> External penetration test to validate security controls
+<strong>Duration:</strong> 2 weeks preparation + 2 weeks vendor testing
+<strong>Team:</strong> 1 engineer + external vendor
+<strong>Status:</strong> Not Started</p>
+<h3 id="week-9-pre-audit-preparation">Week 9: Pre-Audit Preparation<a class="headerlink" href="#week-9-pre-audit-preparation" title="Permanent link">&para;</a></h3>
+<p><strong>Tasks:</strong></p>
+<ol>
+<li><strong>Document Attack Surface</strong> (2 days)</li>
+<li>API endpoints inventory (50+ endpoints)</li>
+<li>Authentication mechanisms documentation</li>
+<li>Data flows and trust boundaries</li>
+<li>
+<p><strong>File:</strong> <code>docs/security/ATTACK_SURFACE.md</code></p>
+</li>
+<li>
+<p><strong>Security Questionnaire</strong> (2 days)</p>
+</li>
+<li>OWASP Top 10 mitigations</li>
+<li>Encryption (TLS, at-rest, in-transit)</li>
+<li>Secret management practices</li>
+<li>Access controls documentation</li>
+<li>
+<p><strong>File:</strong> <code>docs/security/SECURITY_CONTROLS.md</code></p>
+</li>
+<li>
+<p><strong>Provide Test Environment</strong> (1 day)</p>
+</li>
+<li>Staging cluster with production-like config</li>
+<li>Test accounts (admin, developer, restricted)</li>
+<li>Synthetic test data (no production data)</li>
+<li><strong>Infrastructure:</strong> Staging environment</li>
+</ol>
+<p><strong>Deliverables:</strong>
+- ✅ Attack surface documented
+- ✅ Security controls documented
+- ✅ Test environment ready
+- ✅ Vendor selected and contracted</p>
+<h3 id="week-10-internal-security-review">Week 10: Internal Security Review<a class="headerlink" href="#week-10-internal-security-review" title="Permanent link">&para;</a></h3>
+<p><strong>Tasks:</strong></p>
+<ol>
+<li><strong>Internal Security Scan</strong> (2 days)</li>
+<li>OWASP ZAP automated scanning</li>
+<li>Dependency vulnerability check (Snyk/Trivy)</li>
+<li>Secrets scanning (TruffleHog)</li>
+<li>
+<p><strong>Tools:</strong> OWASP ZAP, Snyk, TruffleHog</p>
+</li>
+<li>
+<p><strong>Fix Critical Issues</strong> (3 days)</p>
+</li>
+<li>Address P0/P1 findings from internal scan</li>
+<li>Update dependencies with CVEs</li>
+<li>Remove any detected secrets</li>
+<li><strong>Various files</strong></li>
+</ol>
+<p><strong>Deliverables:</strong>
+- ✅ Internal security scan complete
+- ✅ All P0/P1 issues resolved
+- ✅ No secrets in codebase
+- ✅ Dependencies up to date
+- ✅ <strong>Ready for External Audit</strong></p>
+<h3 id="weeks-11-12-external-security-testing-vendor">Weeks 11-12: External Security Testing (Vendor)<a class="headerlink" href="#weeks-11-12-external-security-testing-vendor" title="Permanent link">&para;</a></h3>
+<p><strong>Vendor Selection:</strong> TBD (recommend NCC Group, Trail of Bits, or Bishop Fox)</p>
+<p><strong>Testing Methods:</strong>
+- Automated vulnerability scanning
+- Manual penetration testing
+- Code review (security-focused)
+- Policy analysis (OPA Rego)</p>
+<p><strong>Expected Timeline:</strong>
+- Week 11: Vendor testing
+- Week 12: Remediation + re-test</p>
+<p><strong>Acceptance Criteria:</strong>
+- [ ] Zero critical vulnerabilities
+- [ ] Zero high vulnerabilities
+- [ ] Remediation plan for medium/low findings
+- [ ] Penetration test report received
+- [ ] Security team sign-off for production</p>
+<p><strong>Deliverables:</strong>
+- ✅ External security audit report
+- ✅ Remediation completed and verified
+- ✅ Penetration test certification
+- ✅ <strong>PRODUCTION SECURITY GATE PASSED</strong></p>
+<hr />
+<h2 id="phase-5-lethal-trifecta-advanced-mitigations-v130">Phase 5: Lethal Trifecta Advanced Mitigations (v1.3.0)<a class="headerlink" href="#phase-5-lethal-trifecta-advanced-mitigations-v130" title="Permanent link">&para;</a></h2>
+<p><strong>Priority:</strong> 🔵 P5 - POST v1.2.0
+<strong>Status:</strong> Deferred to v1.3.0
+<strong>Timeline:</strong> Q2 2026
+<strong>Target Release:</strong> v1.3.0</p>
+<p>These are <strong>nice-to-have</strong> security enhancements identified in the Lethal Trifecta Analysis but not blockers for production:</p>
+<h3 id="advanced-security-features">Advanced Security Features<a class="headerlink" href="#advanced-security-features" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Prompt Injection Detection</strong> (P2 from original plan)</li>
+<li>Pattern-based detection (20+ patterns)</li>
+<li>Entropy analysis for encoded payloads</li>
+<li>Configurable response (block/alert/log)</li>
+<li>Risk scoring system</li>
+<li>
+<p><strong>Effort:</strong> 2 weeks</p>
+</li>
+<li>
+<p><strong>Anomaly Detection System</strong> (P2 from original plan)</p>
+</li>
+<li>Behavioral baseline per user</li>
+<li>Real-time anomaly detection</li>
+<li>Alert on unusual access patterns</li>
+<li>Auto-suspend on critical anomalies</li>
+<li>
+<p><strong>Effort:</strong> 2 weeks</p>
+</li>
+<li>
+<p><strong>Network-Level Controls</strong> (P2 from original plan)</p>
+</li>
+<li>Kubernetes NetworkPolicies</li>
+<li>Egress filtering (domain whitelist)</li>
+<li>Cloud firewall rules</li>
+<li>Defense-in-depth networking</li>
+<li>
+<p><strong>Effort:</strong> 1 week</p>
+</li>
+<li>
+<p><strong>Secret Scanning</strong> (P3 from original plan)</p>
+</li>
+<li>Scan tool responses for secrets</li>
+<li>Redact detected secrets</li>
+<li>Alert on secret exposure</li>
+<li>
+<p><strong>Effort:</strong> 1 week</p>
+</li>
+<li>
+<p><strong>MFA for Critical Actions</strong> (P3 from original plan)</p>
+</li>
+<li>MFA challenge for high-sensitivity resources</li>
+<li>TOTP/SMS/Push notification support</li>
+<li>Grace period for emergency access</li>
+<li><strong>Effort:</strong> 1 week</li>
+</ol>
+<p><strong>Total Effort:</strong> ~7-8 weeks
+<strong>Recommendation:</strong> Target for v1.3.0 release (Q2 2026)
+<strong>Note:</strong> These features enhance security but are not blockers for v2.0.0 production deployment</p>
+<hr />
+<h2 id="production-deployment-strategy">Production Deployment Strategy<a class="headerlink" href="#production-deployment-strategy" title="Permanent link">&para;</a></h2>
+<h3 id="pre-production-checklist">Pre-Production Checklist<a class="headerlink" href="#pre-production-checklist" title="Permanent link">&para;</a></h3>
+<p>Before production deployment, ALL of the following must be complete:</p>
+<p><strong>Phase 1 - Gateway Client:</strong>
+- [ ] All 3 transports (HTTP, SSE, stdio) working
+- [ ] End-to-end tests passing with real MCP server
+- [ ] Performance targets met (&lt;100ms p95)
+- [ ] Code coverage ≥85% for gateway module</p>
+<p><strong>Phase 2 - Policy Validation:</strong>
+- [ ] Validator integrated into policy loading
+- [ ] All existing policies validated and tested
+- [ ] Security team approval</p>
+<p><strong>Phase 3 - Test Quality:</strong>
+- [ ] 100% test pass rate
+- [ ] Overall code coverage ≥85%
+- [ ] E2E scenarios covering major workflows</p>
+<p><strong>Phase 4 - Security Audit:</strong>
+- [ ] External penetration test passed
+- [ ] Zero critical/high vulnerabilities
+- [ ] Remediation complete and verified</p>
+<p><strong>Infrastructure:</strong>
+- [ ] Production Kubernetes cluster provisioned
+- [ ] SSL/TLS certificates configured
+- [ ] DNS records configured
+- [ ] Monitoring dashboards operational
+- [ ] Backup systems verified
+- [ ] Incident response playbook ready</p>
+<p><strong>Documentation:</strong>
+- [ ] Production deployment guide tested
+- [ ] Runbooks peer-reviewed
+- [ ] User training materials ready
+- [ ] API documentation complete</p>
+<h3 id="deployment-timeline">Deployment Timeline<a class="headerlink" href="#deployment-timeline" title="Permanent link">&para;</a></h3>
+<p><strong>Week 13: Staging Deployment</strong>
+- Deploy to staging environment
+- Run full test suite in staging
+- Performance testing under load
+- Security review in staging</p>
+<p><strong>Week 14: Canary Deployment</strong>
+- Deploy to 5% of production traffic
+- Monitor for 48 hours
+- Gradual increase: 5% → 25% → 50% → 100%</p>
+<p><strong>Week 15: Production Go-Live</strong>
+- 100% production traffic
+- 24/7 monitoring for first 72 hours
+- On-call team ready
+- Post-launch review</p>
+<h3 id="rollback-plan">Rollback Plan<a class="headerlink" href="#rollback-plan" title="Permanent link">&para;</a></h3>
+<p><strong>Triggers:</strong>
+- Error rate &gt;1%
+- Latency p95 &gt;200ms (2x normal)
+- Critical security issue discovered
+- Data corruption detected</p>
+<p><strong>Procedure:</strong>
+1. Alert fires (PagerDuty) - &lt;1 min
+2. On-call engineer assesses - &lt;5 min
+3. Rollback decision if confirmed - &lt;5 min
+4. Deploy previous version via Helm - &lt;10 min
+5. Verify metrics return to normal - &lt;15 min
+6. Post-mortem within 24 hours</p>
+<p><strong>Total MTTR Target:</strong> &lt;30 minutes</p>
+<hr />
+<h2 id="success-metrics">Success Metrics<a class="headerlink" href="#success-metrics" title="Permanent link">&para;</a></h2>
+<h3 id="phase-completion-gates">Phase Completion Gates<a class="headerlink" href="#phase-completion-gates" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Metric</th>
+<th>Target</th>
+<th>Measurement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Phase 1: Gateway</strong></td>
+<td>Implementation complete</td>
+<td>100%</td>
+<td>All methods working, no stubs</td>
+</tr>
+<tr>
+<td></td>
+<td>End-to-end test</td>
+<td>Pass</td>
+<td>Real MCP server integration</td>
+</tr>
+<tr>
+<td></td>
+<td>Performance</td>
+<td>&lt;100ms p95</td>
+<td>Load testing</td>
+</tr>
+<tr>
+<td></td>
+<td>Coverage</td>
+<td>≥85%</td>
+<td>pytest-cov</td>
+</tr>
+<tr>
+<td><strong>Phase 2: Policy</strong></td>
+<td>Validation working</td>
+<td>100%</td>
+<td>All policies validated</td>
+</tr>
+<tr>
+<td></td>
+<td>Existing policies pass</td>
+<td>100%</td>
+<td>No validation failures</td>
+</tr>
+<tr>
+<td></td>
+<td>Security review</td>
+<td>Approved</td>
+<td>Security team sign-off</td>
+</tr>
+<tr>
+<td><strong>Phase 3: Tests</strong></td>
+<td>Test pass rate</td>
+<td>100%</td>
+<td>CI green</td>
+</tr>
+<tr>
+<td></td>
+<td>Coverage</td>
+<td>≥85%</td>
+<td>pytest-cov</td>
+</tr>
+<tr>
+<td></td>
+<td>E2E scenarios</td>
+<td>≥20</td>
+<td>Scenario tests passing</td>
+</tr>
+<tr>
+<td><strong>Phase 4: Security</strong></td>
+<td>Pen test</td>
+<td>Passed</td>
+<td>External vendor</td>
+</tr>
+<tr>
+<td></td>
+<td>Critical vulnerabilities</td>
+<td>0</td>
+<td>Security audit</td>
+</tr>
+<tr>
+<td></td>
+<td>High vulnerabilities</td>
+<td>0</td>
+<td>Security audit</td>
+</tr>
+</tbody>
+</table>
+<h3 id="production-readiness-metrics">Production Readiness Metrics<a class="headerlink" href="#production-readiness-metrics" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Metric</th>
+<th>Target</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Functionality</strong></td>
+<td>Gateway client functional</td>
+<td>100%</td>
+<td>🔴 Not Started</td>
+</tr>
+<tr>
+<td></td>
+<td>Policy validation</td>
+<td>100%</td>
+<td>🔴 Not Started</td>
+</tr>
+<tr>
+<td></td>
+<td>Test pass rate</td>
+<td>100%</td>
+<td>🟡 77.8%</td>
+</tr>
+<tr>
+<td><strong>Security</strong></td>
+<td>External audit</td>
+<td>Passed</td>
+<td>🔴 Not Started</td>
+</tr>
+<tr>
+<td></td>
+<td>Vulnerabilities (P0/P1)</td>
+<td>0</td>
+<td>🟡 Unknown</td>
+</tr>
+<tr>
+<td><strong>Quality</strong></td>
+<td>Code coverage</td>
+<td>≥85%</td>
+<td>🟡 ~64%</td>
+</tr>
+<tr>
+<td></td>
+<td>E2E tests</td>
+<td>≥20</td>
+<td>🔴 0</td>
+</tr>
+<tr>
+<td><strong>Performance</strong></td>
+<td>API latency (p95)</td>
+<td>&lt;100ms</td>
+<td>✅ Met</td>
+</tr>
+<tr>
+<td></td>
+<td>Gateway latency (p95)</td>
+<td>&lt;100ms</td>
+<td>🔴 Untested</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Overall Production Readiness:</strong> 🔴 <strong>NOT READY</strong> (4/10 metrics met)</p>
+<hr />
+<h2 id="risk-management">Risk Management<a class="headerlink" href="#risk-management" title="Permanent link">&para;</a></h2>
+<h3 id="critical-risks">Critical Risks<a class="headerlink" href="#critical-risks" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Impact</th>
+<th>Probability</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Gateway implementation takes &gt;4 weeks</strong></td>
+<td>High</td>
+<td>Medium</td>
+<td>Allocate buffer time, consider HTTP-only MVP</td>
+</tr>
+<tr>
+<td><strong>Security audit finds critical vuln</strong></td>
+<td>Critical</td>
+<td>Medium</td>
+<td>Address immediately, delay production</td>
+</tr>
+<tr>
+<td><strong>Test failures block progress</strong></td>
+<td>Medium</td>
+<td>Low</td>
+<td>Refactor problematic code iteratively</td>
+</tr>
+<tr>
+<td><strong>Policy validation breaks existing policies</strong></td>
+<td>High</td>
+<td>Medium</td>
+<td>Gradual rollout, extensive testing</td>
+</tr>
+<tr>
+<td><strong>Performance degradation</strong></td>
+<td>Medium</td>
+<td>Low</td>
+<td>Optimize, add caching, horizontal scaling</td>
+</tr>
+</tbody>
+</table>
+<h3 id="contingency-plans">Contingency Plans<a class="headerlink" href="#contingency-plans" title="Permanent link">&para;</a></h3>
+<p><strong>If Gateway takes &gt;4 weeks:</strong>
+- Option 1: Ship HTTP-only (defer SSE/stdio to v2.1)
+- Option 2: Hire contractor with MCP experience
+- Option 3: Extend timeline by 2 weeks</p>
+<p><strong>If security audit fails:</strong>
+- Option 1: Fix critical issues, deploy to staging only
+- Option 2: Engage security consultant for remediation
+- Option 3: Defer production until re-test passes</p>
+<p><strong>If test coverage can't reach 85%:</strong>
+- Option 1: Accept 80% for v1.2, target 85% for v2.0
+- Option 2: Focus coverage on critical paths only
+- Option 3: Technical debt sprint post-production</p>
+<hr />
+<h2 id="resource-requirements">Resource Requirements<a class="headerlink" href="#resource-requirements" title="Permanent link">&para;</a></h2>
+<h3 id="engineering-team-10-weeks">Engineering Team (10 weeks)<a class="headerlink" href="#engineering-team-10-weeks" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Weeks 1-4</th>
+<th>Weeks 5-6</th>
+<th>Weeks 7-8</th>
+<th>Weeks 9-10</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Senior Backend Engineer</strong></td>
+<td>Full-time (Gateway)</td>
+<td>Full-time (Policy)</td>
+<td>Part-time (Review)</td>
+<td>Part-time (Audit prep)</td>
+<td>6 weeks FTE</td>
+</tr>
+<tr>
+<td><strong>Backend Engineer</strong></td>
+<td>-</td>
+<td>-</td>
+<td>Full-time (Tests)</td>
+<td>Full-time (Security)</td>
+<td>4 weeks FTE</td>
+</tr>
+<tr>
+<td><strong>Security Engineer</strong></td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>Part-time (Audit)</td>
+<td>1 week FTE</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total Engineering Effort:</strong> ~11 weeks FTE across 10 calendar weeks</p>
+<h3 id="external-vendor">External Vendor<a class="headerlink" href="#external-vendor" title="Permanent link">&para;</a></h3>
+<p><strong>Security Audit:</strong> $15,000 - $30,000 (2 weeks testing)</p>
+<h3 id="infrastructure-costs">Infrastructure Costs<a class="headerlink" href="#infrastructure-costs" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Environment</th>
+<th>Cost/Month</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Development</strong></td>
+<td>$200</td>
+<td>Small instances, non-HA</td>
+</tr>
+<tr>
+<td><strong>Staging</strong></td>
+<td>$500</td>
+<td>Production-like, HA enabled</td>
+</tr>
+<tr>
+<td><strong>Production</strong></td>
+<td>$2000</td>
+<td>Full HA, auto-scaling, backups</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total Project Cost:</strong>
+- Engineering: ~$55,000 (11 weeks FTE × $5000/week)
+- Security Audit: ~$20,000
+- Infrastructure (3 months): ~$8,100
+- <strong>Total: ~$83,000</strong></p>
+<hr />
+<h2 id="timeline-summary">Timeline Summary<a class="headerlink" href="#timeline-summary" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Week 1-2:  Gateway HTTP transport + SSE transport
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>Week 3:    Gateway stdio transport
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>Week 4:    Gateway integration &amp; end-to-end testing
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>Week 5:    Policy validation engine
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>Week 6:    Policy validation integration &amp; migration
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>Week 7:    Fix auth provider tests
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>Week 8:    Improve test coverage
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>Week 9:    Security audit preparation
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>Week 10:   Internal security review
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>Week 11:   External security testing (vendor)
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>Week 12:   Remediation &amp; re-test
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>Week 13:   Staging deployment
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>Week 14:   Canary production deployment
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>Week 15:   Full production go-live
+</span></code></pre></div>
+<p><strong>Critical Path:</strong> Gateway (4 weeks) → Policy (2 weeks) → Tests (2 weeks) → Security Audit (4 weeks) → Deployment (3 weeks)</p>
+<p><strong>Total Duration:</strong> 15 weeks from start to production</p>
+<hr />
+<h2 id="shelved-items-post-production">Shelved Items (Post-Production)<a class="headerlink" href="#shelved-items-post-production" title="Permanent link">&para;</a></h2>
+<p>The following items are <strong>intentionally deferred</strong> to focus on production-critical work:</p>
+<h3 id="cicd-improvements">CI/CD Improvements<a class="headerlink" href="#cicd-improvements" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Advanced GitHub Actions workflows</li>
+<li>Automated deployment pipelines</li>
+<li>Blue-green deployment automation</li>
+<li><strong>Reason:</strong> Current CI works; optimize after core dev complete</li>
+</ul>
+<h3 id="advanced-lethal-trifecta-mitigations-v130">Advanced Lethal Trifecta Mitigations (v1.3.0)<a class="headerlink" href="#advanced-lethal-trifecta-mitigations-v130" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Prompt injection detection</li>
+<li>Anomaly detection</li>
+<li>Network-level controls</li>
+<li>Secret scanning</li>
+<li>MFA for critical actions</li>
+<li><strong>Reason:</strong> Important security enhancements but not blockers for v2.0.0 production</li>
+<li><strong>Target:</strong> v1.3.0 release (Q2 2026)</li>
+</ul>
+<h3 id="web-ui-enhancements">Web UI Enhancements<a class="headerlink" href="#web-ui-enhancements" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Advanced policy editor features</li>
+<li>Real-time dashboard updates</li>
+<li>Mobile responsiveness improvements</li>
+<li><strong>Reason:</strong> Current UI functional; polish post-launch</li>
+</ul>
+<hr />
+<h2 id="document-control">Document Control<a class="headerlink" href="#document-control" title="Permanent link">&para;</a></h2>
+<p><strong>Version History:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Date</th>
+<th>Author</th>
+<th>Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.0</td>
+<td>2025-11-20</td>
+<td>SARK Team</td>
+<td>Initial roadmap</td>
+</tr>
+<tr>
+<td>2.0</td>
+<td>2025-12-09</td>
+<td>SARK Team</td>
+<td>Complete revision based on Lethal Trifecta Analysis</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Review Schedule:</strong> Weekly on Mondays during active development</p>
+<p><strong>Next Review:</strong> 2025-12-16</p>
+<p><strong>Approval Status:</strong>
+- [ ] Engineering Lead
+- [ ] Security Team
+- [ ] Product Manager</p>
+<hr />
+<h2 id="related-documentation">Related Documentation<a class="headerlink" href="#related-documentation" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong><a href="../LETHAL_TRIFECTA_ANALYSIS.md">Lethal Trifecta Analysis</a></strong> - Security gap analysis</li>
+<li><strong><a href="../IMPLEMENTATION_PLAN.md">Implementation Plan</a></strong> - Detailed task breakdown</li>
+<li><strong><a href="../PRODUCTION_READINESS/">Production Readiness Checklist</a></strong> - Go-live requirements</li>
+<li><strong><a href="../ARCHITECTURE/">Architecture Guide</a></strong> - System architecture overview</li>
+<li><strong><a href="../SECURITY/">Security Guide</a></strong> - Security requirements and controls</li>
+<li><strong><a href="../DEPLOYMENT/">Deployment Guide</a></strong> - Deployment procedures</li>
+</ul>
+<hr />
+<h2 id="appendix-version-strategy-critical-findings">Appendix: Version Strategy &amp; Critical Findings<a class="headerlink" href="#appendix-version-strategy-critical-findings" title="Permanent link">&para;</a></h2>
+<p><strong>Context:</strong>
+On December 8, 2025, a comprehensive security analysis using Simon Willison's "Lethal Trifecta" framework revealed critical implementation gaps:</p>
+<p><strong>Key Findings:</strong>
+1. <strong>Gateway Client Stubbed:</strong> Returns empty lists and NotImplementedError - cannot communicate with real MCP servers
+2. <strong>Policy Injection Risk:</strong> No validation of OPA policies before loading
+3. <strong>Test Failures:</strong> 154 auth provider tests failing (77.8% pass rate)
+4. <strong>Untested End-to-End:</strong> Critical security flows not verified in practice</p>
+<p><strong>Decision:</strong>
+Adopt honest, incremental versioning with clear milestones:
+- <strong>v1.2.0:</strong> Complete gateway implementation + critical fixes (Weeks 1-8)
+- <strong>v1.3.0:</strong> Advanced Lethal Trifecta security features (Q2 2026)
+- <strong>v2.0.0:</strong> Production release after security audit (Week 15)</p>
+<p><strong>This Roadmap:</strong>
+Addresses these gaps with a focused 15-week plan using semantic versioning that reflects actual readiness.</p>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2024 James R. A. Henry. All rights reserved.
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/apathy-ca/sark" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.path", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

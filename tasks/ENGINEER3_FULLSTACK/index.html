@@ -1,0 +1,2341 @@
+
+<!DOCTYPE html>
+
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="Enterprise-Grade MCP Governance System" name="description"/>
+<meta content="James R. A. Henry" name="author"/>
+<link href="https://sark.example.com/tasks/ENGINEER3_FULLSTACK/" rel="canonical"/>
+<link href="../../assets/images/favicon.png" rel="icon"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-9.7.1" name="generator"/>
+<title>Engineer 3 (Full-Stack) Tasks - SARK - Security Audit and Resource Kontroler</title>
+<link href="../../assets/stylesheets/main.484c7ddc.min.css" rel="stylesheet"/>
+<link href="../../assets/stylesheets/palette.ab4e12ef.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config",""),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+<script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+</head>
+<body data-md-color-accent="indigo" data-md-color-primary="indigo" data-md-color-scheme="default" dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#engineer-3-full-stack-tasks">
+          Skip to content
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<div data-md-color-scheme="default" data-md-component="outdated" hidden="">
+</div>
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="SARK - Security Audit and Resource Kontroler" class="md-header__button md-logo" data-md-component="logo" href="../.." title="SARK - Security Audit and Resource Kontroler">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            SARK - Security Audit and Resource Kontroler
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              Engineer 3 (Full-Stack) Tasks
+            
+          </span>
+</div>
+</div>
+</div>
+<form class="md-header__option" data-md-component="palette">
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="" data-md-color-primary="indigo" data-md-color-scheme="default" id="__palette_0" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="" data-md-color-primary="indigo" data-md-color-scheme="slate" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_0" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+</form>
+<script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<a aria-label="Share" class="md-search__icon md-icon" data-clipboard="" data-clipboard-text="" data-md-component="search-share" href="javascript:void(0)" tabindex="-1" title="Share">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"></path></svg>
+</a>
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+</button>
+</nav>
+<div class="md-search__suggest" data-md-component="search-suggest"></div>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="" tabindex="0">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initializing search
+          </div>
+<ol class="md-search-result__list" role="presentation"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="md-header__source">
+<a class="md-source" data-md-component="source" href="https://github.com/apathy-ca/sark" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+</div>
+<div class="md-source__repository">
+    apathy-ca/sark
+  </div>
+</a>
+</div>
+</nav>
+<nav aria-label="Tabs" class="md-tabs" data-md-component="tabs">
+<div class="md-grid">
+<ul class="md-tabs__list">
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../..">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../QUICK_START/">
+          
+  
+  
+    
+  
+  Getting Started
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../ARCHITECTURE/">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../DEPLOYMENT/">
+          
+  
+  
+    
+  
+  Deployment
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../AUTHENTICATION/">
+          
+  
+  
+    
+  
+  Authentication &amp; Authorization
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../OPA_POLICY_GUIDE/">
+          
+  
+  
+    
+  
+  Policies
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../MONITORING/">
+          
+  
+  
+    
+  
+  Operations
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../DATABASE_MIGRATIONS/">
+          
+  
+  
+    
+  
+  Database
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../PERFORMANCE_TESTING/">
+          
+  
+  
+    
+  
+  Performance
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../API_REFERENCE/">
+          
+  
+  
+    
+  
+  API Reference
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../DEVELOPMENT/">
+          
+  
+  
+    
+  
+  Development
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../EXECUTIVE_SUMMARY/">
+          
+  
+  
+    
+  
+  Reports
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../REPOSITORY_IMPROVEMENT_PLAN/">
+          
+  
+  
+    
+  
+  Planning
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../GLOSSARY/">
+          
+  
+  
+    
+  
+  Reference
+
+        </a>
+</li>
+</ul>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary md-nav--lifted" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="SARK - Security Audit and Resource Kontroler" class="md-nav__button md-logo" data-md-component="logo" href="../.." title="SARK - Security Audit and Resource Kontroler">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+    SARK - Security Audit and Resource Kontroler
+  </label>
+<div class="md-nav__source">
+<a class="md-source" data-md-component="source" href="https://github.com/apathy-ca/sark" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+</div>
+<div class="md-source__repository">
+    apathy-ca/sark
+  </div>
+</a>
+</div>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../..">
+<span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../QUICK_START/">
+<span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../QUICK_REFERENCE_SESSIONS/">
+<span class="md-ellipsis">
+    
+  
+    Quick Reference
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../installation/">
+<span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../ARCHITECTURE/">
+<span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../SECURITY/">
+<span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PERFORMANCE/">
+<span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_4">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../DEPLOYMENT/">
+<span class="md-ellipsis">
+    
+  
+    Deployment Guide
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../DOCKER_DEPLOYMENT/">
+<span class="md-ellipsis">
+    
+  
+    Docker Deployment
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PRODUCTION_DEPLOYMENT/">
+<span class="md-ellipsis">
+    
+  
+    Production Deployment
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PRODUCTION_CONFIG/">
+<span class="md-ellipsis">
+    
+  
+    Production Config
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PRODUCTION_READINESS/">
+<span class="md-ellipsis">
+    
+  
+    Production Readiness
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../DEPLOYMENT_CHECKLIST/">
+<span class="md-ellipsis">
+    
+  
+    Deployment Checklist
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../DISASTER_RECOVERY/">
+<span class="md-ellipsis">
+    
+  
+    Disaster Recovery
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../ROLLBACK_PROCEDURES/">
+<span class="md-ellipsis">
+    
+  
+    Rollback Procedures
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_5" type="checkbox"/>
+<label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Authentication &amp; Authorization
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_5_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_5">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Authentication &amp; Authorization
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../AUTHENTICATION/">
+<span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../AUTHORIZATION/">
+<span class="md-ellipsis">
+    
+  
+    Authorization
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../OIDC_SETUP/">
+<span class="md-ellipsis">
+    
+  
+    OIDC Setup
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../LDAP_SETUP/">
+<span class="md-ellipsis">
+    
+  
+    LDAP Setup
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../SAML_SETUP/">
+<span class="md-ellipsis">
+    
+  
+    SAML Setup
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../API_KEYS/">
+<span class="md-ellipsis">
+    
+  
+    API Keys
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_6" type="checkbox"/>
+<label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Policies
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_6_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_6">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Policies
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../OPA_POLICY_GUIDE/">
+<span class="md-ellipsis">
+    
+  
+    OPA Policy Guide
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../ADVANCED_OPA_POLICIES/">
+<span class="md-ellipsis">
+    
+  
+    Advanced OPA Policies
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../POLICY_OPTIMIZATION/">
+<span class="md-ellipsis">
+    
+  
+    Policy Optimization
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../POLICY_CACHING/">
+<span class="md-ellipsis">
+    
+  
+    Policy Caching
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../POLICY_AUDIT_GUIDE/">
+<span class="md-ellipsis">
+    
+  
+    Policy Audit Guide
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../POLICY_AUDIT_TRAIL/">
+<span class="md-ellipsis">
+    
+  
+    Policy Audit Trail
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_7" type="checkbox"/>
+<label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Operations
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_7_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_7">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Operations
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../MONITORING/">
+<span class="md-ellipsis">
+    
+  
+    Monitoring
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../MONITORING_SETUP/">
+<span class="md-ellipsis">
+    
+  
+    Monitoring Setup
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../OPERATIONAL_RUNBOOK/">
+<span class="md-ellipsis">
+    
+  
+    Operational Runbook
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../OPERATIONS_RUNBOOK/">
+<span class="md-ellipsis">
+    
+  
+    Operations Runbook
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../INCIDENT_RESPONSE/">
+<span class="md-ellipsis">
+    
+  
+    Incident Response
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../TROUBLESHOOTING/">
+<span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_8" type="checkbox"/>
+<label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Database
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_8_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_8">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Database
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../DATABASE_MIGRATIONS/">
+<span class="md-ellipsis">
+    
+  
+    Database Migrations
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../DATABASE_OPTIMIZATION/">
+<span class="md-ellipsis">
+    
+  
+    Database Optimization
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../REDIS_OPTIMIZATION/">
+<span class="md-ellipsis">
+    
+  
+    Redis Optimization
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_9" type="checkbox"/>
+<label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_9_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_9">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Performance
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PERFORMANCE_TESTING/">
+<span class="md-ellipsis">
+    
+  
+    Performance Testing
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PERFORMANCE_TUNING/">
+<span class="md-ellipsis">
+    
+  
+    Performance Tuning
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PERFORMANCE_OPTIMIZATION/">
+<span class="md-ellipsis">
+    
+  
+    Performance Optimization
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PERFORMANCE_REPORT/">
+<span class="md-ellipsis">
+    
+  
+    Performance Report
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../POLICY_PERFORMANCE_REPORT/">
+<span class="md-ellipsis">
+    
+  
+    Policy Performance
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_10" type="checkbox"/>
+<label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_10_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_10">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../API_REFERENCE/">
+<span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../API_INTEGRATION/">
+<span class="md-ellipsis">
+    
+  
+    API Integration
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_11" type="checkbox"/>
+<label class="md-nav__link" for="__nav_11" id="__nav_11_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_11_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_11">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../DEVELOPMENT/">
+<span class="md-ellipsis">
+    
+  
+    Development Guide
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../MIGRATION_GUIDE/">
+<span class="md-ellipsis">
+    
+  
+    Migration Guide
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../DEVELOPMENT_LOG/">
+<span class="md-ellipsis">
+    
+  
+    Development Log
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../TESTING_STRATEGY/">
+<span class="md-ellipsis">
+    
+  
+    Testing Strategy
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../INTEGRATION_TESTING/">
+<span class="md-ellipsis">
+    
+  
+    Integration Testing
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_12" type="checkbox"/>
+<label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Reports
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_12_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_12">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Reports
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../EXECUTIVE_SUMMARY/">
+<span class="md-ellipsis">
+    
+  
+    Executive Summary
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../ROADMAP/">
+<span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../IMPLEMENTATION_PLAN/">
+<span class="md-ellipsis">
+    
+  
+    Implementation Plan
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../GAP_ANALYSIS/">
+<span class="md-ellipsis">
+    
+  
+    Gap Analysis
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PHASE2_COMPLETION_REPORT/">
+<span class="md-ellipsis">
+    
+  
+    Phase 2 Completion
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../RELEASE_NOTES_v0.2.0/">
+<span class="md-ellipsis">
+    
+  
+    Release Notes v0.2.0
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../FINAL_TEST_REPORT/">
+<span class="md-ellipsis">
+    
+  
+    Final Test Report
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../TEST_COVERAGE_REPORT/">
+<span class="md-ellipsis">
+    
+  
+    Test Coverage Report
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../KNOWN_ISSUES/">
+<span class="md-ellipsis">
+    
+  
+    Known Issues
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../LESSONS_LEARNED/">
+<span class="md-ellipsis">
+    
+  
+    Lessons Learned
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_13" type="checkbox"/>
+<label class="md-nav__link" for="__nav_13" id="__nav_13_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Planning
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_13_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_13">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Planning
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../REPOSITORY_IMPROVEMENT_PLAN/">
+<span class="md-ellipsis">
+    
+  
+    Repository Improvement Plan
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../WORK_BREAKDOWN_SESSIONS/">
+<span class="md-ellipsis">
+    
+  
+    Work Breakdown Sessions
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../WORK_TASKS/">
+<span class="md-ellipsis">
+    
+  
+    Work Tasks
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PHASE2_3WEEK_PLAN/">
+<span class="md-ellipsis">
+    
+  
+    Phase 2 3-Week Plan
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../WEEK_2_SUMMARY/">
+<span class="md-ellipsis">
+    
+  
+    Week 2 Summary
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../WEEK_3_SUMMARY/">
+<span class="md-ellipsis">
+    
+  
+    Week 3 Summary
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_14" type="checkbox"/>
+<label class="md-nav__link" for="__nav_14" id="__nav_14_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_14_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_14">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../GLOSSARY/">
+<span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../FAQ/">
+<span class="md-ellipsis">
+    
+  
+    FAQ
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../SECURITY_BEST_PRACTICES/">
+<span class="md-ellipsis">
+    
+  
+    Security Best Practices
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../SECURITY_HARDENING/">
+<span class="md-ellipsis">
+    
+  
+    Security Hardening
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../SECURITY_AUDIT/">
+<span class="md-ellipsis">
+    
+  
+    Security Audit
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PRODUCTION_HANDOFF/">
+<span class="md-ellipsis">
+    
+  
+    Production Handoff
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#your-tasks">
+<span class="md-ellipsis">
+      
+        Your Tasks
+      
+    </span>
+</a>
+<nav aria-label="Your Tasks" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#t12-mcp-visual-diagrams">
+<span class="md-ellipsis">
+      
+        ✅ T1.2 - MCP Visual Diagrams
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#t23-interactive-tutorials-package">
+<span class="md-ellipsis">
+      
+        ✅ T2.3 - Interactive Tutorials Package
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#t32-react-project-scaffold">
+<span class="md-ellipsis">
+      
+        ✅ T3.2 - React Project Scaffold
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#t43-authentication-ui-state-management">
+<span class="md-ellipsis">
+      
+        ✅ T4.3 - Authentication UI &amp; State Management
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#t44-data-fetching-error-handling">
+<span class="md-ellipsis">
+      
+        ✅ T4.4 - Data Fetching &amp; Error Handling
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#t52-mcp-servers-management">
+<span class="md-ellipsis">
+      
+        ✅ T5.2 - MCP Servers Management
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#t54-audit-log-viewer">
+<span class="md-ellipsis">
+      
+        ✅ T5.4 - Audit Log Viewer
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#t62-settings-api-key-management">
+<span class="md-ellipsis">
+      
+        ✅ T6.2 - Settings &amp; API Key Management
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#your-timeline">
+<span class="md-ellipsis">
+      
+        Your Timeline
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#tips-for-success">
+<span class="md-ellipsis">
+      
+        Tips for Success
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<article class="md-content__inner md-typeset">
+<h1 id="engineer-3-full-stack-tasks">Engineer 3 (Full-Stack) Tasks<a class="headerlink" href="#engineer-3-full-stack-tasks" title="Permanent link">¶</a></h1>
+<p><strong>Your Role:</strong> Full-Stack Development - Bridge between frontend and backend
+<strong>Total Tasks:</strong> 8 tasks over 8 weeks
+<strong>Estimated Effort:</strong> ~17 days</p>
+<p>You're the Swiss Army knife - handle both UI features and backend integration.</p>
+<hr/>
+<h2 id="your-tasks">Your Tasks<a class="headerlink" href="#your-tasks" title="Permanent link">¶</a></h2>
+<h3 id="t12-mcp-visual-diagrams">✅ T1.2 - MCP Visual Diagrams<a class="headerlink" href="#t12-mcp-visual-diagrams" title="Permanent link">¶</a></h3>
+<p><strong>Week:</strong> 1
+<strong>Duration:</strong> 1-2 days
+<strong>Priority:</strong> P1 (High - needed for documentation)</p>
+<p><strong>What you're building:</strong>
+Visual diagrams that explain MCP concepts for non-technical users.</p>
+<p><strong>Deliverables:</strong>
+1. Create <code>docs/diagrams/mcp-concepts/</code> directory</p>
+<ol>
+<li><strong>Four Mermaid Diagrams:</strong></li>
+</ol>
+<p><strong>01-basic-mcp-flow.svg:</strong>
+<div class="mermaid">sequenceDiagram
+    AI-&gt;&gt;MCP Server: Request tool execution
+    MCP Server-&gt;&gt;Database: Query data
+    Database--&gt;&gt;MCP Server: Results
+    MCP Server--&gt;&gt;AI: Return results
+</div></p>
+<p><strong>02-ungoverned-mcp-risks.svg:</strong>
+   - Show security risks without governance
+   - Unauthorized access, no audit trail, data leaks</p>
+<p><strong>03-sark-governance-layer.svg:</strong>
+   - Show how SARK sits between AI and MCP servers
+   - Policy check, audit, security</p>
+<p><strong>04-enterprise-mcp-architecture.svg:</strong>
+   - Full enterprise deployment
+   - Multiple servers, policies, monitoring</p>
+<ol>
+<li><strong>Integration:</strong></li>
+<li>Add diagrams to <code>docs/MCP_INTRODUCTION.md</code></li>
+<li>Ensure they render in GitHub</li>
+<li>Add alt text for accessibility</li>
+</ol>
+<p><strong>Acceptance Criteria:</strong>
+- [ ] All 4 diagrams created and clear
+- [ ] Render correctly in GitHub markdown
+- [ ] Integrated into documentation
+- [ ] Alt text provided</p>
+<p><strong>Claude Code Prompt:</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a>Create 4 Mermaid diagrams explaining MCP concepts for SARK documentation.
+</span><span id="__span-0-2"><a href="#__codelineno-0-2" id="__codelineno-0-2" name="__codelineno-0-2"></a>
+</span><span id="__span-0-3"><a href="#__codelineno-0-3" id="__codelineno-0-3" name="__codelineno-0-3"></a>Build:
+</span><span id="__span-0-4"><a href="#__codelineno-0-4" id="__codelineno-0-4" name="__codelineno-0-4"></a>1. 01-basic-mcp-flow.svg - Simple MCP interaction
+</span><span id="__span-0-5"><a href="#__codelineno-0-5" id="__codelineno-0-5" name="__codelineno-0-5"></a>2. 02-ungoverned-mcp-risks.svg - Security risks without governance
+</span><span id="__span-0-6"><a href="#__codelineno-0-6" id="__codelineno-0-6" name="__codelineno-0-6"></a>3. 03-sark-governance-layer.svg - How SARK adds control
+</span><span id="__span-0-7"><a href="#__codelineno-0-7" id="__codelineno-0-7" name="__codelineno-0-7"></a>4. 04-enterprise-mcp-architecture.svg - Full enterprise deployment
+</span><span id="__span-0-8"><a href="#__codelineno-0-8" id="__codelineno-0-8" name="__codelineno-0-8"></a>
+</span><span id="__span-0-9"><a href="#__codelineno-0-9" id="__codelineno-0-9" name="__codelineno-0-9"></a>Save in docs/diagrams/mcp-concepts/ and integrate into MCP_INTRODUCTION.md
+</span></code></pre></div></p>
+<hr/>
+<h3 id="t23-interactive-tutorials-package">✅ T2.3 - Interactive Tutorials Package<a class="headerlink" href="#t23-interactive-tutorials-package" title="Permanent link">¶</a></h3>
+<p><strong>Week:</strong> 2
+<strong>Duration:</strong> 3 days
+<strong>Priority:</strong> P1 (High - critical for onboarding)</p>
+<p><strong>What you're building:</strong>
+Hands-on tutorials that walk users through SARK features.</p>
+<p><strong>Deliverables:</strong>
+1. Create <code>examples/tutorials/</code> directory</p>
+<ol>
+<li><strong>Tutorial 1: Basic Setup</strong> (<code>tutorial-01-basic-setup/</code>):</li>
+<li><code>README.md</code> - Step-by-step guide</li>
+<li><code>docker-compose.yml</code> - Minimal SARK setup</li>
+<li><code>sample-server.json</code> - Example server</li>
+<li>
+<p>Test script to verify setup</p>
+</li>
+<li>
+<p><strong>Tutorial 2: Authentication</strong> (<code>tutorial-02-authentication/</code>):</p>
+</li>
+<li><code>README.md</code> - LDAP setup walkthrough</li>
+<li><code>ldap-config.yml</code> - Sample LDAP config</li>
+<li><code>test-users.ldif</code> - Sample users</li>
+<li>
+<p>Test script to verify auth works</p>
+</li>
+<li>
+<p><strong>Tutorial 3: Writing Policies</strong> (<code>tutorial-03-policies/</code>):</p>
+</li>
+<li><code>README.md</code> - Policy writing workshop</li>
+<li>5 example policies:<ul>
+<li><code>01-allow-all.rego</code> - Simple allow policy</li>
+<li><code>02-rbac.rego</code> - Role-based access</li>
+<li><code>03-team-based.rego</code> - Team ownership</li>
+<li><code>04-time-based.rego</code> - Business hours only</li>
+<li><code>05-sensitivity.rego</code> - Data classification</li>
+</ul>
+</li>
+<li><code>test-policies.sh</code> - Test all policies</li>
+<li>
+<p><code>test-cases.json</code> - Test inputs and expected outputs</p>
+</li>
+<li>
+<p><strong>Tutorial README template:</strong></p>
+</li>
+<li>Objectives</li>
+<li>Prerequisites</li>
+<li>Estimated time</li>
+<li>Step-by-step instructions</li>
+<li>Expected outcomes</li>
+<li>Troubleshooting section</li>
+<li>Next steps</li>
+</ol>
+<p><strong>Acceptance Criteria:</strong>
+- [ ] All 3 tutorials work standalone
+- [ ] Clear step-by-step instructions
+- [ ] Estimated completion time listed
+- [ ] Test scripts verify success
+- [ ] Referenced in LEARNING_PATH.md</p>
+<p><strong>Claude Code Prompt:</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a href="#__codelineno-1-1" id="__codelineno-1-1" name="__codelineno-1-1"></a>Create 3 interactive tutorials for SARK onboarding.
+</span><span id="__span-1-2"><a href="#__codelineno-1-2" id="__codelineno-1-2" name="__codelineno-1-2"></a>
+</span><span id="__span-1-3"><a href="#__codelineno-1-3" id="__codelineno-1-3" name="__codelineno-1-3"></a>Build:
+</span><span id="__span-1-4"><a href="#__codelineno-1-4" id="__codelineno-1-4" name="__codelineno-1-4"></a>1. Tutorial 1: Basic Setup - Get SARK running
+</span><span id="__span-1-5"><a href="#__codelineno-1-5" id="__codelineno-1-5" name="__codelineno-1-5"></a>2. Tutorial 2: Authentication - Configure LDAP
+</span><span id="__span-1-6"><a href="#__codelineno-1-6" id="__codelineno-1-6" name="__codelineno-1-6"></a>3. Tutorial 3: Writing Policies - 5 policy examples with tests
+</span><span id="__span-1-7"><a href="#__codelineno-1-7" id="__codelineno-1-7" name="__codelineno-1-7"></a>
+</span><span id="__span-1-8"><a href="#__codelineno-1-8" id="__codelineno-1-8" name="__codelineno-1-8"></a>Make each tutorial self-contained with README, config files, and test scripts.
+</span><span id="__span-1-9"><a href="#__codelineno-1-9" id="__codelineno-1-9" name="__codelineno-1-9"></a>Include estimated completion times and troubleshooting sections.
+</span></code></pre></div></p>
+<hr/>
+<h3 id="t32-react-project-scaffold">✅ T3.2 - React Project Scaffold<a class="headerlink" href="#t32-react-project-scaffold" title="Permanent link">¶</a></h3>
+<p><strong>Week:</strong> 3
+<strong>Duration:</strong> 2 days
+<strong>Priority:</strong> P0 (Critical - blocks all UI work)</p>
+<p><strong>What you're building:</strong>
+The React project foundation that everyone will build on.</p>
+<p><strong>Deliverables:</strong>
+1. <strong>Create <code>ui/</code> directory</strong></p>
+<ol>
+<li>
+<p><strong>Initialize React + TypeScript + Vite:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a href="#__codelineno-2-1" id="__codelineno-2-1" name="__codelineno-2-1"></a>npm<span class="w"> </span>create<span class="w"> </span>vite@latest<span class="w"> </span>ui<span class="w"> </span>--<span class="w"> </span>--template<span class="w"> </span>react-ts
+</span><span id="__span-2-2"><a href="#__codelineno-2-2" id="__codelineno-2-2" name="__codelineno-2-2"></a><span class="nb">cd</span><span class="w"> </span>ui
+</span><span id="__span-2-3"><a href="#__codelineno-2-3" id="__codelineno-2-3" name="__codelineno-2-3"></a>npm<span class="w"> </span>install
+</span></code></pre></div></p>
+</li>
+<li>
+<p><strong>Install Dependencies:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a href="#__codelineno-3-1" id="__codelineno-3-1" name="__codelineno-3-1"></a><span class="c1"># UI Framework</span>
+</span><span id="__span-3-2"><a href="#__codelineno-3-2" id="__codelineno-3-2" name="__codelineno-3-2"></a>npm<span class="w"> </span>install<span class="w"> </span>-D<span class="w"> </span>tailwindcss<span class="w"> </span>postcss<span class="w"> </span>autoprefixer
+</span><span id="__span-3-3"><a href="#__codelineno-3-3" id="__codelineno-3-3" name="__codelineno-3-3"></a>npx<span class="w"> </span>tailwindcss<span class="w"> </span>init<span class="w"> </span>-p
+</span><span id="__span-3-4"><a href="#__codelineno-3-4" id="__codelineno-3-4" name="__codelineno-3-4"></a>
+</span><span id="__span-3-5"><a href="#__codelineno-3-5" id="__codelineno-3-5" name="__codelineno-3-5"></a><span class="c1"># shadcn/ui</span>
+</span><span id="__span-3-6"><a href="#__codelineno-3-6" id="__codelineno-3-6" name="__codelineno-3-6"></a>npx<span class="w"> </span>shadcn-ui@latest<span class="w"> </span>init
+</span><span id="__span-3-7"><a href="#__codelineno-3-7" id="__codelineno-3-7" name="__codelineno-3-7"></a>
+</span><span id="__span-3-8"><a href="#__codelineno-3-8" id="__codelineno-3-8" name="__codelineno-3-8"></a><span class="c1"># Routing</span>
+</span><span id="__span-3-9"><a href="#__codelineno-3-9" id="__codelineno-3-9" name="__codelineno-3-9"></a>npm<span class="w"> </span>install<span class="w"> </span>react-router-dom
+</span><span id="__span-3-10"><a href="#__codelineno-3-10" id="__codelineno-3-10" name="__codelineno-3-10"></a>
+</span><span id="__span-3-11"><a href="#__codelineno-3-11" id="__codelineno-3-11" name="__codelineno-3-11"></a><span class="c1"># State Management</span>
+</span><span id="__span-3-12"><a href="#__codelineno-3-12" id="__codelineno-3-12" name="__codelineno-3-12"></a>npm<span class="w"> </span>install<span class="w"> </span>@tanstack/react-query<span class="w"> </span>zustand
+</span><span id="__span-3-13"><a href="#__codelineno-3-13" id="__codelineno-3-13" name="__codelineno-3-13"></a>
+</span><span id="__span-3-14"><a href="#__codelineno-3-14" id="__codelineno-3-14" name="__codelineno-3-14"></a><span class="c1"># Forms</span>
+</span><span id="__span-3-15"><a href="#__codelineno-3-15" id="__codelineno-3-15" name="__codelineno-3-15"></a>npm<span class="w"> </span>install<span class="w"> </span>react-hook-form<span class="w"> </span>zod<span class="w"> </span>@hookform/resolvers
+</span><span id="__span-3-16"><a href="#__codelineno-3-16" id="__codelineno-3-16" name="__codelineno-3-16"></a>
+</span><span id="__span-3-17"><a href="#__codelineno-3-17" id="__codelineno-3-17" name="__codelineno-3-17"></a><span class="c1"># API Client</span>
+</span><span id="__span-3-18"><a href="#__codelineno-3-18" id="__codelineno-3-18" name="__codelineno-3-18"></a>npm<span class="w"> </span>install<span class="w"> </span>@hey-api/openapi-ts<span class="w"> </span>axios
+</span><span id="__span-3-19"><a href="#__codelineno-3-19" id="__codelineno-3-19" name="__codelineno-3-19"></a>
+</span><span id="__span-3-20"><a href="#__codelineno-3-20" id="__codelineno-3-20" name="__codelineno-3-20"></a><span class="c1"># Dev Tools</span>
+</span><span id="__span-3-21"><a href="#__codelineno-3-21" id="__codelineno-3-21" name="__codelineno-3-21"></a>npm<span class="w"> </span>install<span class="w"> </span>-D<span class="w"> </span>@types/node
+</span></code></pre></div></p>
+</li>
+<li>
+<p><strong>Project Structure:</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a href="#__codelineno-4-1" id="__codelineno-4-1" name="__codelineno-4-1"></a>ui/
+</span><span id="__span-4-2"><a href="#__codelineno-4-2" id="__codelineno-4-2" name="__codelineno-4-2"></a>├── public/
+</span><span id="__span-4-3"><a href="#__codelineno-4-3" id="__codelineno-4-3" name="__codelineno-4-3"></a>├── src/
+</span><span id="__span-4-4"><a href="#__codelineno-4-4" id="__codelineno-4-4" name="__codelineno-4-4"></a>│   ├── components/
+</span><span id="__span-4-5"><a href="#__codelineno-4-5" id="__codelineno-4-5" name="__codelineno-4-5"></a>│   │   ├── ui/              # shadcn components
+</span><span id="__span-4-6"><a href="#__codelineno-4-6" id="__codelineno-4-6" name="__codelineno-4-6"></a>│   │   ├── layout/          # Layout components
+</span><span id="__span-4-7"><a href="#__codelineno-4-7" id="__codelineno-4-7" name="__codelineno-4-7"></a>│   │   └── features/        # Feature components
+</span><span id="__span-4-8"><a href="#__codelineno-4-8" id="__codelineno-4-8" name="__codelineno-4-8"></a>│   ├── pages/               # Page components
+</span><span id="__span-4-9"><a href="#__codelineno-4-9" id="__codelineno-4-9" name="__codelineno-4-9"></a>│   ├── lib/                 # Utilities
+</span><span id="__span-4-10"><a href="#__codelineno-4-10" id="__codelineno-4-10" name="__codelineno-4-10"></a>│   ├── hooks/               # Custom hooks
+</span><span id="__span-4-11"><a href="#__codelineno-4-11" id="__codelineno-4-11" name="__codelineno-4-11"></a>│   ├── api/                 # API client
+</span><span id="__span-4-12"><a href="#__codelineno-4-12" id="__codelineno-4-12" name="__codelineno-4-12"></a>│   ├── types/               # TypeScript types
+</span><span id="__span-4-13"><a href="#__codelineno-4-13" id="__codelineno-4-13" name="__codelineno-4-13"></a>│   ├── stores/              # Zustand stores
+</span><span id="__span-4-14"><a href="#__codelineno-4-14" id="__codelineno-4-14" name="__codelineno-4-14"></a>│   ├── App.tsx
+</span><span id="__span-4-15"><a href="#__codelineno-4-15" id="__codelineno-4-15" name="__codelineno-4-15"></a>│   ├── main.tsx
+</span><span id="__span-4-16"><a href="#__codelineno-4-16" id="__codelineno-4-16" name="__codelineno-4-16"></a>│   └── index.css
+</span><span id="__span-4-17"><a href="#__codelineno-4-17" id="__codelineno-4-17" name="__codelineno-4-17"></a>├── package.json
+</span><span id="__span-4-18"><a href="#__codelineno-4-18" id="__codelineno-4-18" name="__codelineno-4-18"></a>├── tsconfig.json
+</span><span id="__span-4-19"><a href="#__codelineno-4-19" id="__codelineno-4-19" name="__codelineno-4-19"></a>├── vite.config.ts
+</span><span id="__span-4-20"><a href="#__codelineno-4-20" id="__codelineno-4-20" name="__codelineno-4-20"></a>├── tailwind.config.js
+</span><span id="__span-4-21"><a href="#__codelineno-4-21" id="__codelineno-4-21" name="__codelineno-4-21"></a>└── components.json
+</span></code></pre></div></p>
+</li>
+<li>
+<p><strong>Configure:</strong></p>
+</li>
+<li>React Router setup</li>
+<li>TanStack Query provider</li>
+<li>Tailwind CSS</li>
+<li>
+<p>Path aliases (<code>@/components</code>, etc.)</p>
+</li>
+<li>
+<p><strong>Test:</strong></p>
+</li>
+<li><code>npm run dev</code> starts dev server</li>
+<li><code>npm run build</code> creates production build</li>
+<li>No TypeScript errors</li>
+</ol>
+<p><strong>Acceptance Criteria:</strong>
+- [ ] Dev server runs at http://localhost:3000
+- [ ] Hot reload works
+- [ ] TypeScript compiles with no errors
+- [ ] Tailwind CSS working
+- [ ] Path aliases work
+- [ ] README.md with setup instructions</p>
+<p><strong>Claude Code Prompt:</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a href="#__codelineno-5-1" id="__codelineno-5-1" name="__codelineno-5-1"></a>Set up React + TypeScript + Vite project for SARK UI.
+</span><span id="__span-5-2"><a href="#__codelineno-5-2" id="__codelineno-5-2" name="__codelineno-5-2"></a>
+</span><span id="__span-5-3"><a href="#__codelineno-5-3" id="__codelineno-5-3" name="__codelineno-5-3"></a>Create ui/ directory with:
+</span><span id="__span-5-4"><a href="#__codelineno-5-4" id="__codelineno-5-4" name="__codelineno-5-4"></a>1. React 18 + TypeScript + Vite
+</span><span id="__span-5-5"><a href="#__codelineno-5-5" id="__codelineno-5-5" name="__codelineno-5-5"></a>2. Tailwind CSS + shadcn/ui
+</span><span id="__span-5-6"><a href="#__codelineno-5-6" id="__codelineno-5-6" name="__codelineno-5-6"></a>3. React Router for routing
+</span><span id="__span-5-7"><a href="#__codelineno-5-7" id="__codelineno-5-7" name="__codelineno-5-7"></a>4. TanStack Query for data fetching
+</span><span id="__span-5-8"><a href="#__codelineno-5-8" id="__codelineno-5-8" name="__codelineno-5-8"></a>5. Zustand for state management
+</span><span id="__span-5-9"><a href="#__codelineno-5-9" id="__codelineno-5-9" name="__codelineno-5-9"></a>6. Proper project structure
+</span><span id="__span-5-10"><a href="#__codelineno-5-10" id="__codelineno-5-10" name="__codelineno-5-10"></a>
+</span><span id="__span-5-11"><a href="#__codelineno-5-11" id="__codelineno-5-11" name="__codelineno-5-11"></a>Ensure dev server runs and build works.
+</span><span id="__span-5-12"><a href="#__codelineno-5-12" id="__codelineno-5-12" name="__codelineno-5-12"></a>Add README.md with setup instructions.
+</span></code></pre></div></p>
+<hr/>
+<h3 id="t43-authentication-ui-state-management">✅ T4.3 - Authentication UI &amp; State Management<a class="headerlink" href="#t43-authentication-ui-state-management" title="Permanent link">¶</a></h3>
+<p><strong>Week:</strong> 4
+<strong>Duration:</strong> 2 days
+<strong>Priority:</strong> P0 (Critical - blocks all features)</p>
+<p><strong>What you're building:</strong>
+User authentication and session management for the UI.</p>
+<p><strong>Deliverables:</strong>
+1. <strong>Login Page</strong> (<code>src/pages/Login.tsx</code>):
+   - OIDC login button
+   - Handle OAuth redirect flow
+   - Loading states
+   - Error messages</p>
+<ol>
+<li>
+<p><strong>Auth Store</strong> (<code>src/stores/authStore.ts</code>):
+   <div class="language-typescript highlight"><pre><span></span><code><span id="__span-6-1"><a href="#__codelineno-6-1" id="__codelineno-6-1" name="__codelineno-6-1"></a><span class="kd">interface</span><span class="w"> </span><span class="nx">AuthStore</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-2"><a href="#__codelineno-6-2" id="__codelineno-6-2" name="__codelineno-6-2"></a><span class="w">  </span><span class="nx">user</span><span class="o">:</span><span class="w"> </span><span class="kt">User</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kc">null</span>
+</span><span id="__span-6-3"><a href="#__codelineno-6-3" id="__codelineno-6-3" name="__codelineno-6-3"></a><span class="w">  </span><span class="nx">token</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kc">null</span>
+</span><span id="__span-6-4"><a href="#__codelineno-6-4" id="__codelineno-6-4" name="__codelineno-6-4"></a><span class="w">  </span><span class="nx">isAuthenticated</span><span class="o">:</span><span class="w"> </span><span class="kt">boolean</span>
+</span><span id="__span-6-5"><a href="#__codelineno-6-5" id="__codelineno-6-5" name="__codelineno-6-5"></a><span class="w">  </span><span class="nx">login</span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="nx">code</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nb">Promise</span><span class="o">&lt;</span><span class="ow">void</span><span class="o">&gt;</span>
+</span><span id="__span-6-6"><a href="#__codelineno-6-6" id="__codelineno-6-6" name="__codelineno-6-6"></a><span class="w">  </span><span class="nx">logout</span><span class="o">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="ow">void</span>
+</span><span id="__span-6-7"><a href="#__codelineno-6-7" id="__codelineno-6-7" name="__codelineno-6-7"></a><span class="w">  </span><span class="nx">refreshToken</span><span class="o">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nb">Promise</span><span class="o">&lt;</span><span class="ow">void</span><span class="o">&gt;</span>
+</span><span id="__span-6-8"><a href="#__codelineno-6-8" id="__codelineno-6-8" name="__codelineno-6-8"></a><span class="p">}</span>
+</span></code></pre></div></p>
+</li>
+<li>
+<p><strong>Protected Route Component:</strong>
+<div class="language-typescript highlight"><pre><span></span><code><span id="__span-7-1"><a href="#__codelineno-7-1" id="__codelineno-7-1" name="__codelineno-7-1"></a><span class="o">&lt;</span><span class="nx">ProtectedRoute</span><span class="o">&gt;</span>
+</span><span id="__span-7-2"><a href="#__codelineno-7-2" id="__codelineno-7-2" name="__codelineno-7-2"></a><span class="w">  </span><span class="o">&lt;</span><span class="nx">Dashboard</span><span class="w"> </span><span class="o">/&gt;</span>
+</span><span id="__span-7-3"><a href="#__codelineno-7-3" id="__codelineno-7-3" name="__codelineno-7-3"></a><span class="o">&lt;</span><span class="err">/ProtectedRoute&gt;</span>
+</span></code></pre></div></p>
+</li>
+<li>Redirect to login if not authenticated</li>
+<li>
+<p>Show loading while checking auth</p>
+</li>
+<li>
+<p><strong>Token Management:</strong></p>
+</li>
+<li>Store token in localStorage (or httpOnly cookie)</li>
+<li>Add token to all API requests</li>
+<li>Auto-refresh before expiration</li>
+<li>
+<p>Handle refresh failures</p>
+</li>
+<li>
+<p><strong>User Context:</strong></p>
+</li>
+<li>Current user info</li>
+<li>User roles/permissions</li>
+<li>Display in header</li>
+</ol>
+<p><strong>Acceptance Criteria:</strong>
+- [ ] Users can log in via OIDC
+- [ ] Protected routes redirect to login
+- [ ] Tokens refresh automatically
+- [ ] Logout clears all state
+- [ ] Auth persists across page reloads</p>
+<p><strong>Dependencies:</strong>
+- T3.3 (Engineer 2 must configure CORS and auth endpoints)</p>
+<p><strong>Claude Code Prompt:</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a href="#__codelineno-8-1" id="__codelineno-8-1" name="__codelineno-8-1"></a>Build authentication for SARK UI.
+</span><span id="__span-8-2"><a href="#__codelineno-8-2" id="__codelineno-8-2" name="__codelineno-8-2"></a>
+</span><span id="__span-8-3"><a href="#__codelineno-8-3" id="__codelineno-8-3" name="__codelineno-8-3"></a>Create:
+</span><span id="__span-8-4"><a href="#__codelineno-8-4" id="__codelineno-8-4" name="__codelineno-8-4"></a>1. Login page with OIDC flow
+</span><span id="__span-8-5"><a href="#__codelineno-8-5" id="__codelineno-8-5" name="__codelineno-8-5"></a>2. Auth state management (Zustand store)
+</span><span id="__span-8-6"><a href="#__codelineno-8-6" id="__codelineno-8-6" name="__codelineno-8-6"></a>3. Protected route wrapper
+</span><span id="__span-8-7"><a href="#__codelineno-8-7" id="__codelineno-8-7" name="__codelineno-8-7"></a>4. Token refresh logic
+</span><span id="__span-8-8"><a href="#__codelineno-8-8" id="__codelineno-8-8" name="__codelineno-8-8"></a>5. Logout functionality
+</span><span id="__span-8-9"><a href="#__codelineno-8-9" id="__codelineno-8-9" name="__codelineno-8-9"></a>
+</span><span id="__span-8-10"><a href="#__codelineno-8-10" id="__codelineno-8-10" name="__codelineno-8-10"></a>Use the SARK API for authentication.
+</span><span id="__span-8-11"><a href="#__codelineno-8-11" id="__codelineno-8-11" name="__codelineno-8-11"></a>Store tokens securely and handle refresh.
+</span></code></pre></div></p>
+<hr/>
+<h3 id="t44-data-fetching-error-handling">✅ T4.4 - Data Fetching &amp; Error Handling<a class="headerlink" href="#t44-data-fetching-error-handling" title="Permanent link">¶</a></h3>
+<p><strong>Week:</strong> 4
+<strong>Duration:</strong> 1-2 days
+<strong>Priority:</strong> P1 (High - foundation for all features)</p>
+<p><strong>What you're building:</strong>
+Centralized data fetching and error handling.</p>
+<p><strong>Deliverables:</strong>
+1. <strong>Configure TanStack Query:</strong>
+<div class="language-typescript highlight"><pre><span></span><code><span id="__span-9-1"><a href="#__codelineno-9-1" id="__codelineno-9-1" name="__codelineno-9-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">queryClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">QueryClient</span><span class="p">({</span>
+</span><span id="__span-9-2"><a href="#__codelineno-9-2" id="__codelineno-9-2" name="__codelineno-9-2"></a><span class="w">  </span><span class="nx">defaultOptions</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-3"><a href="#__codelineno-9-3" id="__codelineno-9-3" name="__codelineno-9-3"></a><span class="w">    </span><span class="nx">queries</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-4"><a href="#__codelineno-9-4" id="__codelineno-9-4" name="__codelineno-9-4"></a><span class="w">      </span><span class="nx">staleTime</span><span class="o">:</span><span class="w"> </span><span class="kt">1000</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">60</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">5</span><span class="p">,</span><span class="w"> </span><span class="c1">// 5 minutes</span>
+</span><span id="__span-9-5"><a href="#__codelineno-9-5" id="__codelineno-9-5" name="__codelineno-9-5"></a><span class="w">      </span><span class="nx">cacheTime</span><span class="o">:</span><span class="w"> </span><span class="kt">1000</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">60</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">10</span><span class="p">,</span><span class="w"> </span><span class="c1">// 10 minutes</span>
+</span><span id="__span-9-6"><a href="#__codelineno-9-6" id="__codelineno-9-6" name="__codelineno-9-6"></a><span class="w">      </span><span class="nx">retry</span><span class="o">:</span><span class="w"> </span><span class="kt">1</span><span class="p">,</span>
+</span><span id="__span-9-7"><a href="#__codelineno-9-7" id="__codelineno-9-7" name="__codelineno-9-7"></a><span class="w">      </span><span class="nx">refetchOnWindowFocus</span><span class="o">:</span><span class="w"> </span><span class="kt">false</span><span class="p">,</span>
+</span><span id="__span-9-8"><a href="#__codelineno-9-8" id="__codelineno-9-8" name="__codelineno-9-8"></a><span class="w">    </span><span class="p">},</span>
+</span><span id="__span-9-9"><a href="#__codelineno-9-9" id="__codelineno-9-9" name="__codelineno-9-9"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-9-10"><a href="#__codelineno-9-10" id="__codelineno-9-10" name="__codelineno-9-10"></a><span class="p">})</span>
+</span></code></pre></div></p>
+<ol>
+<li>
+<p><strong>Create Query Hooks</strong> (<code>src/api/hooks.ts</code>):
+   <div class="language-typescript highlight"><pre><span></span><code><span id="__span-10-1"><a href="#__codelineno-10-1" id="__codelineno-10-1" name="__codelineno-10-1"></a><span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">useServers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span>
+</span><span id="__span-10-2"><a href="#__codelineno-10-2" id="__codelineno-10-2" name="__codelineno-10-2"></a><span class="w">  </span><span class="nx">useQuery</span><span class="p">([</span><span class="s1">'servers'</span><span class="p">],</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">api</span><span class="p">.</span><span class="nx">servers</span><span class="p">.</span><span class="nx">list</span><span class="p">())</span>
+</span><span id="__span-10-3"><a href="#__codelineno-10-3" id="__codelineno-10-3" name="__codelineno-10-3"></a>
+</span><span id="__span-10-4"><a href="#__codelineno-10-4" id="__codelineno-10-4" name="__codelineno-10-4"></a><span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">useServer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span>
+</span><span id="__span-10-5"><a href="#__codelineno-10-5" id="__codelineno-10-5" name="__codelineno-10-5"></a><span class="w">  </span><span class="nx">useQuery</span><span class="p">([</span><span class="s1">'server'</span><span class="p">,</span><span class="w"> </span><span class="nx">id</span><span class="p">],</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">api</span><span class="p">.</span><span class="nx">servers</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">id</span><span class="p">))</span>
+</span><span id="__span-10-6"><a href="#__codelineno-10-6" id="__codelineno-10-6" name="__codelineno-10-6"></a>
+</span><span id="__span-10-7"><a href="#__codelineno-10-7" id="__codelineno-10-7" name="__codelineno-10-7"></a><span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">usePolicies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span>
+</span><span id="__span-10-8"><a href="#__codelineno-10-8" id="__codelineno-10-8" name="__codelineno-10-8"></a><span class="w">  </span><span class="nx">useQuery</span><span class="p">([</span><span class="s1">'policies'</span><span class="p">],</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">api</span><span class="p">.</span><span class="nx">policies</span><span class="p">.</span><span class="nx">list</span><span class="p">())</span>
+</span><span id="__span-10-9"><a href="#__codelineno-10-9" id="__codelineno-10-9" name="__codelineno-10-9"></a>
+</span><span id="__span-10-10"><a href="#__codelineno-10-10" id="__codelineno-10-10" name="__codelineno-10-10"></a><span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">useAuditLogs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">filters</span><span class="o">:</span><span class="w"> </span><span class="kt">AuditFilters</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span>
+</span><span id="__span-10-11"><a href="#__codelineno-10-11" id="__codelineno-10-11" name="__codelineno-10-11"></a><span class="w">  </span><span class="nx">useQuery</span><span class="p">([</span><span class="s1">'audit'</span><span class="p">,</span><span class="w"> </span><span class="nx">filters</span><span class="p">],</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">api</span><span class="p">.</span><span class="nx">audit</span><span class="p">.</span><span class="nx">list</span><span class="p">(</span><span class="nx">filters</span><span class="p">))</span>
+</span></code></pre></div></p>
+</li>
+<li>
+<p><strong>Mutation Hooks:</strong>
+<div class="language-typescript highlight"><pre><span></span><code><span id="__span-11-1"><a href="#__codelineno-11-1" id="__codelineno-11-1" name="__codelineno-11-1"></a><span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">useCreateServer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span>
+</span><span id="__span-11-2"><a href="#__codelineno-11-2" id="__codelineno-11-2" name="__codelineno-11-2"></a><span class="w">  </span><span class="nx">useMutation</span><span class="p">((</span><span class="nx">data</span><span class="o">:</span><span class="w"> </span><span class="kt">ServerCreate</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">api</span><span class="p">.</span><span class="nx">servers</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">data</span><span class="p">),</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-11-3"><a href="#__codelineno-11-3" id="__codelineno-11-3" name="__codelineno-11-3"></a><span class="w">    </span><span class="nx">onSuccess</span><span class="o">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-11-4"><a href="#__codelineno-11-4" id="__codelineno-11-4" name="__codelineno-11-4"></a><span class="w">      </span><span class="nx">queryClient</span><span class="p">.</span><span class="nx">invalidateQueries</span><span class="p">([</span><span class="s1">'servers'</span><span class="p">])</span>
+</span><span id="__span-11-5"><a href="#__codelineno-11-5" id="__codelineno-11-5" name="__codelineno-11-5"></a><span class="w">      </span><span class="nx">toast</span><span class="p">.</span><span class="nx">success</span><span class="p">(</span><span class="s1">'Server registered successfully'</span><span class="p">)</span>
+</span><span id="__span-11-6"><a href="#__codelineno-11-6" id="__codelineno-11-6" name="__codelineno-11-6"></a><span class="w">    </span><span class="p">},</span>
+</span><span id="__span-11-7"><a href="#__codelineno-11-7" id="__codelineno-11-7" name="__codelineno-11-7"></a><span class="w">    </span><span class="nx">onError</span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="nx">error</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-11-8"><a href="#__codelineno-11-8" id="__codelineno-11-8" name="__codelineno-11-8"></a><span class="w">      </span><span class="nx">toast</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="s1">'Failed to register server'</span><span class="p">)</span>
+</span><span id="__span-11-9"><a href="#__codelineno-11-9" id="__codelineno-11-9" name="__codelineno-11-9"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-11-10"><a href="#__codelineno-11-10" id="__codelineno-11-10" name="__codelineno-11-10"></a><span class="w">  </span><span class="p">})</span>
+</span></code></pre></div></p>
+</li>
+<li>
+<p><strong>Global Error Handling:</strong></p>
+</li>
+<li>Axios interceptor for 401 (refresh token)</li>
+<li>Axios interceptor for 403 (show permission error)</li>
+<li>Network error handling</li>
+<li>
+<p>Display user-friendly errors</p>
+</li>
+<li>
+<p><strong>Toast Notification System:</strong></p>
+</li>
+<li>Success toasts</li>
+<li>Error toasts</li>
+<li>Loading toasts</li>
+<li>Use shadcn/ui toast component</li>
+</ol>
+<p><strong>Acceptance Criteria:</strong>
+- [ ] All queries use TanStack Query
+- [ ] Queries cache appropriately
+- [ ] Errors display user-friendly messages
+- [ ] Loading states work consistently
+- [ ] Toast notifications work</p>
+<p><strong>Claude Code Prompt:</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a href="#__codelineno-12-1" id="__codelineno-12-1" name="__codelineno-12-1"></a>Set up data fetching and error handling for SARK UI.
+</span><span id="__span-12-2"><a href="#__codelineno-12-2" id="__codelineno-12-2" name="__codelineno-12-2"></a>
+</span><span id="__span-12-3"><a href="#__codelineno-12-3" id="__codelineno-12-3" name="__codelineno-12-3"></a>Create:
+</span><span id="__span-12-4"><a href="#__codelineno-12-4" id="__codelineno-12-4" name="__codelineno-12-4"></a>1. TanStack Query configuration
+</span><span id="__span-12-5"><a href="#__codelineno-12-5" id="__codelineno-12-5" name="__codelineno-12-5"></a>2. Query hooks for all API endpoints (servers, policies, users, audit)
+</span><span id="__span-12-6"><a href="#__codelineno-12-6" id="__codelineno-12-6" name="__codelineno-12-6"></a>3. Mutation hooks with invalidation
+</span><span id="__span-12-7"><a href="#__codelineno-12-7" id="__codelineno-12-7" name="__codelineno-12-7"></a>4. Global error handling with Axios interceptors
+</span><span id="__span-12-8"><a href="#__codelineno-12-8" id="__codelineno-12-8" name="__codelineno-12-8"></a>5. Toast notification system
+</span><span id="__span-12-9"><a href="#__codelineno-12-9" id="__codelineno-12-9" name="__codelineno-12-9"></a>
+</span><span id="__span-12-10"><a href="#__codelineno-12-10" id="__codelineno-12-10" name="__codelineno-12-10"></a>Ensure good UX with loading states and error messages.
+</span></code></pre></div></p>
+<hr/>
+<h3 id="t52-mcp-servers-management">✅ T5.2 - MCP Servers Management<a class="headerlink" href="#t52-mcp-servers-management" title="Permanent link">¶</a></h3>
+<p><strong>Week:</strong> 5
+<strong>Duration:</strong> 3 days
+<strong>Priority:</strong> P1 (High - core feature)</p>
+<p><strong>What you're building:</strong>
+The full server management experience.</p>
+<p><strong>Deliverables:</strong>
+1. <strong>Servers List Page</strong> (<code>src/pages/Servers.tsx</code>):
+   - Table/grid view toggle
+   - Columns:
+     - Name
+     - Endpoint
+     - Health status (green/yellow/red)
+     - Sensitivity level
+     - Last seen
+     - Actions (view, edit, delete)
+   - Search by name
+   - Filter by status, sensitivity
+   - Pagination
+   - "Register Server" button</p>
+<ol>
+<li><strong>Server Detail Page</strong> (<code>src/pages/ServerDetail.tsx</code>):</li>
+<li>Server metadata</li>
+<li>Tabs:<ul>
+<li><strong>Tools</strong> - List of tools with descriptions</li>
+<li><strong>Resources</strong> - Available resources</li>
+<li><strong>Prompts</strong> - MCP prompts</li>
+<li><strong>Health History</strong> - Status over time (chart)</li>
+<li><strong>Activity</strong> - Recent audit events for this server</li>
+</ul>
+</li>
+<li>Edit/Delete buttons</li>
+<li>
+<p>Health check button</p>
+</li>
+<li>
+<p><strong>Register Server Form</strong> (<code>src/pages/ServerRegister.tsx</code>):</p>
+</li>
+<li>Multi-step form or single form with sections:<ul>
+<li><strong>Step 1:</strong> Basic Info (name, transport, endpoint)</li>
+<li><strong>Step 2:</strong> Capabilities and Tools</li>
+<li><strong>Step 3:</strong> Security (sensitivity level, managers)</li>
+<li><strong>Step 4:</strong> Review and Submit</li>
+</ul>
+</li>
+<li>JSON schema validation</li>
+<li>Test connection button</li>
+<li>Preview JSON</li>
+<li>
+<p>Success/error feedback</p>
+</li>
+<li>
+<p><strong>Components:</strong></p>
+</li>
+<li><code>ServerCard.tsx</code> - Card view of server</li>
+<li><code>ServerHealthBadge.tsx</code> - Health indicator</li>
+<li><code>ServerToolsList.tsx</code> - Tools table</li>
+<li><code>ServerHealthChart.tsx</code> - Health history chart</li>
+</ol>
+<p><strong>Acceptance Criteria:</strong>
+- [ ] Can view all servers in list
+- [ ] Can register new server
+- [ ] Can view server details
+- [ ] Can delete server (with confirmation)
+- [ ] Form validation works
+- [ ] Health status updates in real-time</p>
+<p><strong>Claude Code Prompt:</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a href="#__codelineno-13-1" id="__codelineno-13-1" name="__codelineno-13-1"></a>Build complete MCP server management for SARK UI.
+</span><span id="__span-13-2"><a href="#__codelineno-13-2" id="__codelineno-13-2" name="__codelineno-13-2"></a>
+</span><span id="__span-13-3"><a href="#__codelineno-13-3" id="__codelineno-13-3" name="__codelineno-13-3"></a>Create:
+</span><span id="__span-13-4"><a href="#__codelineno-13-4" id="__codelineno-13-4" name="__codelineno-13-4"></a>1. Servers list page with search, filters, pagination
+</span><span id="__span-13-5"><a href="#__codelineno-13-5" id="__codelineno-13-5" name="__codelineno-13-5"></a>2. Server detail page with tabs (Tools, Resources, Health)
+</span><span id="__span-13-6"><a href="#__codelineno-13-6" id="__codelineno-13-6" name="__codelineno-13-6"></a>3. Register server form (multi-step) with validation
+</span><span id="__span-13-7"><a href="#__codelineno-13-7" id="__codelineno-13-7" name="__codelineno-13-7"></a>4. Delete server with confirmation
+</span><span id="__span-13-8"><a href="#__codelineno-13-8" id="__codelineno-13-8" name="__codelineno-13-8"></a>
+</span><span id="__span-13-9"><a href="#__codelineno-13-9" id="__codelineno-13-9" name="__codelineno-13-9"></a>Use shadcn/ui components and TanStack Query for data fetching.
+</span><span id="__span-13-10"><a href="#__codelineno-13-10" id="__codelineno-13-10" name="__codelineno-13-10"></a>Make it intuitive and user-friendly.
+</span></code></pre></div></p>
+<hr/>
+<h3 id="t54-audit-log-viewer">✅ T5.4 - Audit Log Viewer<a class="headerlink" href="#t54-audit-log-viewer" title="Permanent link">¶</a></h3>
+<p><strong>Week:</strong> 5
+<strong>Duration:</strong> 2 days
+<strong>Priority:</strong> P1 (High - compliance requirement)</p>
+<p><strong>What you're building:</strong>
+Searchable audit log viewer for compliance.</p>
+<p><strong>Deliverables:</strong>
+1. <strong>Audit Logs Page</strong> (<code>src/pages/AuditLogs.tsx</code>):
+   - Table with columns:
+     - Timestamp
+     - User (name/email)
+     - Action (tool:invoke, server:register, etc.)
+     - Resource (which tool/server)
+     - Decision (allow/deny)
+     - IP Address
+     - Details (expandable)
+   - Pagination or infinite scroll
+   - Export button</p>
+<ol>
+<li><strong>Advanced Filters:</strong></li>
+<li>Date range picker (last hour, today, week, month, custom)</li>
+<li>Event type dropdown</li>
+<li>User search</li>
+<li>Decision filter (all, allow, deny)</li>
+<li>Resource filter</li>
+<li>
+<p>Apply/Clear buttons</p>
+</li>
+<li>
+<p><strong>Search:</strong></p>
+</li>
+<li>Full-text search across all fields</li>
+<li>Search as you type</li>
+<li>
+<p>Debounced (500ms)</p>
+</li>
+<li>
+<p><strong>Event Detail Modal:</strong></p>
+</li>
+<li>Full event data (JSON)</li>
+<li>Formatted display</li>
+<li>
+<p>Copy to clipboard</p>
+</li>
+<li>
+<p><strong>Export Functionality:</strong></p>
+</li>
+<li>Export to CSV</li>
+<li>Export to JSON</li>
+<li>Respect current filters</li>
+<li>Show progress for large exports</li>
+</ol>
+<p><strong>Acceptance Criteria:</strong>
+- [ ] Can view all audit events
+- [ ] Filters work correctly
+- [ ] Search is fast (&lt;500ms)
+- [ ] Can export results
+- [ ] Pagination handles 100k+ events</p>
+<p><strong>Claude Code Prompt:</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a href="#__codelineno-14-1" id="__codelineno-14-1" name="__codelineno-14-1"></a>Build audit log viewer for SARK UI.
+</span><span id="__span-14-2"><a href="#__codelineno-14-2" id="__codelineno-14-2" name="__codelineno-14-2"></a>
+</span><span id="__span-14-3"><a href="#__codelineno-14-3" id="__codelineno-14-3" name="__codelineno-14-3"></a>Create:
+</span><span id="__span-14-4"><a href="#__codelineno-14-4" id="__codelineno-14-4" name="__codelineno-14-4"></a>1. Audit logs page with table
+</span><span id="__span-14-5"><a href="#__codelineno-14-5" id="__codelineno-14-5" name="__codelineno-14-5"></a>2. Advanced filters (date range, event type, user, decision)
+</span><span id="__span-14-6"><a href="#__codelineno-14-6" id="__codelineno-14-6" name="__codelineno-14-6"></a>3. Search functionality
+</span><span id="__span-14-7"><a href="#__codelineno-14-7" id="__codelineno-14-7" name="__codelineno-14-7"></a>4. Event detail modal
+</span><span id="__span-14-8"><a href="#__codelineno-14-8" id="__codelineno-14-8" name="__codelineno-14-8"></a>5. Export to CSV/JSON
+</span><span id="__span-14-9"><a href="#__codelineno-14-9" id="__codelineno-14-9" name="__codelineno-14-9"></a>
+</span><span id="__span-14-10"><a href="#__codelineno-14-10" id="__codelineno-14-10" name="__codelineno-14-10"></a>Use TanStack Table for performant table rendering.
+</span><span id="__span-14-11"><a href="#__codelineno-14-11" id="__codelineno-14-11" name="__codelineno-14-11"></a>Handle large datasets gracefully.
+</span></code></pre></div></p>
+<hr/>
+<h3 id="t62-settings-api-key-management">✅ T6.2 - Settings &amp; API Key Management<a class="headerlink" href="#t62-settings-api-key-management" title="Permanent link">¶</a></h3>
+<p><strong>Week:</strong> 6
+<strong>Duration:</strong> 2 days
+<strong>Priority:</strong> P1 (High)</p>
+<p><strong>What you're building:</strong>
+Settings interface and API key management.</p>
+<p><strong>Deliverables:</strong>
+1. <strong>Settings Page</strong> (<code>src/pages/Settings.tsx</code>):
+   - Tabs:
+     - General
+     - Authentication
+     - SIEM Integration
+     - Notifications</p>
+<ol>
+<li><strong>General Settings Tab:</strong></li>
+<li>System name</li>
+<li>Logo upload</li>
+<li>Timezone</li>
+<li>
+<p>Date format</p>
+</li>
+<li>
+<p><strong>Authentication Tab:</strong></p>
+</li>
+<li>OIDC provider config</li>
+<li>LDAP settings</li>
+<li>SAML config</li>
+<li>
+<p>Test connection buttons</p>
+</li>
+<li>
+<p><strong>SIEM Integration Tab:</strong></p>
+</li>
+<li>Splunk configuration</li>
+<li>Datadog configuration</li>
+<li>Enable/disable toggle</li>
+<li>
+<p>Test connection</p>
+</li>
+<li>
+<p><strong>API Keys Page</strong> (<code>src/pages/APIKeys.tsx</code>):</p>
+</li>
+<li>List of API keys:<ul>
+<li>Name</li>
+<li>Created date</li>
+<li>Last used</li>
+<li>Scopes</li>
+<li>Actions (revoke)</li>
+</ul>
+</li>
+<li>
+<p>"Create API Key" button</p>
+</li>
+<li>
+<p><strong>Create API Key Modal:</strong></p>
+</li>
+<li>Name input</li>
+<li>Scopes selection (checkboxes):<ul>
+<li><code>server:read</code>, <code>server:write</code></li>
+<li><code>policy:read</code>, <code>policy:write</code></li>
+<li><code>audit:read</code></li>
+</ul>
+</li>
+<li>Create button</li>
+<li>Show key ONCE (with copy button)</li>
+<li>Warning: "Save this key, you won't see it again"</li>
+</ol>
+<p><strong>Acceptance Criteria:</strong>
+- [ ] Can view/update settings
+- [ ] Can create API keys
+- [ ] Can revoke keys
+- [ ] Keys shown only once at creation
+- [ ] Scopes are selectable</p>
+<p><strong>Claude Code Prompt:</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a href="#__codelineno-15-1" id="__codelineno-15-1" name="__codelineno-15-1"></a>Build settings and API key management for SARK UI.
+</span><span id="__span-15-2"><a href="#__codelineno-15-2" id="__codelineno-15-2" name="__codelineno-15-2"></a>
+</span><span id="__span-15-3"><a href="#__codelineno-15-3" id="__codelineno-15-3" name="__codelineno-15-3"></a>Create:
+</span><span id="__span-15-4"><a href="#__codelineno-15-4" id="__codelineno-15-4" name="__codelineno-15-4"></a>1. Settings page with tabs (General, Auth, SIEM, Notifications)
+</span><span id="__span-15-5"><a href="#__codelineno-15-5" id="__codelineno-15-5" name="__codelineno-15-5"></a>2. Forms for each settings category
+</span><span id="__span-15-6"><a href="#__codelineno-15-6" id="__codelineno-15-6" name="__codelineno-15-6"></a>3. API Keys page with list and create modal
+</span><span id="__span-15-7"><a href="#__codelineno-15-7" id="__codelineno-15-7" name="__codelineno-15-7"></a>4. API key creation with scopes selection
+</span><span id="__span-15-8"><a href="#__codelineno-15-8" id="__codelineno-15-8" name="__codelineno-15-8"></a>5. Show key only once with copy button
+</span><span id="__span-15-9"><a href="#__codelineno-15-9" id="__codelineno-15-9" name="__codelineno-15-9"></a>
+</span><span id="__span-15-10"><a href="#__codelineno-15-10" id="__codelineno-15-10" name="__codelineno-15-10"></a>Use forms with validation and proper state management.
+</span></code></pre></div></p>
+<hr/>
+<h2 id="your-timeline">Your Timeline<a class="headerlink" href="#your-timeline" title="Permanent link">¶</a></h2>
+<table>
+<thead>
+<tr>
+<th>Week</th>
+<th>Task</th>
+<th>Duration</th>
+<th>Focus</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1</strong></td>
+<td>T1.2</td>
+<td>1-2 days</td>
+<td>MCP diagrams</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>T2.3</td>
+<td>3 days</td>
+<td>Interactive tutorials</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>T3.2</td>
+<td>2 days</td>
+<td>React project setup</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td>T4.3</td>
+<td>2 days</td>
+<td>Authentication</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td>T4.4</td>
+<td>1-2 days</td>
+<td>Data fetching</td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td>T5.2</td>
+<td>3 days</td>
+<td>Server management</td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td>T5.4</td>
+<td>2 days</td>
+<td>Audit logs</td>
+</tr>
+<tr>
+<td><strong>6</strong></td>
+<td>T6.2</td>
+<td>2 days</td>
+<td>Settings &amp; API keys</td>
+</tr>
+</tbody>
+</table>
+<h2 id="tips-for-success">Tips for Success<a class="headerlink" href="#tips-for-success" title="Permanent link">¶</a></h2>
+<ul>
+<li><strong>You're the integrator:</strong> Bridge frontend and backend, help both teams</li>
+<li><strong>Pair with E1:</strong> On complex UI components</li>
+<li><strong>Pair with E2:</strong> On API integration issues</li>
+<li><strong>Test thoroughly:</strong> You touch both sides, catch integration bugs</li>
+<li><strong>Ask questions:</strong> If unclear, clarify before building</li>
+</ul>
+<hr/>
+<p><strong>You're the glue that holds it all together!</strong> 🔧</p>
+</article>
+</div>
+<script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+</div>
+<button class="md-top md-icon" data-md-component="top" hidden="" type="button">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"></path></svg>
+  Back to top
+</button>
+</main>
+<footer class="md-footer">
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+<div class="md-copyright__highlight">
+      Copyright © 2024 James R. A. Henry. All rights reserved.
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
+      Material for MkDocs
+    </a>
+</div>
+<div class="md-social">
+<a class="md-social__link" href="https://github.com/apathy-ca/sark" rel="noopener" target="_blank" title="github.com">
+<svg viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"></path></svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.path", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+<script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+<script type="module">import mermaid from "https://unpkg.com/mermaid@10.4.0/dist/mermaid.esm.min.mjs";
+mermaid.initialize({});</script></body>
+</html>

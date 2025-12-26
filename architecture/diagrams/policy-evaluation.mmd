@@ -1,0 +1,47 @@
+sequenceDiagram
+    participant Client
+    participant API as API Layer
+    participant Auth as Authentication
+    participant PolicyEval as Policy Evaluator
+    participant Cache as Redis Cache
+    participant OPA as OPA Engine
+    participant Adapter as Protocol Adapter
+    participant Resource as External Resource
+    participant Audit as Audit Service
+
+    Client->>API: POST /api/v2/authorize
+    API->>Auth: Authenticate request
+    Auth-->>API: Principal identity
+
+    API->>PolicyEval: Evaluate authorization
+    PolicyEval->>PolicyEval: Build OPA input
+
+    Note over PolicyEval,Cache: Check if decision is cached
+    PolicyEval->>Cache: Check cache(key)
+    alt Cache Hit
+        Cache-->>PolicyEval: Cached decision
+        PolicyEval-->>API: Allow/Deny (cached)
+    else Cache Miss
+        PolicyEval->>OPA: POST /v1/data/grid/allow
+        Note over OPA: Evaluate all policies<br/>- grid.base<br/>- grid.custom<br/>- grid.federation
+        OPA-->>PolicyEval: Decision + metadata
+        PolicyEval->>Cache: Cache decision (TTL)
+        PolicyEval-->>API: Allow/Deny (fresh)
+    end
+
+    alt Decision: Allow
+        API->>Adapter: invoke(request)
+        Adapter->>Resource: Execute capability
+        Resource-->>Adapter: Result
+        Adapter-->>API: InvocationResult
+
+        API->>Audit: Log success
+        Audit-->>API: Audit ID
+
+        API-->>Client: 200 OK + Result
+    else Decision: Deny
+        API->>Audit: Log denial
+        Audit-->>API: Audit ID
+
+        API-->>Client: 403 Forbidden
+    end

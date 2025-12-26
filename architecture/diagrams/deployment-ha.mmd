@@ -1,0 +1,121 @@
+graph TB
+    subgraph "External Clients"
+        CLIENT1[Web Applications]
+        CLIENT2[Mobile Apps]
+        CLIENT3[Services & APIs]
+    end
+
+    subgraph "Load Balancing Layer"
+        LB[Load Balancer<br/>NGINX/HAProxy]
+        LB_FED[Federation LB<br/>Port 8443]
+    end
+
+    subgraph "SARK Application Tier"
+        SARK1[SARK Node 1<br/>:8000]
+        SARK2[SARK Node 2<br/>:8000]
+        SARK3[SARK Node 3<br/>:8000]
+    end
+
+    subgraph "Policy Engine Cluster"
+        OPA1[OPA Instance 1]
+        OPA2[OPA Instance 2]
+        OPA3[OPA Instance 3]
+    end
+
+    subgraph "Cache Layer"
+        REDIS_M[Redis Primary]
+        REDIS_R1[Redis Replica 1]
+        REDIS_R2[Redis Replica 2]
+    end
+
+    subgraph "Database Layer"
+        PG_PRIMARY[(PostgreSQL Primary<br/>TimescaleDB)]
+        PG_REPLICA1[(PostgreSQL Replica 1<br/>Read-Only)]
+        PG_REPLICA2[(PostgreSQL Replica 2<br/>Read-Only)]
+    end
+
+    subgraph "Monitoring Stack"
+        PROMETHEUS[Prometheus]
+        GRAFANA[Grafana]
+        ALERTMANAGER[AlertManager]
+        LOKI[Loki<br/>Log Aggregation]
+    end
+
+    subgraph "Federation Network"
+        ORG_A[Organization A<br/>SARK Cluster]
+        ORG_B[Organization B<br/>SARK Cluster]
+    end
+
+    %% Client connections
+    CLIENT1 -->|HTTPS| LB
+    CLIENT2 -->|HTTPS| LB
+    CLIENT3 -->|HTTPS| LB
+
+    %% Load balancer to SARK
+    LB -->|Round Robin| SARK1
+    LB -->|Round Robin| SARK2
+    LB -->|Round Robin| SARK3
+
+    %% SARK to OPA cluster
+    SARK1 --> OPA1
+    SARK1 --> OPA2
+    SARK2 --> OPA2
+    SARK2 --> OPA3
+    SARK3 --> OPA1
+    SARK3 --> OPA3
+
+    %% SARK to Redis
+    SARK1 --> REDIS_M
+    SARK2 --> REDIS_M
+    SARK3 --> REDIS_M
+    REDIS_M -.->|Replication| REDIS_R1
+    REDIS_M -.->|Replication| REDIS_R2
+
+    %% SARK to PostgreSQL
+    SARK1 -->|Write| PG_PRIMARY
+    SARK2 -->|Write| PG_PRIMARY
+    SARK3 -->|Write| PG_PRIMARY
+    SARK1 -.->|Read| PG_REPLICA1
+    SARK2 -.->|Read| PG_REPLICA2
+    SARK3 -.->|Read| PG_REPLICA1
+    PG_PRIMARY -.->|Streaming Replication| PG_REPLICA1
+    PG_PRIMARY -.->|Streaming Replication| PG_REPLICA2
+
+    %% Monitoring
+    PROMETHEUS -->|Scrape| SARK1
+    PROMETHEUS -->|Scrape| SARK2
+    PROMETHEUS -->|Scrape| SARK3
+    PROMETHEUS -->|Scrape| PG_PRIMARY
+    PROMETHEUS --> ALERTMANAGER
+    GRAFANA --> PROMETHEUS
+    LOKI -->|Logs| SARK1
+    LOKI -->|Logs| SARK2
+    LOKI -->|Logs| SARK3
+
+    %% Federation
+    LB_FED -->|mTLS| SARK1
+    LB_FED -->|mTLS| SARK2
+    LB_FED -->|mTLS| SARK3
+    SARK1 -.->|mTLS| ORG_A
+    SARK1 -.->|mTLS| ORG_B
+    SARK2 -.->|mTLS| ORG_A
+    SARK2 -.->|mTLS| ORG_B
+
+    %% Styling
+    classDef client fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    classDef lb fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef sark fill:#c8e6c9,stroke:#2e7d32,stroke-width:3px
+    classDef opa fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef redis fill:#ffebee,stroke:#c62828,stroke-width:2px
+    classDef db fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
+    classDef monitor fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    classDef federation fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+
+    class CLIENT1,CLIENT2,CLIENT3 client
+    class LB,LB_FED lb
+    class SARK1,SARK2,SARK3 sark
+    class OPA1,OPA2,OPA3 opa
+    class REDIS_M,REDIS_R1,REDIS_R2 redis
+    class PG_PRIMARY,PG_REPLICA1,PG_REPLICA2 db
+    class PROMETHEUS,GRAFANA,ALERTMANAGER,LOKI monitor
+    class ORG_A,ORG_B federation

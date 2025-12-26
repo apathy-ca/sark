@@ -1,0 +1,3138 @@
+
+<!DOCTYPE html>
+
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="Enterprise-Grade MCP Governance System" name="description"/>
+<meta content="James R. A. Henry" name="author"/>
+<link href="https://sark.example.com/ARCHITECTURE/" rel="canonical"/>
+<link href="../installation/" rel="prev"/>
+<link href="../SECURITY/" rel="next"/>
+<link href="../assets/images/favicon.png" rel="icon"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-9.7.1" name="generator"/>
+<title>Overview - SARK - Security Audit and Resource Kontroler</title>
+<link href="../assets/stylesheets/main.484c7ddc.min.css" rel="stylesheet"/>
+<link href="../assets/stylesheets/palette.ab4e12ef.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config",""),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+<script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+</head>
+<body data-md-color-accent="indigo" data-md-color-primary="indigo" data-md-color-scheme="default" dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#architecture">
+          Skip to content
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<div data-md-color-scheme="default" data-md-component="outdated" hidden="">
+</div>
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="SARK - Security Audit and Resource Kontroler" class="md-header__button md-logo" data-md-component="logo" href=".." title="SARK - Security Audit and Resource Kontroler">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            SARK - Security Audit and Resource Kontroler
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              Overview
+            
+          </span>
+</div>
+</div>
+</div>
+<form class="md-header__option" data-md-component="palette">
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="" data-md-color-primary="indigo" data-md-color-scheme="default" id="__palette_0" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="" data-md-color-primary="indigo" data-md-color-scheme="slate" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_0" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+</form>
+<script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<a aria-label="Share" class="md-search__icon md-icon" data-clipboard="" data-clipboard-text="" data-md-component="search-share" href="javascript:void(0)" tabindex="-1" title="Share">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"></path></svg>
+</a>
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+</button>
+</nav>
+<div class="md-search__suggest" data-md-component="search-suggest"></div>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="" tabindex="0">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initializing search
+          </div>
+<ol class="md-search-result__list" role="presentation"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="md-header__source">
+<a class="md-source" data-md-component="source" href="https://github.com/apathy-ca/sark" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+</div>
+<div class="md-source__repository">
+    apathy-ca/sark
+  </div>
+</a>
+</div>
+</nav>
+<nav aria-label="Tabs" class="md-tabs" data-md-component="tabs">
+<div class="md-grid">
+<ul class="md-tabs__list">
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="..">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../QUICK_START/">
+          
+  
+  
+    
+  
+  Getting Started
+
+        </a>
+</li>
+<li class="md-tabs__item md-tabs__item--active">
+<a class="md-tabs__link" href="./">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../DEPLOYMENT/">
+          
+  
+  
+    
+  
+  Deployment
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../AUTHENTICATION/">
+          
+  
+  
+    
+  
+  Authentication &amp; Authorization
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../OPA_POLICY_GUIDE/">
+          
+  
+  
+    
+  
+  Policies
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../MONITORING/">
+          
+  
+  
+    
+  
+  Operations
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../DATABASE_MIGRATIONS/">
+          
+  
+  
+    
+  
+  Database
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../PERFORMANCE_TESTING/">
+          
+  
+  
+    
+  
+  Performance
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../API_REFERENCE/">
+          
+  
+  
+    
+  
+  API Reference
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../DEVELOPMENT/">
+          
+  
+  
+    
+  
+  Development
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../EXECUTIVE_SUMMARY/">
+          
+  
+  
+    
+  
+  Reports
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../REPOSITORY_IMPROVEMENT_PLAN/">
+          
+  
+  
+    
+  
+  Planning
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../GLOSSARY/">
+          
+  
+  
+    
+  
+  Reference
+
+        </a>
+</li>
+</ul>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary md-nav--lifted" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="SARK - Security Audit and Resource Kontroler" class="md-nav__button md-logo" data-md-component="logo" href=".." title="SARK - Security Audit and Resource Kontroler">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+    SARK - Security Audit and Resource Kontroler
+  </label>
+<div class="md-nav__source">
+<a class="md-source" data-md-component="source" href="https://github.com/apathy-ca/sark" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+</div>
+<div class="md-source__repository">
+    apathy-ca/sark
+  </div>
+</a>
+</div>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="..">
+<span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../QUICK_START/">
+<span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../QUICK_REFERENCE_SESSIONS/">
+<span class="md-ellipsis">
+    
+  
+    Quick Reference
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../installation/">
+<span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+<span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="true" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
+<span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<a class="md-nav__link md-nav__link--active" href="./">
+<span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+</a>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#overview">
+<span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#system-components">
+<span class="md-ellipsis">
+      
+        System Components
+      
+    </span>
+</a>
+<nav aria-label="System Components" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#high-level-architecture">
+<span class="md-ellipsis">
+      
+        High-Level Architecture
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#component-details">
+<span class="md-ellipsis">
+      
+        Component Details
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#detailed-flow-diagrams">
+<span class="md-ellipsis">
+      
+        Detailed Flow Diagrams
+      
+    </span>
+</a>
+<nav aria-label="Detailed Flow Diagrams" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#authentication-flows">
+<span class="md-ellipsis">
+      
+        Authentication Flows
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#session-management-flow">
+<span class="md-ellipsis">
+      
+        Session Management Flow
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#authorization-flow-opa-policy-evaluation">
+<span class="md-ellipsis">
+      
+        Authorization Flow (OPA Policy Evaluation)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#siem-integration-flow">
+<span class="md-ellipsis">
+      
+        SIEM Integration Flow
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#rate-limiting-flow">
+<span class="md-ellipsis">
+      
+        Rate Limiting Flow
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#data-flow">
+<span class="md-ellipsis">
+      
+        Data Flow
+      
+    </span>
+</a>
+<nav aria-label="Data Flow" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#request-processing-flow">
+<span class="md-ellipsis">
+      
+        Request Processing Flow
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#event-driven-architecture">
+<span class="md-ellipsis">
+      
+        Event-Driven Architecture
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#enterprise-integration-patterns">
+<span class="md-ellipsis">
+      
+        Enterprise Integration Patterns
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#technology-stack">
+<span class="md-ellipsis">
+      
+        Technology Stack
+      
+    </span>
+</a>
+<nav aria-label="Technology Stack" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#core-technologies">
+<span class="md-ellipsis">
+      
+        Core Technologies
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#development-tools">
+<span class="md-ellipsis">
+      
+        Development Tools
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#design-principles">
+<span class="md-ellipsis">
+      
+        Design Principles
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deployment-architecture">
+<span class="md-ellipsis">
+      
+        Deployment Architecture
+      
+    </span>
+</a>
+<nav aria-label="Deployment Architecture" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#container-deployment-model">
+<span class="md-ellipsis">
+      
+        Container Deployment Model
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#multi-environment-strategy">
+<span class="md-ellipsis">
+      
+        Multi-Environment Strategy
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#security-architecture">
+<span class="md-ellipsis">
+      
+        Security Architecture
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#scalability-patterns">
+<span class="md-ellipsis">
+      
+        Scalability Patterns
+      
+    </span>
+</a>
+<nav aria-label="Scalability Patterns" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#horizontal-scaling">
+<span class="md-ellipsis">
+      
+        Horizontal Scaling
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#performance-optimization">
+<span class="md-ellipsis">
+      
+        Performance Optimization
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#resilience-reliability">
+<span class="md-ellipsis">
+      
+        Resilience &amp; Reliability
+      
+    </span>
+</a>
+<nav aria-label="Resilience &amp; Reliability" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#fault-tolerance">
+<span class="md-ellipsis">
+      
+        Fault Tolerance
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#high-availability-features">
+<span class="md-ellipsis">
+      
+        High Availability Features
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#monitoring-observability">
+<span class="md-ellipsis">
+      
+        Monitoring &amp; Observability
+      
+    </span>
+</a>
+<nav aria-label="Monitoring &amp; Observability" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#the-three-pillars">
+<span class="md-ellipsis">
+      
+        The Three Pillars
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#future-considerations">
+<span class="md-ellipsis">
+      
+        Future Considerations
+      
+    </span>
+</a>
+<nav aria-label="Future Considerations" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#planned-enhancements">
+<span class="md-ellipsis">
+      
+        Planned Enhancements
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#technology-evaluation">
+<span class="md-ellipsis">
+      
+        Technology Evaluation
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../SECURITY/">
+<span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../PERFORMANCE/">
+<span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_4">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../DEPLOYMENT/">
+<span class="md-ellipsis">
+    
+  
+    Deployment Guide
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../DOCKER_DEPLOYMENT/">
+<span class="md-ellipsis">
+    
+  
+    Docker Deployment
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../PRODUCTION_DEPLOYMENT/">
+<span class="md-ellipsis">
+    
+  
+    Production Deployment
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../PRODUCTION_CONFIG/">
+<span class="md-ellipsis">
+    
+  
+    Production Config
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../PRODUCTION_READINESS/">
+<span class="md-ellipsis">
+    
+  
+    Production Readiness
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../DEPLOYMENT_CHECKLIST/">
+<span class="md-ellipsis">
+    
+  
+    Deployment Checklist
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../DISASTER_RECOVERY/">
+<span class="md-ellipsis">
+    
+  
+    Disaster Recovery
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../ROLLBACK_PROCEDURES/">
+<span class="md-ellipsis">
+    
+  
+    Rollback Procedures
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_5" type="checkbox"/>
+<label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Authentication &amp; Authorization
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_5_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_5">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Authentication &amp; Authorization
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../AUTHENTICATION/">
+<span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../AUTHORIZATION/">
+<span class="md-ellipsis">
+    
+  
+    Authorization
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../OIDC_SETUP/">
+<span class="md-ellipsis">
+    
+  
+    OIDC Setup
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../LDAP_SETUP/">
+<span class="md-ellipsis">
+    
+  
+    LDAP Setup
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../SAML_SETUP/">
+<span class="md-ellipsis">
+    
+  
+    SAML Setup
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../API_KEYS/">
+<span class="md-ellipsis">
+    
+  
+    API Keys
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_6" type="checkbox"/>
+<label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Policies
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_6_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_6">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Policies
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../OPA_POLICY_GUIDE/">
+<span class="md-ellipsis">
+    
+  
+    OPA Policy Guide
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../ADVANCED_OPA_POLICIES/">
+<span class="md-ellipsis">
+    
+  
+    Advanced OPA Policies
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../POLICY_OPTIMIZATION/">
+<span class="md-ellipsis">
+    
+  
+    Policy Optimization
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../POLICY_CACHING/">
+<span class="md-ellipsis">
+    
+  
+    Policy Caching
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../POLICY_AUDIT_GUIDE/">
+<span class="md-ellipsis">
+    
+  
+    Policy Audit Guide
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../POLICY_AUDIT_TRAIL/">
+<span class="md-ellipsis">
+    
+  
+    Policy Audit Trail
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_7" type="checkbox"/>
+<label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Operations
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_7_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_7">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Operations
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../MONITORING/">
+<span class="md-ellipsis">
+    
+  
+    Monitoring
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../MONITORING_SETUP/">
+<span class="md-ellipsis">
+    
+  
+    Monitoring Setup
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../OPERATIONAL_RUNBOOK/">
+<span class="md-ellipsis">
+    
+  
+    Operational Runbook
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../OPERATIONS_RUNBOOK/">
+<span class="md-ellipsis">
+    
+  
+    Operations Runbook
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../INCIDENT_RESPONSE/">
+<span class="md-ellipsis">
+    
+  
+    Incident Response
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../TROUBLESHOOTING/">
+<span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_8" type="checkbox"/>
+<label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Database
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_8_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_8">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Database
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../DATABASE_MIGRATIONS/">
+<span class="md-ellipsis">
+    
+  
+    Database Migrations
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../DATABASE_OPTIMIZATION/">
+<span class="md-ellipsis">
+    
+  
+    Database Optimization
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../REDIS_OPTIMIZATION/">
+<span class="md-ellipsis">
+    
+  
+    Redis Optimization
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_9" type="checkbox"/>
+<label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_9_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_9">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Performance
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../PERFORMANCE_TESTING/">
+<span class="md-ellipsis">
+    
+  
+    Performance Testing
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../PERFORMANCE_TUNING/">
+<span class="md-ellipsis">
+    
+  
+    Performance Tuning
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../PERFORMANCE_OPTIMIZATION/">
+<span class="md-ellipsis">
+    
+  
+    Performance Optimization
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../PERFORMANCE_REPORT/">
+<span class="md-ellipsis">
+    
+  
+    Performance Report
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../POLICY_PERFORMANCE_REPORT/">
+<span class="md-ellipsis">
+    
+  
+    Policy Performance
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_10" type="checkbox"/>
+<label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_10_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_10">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../API_REFERENCE/">
+<span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../API_INTEGRATION/">
+<span class="md-ellipsis">
+    
+  
+    API Integration
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_11" type="checkbox"/>
+<label class="md-nav__link" for="__nav_11" id="__nav_11_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_11_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_11">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../DEVELOPMENT/">
+<span class="md-ellipsis">
+    
+  
+    Development Guide
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../MIGRATION_GUIDE/">
+<span class="md-ellipsis">
+    
+  
+    Migration Guide
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../DEVELOPMENT_LOG/">
+<span class="md-ellipsis">
+    
+  
+    Development Log
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../TESTING_STRATEGY/">
+<span class="md-ellipsis">
+    
+  
+    Testing Strategy
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../INTEGRATION_TESTING/">
+<span class="md-ellipsis">
+    
+  
+    Integration Testing
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_12" type="checkbox"/>
+<label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Reports
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_12_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_12">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Reports
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../EXECUTIVE_SUMMARY/">
+<span class="md-ellipsis">
+    
+  
+    Executive Summary
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../ROADMAP/">
+<span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../IMPLEMENTATION_PLAN/">
+<span class="md-ellipsis">
+    
+  
+    Implementation Plan
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../GAP_ANALYSIS/">
+<span class="md-ellipsis">
+    
+  
+    Gap Analysis
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../PHASE2_COMPLETION_REPORT/">
+<span class="md-ellipsis">
+    
+  
+    Phase 2 Completion
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../RELEASE_NOTES_v0.2.0/">
+<span class="md-ellipsis">
+    
+  
+    Release Notes v0.2.0
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../FINAL_TEST_REPORT/">
+<span class="md-ellipsis">
+    
+  
+    Final Test Report
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../TEST_COVERAGE_REPORT/">
+<span class="md-ellipsis">
+    
+  
+    Test Coverage Report
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../KNOWN_ISSUES/">
+<span class="md-ellipsis">
+    
+  
+    Known Issues
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../LESSONS_LEARNED/">
+<span class="md-ellipsis">
+    
+  
+    Lessons Learned
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_13" type="checkbox"/>
+<label class="md-nav__link" for="__nav_13" id="__nav_13_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Planning
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_13_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_13">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Planning
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../REPOSITORY_IMPROVEMENT_PLAN/">
+<span class="md-ellipsis">
+    
+  
+    Repository Improvement Plan
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../WORK_BREAKDOWN_SESSIONS/">
+<span class="md-ellipsis">
+    
+  
+    Work Breakdown Sessions
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../WORK_TASKS/">
+<span class="md-ellipsis">
+    
+  
+    Work Tasks
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../PHASE2_3WEEK_PLAN/">
+<span class="md-ellipsis">
+    
+  
+    Phase 2 3-Week Plan
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../WEEK_2_SUMMARY/">
+<span class="md-ellipsis">
+    
+  
+    Week 2 Summary
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../WEEK_3_SUMMARY/">
+<span class="md-ellipsis">
+    
+  
+    Week 3 Summary
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_14" type="checkbox"/>
+<label class="md-nav__link" for="__nav_14" id="__nav_14_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_14_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_14">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../GLOSSARY/">
+<span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../FAQ/">
+<span class="md-ellipsis">
+    
+  
+    FAQ
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../SECURITY_BEST_PRACTICES/">
+<span class="md-ellipsis">
+    
+  
+    Security Best Practices
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../SECURITY_HARDENING/">
+<span class="md-ellipsis">
+    
+  
+    Security Hardening
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../SECURITY_AUDIT/">
+<span class="md-ellipsis">
+    
+  
+    Security Audit
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../PRODUCTION_HANDOFF/">
+<span class="md-ellipsis">
+    
+  
+    Production Handoff
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#overview">
+<span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#system-components">
+<span class="md-ellipsis">
+      
+        System Components
+      
+    </span>
+</a>
+<nav aria-label="System Components" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#high-level-architecture">
+<span class="md-ellipsis">
+      
+        High-Level Architecture
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#component-details">
+<span class="md-ellipsis">
+      
+        Component Details
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#detailed-flow-diagrams">
+<span class="md-ellipsis">
+      
+        Detailed Flow Diagrams
+      
+    </span>
+</a>
+<nav aria-label="Detailed Flow Diagrams" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#authentication-flows">
+<span class="md-ellipsis">
+      
+        Authentication Flows
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#session-management-flow">
+<span class="md-ellipsis">
+      
+        Session Management Flow
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#authorization-flow-opa-policy-evaluation">
+<span class="md-ellipsis">
+      
+        Authorization Flow (OPA Policy Evaluation)
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#siem-integration-flow">
+<span class="md-ellipsis">
+      
+        SIEM Integration Flow
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#rate-limiting-flow">
+<span class="md-ellipsis">
+      
+        Rate Limiting Flow
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#data-flow">
+<span class="md-ellipsis">
+      
+        Data Flow
+      
+    </span>
+</a>
+<nav aria-label="Data Flow" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#request-processing-flow">
+<span class="md-ellipsis">
+      
+        Request Processing Flow
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#event-driven-architecture">
+<span class="md-ellipsis">
+      
+        Event-Driven Architecture
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#enterprise-integration-patterns">
+<span class="md-ellipsis">
+      
+        Enterprise Integration Patterns
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#technology-stack">
+<span class="md-ellipsis">
+      
+        Technology Stack
+      
+    </span>
+</a>
+<nav aria-label="Technology Stack" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#core-technologies">
+<span class="md-ellipsis">
+      
+        Core Technologies
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#development-tools">
+<span class="md-ellipsis">
+      
+        Development Tools
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#design-principles">
+<span class="md-ellipsis">
+      
+        Design Principles
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#deployment-architecture">
+<span class="md-ellipsis">
+      
+        Deployment Architecture
+      
+    </span>
+</a>
+<nav aria-label="Deployment Architecture" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#container-deployment-model">
+<span class="md-ellipsis">
+      
+        Container Deployment Model
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#multi-environment-strategy">
+<span class="md-ellipsis">
+      
+        Multi-Environment Strategy
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#security-architecture">
+<span class="md-ellipsis">
+      
+        Security Architecture
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#scalability-patterns">
+<span class="md-ellipsis">
+      
+        Scalability Patterns
+      
+    </span>
+</a>
+<nav aria-label="Scalability Patterns" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#horizontal-scaling">
+<span class="md-ellipsis">
+      
+        Horizontal Scaling
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#performance-optimization">
+<span class="md-ellipsis">
+      
+        Performance Optimization
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#resilience-reliability">
+<span class="md-ellipsis">
+      
+        Resilience &amp; Reliability
+      
+    </span>
+</a>
+<nav aria-label="Resilience &amp; Reliability" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#fault-tolerance">
+<span class="md-ellipsis">
+      
+        Fault Tolerance
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#high-availability-features">
+<span class="md-ellipsis">
+      
+        High Availability Features
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#monitoring-observability">
+<span class="md-ellipsis">
+      
+        Monitoring &amp; Observability
+      
+    </span>
+</a>
+<nav aria-label="Monitoring &amp; Observability" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#the-three-pillars">
+<span class="md-ellipsis">
+      
+        The Three Pillars
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#future-considerations">
+<span class="md-ellipsis">
+      
+        Future Considerations
+      
+    </span>
+</a>
+<nav aria-label="Future Considerations" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#planned-enhancements">
+<span class="md-ellipsis">
+      
+        Planned Enhancements
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#technology-evaluation">
+<span class="md-ellipsis">
+      
+        Technology Evaluation
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<nav aria-label="Navigation" class="md-path">
+<ol class="md-path__list">
+<li class="md-path__item">
+<a class="md-path__link" href="..">
+<span class="md-ellipsis">
+    Home
+  </span>
+</a>
+</li>
+<li class="md-path__item">
+<a class="md-path__link" href="./">
+<span class="md-ellipsis">
+    Architecture
+  </span>
+</a>
+</li>
+</ol>
+</nav>
+<article class="md-content__inner md-typeset">
+<h1 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">¶</a></h1>
+<blockquote>
+<p><em>"He's not any kind of user, SARK, he's a program."</em> —MCP, probably</p>
+</blockquote>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">¶</a></h2>
+<p>SARK is designed as a scalable, enterprise-grade platform for orchestration and automation. The architecture follows modern cloud-native principles with a focus on reliability, observability, and extensibility.</p>
+<h2 id="system-components">System Components<a class="headerlink" href="#system-components" title="Permanent link">¶</a></h2>
+<h3 id="high-level-architecture">High-Level Architecture<a class="headerlink" href="#high-level-architecture" title="Permanent link">¶</a></h3>
+<div class="mermaid">graph TB
+    subgraph "Presentation Layer"
+        API[REST API Gateway]
+        WEB[Web Interface]
+        CLI[CLI Client]
+    end
+
+    subgraph "Application Layer"
+        AUTH[Authentication Service]
+        AUTHZ[Authorization Service]
+        ORCH[Orchestration Engine]
+        TASK[Task Scheduler]
+        WORK[Worker Pool]
+        PLUG[Plugin Manager]
+    end
+
+    subgraph "Data Layer"
+        CACHE[(Redis Cache)]
+        DB[(Primary Database)]
+        QUEUE[(Message Queue)]
+        BLOB[(Object Storage)]
+    end
+
+    subgraph "Infrastructure Layer"
+        MON[Monitoring]
+        LOG[Logging]
+        TRACE[Tracing]
+        METRICS[Metrics]
+    end
+
+    API --&gt; AUTH
+    WEB --&gt; AUTH
+    CLI --&gt; AUTH
+
+    AUTH --&gt; AUTHZ
+    AUTHZ --&gt; ORCH
+    ORCH --&gt; TASK
+    TASK --&gt; QUEUE
+    WORK --&gt; QUEUE
+    ORCH --&gt; PLUG
+
+    WORK --&gt; DB
+    WORK --&gt; CACHE
+    WORK --&gt; BLOB
+
+    API --&gt; LOG
+    ORCH --&gt; METRICS
+    WORK --&gt; TRACE
+
+    style Application Layer fill:#4a90e2
+    style Data Layer fill:#f5a623
+    style Infrastructure Layer fill:#50c878
+</div>
+<h3 id="component-details">Component Details<a class="headerlink" href="#component-details" title="Permanent link">¶</a></h3>
+<h4 id="api-gateway">API Gateway<a class="headerlink" href="#api-gateway" title="Permanent link">¶</a></h4>
+<ul>
+<li>RESTful API endpoints</li>
+<li>Request validation and rate limiting</li>
+<li>API versioning support</li>
+<li>OpenAPI/Swagger documentation</li>
+<li>WebSocket support for real-time updates</li>
+</ul>
+<h4 id="authentication-authorization">Authentication &amp; Authorization<a class="headerlink" href="#authentication-authorization" title="Permanent link">¶</a></h4>
+<ul>
+<li>Multi-provider authentication (LDAP, SAML, OIDC, OAuth2)</li>
+<li>JWT token-based sessions</li>
+<li>Role-Based Access Control (RBAC)</li>
+<li>Attribute-Based Access Control (ABAC)</li>
+<li>API key management</li>
+</ul>
+<hr/>
+<h2 id="detailed-flow-diagrams">Detailed Flow Diagrams<a class="headerlink" href="#detailed-flow-diagrams" title="Permanent link">¶</a></h2>
+<h3 id="authentication-flows">Authentication Flows<a class="headerlink" href="#authentication-flows" title="Permanent link">¶</a></h3>
+<h4 id="ldap-authentication-flow">LDAP Authentication Flow<a class="headerlink" href="#ldap-authentication-flow" title="Permanent link">¶</a></h4>
+<div class="mermaid">sequenceDiagram
+    participant Client
+    participant API as SARK API
+    participant Auth as Auth Service
+    participant LDAP as LDAP Server
+    participant Redis as Redis (Sessions)
+    participant DB as PostgreSQL
+
+    Client-&gt;&gt;API: POST /api/v1/auth/login/ldap<br/>{username, password}
+    API-&gt;&gt;Auth: Authenticate(credentials)
+
+    Auth-&gt;&gt;LDAP: LDAP Bind<br/>(username, password)
+    LDAP--&gt;&gt;Auth: Bind Success + User Attributes
+
+    Auth-&gt;&gt;Auth: Extract roles, teams, groups
+    Auth-&gt;&gt;Auth: Generate JWT access token (60 min)
+    Auth-&gt;&gt;Auth: Generate refresh token ID
+
+    Auth-&gt;&gt;Redis: SETEX refresh_token:user:{user_id}:{token_id}<br/>TTL: 7 days<br/>Value: {user_data, ip, user_agent}
+    Redis--&gt;&gt;Auth: OK
+
+    Auth-&gt;&gt;DB: INSERT INTO audit_events<br/>(authentication_success)
+    DB--&gt;&gt;Auth: OK
+
+    Auth--&gt;&gt;API: {access_token, refresh_token, user}
+    API--&gt;&gt;Client: 200 OK<br/>{access_token, refresh_token, user}
+
+    Note over Client,Redis: Client stores access token in memory<br/>and refresh token in secure storage
+</div>
+<h4 id="oidc-authentication-flow">OIDC Authentication Flow<a class="headerlink" href="#oidc-authentication-flow" title="Permanent link">¶</a></h4>
+<div class="mermaid">sequenceDiagram
+    participant User as User Browser
+    participant API as SARK API
+    participant Auth as Auth Service
+    participant IdP as OIDC Provider<br/>(Google/Okta/Auth0)
+    participant Redis as Redis
+    participant DB as PostgreSQL
+
+    User-&gt;&gt;API: GET /api/v1/auth/oidc/login
+    API-&gt;&gt;Auth: Initiate OIDC flow
+    Auth-&gt;&gt;Auth: Generate state + PKCE challenge
+    Auth-&gt;&gt;Redis: Store state (CSRF protection)
+    Auth--&gt;&gt;User: 307 Redirect to IdP<br/>+ state + code_challenge
+
+    User-&gt;&gt;IdP: Authorization request
+    IdP-&gt;&gt;User: Login page
+    User-&gt;&gt;IdP: Credentials
+    IdP--&gt;&gt;User: 302 Redirect to callback<br/>+ code + state
+
+    User-&gt;&gt;API: GET /api/v1/auth/oidc/callback?code=...&amp;state=...
+    API-&gt;&gt;Auth: Handle callback
+    Auth-&gt;&gt;Redis: Verify state
+    Redis--&gt;&gt;Auth: State valid
+
+    Auth-&gt;&gt;IdP: Exchange code for tokens<br/>(+ code_verifier for PKCE)
+    IdP--&gt;&gt;Auth: {id_token, access_token, refresh_token}
+
+    Auth-&gt;&gt;Auth: Verify ID token signature
+    Auth-&gt;&gt;Auth: Extract claims (email, roles)
+    Auth-&gt;&gt;Auth: Generate SARK JWT access token
+    Auth-&gt;&gt;Auth: Generate SARK refresh token
+
+    Auth-&gt;&gt;Redis: Store refresh token (7 days)
+    Auth-&gt;&gt;DB: Log authentication success
+
+    Auth--&gt;&gt;User: 200 OK + Set-Cookie<br/>{access_token, refresh_token, user}
+</div>
+<h4 id="saml-20-authentication-flow">SAML 2.0 Authentication Flow<a class="headerlink" href="#saml-20-authentication-flow" title="Permanent link">¶</a></h4>
+<div class="mermaid">sequenceDiagram
+    participant User as User Browser
+    participant API as SARK API/SP
+    participant IdP as SAML Identity Provider
+    participant Redis as Redis
+    participant DB as PostgreSQL
+
+    User-&gt;&gt;API: GET /api/auth/saml/login
+    API-&gt;&gt;API: Generate SAML AuthnRequest
+    API-&gt;&gt;API: Generate RelayState (session ID)
+    API-&gt;&gt;Redis: Store RelayState + metadata
+    API--&gt;&gt;User: 302 Redirect to IdP<br/>+ SAMLRequest + RelayState
+
+    User-&gt;&gt;IdP: SAML AuthnRequest
+    IdP-&gt;&gt;User: Login page
+    User-&gt;&gt;IdP: Credentials
+    IdP-&gt;&gt;IdP: Create SAML Assertion<br/>(signed + encrypted)
+    IdP--&gt;&gt;User: POST to ACS URL<br/>+ SAMLResponse + RelayState
+
+    User-&gt;&gt;API: POST /api/auth/saml/acs<br/>{SAMLResponse, RelayState}
+    API-&gt;&gt;API: Validate SAML Response signature
+    API-&gt;&gt;API: Decrypt SAML Assertion
+    API-&gt;&gt;API: Verify conditions (time, audience)
+    API-&gt;&gt;Redis: Verify RelayState
+
+    API-&gt;&gt;API: Extract attributes<br/>(email, name, roles)
+    API-&gt;&gt;API: Generate JWT access token
+    API-&gt;&gt;API: Generate refresh token
+
+    API-&gt;&gt;Redis: Store refresh token
+    API-&gt;&gt;DB: Log authentication success
+
+    API--&gt;&gt;User: 200 OK + HTML page<br/>with tokens + redirect
+</div>
+<hr/>
+<h3 id="session-management-flow">Session Management Flow<a class="headerlink" href="#session-management-flow" title="Permanent link">¶</a></h3>
+<div class="mermaid">sequenceDiagram
+    participant Client
+    participant API as SARK API
+    participant Auth as Auth Service
+    participant Redis as Redis
+    participant DB as PostgreSQL
+
+    Note over Client,DB: Initial Login (see Authentication Flows above)
+    Note over Client: Access token stored in memory (60 min TTL)
+    Note over Client: Refresh token stored securely (7 day TTL)
+
+    rect rgb(220, 240, 255)
+        Note over Client,API: Normal API Requests (Access Token Valid)
+        Client-&gt;&gt;API: GET /api/v1/servers<br/>Authorization: Bearer {access_token}
+        API-&gt;&gt;API: Validate JWT signature
+        API-&gt;&gt;API: Check expiration
+        API-&gt;&gt;API: Extract user context
+        API--&gt;&gt;Client: 200 OK + response data
+    end
+
+    rect rgb(255, 240, 220)
+        Note over Client,Redis: Access Token Expired - Refresh Flow
+        Client-&gt;&gt;API: GET /api/v1/servers<br/>Authorization: Bearer {expired_token}
+        API-&gt;&gt;API: Validate JWT
+        API--&gt;&gt;Client: 401 Unauthorized<br/>{error: "Token expired"}
+
+        Client-&gt;&gt;API: POST /api/v1/auth/refresh<br/>{refresh_token}
+        API-&gt;&gt;Auth: Refresh access token
+        Auth-&gt;&gt;Redis: GET refresh_token:user:{user_id}:{token_id}
+        Redis--&gt;&gt;Auth: Token data found
+
+        Auth-&gt;&gt;Auth: Validate refresh token<br/>(not expired, not revoked)
+        Auth-&gt;&gt;Auth: Check concurrent session limit (5)
+        Auth-&gt;&gt;Auth: Generate new JWT access token
+
+        alt Token rotation enabled
+            Auth-&gt;&gt;Auth: Generate new refresh token
+            Auth-&gt;&gt;Redis: DEL old refresh token
+            Auth-&gt;&gt;Redis: SETEX new refresh token (7 days)
+            Auth--&gt;&gt;Client: {new_access_token, new_refresh_token}
+        else Token rotation disabled
+            Auth-&gt;&gt;Redis: Update last_used timestamp
+            Auth--&gt;&gt;Client: {new_access_token}
+        end
+
+        Client-&gt;&gt;API: GET /api/v1/servers<br/>Authorization: Bearer {new_access_token}
+        API--&gt;&gt;Client: 200 OK + response data
+    end
+
+    rect rgb(255, 220, 220)
+        Note over Client,Redis: Logout - Revoke Session
+        Client-&gt;&gt;API: POST /api/v1/auth/revoke<br/>{refresh_token}
+        API-&gt;&gt;Auth: Revoke refresh token
+        Auth-&gt;&gt;Redis: DEL refresh_token:user:{user_id}:{token_id}
+        Redis--&gt;&gt;Auth: OK (1 deleted)
+        Auth-&gt;&gt;DB: Log logout event
+        Auth--&gt;&gt;Client: 200 OK {success: true}
+
+        Note over Client: Clear access token from memory
+        Note over Client: Clear refresh token from storage
+    end
+
+    rect rgb(240, 220, 255)
+        Note over Client,Redis: Concurrent Session Limit Enforcement
+        Client-&gt;&gt;API: POST /api/v1/auth/login/ldap
+        API-&gt;&gt;Auth: Authenticate
+        Auth-&gt;&gt;Auth: Login successful
+        Auth-&gt;&gt;Redis: KEYS refresh_token:user:{user_id}:*
+        Redis--&gt;&gt;Auth: 5 active sessions (at limit)
+
+        Auth-&gt;&gt;Redis: Get oldest session by timestamp
+        Auth-&gt;&gt;Redis: DEL refresh_token:user:{user_id}:{oldest_token_id}
+        Auth-&gt;&gt;Redis: SETEX new refresh token
+        Auth--&gt;&gt;Client: 200 OK {access_token, refresh_token}
+
+        Note over Client: Oldest session now invalid<br/>User must re-authenticate on that device
+    end
+</div>
+<hr/>
+<h3 id="authorization-flow-opa-policy-evaluation">Authorization Flow (OPA Policy Evaluation)<a class="headerlink" href="#authorization-flow-opa-policy-evaluation" title="Permanent link">¶</a></h3>
+<div class="mermaid">sequenceDiagram
+    participant Client
+    participant API as SARK API
+    participant AuthZ as Authorization Service
+    participant Redis as Redis (Policy Cache)
+    participant OPA as Open Policy Agent
+    participant DB as PostgreSQL (Audit)
+    participant SIEM as SIEM<br/>(Splunk/Datadog)
+
+    Client-&gt;&gt;API: POST /api/v1/policy/evaluate<br/>{user_id, action, tool, parameters}
+    API-&gt;&gt;AuthZ: Evaluate policy
+
+    AuthZ-&gt;&gt;AuthZ: Extract user context from JWT<br/>(roles, teams, permissions)
+    AuthZ-&gt;&gt;AuthZ: Build policy input:<br/>{user, action, tool, context}
+    AuthZ-&gt;&gt;AuthZ: Generate cache key:<br/>hash(user_id + action + resource + context)
+
+    AuthZ-&gt;&gt;Redis: GET policy:decision:{cache_key}
+
+    alt Cache HIT (80%+ of requests)
+        Redis--&gt;&gt;AuthZ: Cached decision<br/>{decision, reason, ttl}
+        AuthZ--&gt;&gt;API: 200 OK + X-Cache-Status: HIT<br/>{decision, reason, audit_id}
+        Note over AuthZ: Response time: &lt;5ms
+    else Cache MISS (20% of requests)
+        Redis--&gt;&gt;AuthZ: null (cache miss)
+
+        AuthZ-&gt;&gt;OPA: POST /v1/data/mcp/allow<br/>{input: {user, action, tool, context}}
+        OPA-&gt;&gt;OPA: Load policies from bundle
+        OPA-&gt;&gt;OPA: Evaluate rules:<br/>- RBAC (role-based)<br/>- Sensitivity level check<br/>- Time-based restrictions<br/>- IP-based restrictions<br/>- MFA requirements<br/>- Parameter filtering
+
+        OPA--&gt;&gt;AuthZ: {allow: true/false, reason, filtered_params}
+        Note over OPA: Response time: &lt;50ms
+
+        AuthZ-&gt;&gt;AuthZ: Determine cache TTL based on sensitivity:<br/>- Critical: 30s<br/>- High: 60s<br/>- Medium: 300s<br/>- Low: 600s
+
+        AuthZ-&gt;&gt;Redis: SETEX policy:decision:{cache_key}<br/>TTL: {sensitivity_ttl}<br/>Value: {decision, reason}
+
+        AuthZ--&gt;&gt;API: 200 OK + X-Cache-Status: MISS<br/>{decision, reason, filtered_parameters, audit_id}
+    end
+
+    par Async Audit Logging
+        AuthZ-&gt;&gt;DB: INSERT INTO audit_events<br/>(event_type='policy_decision',<br/> decision, user_id, action, reason)
+        DB--&gt;&gt;AuthZ: OK
+    and Async SIEM Forwarding
+        AuthZ-&gt;&gt;SIEM: Forward audit event<br/>(batched, async)
+        SIEM--&gt;&gt;AuthZ: OK (202 Accepted)
+    end
+
+    API--&gt;&gt;Client: Policy decision response
+
+    alt Decision: ALLOW
+        Client-&gt;&gt;API: Execute operation<br/>(e.g., invoke tool)
+        Note over Client: Operation proceeds
+    else Decision: DENY
+        Note over Client: Operation blocked<br/>Display denial reason to user
+    end
+</div>
+<hr/>
+<h3 id="siem-integration-flow">SIEM Integration Flow<a class="headerlink" href="#siem-integration-flow" title="Permanent link">¶</a></h3>
+<div class="mermaid">sequenceDiagram
+    participant App as SARK Application
+    participant Queue as SIEM Event Queue<br/>(In-Memory)
+    participant Forwarder as SIEM Forwarder
+    participant Redis as Redis<br/>(Circuit Breaker)
+    participant Splunk as Splunk HEC
+    participant Datadog as Datadog Logs API
+
+    Note over App,Datadog: Audit Event Generated
+
+    rect rgb(220, 255, 220)
+        Note over App,Queue: Event Queuing (Non-Blocking)
+        App-&gt;&gt;App: Generate audit event:<br/>{event_type, severity, user, action, timestamp}
+        App-&gt;&gt;Queue: Enqueue event (async)
+        Queue--&gt;&gt;App: Queued (non-blocking)
+        Note over App: Application continues<br/>(&lt; 1ms overhead)
+    end
+
+    rect rgb(220, 240, 255)
+        Note over Queue,Forwarder: Batch Processing
+        loop Every 5 seconds OR 100 events
+            Forwarder-&gt;&gt;Queue: Dequeue batch (up to 100 events)
+            Queue--&gt;&gt;Forwarder: Batch of events
+
+            Forwarder-&gt;&gt;Forwarder: Compress payload (gzip)
+            Forwarder-&gt;&gt;Forwarder: Format for target SIEM
+        end
+    end
+
+    rect rgb(255, 240, 220)
+        Note over Forwarder,Redis: Circuit Breaker Check
+        Forwarder-&gt;&gt;Redis: GET circuit:splunk:state
+
+        alt Circuit CLOSED (Normal)
+            Redis--&gt;&gt;Forwarder: "closed"
+            Note over Forwarder: Proceed with request
+        else Circuit OPEN (Too many failures)
+            Redis--&gt;&gt;Forwarder: "open"
+            Forwarder-&gt;&gt;Forwarder: Skip SIEM forwarding
+            Forwarder-&gt;&gt;Forwarder: Log to local file
+            Note over Forwarder: Wait for circuit to recover<br/>(30 seconds)
+        else Circuit HALF-OPEN (Testing)
+            Redis--&gt;&gt;Forwarder: "half_open"
+            Note over Forwarder: Send single test request
+        end
+    end
+
+    par Forward to Splunk
+        rect rgb(255, 250, 220)
+            Forwarder-&gt;&gt;Splunk: POST /services/collector/event<br/>Authorization: Splunk {hec_token}<br/>Body: {events: [...], compressed}
+
+            alt Splunk Success
+                Splunk--&gt;&gt;Forwarder: 200 OK {ackId}
+                Forwarder-&gt;&gt;Redis: INCR circuit:splunk:success
+                Forwarder-&gt;&gt;Forwarder: Mark events as sent
+                Note over Forwarder: Success! Events forwarded
+            else Splunk Failure (503, timeout)
+                Splunk--&gt;&gt;Forwarder: 503 Service Unavailable
+                Forwarder-&gt;&gt;Redis: INCR circuit:splunk:failure
+                Forwarder-&gt;&gt;Redis: Check failure threshold (5 consecutive)
+
+                alt Threshold exceeded
+                    Forwarder-&gt;&gt;Redis: SET circuit:splunk:state = "open"<br/>EXPIRE 30s
+                    Note over Redis: Circuit opened for 30s
+                end
+
+                Forwarder-&gt;&gt;Forwarder: Retry with exponential backoff<br/>(2s, 4s, 8s, 16s, 32s)
+
+                loop Retry up to 5 times
+                    Forwarder-&gt;&gt;Splunk: Retry POST
+                    alt Retry success
+                        Splunk--&gt;&gt;Forwarder: 200 OK
+                        Forwarder-&gt;&gt;Redis: RESET circuit:splunk:failure
+                    else All retries exhausted
+                        Forwarder-&gt;&gt;Forwarder: Log failure to disk
+                        Forwarder-&gt;&gt;Forwarder: Dead letter queue
+                        Note over Forwarder: Alert: SIEM forwarding failed
+                    end
+                end
+            end
+        end
+    and Forward to Datadog
+        rect rgb(220, 240, 255)
+            Forwarder-&gt;&gt;Datadog: POST /api/v2/logs<br/>DD-API-KEY: {api_key}<br/>Content-Encoding: gzip<br/>Body: {logs: [...]}
+
+            alt Datadog Success
+                Datadog--&gt;&gt;Forwarder: 202 Accepted
+                Forwarder-&gt;&gt;Redis: INCR circuit:datadog:success
+                Note over Forwarder: Events forwarded to Datadog
+            else Datadog Failure
+                Datadog--&gt;&gt;Forwarder: 429 Rate Limited
+                Forwarder-&gt;&gt;Redis: INCR circuit:datadog:failure
+                Forwarder-&gt;&gt;Forwarder: Apply backoff + retry logic
+            end
+        end
+    end
+
+    rect rgb(220, 255, 240)
+        Note over Forwarder,Datadog: Monitoring &amp; Metrics
+        Forwarder-&gt;&gt;Forwarder: Update metrics:<br/>- siem_events_forwarded_total{siem="splunk"}<br/>- siem_events_failed_total<br/>- siem_batch_size_bytes<br/>- siem_forward_duration_seconds
+    end
+</div>
+<hr/>
+<h3 id="rate-limiting-flow">Rate Limiting Flow<a class="headerlink" href="#rate-limiting-flow" title="Permanent link">¶</a></h3>
+<div class="mermaid">sequenceDiagram
+    participant Client
+    participant API as SARK API
+    participant RateLimit as Rate Limiter
+    participant Redis as Redis
+    participant Handler as Request Handler
+
+    Client-&gt;&gt;API: API Request<br/>Authorization: Bearer {token}
+    API-&gt;&gt;API: Extract authentication:<br/>- JWT user ID<br/>- API key<br/>- Client IP
+
+    API-&gt;&gt;RateLimit: Check rate limit(identifier, tier)
+
+    RateLimit-&gt;&gt;RateLimit: Determine tier:<br/>- Admin: bypass<br/>- User (JWT): 5000/min<br/>- API Key: 1000/min<br/>- IP: 100/min
+
+    alt Admin user
+        RateLimit--&gt;&gt;API: Bypass (unlimited)
+        API-&gt;&gt;Handler: Process request
+        Handler--&gt;&gt;Client: 200 OK + response
+    else Non-admin user
+        RateLimit-&gt;&gt;Redis: INCR rate:limit:{tier}:{identifier}:{minute}
+        Redis--&gt;&gt;RateLimit: Current count
+
+        RateLimit-&gt;&gt;Redis: TTL rate:limit:{tier}:{identifier}:{minute}
+
+        alt First request in window
+            Redis--&gt;&gt;RateLimit: -1 (key doesn't exist)
+            RateLimit-&gt;&gt;Redis: EXPIRE rate:limit:{tier}:{identifier}:{minute} 60
+        end
+
+        alt Under limit
+            RateLimit-&gt;&gt;RateLimit: requests &lt; limit
+            RateLimit--&gt;&gt;API: Allow<br/>(remaining = limit - requests)
+
+            API--&gt;&gt;Client: Response + Headers:<br/>X-RateLimit-Limit: 5000<br/>X-RateLimit-Remaining: 4987<br/>X-RateLimit-Reset: {unix_timestamp}
+
+            API-&gt;&gt;Handler: Process request
+            Handler--&gt;&gt;Client: 200 OK + response
+        else Over limit (no burst available)
+            RateLimit-&gt;&gt;RateLimit: requests &gt;= limit + burst
+            RateLimit-&gt;&gt;Redis: GET rate:limit:{tier}:{identifier}:{minute}
+            Redis--&gt;&gt;RateLimit: TTL remaining
+
+            RateLimit--&gt;&gt;API: Rate limit exceeded<br/>(retry_after = TTL)
+
+            API--&gt;&gt;Client: 429 Too Many Requests<br/>Headers:<br/>X-RateLimit-Limit: 5000<br/>X-RateLimit-Remaining: 0<br/>X-RateLimit-Reset: {unix_timestamp}<br/>Retry-After: 45<br/>Body:<br/>{<br/>  "detail": "Rate limit exceeded. Try again in 45 seconds.",<br/>  "retry_after": 45<br/>}
+
+            Note over Client: Wait 45 seconds before retrying
+        end
+    end
+</div>
+<h4 id="orchestration-engine">Orchestration Engine<a class="headerlink" href="#orchestration-engine" title="Permanent link">¶</a></h4>
+<ul>
+<li>Workflow definition and execution</li>
+<li>State machine implementation</li>
+<li>Error handling and retry logic</li>
+<li>Compensation transactions</li>
+<li>Event-driven architecture</li>
+</ul>
+<h4 id="task-scheduler">Task Scheduler<a class="headerlink" href="#task-scheduler" title="Permanent link">¶</a></h4>
+<ul>
+<li>Cron-based scheduling</li>
+<li>Event-triggered execution</li>
+<li>Priority queue management</li>
+<li>Dependency resolution</li>
+<li>Distributed coordination</li>
+</ul>
+<h4 id="worker-pool">Worker Pool<a class="headerlink" href="#worker-pool" title="Permanent link">¶</a></h4>
+<ul>
+<li>Horizontal scaling capabilities</li>
+<li>Task isolation and sandboxing</li>
+<li>Resource management</li>
+<li>Health checking</li>
+<li>Graceful shutdown</li>
+</ul>
+<h4 id="plugin-manager">Plugin Manager<a class="headerlink" href="#plugin-manager" title="Permanent link">¶</a></h4>
+<ul>
+<li>Dynamic plugin loading</li>
+<li>Dependency injection</li>
+<li>Plugin lifecycle management</li>
+<li>Isolation and security</li>
+<li>Hot-reload capabilities</li>
+</ul>
+<h2 id="data-flow">Data Flow<a class="headerlink" href="#data-flow" title="Permanent link">¶</a></h2>
+<h3 id="request-processing-flow">Request Processing Flow<a class="headerlink" href="#request-processing-flow" title="Permanent link">¶</a></h3>
+<div class="mermaid">sequenceDiagram
+    participant Client
+    participant API Gateway
+    participant Auth Service
+    participant Orchestrator
+    participant Task Queue
+    participant Worker
+    participant Database
+    participant External API
+
+    Client-&gt;&gt;API Gateway: HTTP Request
+    API Gateway-&gt;&gt;Auth Service: Validate credentials
+    Auth Service--&gt;&gt;API Gateway: Token validated
+
+    API Gateway-&gt;&gt;Orchestrator: Process task request
+    Orchestrator-&gt;&gt;Task Queue: Enqueue task
+    Orchestrator--&gt;&gt;API Gateway: Task accepted (202)
+    API Gateway--&gt;&gt;Client: Request ID
+
+    Worker-&gt;&gt;Task Queue: Poll for tasks
+    Task Queue--&gt;&gt;Worker: Task details
+    Worker-&gt;&gt;External API: Execute operation
+    External API--&gt;&gt;Worker: Result
+    Worker-&gt;&gt;Database: Store result
+    Worker-&gt;&gt;Task Queue: Mark complete
+
+    Client-&gt;&gt;API Gateway: Check status (Request ID)
+    API Gateway-&gt;&gt;Database: Query result
+    Database--&gt;&gt;API Gateway: Result data
+    API Gateway--&gt;&gt;Client: Task result (200)
+</div>
+<h3 id="event-driven-architecture">Event-Driven Architecture<a class="headerlink" href="#event-driven-architecture" title="Permanent link">¶</a></h3>
+<div class="mermaid">graph LR
+    subgraph "Event Sources"
+        EXT[External Webhooks]
+        SCHED[Scheduled Jobs]
+        USER[User Actions]
+        SYS[System Events]
+    end
+
+    subgraph "Event Bus"
+        BUS[Message Broker]
+    end
+
+    subgraph "Event Handlers"
+        H1[Handler: Deployment]
+        H2[Handler: Notifications]
+        H3[Handler: Analytics]
+        H4[Handler: Audit]
+    end
+
+    subgraph "Side Effects"
+        NOTIFY[Send Notifications]
+        LOG[Write Logs]
+        METRIC[Update Metrics]
+        DB[Update Database]
+    end
+
+    EXT --&gt; BUS
+    SCHED --&gt; BUS
+    USER --&gt; BUS
+    SYS --&gt; BUS
+
+    BUS --&gt; H1
+    BUS --&gt; H2
+    BUS --&gt; H3
+    BUS --&gt; H4
+
+    H1 --&gt; DB
+    H2 --&gt; NOTIFY
+    H3 --&gt; METRIC
+    H4 --&gt; LOG
+
+    style Event Bus fill:#4a90e2
+</div>
+<h3 id="enterprise-integration-patterns">Enterprise Integration Patterns<a class="headerlink" href="#enterprise-integration-patterns" title="Permanent link">¶</a></h3>
+<div class="mermaid">graph TB
+    subgraph "Integration Patterns"
+        direction TB
+
+        subgraph "Synchronous"
+            SYNC_REST[REST API Calls]
+            SYNC_RPC[gRPC Services]
+        end
+
+        subgraph "Asynchronous"
+            ASYNC_QUEUE[Message Queues]
+            ASYNC_EVENT[Event Streams]
+            ASYNC_WH[Webhooks]
+        end
+
+        subgraph "Batch"
+            BATCH_FILE[File Processing]
+            BATCH_ETL[ETL Pipelines]
+        end
+    end
+
+    subgraph "SARK Integration Layer"
+        ADAPTER[Protocol Adapters]
+        TRANSFORM[Data Transformers]
+        RETRY[Retry Handler]
+        CB[Circuit Breaker]
+    end
+
+    SYNC_REST --&gt; ADAPTER
+    SYNC_RPC --&gt; ADAPTER
+    ASYNC_QUEUE --&gt; ADAPTER
+    ASYNC_EVENT --&gt; ADAPTER
+    ASYNC_WH --&gt; ADAPTER
+    BATCH_FILE --&gt; ADAPTER
+    BATCH_ETL --&gt; ADAPTER
+
+    ADAPTER --&gt; TRANSFORM
+    TRANSFORM --&gt; RETRY
+    RETRY --&gt; CB
+
+    style SARK Integration Layer fill:#50c878
+</div>
+<h2 id="technology-stack">Technology Stack<a class="headerlink" href="#technology-stack" title="Permanent link">¶</a></h2>
+<h3 id="core-technologies">Core Technologies<a class="headerlink" href="#core-technologies" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>Language</strong>: Python 3.11</li>
+<li><strong>Containerization</strong>: Docker with Docker Compose v2</li>
+<li><strong>Testing</strong>: pytest with coverage</li>
+<li><strong>Type Checking</strong>: MyPy (strict mode)</li>
+<li><strong>Code Quality</strong>: Black, Ruff, Bandit</li>
+</ul>
+<h3 id="development-tools">Development Tools<a class="headerlink" href="#development-tools" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>Version Control</strong>: Git with Conventional Commits</li>
+<li><strong>CI/CD</strong>: GitHub Actions</li>
+<li><strong>Pre-commit Hooks</strong>: Automated quality checks</li>
+<li><strong>Dependency Management</strong>: pip with requirements files</li>
+</ul>
+<h2 id="design-principles">Design Principles<a class="headerlink" href="#design-principles" title="Permanent link">¶</a></h2>
+<ol>
+<li><strong>Type Safety</strong>: Strict type checking with MyPy</li>
+<li><strong>Code Quality</strong>: Automated linting and formatting</li>
+<li><strong>Testing</strong>: High test coverage (&gt;80%)</li>
+<li><strong>Security</strong>: Regular security scans with Bandit</li>
+<li><strong>Maintainability</strong>: Clear documentation and code standards</li>
+<li><strong>Scalability</strong>: Docker-based deployment ready for scaling</li>
+</ol>
+<h2 id="deployment-architecture">Deployment Architecture<a class="headerlink" href="#deployment-architecture" title="Permanent link">¶</a></h2>
+<h3 id="container-deployment-model">Container Deployment Model<a class="headerlink" href="#container-deployment-model" title="Permanent link">¶</a></h3>
+<div class="mermaid">graph TB
+    subgraph "Load Balancer"
+        LB[NGINX/HAProxy]
+    end
+
+    subgraph "API Tier - Auto-scaled"
+        API1[API Container 1]
+        API2[API Container 2]
+        API3[API Container N]
+    end
+
+    subgraph "Worker Tier - Auto-scaled"
+        W1[Worker Container 1]
+        W2[Worker Container 2]
+        W3[Worker Container N]
+    end
+
+    subgraph "Shared Services"
+        REDIS[(Redis Cluster)]
+        PG[(PostgreSQL)]
+        MQ[(RabbitMQ/Kafka)]
+        S3[(Object Storage)]
+    end
+
+    subgraph "Observability Stack"
+        PROM[Prometheus]
+        GRAF[Grafana]
+        JAEGER[Jaeger]
+        ELK[ELK Stack]
+    end
+
+    LB --&gt; API1
+    LB --&gt; API2
+    LB --&gt; API3
+
+    API1 --&gt; REDIS
+    API2 --&gt; REDIS
+    API3 --&gt; REDIS
+
+    API1 --&gt; PG
+    API2 --&gt; PG
+    API3 --&gt; PG
+
+    API1 --&gt; MQ
+    API2 --&gt; MQ
+    API3 --&gt; MQ
+
+    W1 --&gt; MQ
+    W2 --&gt; MQ
+    W3 --&gt; MQ
+
+    W1 --&gt; PG
+    W2 --&gt; PG
+    W3 --&gt; PG
+
+    W1 --&gt; S3
+    W2 --&gt; S3
+    W3 --&gt; S3
+
+    API1 --&gt; PROM
+    W1 --&gt; PROM
+    API1 --&gt; JAEGER
+    W1 --&gt; JAEGER
+    API1 --&gt; ELK
+    W1 --&gt; ELK
+
+    PROM --&gt; GRAF
+
+    style API Tier - Auto-scaled fill:#4a90e2
+    style Worker Tier - Auto-scaled fill:#50c878
+</div>
+<h3 id="multi-environment-strategy">Multi-Environment Strategy<a class="headerlink" href="#multi-environment-strategy" title="Permanent link">¶</a></h3>
+<div class="mermaid">graph LR
+    subgraph "Development"
+        DEV[Dev Environment<br/>Single Node<br/>In-memory stores]
+    end
+
+    subgraph "Staging"
+        STG[Staging Environment<br/>Production-like<br/>Reduced scale]
+    end
+
+    subgraph "Production"
+        subgraph "Region 1"
+            PROD1[Production Cluster<br/>HA Configuration<br/>Full monitoring]
+        end
+
+        subgraph "Region 2 (DR)"
+            PROD2[DR Cluster<br/>Hot Standby<br/>Geo-replication]
+        end
+    end
+
+    DEV --&gt;|Promote| STG
+    STG --&gt;|Promote| PROD1
+    PROD1 &lt;--&gt;|Replicate| PROD2
+
+    style Production fill:#f5a623
+</div>
+<h3 id="security-architecture">Security Architecture<a class="headerlink" href="#security-architecture" title="Permanent link">¶</a></h3>
+<div class="mermaid">graph TB
+    subgraph "Security Layers"
+        direction TB
+
+        subgraph "Network Security"
+            FW[Firewall]
+            WAF[Web Application Firewall]
+            DDOS[DDoS Protection]
+        end
+
+        subgraph "Application Security"
+            TLS[TLS Termination]
+            AUTHSEC[Authentication]
+            AUTHZSEC[Authorization]
+            VALID[Input Validation]
+        end
+
+        subgraph "Data Security"
+            ENC_TRANSIT[Encryption in Transit]
+            ENC_REST[Encryption at Rest]
+            MASK[Data Masking]
+            AUDIT[Audit Logging]
+        end
+
+        subgraph "Infrastructure Security"
+            SECRETS[Secret Management<br/>Vault/KMS]
+            SCAN[Security Scanning]
+            PATCH[Patch Management]
+            BACKUP[Backup &amp; Recovery]
+        end
+    end
+
+    FW --&gt; WAF
+    WAF --&gt; TLS
+    TLS --&gt; AUTHSEC
+    AUTHSEC --&gt; AUTHZSEC
+    AUTHZSEC --&gt; VALID
+    VALID --&gt; ENC_TRANSIT
+    ENC_TRANSIT --&gt; ENC_REST
+    ENC_REST --&gt; MASK
+    MASK --&gt; AUDIT
+    AUDIT --&gt; SECRETS
+
+    style Security Layers fill:#e74c3c
+</div>
+<h2 id="scalability-patterns">Scalability Patterns<a class="headerlink" href="#scalability-patterns" title="Permanent link">¶</a></h2>
+<h3 id="horizontal-scaling">Horizontal Scaling<a class="headerlink" href="#horizontal-scaling" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>API Layer</strong>: Stateless design allows unlimited horizontal scaling</li>
+<li><strong>Worker Pool</strong>: Auto-scaling based on queue depth and CPU/memory metrics</li>
+<li><strong>Database</strong>: Read replicas for query distribution, sharding for write scaling</li>
+<li><strong>Cache</strong>: Redis cluster with consistent hashing for distribution</li>
+</ul>
+<h3 id="performance-optimization">Performance Optimization<a class="headerlink" href="#performance-optimization" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>Caching Strategy</strong>: Multi-tier caching (in-memory, distributed, CDN)</li>
+<li><strong>Database Optimization</strong>: Indexing, query optimization, connection pooling</li>
+<li><strong>Async Processing</strong>: Long-running tasks moved to background workers</li>
+<li><strong>Resource Pooling</strong>: Connection pools, thread pools, object pools</li>
+</ul>
+<h2 id="resilience-reliability">Resilience &amp; Reliability<a class="headerlink" href="#resilience-reliability" title="Permanent link">¶</a></h2>
+<h3 id="fault-tolerance">Fault Tolerance<a class="headerlink" href="#fault-tolerance" title="Permanent link">¶</a></h3>
+<div class="mermaid">graph TB
+    REQUEST[Incoming Request]
+
+    REQUEST --&gt; RETRY{Retry Logic}
+    RETRY --&gt;|Success| SUCCESS[Success]
+    RETRY --&gt;|Failure| CB{Circuit Breaker}
+
+    CB --&gt;|Open| FALLBACK[Fallback Response]
+    CB --&gt;|Closed| TIMEOUT{Timeout}
+    CB --&gt;|Half-Open| TIMEOUT
+
+    TIMEOUT --&gt;|Within Limit| PROCESS[Process Request]
+    TIMEOUT --&gt;|Exceeded| FALLBACK
+
+    PROCESS --&gt;|Success| SUCCESS
+    PROCESS --&gt;|Failure| RETRY
+
+    style SUCCESS fill:#50c878
+    style FALLBACK fill:#f5a623
+</div>
+<h3 id="high-availability-features">High Availability Features<a class="headerlink" href="#high-availability-features" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>Multi-AZ Deployment</strong>: Resources distributed across availability zones</li>
+<li><strong>Health Checks</strong>: Automated health monitoring with auto-recovery</li>
+<li><strong>Graceful Degradation</strong>: Fallback mechanisms for non-critical services</li>
+<li><strong>Data Replication</strong>: Synchronous and asynchronous replication strategies</li>
+<li><strong>Backup Strategy</strong>: Automated backups with point-in-time recovery</li>
+</ul>
+<h2 id="monitoring-observability">Monitoring &amp; Observability<a class="headerlink" href="#monitoring-observability" title="Permanent link">¶</a></h2>
+<h3 id="the-three-pillars">The Three Pillars<a class="headerlink" href="#the-three-pillars" title="Permanent link">¶</a></h3>
+<ol>
+<li><strong>Metrics</strong> (Prometheus + Grafana)</li>
+<li>Application metrics (requests, latency, errors)</li>
+<li>System metrics (CPU, memory, disk, network)</li>
+<li>
+<p>Business metrics (task completion, user activity)</p>
+</li>
+<li>
+<p><strong>Logs</strong> (ELK Stack)</p>
+</li>
+<li>Structured JSON logging</li>
+<li>Centralized log aggregation</li>
+<li>Log retention and archival</li>
+<li>
+<p>Searchable audit trails</p>
+</li>
+<li>
+<p><strong>Traces</strong> (Jaeger)</p>
+</li>
+<li>Distributed tracing</li>
+<li>Request flow visualization</li>
+<li>Performance bottleneck identification</li>
+<li>Service dependency mapping</li>
+</ol>
+<h2 id="future-considerations">Future Considerations<a class="headerlink" href="#future-considerations" title="Permanent link">¶</a></h2>
+<h3 id="planned-enhancements">Planned Enhancements<a class="headerlink" href="#planned-enhancements" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>Multi-tenancy</strong>: Tenant isolation and resource quotas</li>
+<li><strong>Service Mesh</strong>: Istio/Linkerd for advanced traffic management</li>
+<li><strong>GraphQL API</strong>: Alternative API interface alongside REST</li>
+<li><strong>Real-time Streaming</strong>: WebSocket/SSE for live updates</li>
+<li><strong>ML/AI Integration</strong>: Intelligent task routing and anomaly detection</li>
+<li><strong>Federation</strong>: Multi-cluster deployment and management</li>
+<li><strong>Progressive Delivery</strong>: Canary deployments, blue-green deployments, feature flags</li>
+</ul>
+<h3 id="technology-evaluation">Technology Evaluation<a class="headerlink" href="#technology-evaluation" title="Permanent link">¶</a></h3>
+<ul>
+<li>Database architecture (PostgreSQL + TimescaleDB for time-series)</li>
+<li>Caching strategy (Redis Cluster + local caching)</li>
+<li>Message queue selection (Kafka for high-throughput, RabbitMQ for reliability)</li>
+<li>Service mesh adoption timeline</li>
+<li>Kubernetes vs. Docker Swarm for orchestration</li>
+</ul>
+<hr/>
+<p><strong>This document evolves with the project. Refer to commit history for architectural decisions and their rationale.</strong></p>
+</article>
+</div>
+<script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+</div>
+<button class="md-top md-icon" data-md-component="top" hidden="" type="button">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"></path></svg>
+  Back to top
+</button>
+</main>
+<footer class="md-footer">
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+<div class="md-copyright__highlight">
+      Copyright © 2024 James R. A. Henry. All rights reserved.
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
+      Material for MkDocs
+    </a>
+</div>
+<div class="md-social">
+<a class="md-social__link" href="https://github.com/apathy-ca/sark" rel="noopener" target="_blank" title="github.com">
+<svg viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"></path></svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.path", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+<script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+<script type="module">import mermaid from "https://unpkg.com/mermaid@10.4.0/dist/mermaid.esm.min.mjs";
+mermaid.initialize({});</script></body>
+</html>

@@ -1,0 +1,2956 @@
+
+<!DOCTYPE html>
+
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="Enterprise-Grade MCP Governance System" name="description"/>
+<meta content="James R. A. Henry" name="author"/>
+<link href="https://sark.example.com/architecture/ADAPTER_INTERFACE_CONTRACT/" rel="canonical"/>
+<link href="../../assets/images/favicon.png" rel="icon"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-9.7.1" name="generator"/>
+<title>Protocol Adapter Interface Contract - SARK - Security Audit and Resource Kontroler</title>
+<link href="../../assets/stylesheets/main.484c7ddc.min.css" rel="stylesheet"/>
+<link href="../../assets/stylesheets/palette.ab4e12ef.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config",""),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+<script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+</head>
+<body data-md-color-accent="indigo" data-md-color-primary="indigo" data-md-color-scheme="default" dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#protocol-adapter-interface-contract">
+          Skip to content
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<div data-md-color-scheme="default" data-md-component="outdated" hidden="">
+</div>
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="SARK - Security Audit and Resource Kontroler" class="md-header__button md-logo" data-md-component="logo" href="../.." title="SARK - Security Audit and Resource Kontroler">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            SARK - Security Audit and Resource Kontroler
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              Protocol Adapter Interface Contract
+            
+          </span>
+</div>
+</div>
+</div>
+<form class="md-header__option" data-md-component="palette">
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="" data-md-color-primary="indigo" data-md-color-scheme="default" id="__palette_0" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="" data-md-color-primary="indigo" data-md-color-scheme="slate" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_0" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+</form>
+<script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<a aria-label="Share" class="md-search__icon md-icon" data-clipboard="" data-clipboard-text="" data-md-component="search-share" href="javascript:void(0)" tabindex="-1" title="Share">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"></path></svg>
+</a>
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+</button>
+</nav>
+<div class="md-search__suggest" data-md-component="search-suggest"></div>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="" tabindex="0">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initializing search
+          </div>
+<ol class="md-search-result__list" role="presentation"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="md-header__source">
+<a class="md-source" data-md-component="source" href="https://github.com/apathy-ca/sark" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+</div>
+<div class="md-source__repository">
+    apathy-ca/sark
+  </div>
+</a>
+</div>
+</nav>
+<nav aria-label="Tabs" class="md-tabs" data-md-component="tabs">
+<div class="md-grid">
+<ul class="md-tabs__list">
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../..">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../QUICK_START/">
+          
+  
+  
+    
+  
+  Getting Started
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../ARCHITECTURE/">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../DEPLOYMENT/">
+          
+  
+  
+    
+  
+  Deployment
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../AUTHENTICATION/">
+          
+  
+  
+    
+  
+  Authentication &amp; Authorization
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../OPA_POLICY_GUIDE/">
+          
+  
+  
+    
+  
+  Policies
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../MONITORING/">
+          
+  
+  
+    
+  
+  Operations
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../DATABASE_MIGRATIONS/">
+          
+  
+  
+    
+  
+  Database
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../PERFORMANCE_TESTING/">
+          
+  
+  
+    
+  
+  Performance
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../API_REFERENCE/">
+          
+  
+  
+    
+  
+  API Reference
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../DEVELOPMENT/">
+          
+  
+  
+    
+  
+  Development
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../EXECUTIVE_SUMMARY/">
+          
+  
+  
+    
+  
+  Reports
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../REPOSITORY_IMPROVEMENT_PLAN/">
+          
+  
+  
+    
+  
+  Planning
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../GLOSSARY/">
+          
+  
+  
+    
+  
+  Reference
+
+        </a>
+</li>
+</ul>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary md-nav--lifted" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="SARK - Security Audit and Resource Kontroler" class="md-nav__button md-logo" data-md-component="logo" href="../.." title="SARK - Security Audit and Resource Kontroler">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+    SARK - Security Audit and Resource Kontroler
+  </label>
+<div class="md-nav__source">
+<a class="md-source" data-md-component="source" href="https://github.com/apathy-ca/sark" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+</div>
+<div class="md-source__repository">
+    apathy-ca/sark
+  </div>
+</a>
+</div>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../..">
+<span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../QUICK_START/">
+<span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../QUICK_REFERENCE_SESSIONS/">
+<span class="md-ellipsis">
+    
+  
+    Quick Reference
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../installation/">
+<span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../ARCHITECTURE/">
+<span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../SECURITY/">
+<span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PERFORMANCE/">
+<span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_4">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../DEPLOYMENT/">
+<span class="md-ellipsis">
+    
+  
+    Deployment Guide
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../DOCKER_DEPLOYMENT/">
+<span class="md-ellipsis">
+    
+  
+    Docker Deployment
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PRODUCTION_DEPLOYMENT/">
+<span class="md-ellipsis">
+    
+  
+    Production Deployment
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PRODUCTION_CONFIG/">
+<span class="md-ellipsis">
+    
+  
+    Production Config
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PRODUCTION_READINESS/">
+<span class="md-ellipsis">
+    
+  
+    Production Readiness
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../DEPLOYMENT_CHECKLIST/">
+<span class="md-ellipsis">
+    
+  
+    Deployment Checklist
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../DISASTER_RECOVERY/">
+<span class="md-ellipsis">
+    
+  
+    Disaster Recovery
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../ROLLBACK_PROCEDURES/">
+<span class="md-ellipsis">
+    
+  
+    Rollback Procedures
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_5" type="checkbox"/>
+<label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Authentication &amp; Authorization
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_5_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_5">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Authentication &amp; Authorization
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../AUTHENTICATION/">
+<span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../AUTHORIZATION/">
+<span class="md-ellipsis">
+    
+  
+    Authorization
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../OIDC_SETUP/">
+<span class="md-ellipsis">
+    
+  
+    OIDC Setup
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../LDAP_SETUP/">
+<span class="md-ellipsis">
+    
+  
+    LDAP Setup
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../SAML_SETUP/">
+<span class="md-ellipsis">
+    
+  
+    SAML Setup
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../API_KEYS/">
+<span class="md-ellipsis">
+    
+  
+    API Keys
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_6" type="checkbox"/>
+<label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Policies
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_6_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_6">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Policies
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../OPA_POLICY_GUIDE/">
+<span class="md-ellipsis">
+    
+  
+    OPA Policy Guide
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../ADVANCED_OPA_POLICIES/">
+<span class="md-ellipsis">
+    
+  
+    Advanced OPA Policies
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../POLICY_OPTIMIZATION/">
+<span class="md-ellipsis">
+    
+  
+    Policy Optimization
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../POLICY_CACHING/">
+<span class="md-ellipsis">
+    
+  
+    Policy Caching
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../POLICY_AUDIT_GUIDE/">
+<span class="md-ellipsis">
+    
+  
+    Policy Audit Guide
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../POLICY_AUDIT_TRAIL/">
+<span class="md-ellipsis">
+    
+  
+    Policy Audit Trail
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_7" type="checkbox"/>
+<label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Operations
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_7_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_7">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Operations
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../MONITORING/">
+<span class="md-ellipsis">
+    
+  
+    Monitoring
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../MONITORING_SETUP/">
+<span class="md-ellipsis">
+    
+  
+    Monitoring Setup
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../OPERATIONAL_RUNBOOK/">
+<span class="md-ellipsis">
+    
+  
+    Operational Runbook
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../OPERATIONS_RUNBOOK/">
+<span class="md-ellipsis">
+    
+  
+    Operations Runbook
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../INCIDENT_RESPONSE/">
+<span class="md-ellipsis">
+    
+  
+    Incident Response
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../TROUBLESHOOTING/">
+<span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_8" type="checkbox"/>
+<label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Database
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_8_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_8">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Database
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../DATABASE_MIGRATIONS/">
+<span class="md-ellipsis">
+    
+  
+    Database Migrations
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../DATABASE_OPTIMIZATION/">
+<span class="md-ellipsis">
+    
+  
+    Database Optimization
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../REDIS_OPTIMIZATION/">
+<span class="md-ellipsis">
+    
+  
+    Redis Optimization
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_9" type="checkbox"/>
+<label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_9_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_9">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Performance
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PERFORMANCE_TESTING/">
+<span class="md-ellipsis">
+    
+  
+    Performance Testing
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PERFORMANCE_TUNING/">
+<span class="md-ellipsis">
+    
+  
+    Performance Tuning
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PERFORMANCE_OPTIMIZATION/">
+<span class="md-ellipsis">
+    
+  
+    Performance Optimization
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PERFORMANCE_REPORT/">
+<span class="md-ellipsis">
+    
+  
+    Performance Report
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../POLICY_PERFORMANCE_REPORT/">
+<span class="md-ellipsis">
+    
+  
+    Policy Performance
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_10" type="checkbox"/>
+<label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_10_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_10">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../API_REFERENCE/">
+<span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../API_INTEGRATION/">
+<span class="md-ellipsis">
+    
+  
+    API Integration
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_11" type="checkbox"/>
+<label class="md-nav__link" for="__nav_11" id="__nav_11_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_11_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_11">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../DEVELOPMENT/">
+<span class="md-ellipsis">
+    
+  
+    Development Guide
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../MIGRATION_GUIDE/">
+<span class="md-ellipsis">
+    
+  
+    Migration Guide
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../DEVELOPMENT_LOG/">
+<span class="md-ellipsis">
+    
+  
+    Development Log
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../TESTING_STRATEGY/">
+<span class="md-ellipsis">
+    
+  
+    Testing Strategy
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../INTEGRATION_TESTING/">
+<span class="md-ellipsis">
+    
+  
+    Integration Testing
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_12" type="checkbox"/>
+<label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Reports
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_12_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_12">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Reports
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../EXECUTIVE_SUMMARY/">
+<span class="md-ellipsis">
+    
+  
+    Executive Summary
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../ROADMAP/">
+<span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../IMPLEMENTATION_PLAN/">
+<span class="md-ellipsis">
+    
+  
+    Implementation Plan
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../GAP_ANALYSIS/">
+<span class="md-ellipsis">
+    
+  
+    Gap Analysis
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PHASE2_COMPLETION_REPORT/">
+<span class="md-ellipsis">
+    
+  
+    Phase 2 Completion
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../RELEASE_NOTES_v0.2.0/">
+<span class="md-ellipsis">
+    
+  
+    Release Notes v0.2.0
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../FINAL_TEST_REPORT/">
+<span class="md-ellipsis">
+    
+  
+    Final Test Report
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../TEST_COVERAGE_REPORT/">
+<span class="md-ellipsis">
+    
+  
+    Test Coverage Report
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../KNOWN_ISSUES/">
+<span class="md-ellipsis">
+    
+  
+    Known Issues
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../LESSONS_LEARNED/">
+<span class="md-ellipsis">
+    
+  
+    Lessons Learned
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_13" type="checkbox"/>
+<label class="md-nav__link" for="__nav_13" id="__nav_13_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Planning
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_13_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_13">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Planning
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../REPOSITORY_IMPROVEMENT_PLAN/">
+<span class="md-ellipsis">
+    
+  
+    Repository Improvement Plan
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../WORK_BREAKDOWN_SESSIONS/">
+<span class="md-ellipsis">
+    
+  
+    Work Breakdown Sessions
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../WORK_TASKS/">
+<span class="md-ellipsis">
+    
+  
+    Work Tasks
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PHASE2_3WEEK_PLAN/">
+<span class="md-ellipsis">
+    
+  
+    Phase 2 3-Week Plan
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../WEEK_2_SUMMARY/">
+<span class="md-ellipsis">
+    
+  
+    Week 2 Summary
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../WEEK_3_SUMMARY/">
+<span class="md-ellipsis">
+    
+  
+    Week 3 Summary
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_14" type="checkbox"/>
+<label class="md-nav__link" for="__nav_14" id="__nav_14_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_14_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_14">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../GLOSSARY/">
+<span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../FAQ/">
+<span class="md-ellipsis">
+    
+  
+    FAQ
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../SECURITY_BEST_PRACTICES/">
+<span class="md-ellipsis">
+    
+  
+    Security Best Practices
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../SECURITY_HARDENING/">
+<span class="md-ellipsis">
+    
+  
+    Security Hardening
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../SECURITY_AUDIT/">
+<span class="md-ellipsis">
+    
+  
+    Security Audit
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PRODUCTION_HANDOFF/">
+<span class="md-ellipsis">
+    
+  
+    Production Handoff
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#purpose">
+<span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#table-of-contents">
+<span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#core-concept">
+<span class="md-ellipsis">
+      
+        Core Concept
+      
+    </span>
+</a>
+<nav aria-label="Core Concept" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#the-adapter-pattern">
+<span class="md-ellipsis">
+      
+        The Adapter Pattern
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#interface-definition">
+<span class="md-ellipsis">
+      
+        Interface Definition
+      
+    </span>
+</a>
+<nav aria-label="Interface Definition" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#location">
+<span class="md-ellipsis">
+      
+        Location
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#base-class">
+<span class="md-ellipsis">
+      
+        Base Class
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#required-methods">
+<span class="md-ellipsis">
+      
+        Required Methods
+      
+    </span>
+</a>
+<nav aria-label="Required Methods" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#1-protocol-identification">
+<span class="md-ellipsis">
+      
+        1. Protocol Identification
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#2-resource-discovery">
+<span class="md-ellipsis">
+      
+        2. Resource Discovery
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#3-capability-listing">
+<span class="md-ellipsis">
+      
+        3. Capability Listing
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#4-request-validation">
+<span class="md-ellipsis">
+      
+        4. Request Validation
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#5-capability-invocation">
+<span class="md-ellipsis">
+      
+        5. Capability Invocation
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#6-health-check">
+<span class="md-ellipsis">
+      
+        6. Health Check
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#optional-methods">
+<span class="md-ellipsis">
+      
+        Optional Methods
+      
+    </span>
+</a>
+<nav aria-label="Optional Methods" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#7-resource-lifecycle-hooks">
+<span class="md-ellipsis">
+      
+        7. Resource Lifecycle Hooks
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#8-streaming-support">
+<span class="md-ellipsis">
+      
+        8. Streaming Support
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#9-batch-operations">
+<span class="md-ellipsis">
+      
+        9. Batch Operations
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#10-capability-refresh">
+<span class="md-ellipsis">
+      
+        10. Capability Refresh
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#11-authentication">
+<span class="md-ellipsis">
+      
+        11. Authentication
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#12-introspection-methods">
+<span class="md-ellipsis">
+      
+        12. Introspection Methods
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#exception-handling">
+<span class="md-ellipsis">
+      
+        Exception Handling
+      
+    </span>
+</a>
+<nav aria-label="Exception Handling" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#exception-hierarchy">
+<span class="md-ellipsis">
+      
+        Exception Hierarchy
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#when-to-raise-exceptions">
+<span class="md-ellipsis">
+      
+        When to Raise Exceptions
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#exception-best-practices">
+<span class="md-ellipsis">
+      
+        Exception Best Practices
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#integration-points">
+<span class="md-ellipsis">
+      
+        Integration Points
+      
+    </span>
+</a>
+<nav aria-label="Integration Points" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#with-sark-core">
+<span class="md-ellipsis">
+      
+        With SARK Core
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#with-database">
+<span class="md-ellipsis">
+      
+        With Database
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#testing-requirements">
+<span class="md-ellipsis">
+      
+        Testing Requirements
+      
+    </span>
+</a>
+<nav aria-label="Testing Requirements" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#contract-test-suite">
+<span class="md-ellipsis">
+      
+        Contract Test Suite
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#test-coverage-requirements">
+<span class="md-ellipsis">
+      
+        Test Coverage Requirements
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#integration-tests">
+<span class="md-ellipsis">
+      
+        Integration Tests
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#examples">
+<span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+</a>
+<nav aria-label="Examples" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#complete-minimal-adapter">
+<span class="md-ellipsis">
+      
+        Complete Minimal Adapter
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#registration-and-usage">
+<span class="md-ellipsis">
+      
+        Registration and Usage
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#sign-off">
+<span class="md-ellipsis">
+      
+        Sign-Off
+      
+    </span>
+</a>
+<nav aria-label="Sign-Off" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#review-checklist">
+<span class="md-ellipsis">
+      
+        Review Checklist
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#approval">
+<span class="md-ellipsis">
+      
+        Approval
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#change-log">
+<span class="md-ellipsis">
+      
+        Change Log
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#questions-support">
+<span class="md-ellipsis">
+      
+        Questions &amp; Support
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<article class="md-content__inner md-typeset">
+<h1 id="protocol-adapter-interface-contract">Protocol Adapter Interface Contract<a class="headerlink" href="#protocol-adapter-interface-contract" title="Permanent link">¶</a></h1>
+<p><strong>Version:</strong> 2.0.0
+<strong>Status:</strong> 🔒 <strong>FROZEN</strong> (Week 1 Foundation Complete)
+<strong>Last Updated:</strong> November 28, 2025
+<strong>Owner:</strong> ENGINEER-1 (Lead Architect)</p>
+<hr/>
+<h2 id="purpose">Purpose<a class="headerlink" href="#purpose" title="Permanent link">¶</a></h2>
+<p>This document defines the <strong>complete and frozen</strong> interface contract for all SARK v2.0 protocol adapters. All adapter implementations (MCP, HTTP, gRPC, custom) <strong>MUST</strong> adhere to this contract.</p>
+<p><strong>🚨 CRITICAL:</strong> This interface is now <strong>FROZEN</strong> for v2.0 implementation. Changes require architecture review and approval from ENGINEER-1.</p>
+<hr/>
+<h2 id="table-of-contents">Table of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link">¶</a></h2>
+<ol>
+<li><a href="#core-concept">Core Concept</a></li>
+<li><a href="#interface-definition">Interface Definition</a></li>
+<li><a href="#required-methods">Required Methods</a></li>
+<li><a href="#optional-methods">Optional Methods</a></li>
+<li><a href="#exception-handling">Exception Handling</a></li>
+<li><a href="#integration-points">Integration Points</a></li>
+<li><a href="#testing-requirements">Testing Requirements</a></li>
+<li><a href="#examples">Examples</a></li>
+<li><a href="#sign-off">Sign-Off</a></li>
+</ol>
+<hr/>
+<h2 id="core-concept">Core Concept<a class="headerlink" href="#core-concept" title="Permanent link">¶</a></h2>
+<h3 id="the-adapter-pattern">The Adapter Pattern<a class="headerlink" href="#the-adapter-pattern" title="Permanent link">¶</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a>┌─────────────────────────────────────────────────────┐
+</span><span id="__span-0-2"><a href="#__codelineno-0-2" id="__codelineno-0-2" name="__codelineno-0-2"></a>│           SARK Core (Protocol-Agnostic)             │
+</span><span id="__span-0-3"><a href="#__codelineno-0-3" id="__codelineno-0-3" name="__codelineno-0-3"></a>│  ┌──────────┐  ┌──────┐  ┌──────┐  ┌──────────┐    │
+</span><span id="__span-0-4"><a href="#__codelineno-0-4" id="__codelineno-0-4" name="__codelineno-0-4"></a>│  │ Policy   │  │ Audit │  │ Auth │  │ Gateway  │    │
+</span><span id="__span-0-5"><a href="#__codelineno-0-5" id="__codelineno-0-5" name="__codelineno-0-5"></a>│  │ (OPA)    │  │ (TS) │  │      │  │          │    │
+</span><span id="__span-0-6"><a href="#__codelineno-0-6" id="__codelineno-0-6" name="__codelineno-0-6"></a>│  └──────────┘  └──────┘  └──────┘  └──────────┘    │
+</span><span id="__span-0-7"><a href="#__codelineno-0-7" id="__codelineno-0-7" name="__codelineno-0-7"></a>└───────────────────┬─────────────────────────────────┘
+</span><span id="__span-0-8"><a href="#__codelineno-0-8" id="__codelineno-0-8" name="__codelineno-0-8"></a>                    │ ProtocolAdapter Interface
+</span><span id="__span-0-9"><a href="#__codelineno-0-9" id="__codelineno-0-9" name="__codelineno-0-9"></a>        ┏━━━━━━━━━━━┻━━━━━━━━━━━━━━┓
+</span><span id="__span-0-10"><a href="#__codelineno-0-10" id="__codelineno-0-10" name="__codelineno-0-10"></a>        ┃                           ┃
+</span><span id="__span-0-11"><a href="#__codelineno-0-11" id="__codelineno-0-11" name="__codelineno-0-11"></a>   ┌────┴────┐   ┌──────────┐  ┌───┴────┐
+</span><span id="__span-0-12"><a href="#__codelineno-0-12" id="__codelineno-0-12" name="__codelineno-0-12"></a>   │   MCP   │   │   HTTP   │  │  gRPC  │
+</span><span id="__span-0-13"><a href="#__codelineno-0-13" id="__codelineno-0-13" name="__codelineno-0-13"></a>   │ Adapter │   │ Adapter  │  │ Adapter│
+</span><span id="__span-0-14"><a href="#__codelineno-0-14" id="__codelineno-0-14" name="__codelineno-0-14"></a>   └────┬────┘   └────┬─────┘  └────┬───┘
+</span><span id="__span-0-15"><a href="#__codelineno-0-15" id="__codelineno-0-15" name="__codelineno-0-15"></a>        │             │              │
+</span><span id="__span-0-16"><a href="#__codelineno-0-16" id="__codelineno-0-16" name="__codelineno-0-16"></a>   [MCP Servers] [REST APIs]   [gRPC Services]
+</span></code></pre></div>
+<p><strong>Key Principle:</strong> Adapters translate protocol-specific concepts into GRID's universal abstractions (Resource, Capability, Invocation).</p>
+<hr/>
+<h2 id="interface-definition">Interface Definition<a class="headerlink" href="#interface-definition" title="Permanent link">¶</a></h2>
+<h3 id="location">Location<a class="headerlink" href="#location" title="Permanent link">¶</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a href="#__codelineno-1-1" id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sark.adapters.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProtocolAdapter</span>
+</span></code></pre></div>
+<p><strong>File:</strong> <code>src/sark/adapters/base.py</code> (389 lines)</p>
+<h3 id="base-class">Base Class<a class="headerlink" href="#base-class" title="Permanent link">¶</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a href="#__codelineno-2-1" id="__codelineno-2-1" name="__codelineno-2-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">ProtocolAdapter</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+</span><span id="__span-2-2"><a href="#__codelineno-2-2" id="__codelineno-2-2" name="__codelineno-2-2"></a><span class="w">    </span><span class="sd">"""</span>
+</span><span id="__span-2-3"><a href="#__codelineno-2-3" id="__codelineno-2-3" name="__codelineno-2-3"></a><span class="sd">    Abstract base class for all protocol adapters.</span>
+</span><span id="__span-2-4"><a href="#__codelineno-2-4" id="__codelineno-2-4" name="__codelineno-2-4"></a>
+</span><span id="__span-2-5"><a href="#__codelineno-2-5" id="__codelineno-2-5" name="__codelineno-2-5"></a><span class="sd">    Each adapter translates protocol-specific concepts into GRID's</span>
+</span><span id="__span-2-6"><a href="#__codelineno-2-6" id="__codelineno-2-6" name="__codelineno-2-6"></a><span class="sd">    universal abstractions (Resource, Capability, Action).</span>
+</span><span id="__span-2-7"><a href="#__codelineno-2-7" id="__codelineno-2-7" name="__codelineno-2-7"></a><span class="sd">    """</span>
+</span></code></pre></div>
+<hr/>
+<h2 id="required-methods">Required Methods<a class="headerlink" href="#required-methods" title="Permanent link">¶</a></h2>
+<p>All adapters <strong>MUST</strong> implement these abstract methods.</p>
+<h3 id="1-protocol-identification">1. Protocol Identification<a class="headerlink" href="#1-protocol-identification" title="Permanent link">¶</a></h3>
+<h4 id="protocol_name-property"><code>protocol_name</code> (property)<a class="headerlink" href="#protocol_name-property" title="Permanent link">¶</a></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a href="#__codelineno-3-1" id="__codelineno-3-1" name="__codelineno-3-1"></a><span class="nd">@property</span>
+</span><span id="__span-3-2"><a href="#__codelineno-3-2" id="__codelineno-3-2" name="__codelineno-3-2"></a><span class="nd">@abstractmethod</span>
+</span><span id="__span-3-3"><a href="#__codelineno-3-3" id="__codelineno-3-3" name="__codelineno-3-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">protocol_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="__span-3-4"><a href="#__codelineno-3-4" id="__codelineno-3-4" name="__codelineno-3-4"></a><span class="w">    </span><span class="sd">"""</span>
+</span><span id="__span-3-5"><a href="#__codelineno-3-5" id="__codelineno-3-5" name="__codelineno-3-5"></a><span class="sd">    Return the protocol identifier.</span>
+</span><span id="__span-3-6"><a href="#__codelineno-3-6" id="__codelineno-3-6" name="__codelineno-3-6"></a>
+</span><span id="__span-3-7"><a href="#__codelineno-3-7" id="__codelineno-3-7" name="__codelineno-3-7"></a><span class="sd">    Returns:</span>
+</span><span id="__span-3-8"><a href="#__codelineno-3-8" id="__codelineno-3-8" name="__codelineno-3-8"></a><span class="sd">        str: Protocol name in lowercase (e.g., 'mcp', 'http', 'grpc')</span>
+</span><span id="__span-3-9"><a href="#__codelineno-3-9" id="__codelineno-3-9" name="__codelineno-3-9"></a>
+</span><span id="__span-3-10"><a href="#__codelineno-3-10" id="__codelineno-3-10" name="__codelineno-3-10"></a><span class="sd">    Examples:</span>
+</span><span id="__span-3-11"><a href="#__codelineno-3-11" id="__codelineno-3-11" name="__codelineno-3-11"></a><span class="sd">        - 'mcp' for Model Context Protocol</span>
+</span><span id="__span-3-12"><a href="#__codelineno-3-12" id="__codelineno-3-12" name="__codelineno-3-12"></a><span class="sd">        - 'http' for REST/HTTP APIs</span>
+</span><span id="__span-3-13"><a href="#__codelineno-3-13" id="__codelineno-3-13" name="__codelineno-3-13"></a><span class="sd">        - 'grpc' for gRPC services</span>
+</span><span id="__span-3-14"><a href="#__codelineno-3-14" id="__codelineno-3-14" name="__codelineno-3-14"></a><span class="sd">        - 'graphql' for GraphQL APIs</span>
+</span><span id="__span-3-15"><a href="#__codelineno-3-15" id="__codelineno-3-15" name="__codelineno-3-15"></a><span class="sd">    """</span>
+</span></code></pre></div>
+<p><strong>Contract:</strong>
+- MUST return lowercase string
+- MUST be unique across all registered adapters
+- SHOULD be stable across versions
+- MUST NOT contain spaces or special characters (use underscores)</p>
+<h4 id="protocol_version-property"><code>protocol_version</code> (property)<a class="headerlink" href="#protocol_version-property" title="Permanent link">¶</a></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a href="#__codelineno-4-1" id="__codelineno-4-1" name="__codelineno-4-1"></a><span class="nd">@property</span>
+</span><span id="__span-4-2"><a href="#__codelineno-4-2" id="__codelineno-4-2" name="__codelineno-4-2"></a><span class="nd">@abstractmethod</span>
+</span><span id="__span-4-3"><a href="#__codelineno-4-3" id="__codelineno-4-3" name="__codelineno-4-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">protocol_version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="__span-4-4"><a href="#__codelineno-4-4" id="__codelineno-4-4" name="__codelineno-4-4"></a><span class="w">    </span><span class="sd">"""</span>
+</span><span id="__span-4-5"><a href="#__codelineno-4-5" id="__codelineno-4-5" name="__codelineno-4-5"></a><span class="sd">    Return the protocol version this adapter supports.</span>
+</span><span id="__span-4-6"><a href="#__codelineno-4-6" id="__codelineno-4-6" name="__codelineno-4-6"></a>
+</span><span id="__span-4-7"><a href="#__codelineno-4-7" id="__codelineno-4-7" name="__codelineno-4-7"></a><span class="sd">    Returns:</span>
+</span><span id="__span-4-8"><a href="#__codelineno-4-8" id="__codelineno-4-8" name="__codelineno-4-8"></a><span class="sd">        str: Protocol version string (e.g., '2024-11-05', '1.0', 'v3')</span>
+</span><span id="__span-4-9"><a href="#__codelineno-4-9" id="__codelineno-4-9" name="__codelineno-4-9"></a>
+</span><span id="__span-4-10"><a href="#__codelineno-4-10" id="__codelineno-4-10" name="__codelineno-4-10"></a><span class="sd">    Examples:</span>
+</span><span id="__span-4-11"><a href="#__codelineno-4-11" id="__codelineno-4-11" name="__codelineno-4-11"></a><span class="sd">        - '2024-11-05' for MCP specification version</span>
+</span><span id="__span-4-12"><a href="#__codelineno-4-12" id="__codelineno-4-12" name="__codelineno-4-12"></a><span class="sd">        - '3.0' for OpenAPI 3.0</span>
+</span><span id="__span-4-13"><a href="#__codelineno-4-13" id="__codelineno-4-13" name="__codelineno-4-13"></a><span class="sd">        - '1.44.0' for gRPC version</span>
+</span><span id="__span-4-14"><a href="#__codelineno-4-14" id="__codelineno-4-14" name="__codelineno-4-14"></a><span class="sd">    """</span>
+</span></code></pre></div>
+<p><strong>Contract:</strong>
+- MUST return non-empty string
+- SHOULD use semantic versioning or spec dates
+- MUST be the version the adapter is coded against</p>
+<hr/>
+<h3 id="2-resource-discovery">2. Resource Discovery<a class="headerlink" href="#2-resource-discovery" title="Permanent link">¶</a></h3>
+<h4 id="discover_resources"><code>discover_resources()</code><a class="headerlink" href="#discover_resources" title="Permanent link">¶</a></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a href="#__codelineno-5-1" id="__codelineno-5-1" name="__codelineno-5-1"></a><span class="nd">@abstractmethod</span>
+</span><span id="__span-5-2"><a href="#__codelineno-5-2" id="__codelineno-5-2" name="__codelineno-5-2"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">discover_resources</span><span class="p">(</span>
+</span><span id="__span-5-3"><a href="#__codelineno-5-3" id="__codelineno-5-3" name="__codelineno-5-3"></a>    <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-5-4"><a href="#__codelineno-5-4" id="__codelineno-5-4" name="__codelineno-5-4"></a>    <span class="n">discovery_config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+</span><span id="__span-5-5"><a href="#__codelineno-5-5" id="__codelineno-5-5" name="__codelineno-5-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ResourceSchema</span><span class="p">]:</span>
+</span><span id="__span-5-6"><a href="#__codelineno-5-6" id="__codelineno-5-6" name="__codelineno-5-6"></a><span class="w">    </span><span class="sd">"""</span>
+</span><span id="__span-5-7"><a href="#__codelineno-5-7" id="__codelineno-5-7" name="__codelineno-5-7"></a><span class="sd">    Discover available resources for this protocol.</span>
+</span><span id="__span-5-8"><a href="#__codelineno-5-8" id="__codelineno-5-8" name="__codelineno-5-8"></a>
+</span><span id="__span-5-9"><a href="#__codelineno-5-9" id="__codelineno-5-9" name="__codelineno-5-9"></a><span class="sd">    Args:</span>
+</span><span id="__span-5-10"><a href="#__codelineno-5-10" id="__codelineno-5-10" name="__codelineno-5-10"></a><span class="sd">        discovery_config: Protocol-specific discovery configuration</span>
+</span><span id="__span-5-11"><a href="#__codelineno-5-11" id="__codelineno-5-11" name="__codelineno-5-11"></a>
+</span><span id="__span-5-12"><a href="#__codelineno-5-12" id="__codelineno-5-12" name="__codelineno-5-12"></a><span class="sd">    Returns:</span>
+</span><span id="__span-5-13"><a href="#__codelineno-5-13" id="__codelineno-5-13" name="__codelineno-5-13"></a><span class="sd">        List[ResourceSchema]: Discovered resources with their capabilities</span>
+</span><span id="__span-5-14"><a href="#__codelineno-5-14" id="__codelineno-5-14" name="__codelineno-5-14"></a>
+</span><span id="__span-5-15"><a href="#__codelineno-5-15" id="__codelineno-5-15" name="__codelineno-5-15"></a><span class="sd">    Raises:</span>
+</span><span id="__span-5-16"><a href="#__codelineno-5-16" id="__codelineno-5-16" name="__codelineno-5-16"></a><span class="sd">        DiscoveryError: If discovery fails</span>
+</span><span id="__span-5-17"><a href="#__codelineno-5-17" id="__codelineno-5-17" name="__codelineno-5-17"></a><span class="sd">        ConnectionError: If cannot connect to discovery endpoint</span>
+</span><span id="__span-5-18"><a href="#__codelineno-5-18" id="__codelineno-5-18" name="__codelineno-5-18"></a><span class="sd">        AuthenticationError: If authentication fails during discovery</span>
+</span><span id="__span-5-19"><a href="#__codelineno-5-19" id="__codelineno-5-19" name="__codelineno-5-19"></a><span class="sd">        ValidationError: If discovery_config is invalid</span>
+</span><span id="__span-5-20"><a href="#__codelineno-5-20" id="__codelineno-5-20" name="__codelineno-5-20"></a><span class="sd">    """</span>
+</span></code></pre></div>
+<p><strong>Contract:</strong></p>
+<p><strong>Input (<code>discovery_config</code>):</strong>
+- Format is protocol-specific (documented per adapter)
+- MUST include all required fields for discovery
+- MAY include authentication credentials
+- MUST be validated before use</p>
+<p><strong>Output (<code>List[ResourceSchema]</code>):</strong>
+- MUST return list (empty list if no resources found)
+- Each <code>ResourceSchema</code> MUST have:
+  - <code>id</code>: Unique identifier for the resource
+  - <code>name</code>: Human-readable name
+  - <code>protocol</code>: Matches <code>self.protocol_name</code>
+  - <code>endpoint</code>: Connection endpoint (URL, command, host:port, etc.)
+  - <code>sensitivity_level</code>: One of 'low', 'medium', 'high', 'critical'
+  - <code>metadata</code>: Protocol-specific metadata (dict)
+  - <code>created_at</code>: Discovery timestamp
+  - <code>updated_at</code>: Discovery timestamp</p>
+<p><strong>Error Handling:</strong>
+- MUST raise <code>DiscoveryError</code> for discovery failures
+- MUST raise <code>ConnectionError</code> for network/connection issues
+- MUST raise <code>AuthenticationError</code> if credentials are invalid
+- MUST include descriptive error messages with <code>details</code></p>
+<p><strong>Examples:</strong></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a href="#__codelineno-6-1" id="__codelineno-6-1" name="__codelineno-6-1"></a><span class="c1"># MCP Discovery</span>
+</span><span id="__span-6-2"><a href="#__codelineno-6-2" id="__codelineno-6-2" name="__codelineno-6-2"></a><span class="n">discovery_config</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-6-3"><a href="#__codelineno-6-3" id="__codelineno-6-3" name="__codelineno-6-3"></a>    <span class="s2">"transport"</span><span class="p">:</span> <span class="s2">"stdio"</span><span class="p">,</span>
+</span><span id="__span-6-4"><a href="#__codelineno-6-4" id="__codelineno-6-4" name="__codelineno-6-4"></a>    <span class="s2">"command"</span><span class="p">:</span> <span class="s2">"npx"</span><span class="p">,</span>
+</span><span id="__span-6-5"><a href="#__codelineno-6-5" id="__codelineno-6-5" name="__codelineno-6-5"></a>    <span class="s2">"args"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"-y"</span><span class="p">,</span> <span class="s2">"@modelcontextprotocol/server-filesystem"</span><span class="p">],</span>
+</span><span id="__span-6-6"><a href="#__codelineno-6-6" id="__codelineno-6-6" name="__codelineno-6-6"></a>    <span class="s2">"env"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"PATH"</span><span class="p">:</span> <span class="s2">"/usr/bin"</span><span class="p">}</span>
+</span><span id="__span-6-7"><a href="#__codelineno-6-7" id="__codelineno-6-7" name="__codelineno-6-7"></a><span class="p">}</span>
+</span><span id="__span-6-8"><a href="#__codelineno-6-8" id="__codelineno-6-8" name="__codelineno-6-8"></a>
+</span><span id="__span-6-9"><a href="#__codelineno-6-9" id="__codelineno-6-9" name="__codelineno-6-9"></a><span class="c1"># HTTP Discovery</span>
+</span><span id="__span-6-10"><a href="#__codelineno-6-10" id="__codelineno-6-10" name="__codelineno-6-10"></a><span class="n">discovery_config</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-6-11"><a href="#__codelineno-6-11" id="__codelineno-6-11" name="__codelineno-6-11"></a>    <span class="s2">"base_url"</span><span class="p">:</span> <span class="s2">"https://api.example.com"</span><span class="p">,</span>
+</span><span id="__span-6-12"><a href="#__codelineno-6-12" id="__codelineno-6-12" name="__codelineno-6-12"></a>    <span class="s2">"openapi_spec_url"</span><span class="p">:</span> <span class="s2">"https://api.example.com/openapi.json"</span><span class="p">,</span>
+</span><span id="__span-6-13"><a href="#__codelineno-6-13" id="__codelineno-6-13" name="__codelineno-6-13"></a>    <span class="s2">"auth"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"bearer"</span><span class="p">,</span> <span class="s2">"token"</span><span class="p">:</span> <span class="s2">"eyJ..."</span><span class="p">}</span>
+</span><span id="__span-6-14"><a href="#__codelineno-6-14" id="__codelineno-6-14" name="__codelineno-6-14"></a><span class="p">}</span>
+</span><span id="__span-6-15"><a href="#__codelineno-6-15" id="__codelineno-6-15" name="__codelineno-6-15"></a>
+</span><span id="__span-6-16"><a href="#__codelineno-6-16" id="__codelineno-6-16" name="__codelineno-6-16"></a><span class="c1"># gRPC Discovery</span>
+</span><span id="__span-6-17"><a href="#__codelineno-6-17" id="__codelineno-6-17" name="__codelineno-6-17"></a><span class="n">discovery_config</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-6-18"><a href="#__codelineno-6-18" id="__codelineno-6-18" name="__codelineno-6-18"></a>    <span class="s2">"host"</span><span class="p">:</span> <span class="s2">"api.example.com"</span><span class="p">,</span>
+</span><span id="__span-6-19"><a href="#__codelineno-6-19" id="__codelineno-6-19" name="__codelineno-6-19"></a>    <span class="s2">"port"</span><span class="p">:</span> <span class="mi">9090</span><span class="p">,</span>
+</span><span id="__span-6-20"><a href="#__codelineno-6-20" id="__codelineno-6-20" name="__codelineno-6-20"></a>    <span class="s2">"use_reflection"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="__span-6-21"><a href="#__codelineno-6-21" id="__codelineno-6-21" name="__codelineno-6-21"></a>    <span class="s2">"tls"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"enabled"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">"verify"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+</span><span id="__span-6-22"><a href="#__codelineno-6-22" id="__codelineno-6-22" name="__codelineno-6-22"></a><span class="p">}</span>
+</span></code></pre></div>
+<hr/>
+<h3 id="3-capability-listing">3. Capability Listing<a class="headerlink" href="#3-capability-listing" title="Permanent link">¶</a></h3>
+<h4 id="get_capabilities"><code>get_capabilities()</code><a class="headerlink" href="#get_capabilities" title="Permanent link">¶</a></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a href="#__codelineno-7-1" id="__codelineno-7-1" name="__codelineno-7-1"></a><span class="nd">@abstractmethod</span>
+</span><span id="__span-7-2"><a href="#__codelineno-7-2" id="__codelineno-7-2" name="__codelineno-7-2"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_capabilities</span><span class="p">(</span>
+</span><span id="__span-7-3"><a href="#__codelineno-7-3" id="__codelineno-7-3" name="__codelineno-7-3"></a>    <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-7-4"><a href="#__codelineno-7-4" id="__codelineno-7-4" name="__codelineno-7-4"></a>    <span class="n">resource</span><span class="p">:</span> <span class="n">ResourceSchema</span>
+</span><span id="__span-7-5"><a href="#__codelineno-7-5" id="__codelineno-7-5" name="__codelineno-7-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">CapabilitySchema</span><span class="p">]:</span>
+</span><span id="__span-7-6"><a href="#__codelineno-7-6" id="__codelineno-7-6" name="__codelineno-7-6"></a><span class="w">    </span><span class="sd">"""</span>
+</span><span id="__span-7-7"><a href="#__codelineno-7-7" id="__codelineno-7-7" name="__codelineno-7-7"></a><span class="sd">    Get all capabilities for a resource.</span>
+</span><span id="__span-7-8"><a href="#__codelineno-7-8" id="__codelineno-7-8" name="__codelineno-7-8"></a>
+</span><span id="__span-7-9"><a href="#__codelineno-7-9" id="__codelineno-7-9" name="__codelineno-7-9"></a><span class="sd">    Args:</span>
+</span><span id="__span-7-10"><a href="#__codelineno-7-10" id="__codelineno-7-10" name="__codelineno-7-10"></a><span class="sd">        resource: The resource to query</span>
+</span><span id="__span-7-11"><a href="#__codelineno-7-11" id="__codelineno-7-11" name="__codelineno-7-11"></a>
+</span><span id="__span-7-12"><a href="#__codelineno-7-12" id="__codelineno-7-12" name="__codelineno-7-12"></a><span class="sd">    Returns:</span>
+</span><span id="__span-7-13"><a href="#__codelineno-7-13" id="__codelineno-7-13" name="__codelineno-7-13"></a><span class="sd">        List[CapabilitySchema]: Capabilities available on this resource</span>
+</span><span id="__span-7-14"><a href="#__codelineno-7-14" id="__codelineno-7-14" name="__codelineno-7-14"></a>
+</span><span id="__span-7-15"><a href="#__codelineno-7-15" id="__codelineno-7-15" name="__codelineno-7-15"></a><span class="sd">    Raises:</span>
+</span><span id="__span-7-16"><a href="#__codelineno-7-16" id="__codelineno-7-16" name="__codelineno-7-16"></a><span class="sd">        ResourceNotFoundError: If resource doesn't exist</span>
+</span><span id="__span-7-17"><a href="#__codelineno-7-17" id="__codelineno-7-17" name="__codelineno-7-17"></a><span class="sd">        ConnectionError: If cannot connect to resource</span>
+</span><span id="__span-7-18"><a href="#__codelineno-7-18" id="__codelineno-7-18" name="__codelineno-7-18"></a><span class="sd">    """</span>
+</span></code></pre></div>
+<p><strong>Contract:</strong></p>
+<p><strong>Input (<code>resource</code>):</strong>
+- MUST be a valid <code>ResourceSchema</code> instance
+- MUST have <code>protocol</code> matching <code>self.protocol_name</code></p>
+<p><strong>Output (<code>List[CapabilitySchema]</code>):</strong>
+- MUST return list (empty if no capabilities)
+- Each <code>CapabilitySchema</code> MUST have:
+  - <code>id</code>: Unique identifier for the capability
+  - <code>resource_id</code>: Matches <code>resource.id</code>
+  - <code>name</code>: Capability name (tool name, endpoint name, method name)
+  - <code>description</code>: Optional human-readable description
+  - <code>input_schema</code>: JSON Schema or protocol-specific schema (dict)
+  - <code>output_schema</code>: JSON Schema or protocol-specific schema (dict)
+  - <code>sensitivity_level</code>: One of 'low', 'medium', 'high', 'critical'
+  - <code>metadata</code>: Protocol-specific metadata (e.g., HTTP method, gRPC package)</p>
+<p><strong>Caching:</strong>
+- Adapters MAY cache capabilities
+- Cache MUST be invalidated on <code>refresh_capabilities()</code> call
+- Cache key SHOULD be <code>resource.id</code></p>
+<hr/>
+<h3 id="4-request-validation">4. Request Validation<a class="headerlink" href="#4-request-validation" title="Permanent link">¶</a></h3>
+<h4 id="validate_request"><code>validate_request()</code><a class="headerlink" href="#validate_request" title="Permanent link">¶</a></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a href="#__codelineno-8-1" id="__codelineno-8-1" name="__codelineno-8-1"></a><span class="nd">@abstractmethod</span>
+</span><span id="__span-8-2"><a href="#__codelineno-8-2" id="__codelineno-8-2" name="__codelineno-8-2"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">validate_request</span><span class="p">(</span>
+</span><span id="__span-8-3"><a href="#__codelineno-8-3" id="__codelineno-8-3" name="__codelineno-8-3"></a>    <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-8-4"><a href="#__codelineno-8-4" id="__codelineno-8-4" name="__codelineno-8-4"></a>    <span class="n">request</span><span class="p">:</span> <span class="n">InvocationRequest</span>
+</span><span id="__span-8-5"><a href="#__codelineno-8-5" id="__codelineno-8-5" name="__codelineno-8-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="__span-8-6"><a href="#__codelineno-8-6" id="__codelineno-8-6" name="__codelineno-8-6"></a><span class="w">    </span><span class="sd">"""</span>
+</span><span id="__span-8-7"><a href="#__codelineno-8-7" id="__codelineno-8-7" name="__codelineno-8-7"></a><span class="sd">    Validate an invocation request before execution.</span>
+</span><span id="__span-8-8"><a href="#__codelineno-8-8" id="__codelineno-8-8" name="__codelineno-8-8"></a>
+</span><span id="__span-8-9"><a href="#__codelineno-8-9" id="__codelineno-8-9" name="__codelineno-8-9"></a><span class="sd">    Args:</span>
+</span><span id="__span-8-10"><a href="#__codelineno-8-10" id="__codelineno-8-10" name="__codelineno-8-10"></a><span class="sd">        request: The invocation request to validate</span>
+</span><span id="__span-8-11"><a href="#__codelineno-8-11" id="__codelineno-8-11" name="__codelineno-8-11"></a>
+</span><span id="__span-8-12"><a href="#__codelineno-8-12" id="__codelineno-8-12" name="__codelineno-8-12"></a><span class="sd">    Returns:</span>
+</span><span id="__span-8-13"><a href="#__codelineno-8-13" id="__codelineno-8-13" name="__codelineno-8-13"></a><span class="sd">        bool: True if valid, False otherwise</span>
+</span><span id="__span-8-14"><a href="#__codelineno-8-14" id="__codelineno-8-14" name="__codelineno-8-14"></a>
+</span><span id="__span-8-15"><a href="#__codelineno-8-15" id="__codelineno-8-15" name="__codelineno-8-15"></a><span class="sd">    Raises:</span>
+</span><span id="__span-8-16"><a href="#__codelineno-8-16" id="__codelineno-8-16" name="__codelineno-8-16"></a><span class="sd">        ValidationError: If request is invalid (with details)</span>
+</span><span id="__span-8-17"><a href="#__codelineno-8-17" id="__codelineno-8-17" name="__codelineno-8-17"></a><span class="sd">    """</span>
+</span></code></pre></div>
+<p><strong>Contract:</strong></p>
+<p><strong>Input (<code>request</code>):</strong>
+- MUST have <code>capability_id</code>, <code>principal_id</code>, <code>arguments</code>
+- MAY have additional <code>context</code> fields</p>
+<p><strong>Output:</strong>
+- MUST return <code>True</code> if valid
+- MUST raise <code>ValidationError</code> (not return <code>False</code>) if invalid</p>
+<p><strong>Validation Rules:</strong>
+- MUST validate <code>arguments</code> against capability's <code>input_schema</code>
+- MUST check that <code>capability_id</code> exists
+- SHOULD validate types and required fields
+- MAY perform protocol-specific validation</p>
+<p><strong>Error Details:</strong>
+- <code>ValidationError</code> MUST include <code>validation_errors</code> list
+- Each error SHOULD specify field path and reason</p>
+<p><strong>Example:</strong></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a href="#__codelineno-9-1" id="__codelineno-9-1" name="__codelineno-9-1"></a><span class="k">try</span><span class="p">:</span>
+</span><span id="__span-9-2"><a href="#__codelineno-9-2" id="__codelineno-9-2" name="__codelineno-9-2"></a>    <span class="n">is_valid</span> <span class="o">=</span> <span class="k">await</span> <span class="n">adapter</span><span class="o">.</span><span class="n">validate_request</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+</span><span id="__span-9-3"><a href="#__codelineno-9-3" id="__codelineno-9-3" name="__codelineno-9-3"></a>    <span class="c1"># is_valid is always True if no exception</span>
+</span><span id="__span-9-4"><a href="#__codelineno-9-4" id="__codelineno-9-4" name="__codelineno-9-4"></a><span class="k">except</span> <span class="n">ValidationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="__span-9-5"><a href="#__codelineno-9-5" id="__codelineno-9-5" name="__codelineno-9-5"></a>    <span class="c1"># e.validation_errors = [</span>
+</span><span id="__span-9-6"><a href="#__codelineno-9-6" id="__codelineno-9-6" name="__codelineno-9-6"></a>    <span class="c1">#     {"field": "arguments.path", "error": "required field missing"},</span>
+</span><span id="__span-9-7"><a href="#__codelineno-9-7" id="__codelineno-9-7" name="__codelineno-9-7"></a>    <span class="c1">#     {"field": "arguments.depth", "error": "must be positive integer"}</span>
+</span><span id="__span-9-8"><a href="#__codelineno-9-8" id="__codelineno-9-8" name="__codelineno-9-8"></a>    <span class="c1"># ]</span>
+</span></code></pre></div>
+<hr/>
+<h3 id="5-capability-invocation">5. Capability Invocation<a class="headerlink" href="#5-capability-invocation" title="Permanent link">¶</a></h3>
+<h4 id="invoke"><code>invoke()</code><a class="headerlink" href="#invoke" title="Permanent link">¶</a></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a href="#__codelineno-10-1" id="__codelineno-10-1" name="__codelineno-10-1"></a><span class="nd">@abstractmethod</span>
+</span><span id="__span-10-2"><a href="#__codelineno-10-2" id="__codelineno-10-2" name="__codelineno-10-2"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">invoke</span><span class="p">(</span>
+</span><span id="__span-10-3"><a href="#__codelineno-10-3" id="__codelineno-10-3" name="__codelineno-10-3"></a>    <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-10-4"><a href="#__codelineno-10-4" id="__codelineno-10-4" name="__codelineno-10-4"></a>    <span class="n">request</span><span class="p">:</span> <span class="n">InvocationRequest</span>
+</span><span id="__span-10-5"><a href="#__codelineno-10-5" id="__codelineno-10-5" name="__codelineno-10-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InvocationResult</span><span class="p">:</span>
+</span><span id="__span-10-6"><a href="#__codelineno-10-6" id="__codelineno-10-6" name="__codelineno-10-6"></a><span class="w">    </span><span class="sd">"""</span>
+</span><span id="__span-10-7"><a href="#__codelineno-10-7" id="__codelineno-10-7" name="__codelineno-10-7"></a><span class="sd">    Invoke a capability on a resource.</span>
+</span><span id="__span-10-8"><a href="#__codelineno-10-8" id="__codelineno-10-8" name="__codelineno-10-8"></a>
+</span><span id="__span-10-9"><a href="#__codelineno-10-9" id="__codelineno-10-9" name="__codelineno-10-9"></a><span class="sd">    Args:</span>
+</span><span id="__span-10-10"><a href="#__codelineno-10-10" id="__codelineno-10-10" name="__codelineno-10-10"></a><span class="sd">        request: The invocation request</span>
+</span><span id="__span-10-11"><a href="#__codelineno-10-11" id="__codelineno-10-11" name="__codelineno-10-11"></a>
+</span><span id="__span-10-12"><a href="#__codelineno-10-12" id="__codelineno-10-12" name="__codelineno-10-12"></a><span class="sd">    Returns:</span>
+</span><span id="__span-10-13"><a href="#__codelineno-10-13" id="__codelineno-10-13" name="__codelineno-10-13"></a><span class="sd">        InvocationResult: The invocation result</span>
+</span><span id="__span-10-14"><a href="#__codelineno-10-14" id="__codelineno-10-14" name="__codelineno-10-14"></a>
+</span><span id="__span-10-15"><a href="#__codelineno-10-15" id="__codelineno-10-15" name="__codelineno-10-15"></a><span class="sd">    Raises:</span>
+</span><span id="__span-10-16"><a href="#__codelineno-10-16" id="__codelineno-10-16" name="__codelineno-10-16"></a><span class="sd">        InvocationError: If invocation fails</span>
+</span><span id="__span-10-17"><a href="#__codelineno-10-17" id="__codelineno-10-17" name="__codelineno-10-17"></a><span class="sd">        TimeoutError: If invocation times out</span>
+</span><span id="__span-10-18"><a href="#__codelineno-10-18" id="__codelineno-10-18" name="__codelineno-10-18"></a><span class="sd">        CapabilityNotFoundError: If capability doesn't exist</span>
+</span><span id="__span-10-19"><a href="#__codelineno-10-19" id="__codelineno-10-19" name="__codelineno-10-19"></a>
+</span><span id="__span-10-20"><a href="#__codelineno-10-20" id="__codelineno-10-20" name="__codelineno-10-20"></a><span class="sd">    Note:</span>
+</span><span id="__span-10-21"><a href="#__codelineno-10-21" id="__codelineno-10-21" name="__codelineno-10-21"></a><span class="sd">        This method MUST NOT perform authorization checks.</span>
+</span><span id="__span-10-22"><a href="#__codelineno-10-22" id="__codelineno-10-22" name="__codelineno-10-22"></a><span class="sd">        Authorization is handled by SARK core before calling invoke().</span>
+</span><span id="__span-10-23"><a href="#__codelineno-10-23" id="__codelineno-10-23" name="__codelineno-10-23"></a><span class="sd">    """</span>
+</span></code></pre></div>
+<p><strong>Contract:</strong></p>
+<p><strong>Input (<code>request</code>):</strong>
+- MUST be pre-validated by <code>validate_request()</code>
+- MUST be pre-authorized by SARK core policy engine</p>
+<p><strong>Output (<code>InvocationResult</code>):</strong>
+- MUST always return <code>InvocationResult</code> (never raise for execution errors)
+- MUST have:
+  - <code>success</code>: <code>True</code> if succeeded, <code>False</code> if failed
+  - <code>result</code>: Response data (if <code>success=True</code>), <code>None</code> if failed
+  - <code>error</code>: Error message (if <code>success=False</code>), <code>None</code> if succeeded
+  - <code>metadata</code>: Protocol-specific metadata (dict)
+  - <code>duration_ms</code>: Execution time in milliseconds (float)</p>
+<p><strong>Timing:</strong>
+- <code>duration_ms</code> MUST be wall-clock time from start to end
+- SHOULD measure only the protocol invocation, not validation</p>
+<p><strong>Error Handling:</strong>
+- Protocol errors MUST set <code>success=False</code> and populate <code>error</code>
+- MUST NOT raise exceptions for normal protocol errors
+- MAY raise exceptions for adapter bugs or critical failures
+- SHOULD include stack traces in <code>metadata["stack_trace"]</code> for debugging</p>
+<p><strong>Example:</strong></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a href="#__codelineno-11-1" id="__codelineno-11-1" name="__codelineno-11-1"></a><span class="c1"># Success case</span>
+</span><span id="__span-11-2"><a href="#__codelineno-11-2" id="__codelineno-11-2" name="__codelineno-11-2"></a><span class="n">InvocationResult</span><span class="p">(</span>
+</span><span id="__span-11-3"><a href="#__codelineno-11-3" id="__codelineno-11-3" name="__codelineno-11-3"></a>    <span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="__span-11-4"><a href="#__codelineno-11-4" id="__codelineno-11-4" name="__codelineno-11-4"></a>    <span class="n">result</span><span class="o">=</span><span class="p">{</span><span class="s2">"files"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"file1.txt"</span><span class="p">,</span> <span class="s2">"file2.txt"</span><span class="p">]},</span>
+</span><span id="__span-11-5"><a href="#__codelineno-11-5" id="__codelineno-11-5" name="__codelineno-11-5"></a>    <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"protocol"</span><span class="p">:</span> <span class="s2">"mcp"</span><span class="p">,</span> <span class="s2">"tool_name"</span><span class="p">:</span> <span class="s2">"list_files"</span><span class="p">},</span>
+</span><span id="__span-11-6"><a href="#__codelineno-11-6" id="__codelineno-11-6" name="__codelineno-11-6"></a>    <span class="n">duration_ms</span><span class="o">=</span><span class="mf">45.2</span>
+</span><span id="__span-11-7"><a href="#__codelineno-11-7" id="__codelineno-11-7" name="__codelineno-11-7"></a><span class="p">)</span>
+</span><span id="__span-11-8"><a href="#__codelineno-11-8" id="__codelineno-11-8" name="__codelineno-11-8"></a>
+</span><span id="__span-11-9"><a href="#__codelineno-11-9" id="__codelineno-11-9" name="__codelineno-11-9"></a><span class="c1"># Failure case</span>
+</span><span id="__span-11-10"><a href="#__codelineno-11-10" id="__codelineno-11-10" name="__codelineno-11-10"></a><span class="n">InvocationResult</span><span class="p">(</span>
+</span><span id="__span-11-11"><a href="#__codelineno-11-11" id="__codelineno-11-11" name="__codelineno-11-11"></a>    <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-11-12"><a href="#__codelineno-11-12" id="__codelineno-11-12" name="__codelineno-11-12"></a>    <span class="n">error</span><span class="o">=</span><span class="s2">"Permission denied: /secret/path"</span><span class="p">,</span>
+</span><span id="__span-11-13"><a href="#__codelineno-11-13" id="__codelineno-11-13" name="__codelineno-11-13"></a>    <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"status_code"</span><span class="p">:</span> <span class="mi">403</span><span class="p">,</span> <span class="s2">"protocol_error"</span><span class="p">:</span> <span class="s2">"AccessDenied"</span><span class="p">},</span>
+</span><span id="__span-11-14"><a href="#__codelineno-11-14" id="__codelineno-11-14" name="__codelineno-11-14"></a>    <span class="n">duration_ms</span><span class="o">=</span><span class="mf">12.1</span>
+</span><span id="__span-11-15"><a href="#__codelineno-11-15" id="__codelineno-11-15" name="__codelineno-11-15"></a><span class="p">)</span>
+</span></code></pre></div>
+<hr/>
+<h3 id="6-health-check">6. Health Check<a class="headerlink" href="#6-health-check" title="Permanent link">¶</a></h3>
+<h4 id="health_check"><code>health_check()</code><a class="headerlink" href="#health_check" title="Permanent link">¶</a></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a href="#__codelineno-12-1" id="__codelineno-12-1" name="__codelineno-12-1"></a><span class="nd">@abstractmethod</span>
+</span><span id="__span-12-2"><a href="#__codelineno-12-2" id="__codelineno-12-2" name="__codelineno-12-2"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">health_check</span><span class="p">(</span>
+</span><span id="__span-12-3"><a href="#__codelineno-12-3" id="__codelineno-12-3" name="__codelineno-12-3"></a>    <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-12-4"><a href="#__codelineno-12-4" id="__codelineno-12-4" name="__codelineno-12-4"></a>    <span class="n">resource</span><span class="p">:</span> <span class="n">ResourceSchema</span>
+</span><span id="__span-12-5"><a href="#__codelineno-12-5" id="__codelineno-12-5" name="__codelineno-12-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="__span-12-6"><a href="#__codelineno-12-6" id="__codelineno-12-6" name="__codelineno-12-6"></a><span class="w">    </span><span class="sd">"""</span>
+</span><span id="__span-12-7"><a href="#__codelineno-12-7" id="__codelineno-12-7" name="__codelineno-12-7"></a><span class="sd">    Check if a resource is healthy and reachable.</span>
+</span><span id="__span-12-8"><a href="#__codelineno-12-8" id="__codelineno-12-8" name="__codelineno-12-8"></a>
+</span><span id="__span-12-9"><a href="#__codelineno-12-9" id="__codelineno-12-9" name="__codelineno-12-9"></a><span class="sd">    Args:</span>
+</span><span id="__span-12-10"><a href="#__codelineno-12-10" id="__codelineno-12-10" name="__codelineno-12-10"></a><span class="sd">        resource: The resource to check</span>
+</span><span id="__span-12-11"><a href="#__codelineno-12-11" id="__codelineno-12-11" name="__codelineno-12-11"></a>
+</span><span id="__span-12-12"><a href="#__codelineno-12-12" id="__codelineno-12-12" name="__codelineno-12-12"></a><span class="sd">    Returns:</span>
+</span><span id="__span-12-13"><a href="#__codelineno-12-13" id="__codelineno-12-13" name="__codelineno-12-13"></a><span class="sd">        bool: True if healthy and reachable, False otherwise</span>
+</span><span id="__span-12-14"><a href="#__codelineno-12-14" id="__codelineno-12-14" name="__codelineno-12-14"></a>
+</span><span id="__span-12-15"><a href="#__codelineno-12-15" id="__codelineno-12-15" name="__codelineno-12-15"></a><span class="sd">    Note:</span>
+</span><span id="__span-12-16"><a href="#__codelineno-12-16" id="__codelineno-12-16" name="__codelineno-12-16"></a><span class="sd">        This method MUST NOT raise exceptions. Return False on any error.</span>
+</span><span id="__span-12-17"><a href="#__codelineno-12-17" id="__codelineno-12-17" name="__codelineno-12-17"></a><span class="sd">    """</span>
+</span></code></pre></div>
+<p><strong>Contract:</strong></p>
+<p><strong>Input:</strong>
+- Valid <code>ResourceSchema</code> instance</p>
+<p><strong>Output:</strong>
+- MUST return <code>bool</code>
+- MUST return <code>True</code> if resource is reachable and responding
+- MUST return <code>False</code> if resource is unreachable, unhealthy, or check fails</p>
+<p><strong>Implementation:</strong>
+- SHOULD use protocol-specific health check (e.g., HTTP HEAD, gRPC health check)
+- MUST timeout quickly (recommended: 5 seconds)
+- MUST NOT raise exceptions (catch all and return <code>False</code>)
+- SHOULD log health check failures at DEBUG level</p>
+<p><strong>Usage:</strong>
+- Called periodically by SARK core for resource status monitoring
+- Used to mark resources as <code>unhealthy</code> in the registry</p>
+<hr/>
+<h2 id="optional-methods">Optional Methods<a class="headerlink" href="#optional-methods" title="Permanent link">¶</a></h2>
+<p>These methods have default implementations but MAY be overridden.</p>
+<h3 id="7-resource-lifecycle-hooks">7. Resource Lifecycle Hooks<a class="headerlink" href="#7-resource-lifecycle-hooks" title="Permanent link">¶</a></h3>
+<h4 id="on_resource_registered"><code>on_resource_registered()</code><a class="headerlink" href="#on_resource_registered" title="Permanent link">¶</a></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a href="#__codelineno-13-1" id="__codelineno-13-1" name="__codelineno-13-1"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">on_resource_registered</span><span class="p">(</span>
+</span><span id="__span-13-2"><a href="#__codelineno-13-2" id="__codelineno-13-2" name="__codelineno-13-2"></a>    <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-13-3"><a href="#__codelineno-13-3" id="__codelineno-13-3" name="__codelineno-13-3"></a>    <span class="n">resource</span><span class="p">:</span> <span class="n">ResourceSchema</span>
+</span><span id="__span-13-4"><a href="#__codelineno-13-4" id="__codelineno-13-4" name="__codelineno-13-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-13-5"><a href="#__codelineno-13-5" id="__codelineno-13-5" name="__codelineno-13-5"></a><span class="w">    </span><span class="sd">"""</span>
+</span><span id="__span-13-6"><a href="#__codelineno-13-6" id="__codelineno-13-6" name="__codelineno-13-6"></a><span class="sd">    Called when a resource is registered.</span>
+</span><span id="__span-13-7"><a href="#__codelineno-13-7" id="__codelineno-13-7" name="__codelineno-13-7"></a>
+</span><span id="__span-13-8"><a href="#__codelineno-13-8" id="__codelineno-13-8" name="__codelineno-13-8"></a><span class="sd">    Override to perform protocol-specific setup.</span>
+</span><span id="__span-13-9"><a href="#__codelineno-13-9" id="__codelineno-13-9" name="__codelineno-13-9"></a>
+</span><span id="__span-13-10"><a href="#__codelineno-13-10" id="__codelineno-13-10" name="__codelineno-13-10"></a><span class="sd">    Args:</span>
+</span><span id="__span-13-11"><a href="#__codelineno-13-11" id="__codelineno-13-11" name="__codelineno-13-11"></a><span class="sd">        resource: The newly registered resource</span>
+</span><span id="__span-13-12"><a href="#__codelineno-13-12" id="__codelineno-13-12" name="__codelineno-13-12"></a>
+</span><span id="__span-13-13"><a href="#__codelineno-13-13" id="__codelineno-13-13" name="__codelineno-13-13"></a><span class="sd">    Default: No-op</span>
+</span><span id="__span-13-14"><a href="#__codelineno-13-14" id="__codelineno-13-14" name="__codelineno-13-14"></a><span class="sd">    """</span>
+</span></code></pre></div>
+<p><strong>Use Cases:</strong>
+- Establish persistent connections
+- Warm caches
+- Subscribe to events
+- Initialize protocol-specific state</p>
+<h4 id="on_resource_unregistered"><code>on_resource_unregistered()</code><a class="headerlink" href="#on_resource_unregistered" title="Permanent link">¶</a></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a href="#__codelineno-14-1" id="__codelineno-14-1" name="__codelineno-14-1"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">on_resource_unregistered</span><span class="p">(</span>
+</span><span id="__span-14-2"><a href="#__codelineno-14-2" id="__codelineno-14-2" name="__codelineno-14-2"></a>    <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-14-3"><a href="#__codelineno-14-3" id="__codelineno-14-3" name="__codelineno-14-3"></a>    <span class="n">resource</span><span class="p">:</span> <span class="n">ResourceSchema</span>
+</span><span id="__span-14-4"><a href="#__codelineno-14-4" id="__codelineno-14-4" name="__codelineno-14-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-14-5"><a href="#__codelineno-14-5" id="__codelineno-14-5" name="__codelineno-14-5"></a><span class="w">    </span><span class="sd">"""</span>
+</span><span id="__span-14-6"><a href="#__codelineno-14-6" id="__codelineno-14-6" name="__codelineno-14-6"></a><span class="sd">    Called when a resource is unregistered.</span>
+</span><span id="__span-14-7"><a href="#__codelineno-14-7" id="__codelineno-14-7" name="__codelineno-14-7"></a>
+</span><span id="__span-14-8"><a href="#__codelineno-14-8" id="__codelineno-14-8" name="__codelineno-14-8"></a><span class="sd">    Override to perform protocol-specific cleanup.</span>
+</span><span id="__span-14-9"><a href="#__codelineno-14-9" id="__codelineno-14-9" name="__codelineno-14-9"></a>
+</span><span id="__span-14-10"><a href="#__codelineno-14-10" id="__codelineno-14-10" name="__codelineno-14-10"></a><span class="sd">    Args:</span>
+</span><span id="__span-14-11"><a href="#__codelineno-14-11" id="__codelineno-14-11" name="__codelineno-14-11"></a><span class="sd">        resource: The resource being unregistered</span>
+</span><span id="__span-14-12"><a href="#__codelineno-14-12" id="__codelineno-14-12" name="__codelineno-14-12"></a>
+</span><span id="__span-14-13"><a href="#__codelineno-14-13" id="__codelineno-14-13" name="__codelineno-14-13"></a><span class="sd">    Default: No-op</span>
+</span><span id="__span-14-14"><a href="#__codelineno-14-14" id="__codelineno-14-14" name="__codelineno-14-14"></a><span class="sd">    """</span>
+</span></code></pre></div>
+<p><strong>Use Cases:</strong>
+- Close connections
+- Unsubscribe from events
+- Clear caches
+- Release resources</p>
+<hr/>
+<h3 id="8-streaming-support">8. Streaming Support<a class="headerlink" href="#8-streaming-support" title="Permanent link">¶</a></h3>
+<h4 id="invoke_streaming"><code>invoke_streaming()</code><a class="headerlink" href="#invoke_streaming" title="Permanent link">¶</a></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-15-1"><a href="#__codelineno-15-1" id="__codelineno-15-1" name="__codelineno-15-1"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">invoke_streaming</span><span class="p">(</span>
+</span><span id="__span-15-2"><a href="#__codelineno-15-2" id="__codelineno-15-2" name="__codelineno-15-2"></a>    <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-15-3"><a href="#__codelineno-15-3" id="__codelineno-15-3" name="__codelineno-15-3"></a>    <span class="n">request</span><span class="p">:</span> <span class="n">InvocationRequest</span>
+</span><span id="__span-15-4"><a href="#__codelineno-15-4" id="__codelineno-15-4" name="__codelineno-15-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncIterator</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+</span><span id="__span-15-5"><a href="#__codelineno-15-5" id="__codelineno-15-5" name="__codelineno-15-5"></a><span class="w">    </span><span class="sd">"""</span>
+</span><span id="__span-15-6"><a href="#__codelineno-15-6" id="__codelineno-15-6" name="__codelineno-15-6"></a><span class="sd">    Invoke a capability with streaming response support.</span>
+</span><span id="__span-15-7"><a href="#__codelineno-15-7" id="__codelineno-15-7" name="__codelineno-15-7"></a>
+</span><span id="__span-15-8"><a href="#__codelineno-15-8" id="__codelineno-15-8" name="__codelineno-15-8"></a><span class="sd">    Args:</span>
+</span><span id="__span-15-9"><a href="#__codelineno-15-9" id="__codelineno-15-9" name="__codelineno-15-9"></a><span class="sd">        request: The invocation request</span>
+</span><span id="__span-15-10"><a href="#__codelineno-15-10" id="__codelineno-15-10" name="__codelineno-15-10"></a>
+</span><span id="__span-15-11"><a href="#__codelineno-15-11" id="__codelineno-15-11" name="__codelineno-15-11"></a><span class="sd">    Yields:</span>
+</span><span id="__span-15-12"><a href="#__codelineno-15-12" id="__codelineno-15-12" name="__codelineno-15-12"></a><span class="sd">        Response chunks as they become available</span>
+</span><span id="__span-15-13"><a href="#__codelineno-15-13" id="__codelineno-15-13" name="__codelineno-15-13"></a>
+</span><span id="__span-15-14"><a href="#__codelineno-15-14" id="__codelineno-15-14" name="__codelineno-15-14"></a><span class="sd">    Raises:</span>
+</span><span id="__span-15-15"><a href="#__codelineno-15-15" id="__codelineno-15-15" name="__codelineno-15-15"></a><span class="sd">        UnsupportedOperationError: If streaming not supported (default)</span>
+</span><span id="__span-15-16"><a href="#__codelineno-15-16" id="__codelineno-15-16" name="__codelineno-15-16"></a><span class="sd">        StreamingError: If streaming fails mid-stream</span>
+</span><span id="__span-15-17"><a href="#__codelineno-15-17" id="__codelineno-15-17" name="__codelineno-15-17"></a>
+</span><span id="__span-15-18"><a href="#__codelineno-15-18" id="__codelineno-15-18" name="__codelineno-15-18"></a><span class="sd">    Default: Raises UnsupportedOperationError</span>
+</span><span id="__span-15-19"><a href="#__codelineno-15-19" id="__codelineno-15-19" name="__codelineno-15-19"></a><span class="sd">    """</span>
+</span></code></pre></div>
+<p><strong>Contract:</strong></p>
+<p><strong>When to Override:</strong>
+- If protocol supports streaming (SSE, gRPC streaming, WebSocket)</p>
+<p><strong>Behavior:</strong>
+- MUST yield chunks as they arrive
+- MUST raise <code>StreamingError</code> if stream fails mid-way
+- SHOULD include <code>chunks_received</code> in error metadata</p>
+<p><strong>Default Implementation:</strong>
+- Raises <code>UnsupportedOperationError</code></p>
+<p><strong>Example:</strong></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-16-1"><a href="#__codelineno-16-1" id="__codelineno-16-1" name="__codelineno-16-1"></a><span class="k">async</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">adapter</span><span class="o">.</span><span class="n">invoke_streaming</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+</span><span id="__span-16-2"><a href="#__codelineno-16-2" id="__codelineno-16-2" name="__codelineno-16-2"></a>    <span class="c1"># chunk could be:</span>
+</span><span id="__span-16-3"><a href="#__codelineno-16-3" id="__codelineno-16-3" name="__codelineno-16-3"></a>    <span class="c1"># - bytes (raw data)</span>
+</span><span id="__span-16-4"><a href="#__codelineno-16-4" id="__codelineno-16-4" name="__codelineno-16-4"></a>    <span class="c1"># - dict (JSON objects)</span>
+</span><span id="__span-16-5"><a href="#__codelineno-16-5" id="__codelineno-16-5" name="__codelineno-16-5"></a>    <span class="c1"># - str (text lines)</span>
+</span><span id="__span-16-6"><a href="#__codelineno-16-6" id="__codelineno-16-6" name="__codelineno-16-6"></a>    <span class="c1"># - protocol-specific objects</span>
+</span><span id="__span-16-7"><a href="#__codelineno-16-7" id="__codelineno-16-7" name="__codelineno-16-7"></a>    <span class="n">process</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+</span></code></pre></div>
+<hr/>
+<h3 id="9-batch-operations">9. Batch Operations<a class="headerlink" href="#9-batch-operations" title="Permanent link">¶</a></h3>
+<h4 id="invoke_batch"><code>invoke_batch()</code><a class="headerlink" href="#invoke_batch" title="Permanent link">¶</a></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-17-1"><a href="#__codelineno-17-1" id="__codelineno-17-1" name="__codelineno-17-1"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">invoke_batch</span><span class="p">(</span>
+</span><span id="__span-17-2"><a href="#__codelineno-17-2" id="__codelineno-17-2" name="__codelineno-17-2"></a>    <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-17-3"><a href="#__codelineno-17-3" id="__codelineno-17-3" name="__codelineno-17-3"></a>    <span class="n">requests</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">InvocationRequest</span><span class="p">]</span>
+</span><span id="__span-17-4"><a href="#__codelineno-17-4" id="__codelineno-17-4" name="__codelineno-17-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">InvocationResult</span><span class="p">]:</span>
+</span><span id="__span-17-5"><a href="#__codelineno-17-5" id="__codelineno-17-5" name="__codelineno-17-5"></a><span class="w">    </span><span class="sd">"""</span>
+</span><span id="__span-17-6"><a href="#__codelineno-17-6" id="__codelineno-17-6" name="__codelineno-17-6"></a><span class="sd">    Invoke multiple capabilities in a batch operation.</span>
+</span><span id="__span-17-7"><a href="#__codelineno-17-7" id="__codelineno-17-7" name="__codelineno-17-7"></a>
+</span><span id="__span-17-8"><a href="#__codelineno-17-8" id="__codelineno-17-8" name="__codelineno-17-8"></a><span class="sd">    Args:</span>
+</span><span id="__span-17-9"><a href="#__codelineno-17-9" id="__codelineno-17-9" name="__codelineno-17-9"></a><span class="sd">        requests: List of invocation requests</span>
+</span><span id="__span-17-10"><a href="#__codelineno-17-10" id="__codelineno-17-10" name="__codelineno-17-10"></a>
+</span><span id="__span-17-11"><a href="#__codelineno-17-11" id="__codelineno-17-11" name="__codelineno-17-11"></a><span class="sd">    Returns:</span>
+</span><span id="__span-17-12"><a href="#__codelineno-17-12" id="__codelineno-17-12" name="__codelineno-17-12"></a><span class="sd">        List[InvocationResult]: Results in same order as requests</span>
+</span><span id="__span-17-13"><a href="#__codelineno-17-13" id="__codelineno-17-13" name="__codelineno-17-13"></a>
+</span><span id="__span-17-14"><a href="#__codelineno-17-14" id="__codelineno-17-14" name="__codelineno-17-14"></a><span class="sd">    Default: Calls invoke() sequentially</span>
+</span><span id="__span-17-15"><a href="#__codelineno-17-15" id="__codelineno-17-15" name="__codelineno-17-15"></a><span class="sd">    """</span>
+</span></code></pre></div>
+<p><strong>Contract:</strong></p>
+<p><strong>When to Override:</strong>
+- If protocol has optimized batch APIs (e.g., HTTP batch, gRPC batch)</p>
+<p><strong>Behavior:</strong>
+- MUST return results in same order as input requests
+- MUST NOT stop on first error (try all requests)
+- SHOULD be more efficient than sequential calls</p>
+<p><strong>Default Implementation:</strong>
+- Calls <code>invoke()</code> for each request sequentially
+- Catches exceptions and converts to <code>InvocationResult(success=False)</code></p>
+<hr/>
+<h3 id="10-capability-refresh">10. Capability Refresh<a class="headerlink" href="#10-capability-refresh" title="Permanent link">¶</a></h3>
+<h4 id="refresh_capabilities"><code>refresh_capabilities()</code><a class="headerlink" href="#refresh_capabilities" title="Permanent link">¶</a></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-18-1"><a href="#__codelineno-18-1" id="__codelineno-18-1" name="__codelineno-18-1"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">refresh_capabilities</span><span class="p">(</span>
+</span><span id="__span-18-2"><a href="#__codelineno-18-2" id="__codelineno-18-2" name="__codelineno-18-2"></a>    <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-18-3"><a href="#__codelineno-18-3" id="__codelineno-18-3" name="__codelineno-18-3"></a>    <span class="n">resource</span><span class="p">:</span> <span class="n">ResourceSchema</span>
+</span><span id="__span-18-4"><a href="#__codelineno-18-4" id="__codelineno-18-4" name="__codelineno-18-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">CapabilitySchema</span><span class="p">]:</span>
+</span><span id="__span-18-5"><a href="#__codelineno-18-5" id="__codelineno-18-5" name="__codelineno-18-5"></a><span class="w">    </span><span class="sd">"""</span>
+</span><span id="__span-18-6"><a href="#__codelineno-18-6" id="__codelineno-18-6" name="__codelineno-18-6"></a><span class="sd">    Refresh the capabilities list for a resource.</span>
+</span><span id="__span-18-7"><a href="#__codelineno-18-7" id="__codelineno-18-7" name="__codelineno-18-7"></a>
+</span><span id="__span-18-8"><a href="#__codelineno-18-8" id="__codelineno-18-8" name="__codelineno-18-8"></a><span class="sd">    Args:</span>
+</span><span id="__span-18-9"><a href="#__codelineno-18-9" id="__codelineno-18-9" name="__codelineno-18-9"></a><span class="sd">        resource: The resource to refresh</span>
+</span><span id="__span-18-10"><a href="#__codelineno-18-10" id="__codelineno-18-10" name="__codelineno-18-10"></a>
+</span><span id="__span-18-11"><a href="#__codelineno-18-11" id="__codelineno-18-11" name="__codelineno-18-11"></a><span class="sd">    Returns:</span>
+</span><span id="__span-18-12"><a href="#__codelineno-18-12" id="__codelineno-18-12" name="__codelineno-18-12"></a><span class="sd">        List[CapabilitySchema]: Updated capabilities</span>
+</span><span id="__span-18-13"><a href="#__codelineno-18-13" id="__codelineno-18-13" name="__codelineno-18-13"></a>
+</span><span id="__span-18-14"><a href="#__codelineno-18-14" id="__codelineno-18-14" name="__codelineno-18-14"></a><span class="sd">    Default: Calls get_capabilities()</span>
+</span><span id="__span-18-15"><a href="#__codelineno-18-15" id="__codelineno-18-15" name="__codelineno-18-15"></a><span class="sd">    """</span>
+</span></code></pre></div>
+<p><strong>When to Override:</strong>
+- If there's a more efficient refresh mechanism
+- If capabilities are cached and need invalidation</p>
+<p><strong>Default:</strong> Calls <code>get_capabilities()</code></p>
+<hr/>
+<h3 id="11-authentication">11. Authentication<a class="headerlink" href="#11-authentication" title="Permanent link">¶</a></h3>
+<h4 id="authenticate"><code>authenticate()</code><a class="headerlink" href="#authenticate" title="Permanent link">¶</a></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-19-1"><a href="#__codelineno-19-1" id="__codelineno-19-1" name="__codelineno-19-1"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">authenticate</span><span class="p">(</span>
+</span><span id="__span-19-2"><a href="#__codelineno-19-2" id="__codelineno-19-2" name="__codelineno-19-2"></a>    <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-19-3"><a href="#__codelineno-19-3" id="__codelineno-19-3" name="__codelineno-19-3"></a>    <span class="n">resource</span><span class="p">:</span> <span class="n">ResourceSchema</span><span class="p">,</span>
+</span><span id="__span-19-4"><a href="#__codelineno-19-4" id="__codelineno-19-4" name="__codelineno-19-4"></a>    <span class="n">credentials</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+</span><span id="__span-19-5"><a href="#__codelineno-19-5" id="__codelineno-19-5" name="__codelineno-19-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+</span><span id="__span-19-6"><a href="#__codelineno-19-6" id="__codelineno-19-6" name="__codelineno-19-6"></a><span class="w">    </span><span class="sd">"""</span>
+</span><span id="__span-19-7"><a href="#__codelineno-19-7" id="__codelineno-19-7" name="__codelineno-19-7"></a><span class="sd">    Authenticate to a resource.</span>
+</span><span id="__span-19-8"><a href="#__codelineno-19-8" id="__codelineno-19-8" name="__codelineno-19-8"></a>
+</span><span id="__span-19-9"><a href="#__codelineno-19-9" id="__codelineno-19-9" name="__codelineno-19-9"></a><span class="sd">    Args:</span>
+</span><span id="__span-19-10"><a href="#__codelineno-19-10" id="__codelineno-19-10" name="__codelineno-19-10"></a><span class="sd">        resource: The resource to authenticate to</span>
+</span><span id="__span-19-11"><a href="#__codelineno-19-11" id="__codelineno-19-11" name="__codelineno-19-11"></a><span class="sd">        credentials: Protocol-specific credentials</span>
+</span><span id="__span-19-12"><a href="#__codelineno-19-12" id="__codelineno-19-12" name="__codelineno-19-12"></a>
+</span><span id="__span-19-13"><a href="#__codelineno-19-13" id="__codelineno-19-13" name="__codelineno-19-13"></a><span class="sd">    Returns:</span>
+</span><span id="__span-19-14"><a href="#__codelineno-19-14" id="__codelineno-19-14" name="__codelineno-19-14"></a><span class="sd">        Dict[str, Any]: Authentication result (tokens, session info)</span>
+</span><span id="__span-19-15"><a href="#__codelineno-19-15" id="__codelineno-19-15" name="__codelineno-19-15"></a>
+</span><span id="__span-19-16"><a href="#__codelineno-19-16" id="__codelineno-19-16" name="__codelineno-19-16"></a><span class="sd">    Raises:</span>
+</span><span id="__span-19-17"><a href="#__codelineno-19-17" id="__codelineno-19-17" name="__codelineno-19-17"></a><span class="sd">        AuthenticationError: If authentication fails</span>
+</span><span id="__span-19-18"><a href="#__codelineno-19-18" id="__codelineno-19-18" name="__codelineno-19-18"></a><span class="sd">        UnsupportedOperationError: If auth handled externally (default)</span>
+</span><span id="__span-19-19"><a href="#__codelineno-19-19" id="__codelineno-19-19" name="__codelineno-19-19"></a>
+</span><span id="__span-19-20"><a href="#__codelineno-19-20" id="__codelineno-19-20" name="__codelineno-19-20"></a><span class="sd">    Default: Raises UnsupportedOperationError</span>
+</span><span id="__span-19-21"><a href="#__codelineno-19-21" id="__codelineno-19-21" name="__codelineno-19-21"></a><span class="sd">    """</span>
+</span></code></pre></div>
+<p><strong>Credential Formats:</strong></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-20-1"><a href="#__codelineno-20-1" id="__codelineno-20-1" name="__codelineno-20-1"></a><span class="c1"># API Key</span>
+</span><span id="__span-20-2"><a href="#__codelineno-20-2" id="__codelineno-20-2" name="__codelineno-20-2"></a><span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"api_key"</span><span class="p">,</span> <span class="s2">"key"</span><span class="p">:</span> <span class="s2">"sk-..."</span><span class="p">}</span>
+</span><span id="__span-20-3"><a href="#__codelineno-20-3" id="__codelineno-20-3" name="__codelineno-20-3"></a>
+</span><span id="__span-20-4"><a href="#__codelineno-20-4" id="__codelineno-20-4" name="__codelineno-20-4"></a><span class="c1"># Bearer Token</span>
+</span><span id="__span-20-5"><a href="#__codelineno-20-5" id="__codelineno-20-5" name="__codelineno-20-5"></a><span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"bearer"</span><span class="p">,</span> <span class="s2">"token"</span><span class="p">:</span> <span class="s2">"eyJ..."</span><span class="p">}</span>
+</span><span id="__span-20-6"><a href="#__codelineno-20-6" id="__codelineno-20-6" name="__codelineno-20-6"></a>
+</span><span id="__span-20-7"><a href="#__codelineno-20-7" id="__codelineno-20-7" name="__codelineno-20-7"></a><span class="c1"># Basic Auth</span>
+</span><span id="__span-20-8"><a href="#__codelineno-20-8" id="__codelineno-20-8" name="__codelineno-20-8"></a><span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"basic"</span><span class="p">,</span> <span class="s2">"username"</span><span class="p">:</span> <span class="s2">"user"</span><span class="p">,</span> <span class="s2">"password"</span><span class="p">:</span> <span class="s2">"pass"</span><span class="p">}</span>
+</span><span id="__span-20-9"><a href="#__codelineno-20-9" id="__codelineno-20-9" name="__codelineno-20-9"></a>
+</span><span id="__span-20-10"><a href="#__codelineno-20-10" id="__codelineno-20-10" name="__codelineno-20-10"></a><span class="c1"># mTLS</span>
+</span><span id="__span-20-11"><a href="#__codelineno-20-11" id="__codelineno-20-11" name="__codelineno-20-11"></a><span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"mtls"</span><span class="p">,</span> <span class="s2">"cert_path"</span><span class="p">:</span> <span class="s2">"/path/cert.pem"</span><span class="p">,</span> <span class="s2">"key_path"</span><span class="p">:</span> <span class="s2">"/path/key.pem"</span><span class="p">}</span>
+</span><span id="__span-20-12"><a href="#__codelineno-20-12" id="__codelineno-20-12" name="__codelineno-20-12"></a>
+</span><span id="__span-20-13"><a href="#__codelineno-20-13" id="__codelineno-20-13" name="__codelineno-20-13"></a><span class="c1"># OAuth2</span>
+</span><span id="__span-20-14"><a href="#__codelineno-20-14" id="__codelineno-20-14" name="__codelineno-20-14"></a><span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"oauth2"</span><span class="p">,</span> <span class="s2">"client_id"</span><span class="p">:</span> <span class="s2">"..."</span><span class="p">,</span> <span class="s2">"client_secret"</span><span class="p">:</span> <span class="s2">"..."</span><span class="p">,</span> <span class="s2">"token_url"</span><span class="p">:</span> <span class="s2">"..."</span><span class="p">}</span>
+</span></code></pre></div>
+<p><strong>Return Value:</strong></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-21-1"><a href="#__codelineno-21-1" id="__codelineno-21-1" name="__codelineno-21-1"></a><span class="p">{</span>
+</span><span id="__span-21-2"><a href="#__codelineno-21-2" id="__codelineno-21-2" name="__codelineno-21-2"></a>    <span class="s2">"authenticated"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="__span-21-3"><a href="#__codelineno-21-3" id="__codelineno-21-3" name="__codelineno-21-3"></a>    <span class="s2">"token"</span><span class="p">:</span> <span class="s2">"session-token-here"</span><span class="p">,</span>
+</span><span id="__span-21-4"><a href="#__codelineno-21-4" id="__codelineno-21-4" name="__codelineno-21-4"></a>    <span class="s2">"expires_at"</span><span class="p">:</span> <span class="s2">"2025-12-01T00:00:00Z"</span><span class="p">,</span>
+</span><span id="__span-21-5"><a href="#__codelineno-21-5" id="__codelineno-21-5" name="__codelineno-21-5"></a>    <span class="s2">"refresh_token"</span><span class="p">:</span> <span class="s2">"refresh-token-here"</span>  <span class="c1"># optional</span>
+</span><span id="__span-21-6"><a href="#__codelineno-21-6" id="__codelineno-21-6" name="__codelineno-21-6"></a><span class="p">}</span>
+</span></code></pre></div>
+<hr/>
+<h3 id="12-introspection-methods">12. Introspection Methods<a class="headerlink" href="#12-introspection-methods" title="Permanent link">¶</a></h3>
+<h4 id="supports_streaming"><code>supports_streaming()</code><a class="headerlink" href="#supports_streaming" title="Permanent link">¶</a></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-22-1"><a href="#__codelineno-22-1" id="__codelineno-22-1" name="__codelineno-22-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">supports_streaming</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="__span-22-2"><a href="#__codelineno-22-2" id="__codelineno-22-2" name="__codelineno-22-2"></a><span class="w">    </span><span class="sd">"""Check if adapter supports streaming."""</span>
+</span></code></pre></div>
+<p><strong>Returns:</strong> <code>True</code> if <code>invoke_streaming()</code> is overridden, <code>False</code> otherwise.</p>
+<h4 id="supports_batch"><code>supports_batch()</code><a class="headerlink" href="#supports_batch" title="Permanent link">¶</a></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-23-1"><a href="#__codelineno-23-1" id="__codelineno-23-1" name="__codelineno-23-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">supports_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="__span-23-2"><a href="#__codelineno-23-2" id="__codelineno-23-2" name="__codelineno-23-2"></a><span class="w">    </span><span class="sd">"""Check if adapter supports optimized batch operations."""</span>
+</span></code></pre></div>
+<p><strong>Returns:</strong> <code>True</code> if <code>invoke_batch()</code> is overridden with optimization, <code>False</code> if using default.</p>
+<h4 id="get_adapter_info"><code>get_adapter_info()</code><a class="headerlink" href="#get_adapter_info" title="Permanent link">¶</a></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-24-1"><a href="#__codelineno-24-1" id="__codelineno-24-1" name="__codelineno-24-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_adapter_info</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+</span><span id="__span-24-2"><a href="#__codelineno-24-2" id="__codelineno-24-2" name="__codelineno-24-2"></a><span class="w">    </span><span class="sd">"""Get adapter metadata and capabilities."""</span>
+</span></code></pre></div>
+<p><strong>Returns:</strong>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-25-1"><a href="#__codelineno-25-1" id="__codelineno-25-1" name="__codelineno-25-1"></a><span class="p">{</span>
+</span><span id="__span-25-2"><a href="#__codelineno-25-2" id="__codelineno-25-2" name="__codelineno-25-2"></a>    <span class="s2">"protocol_name"</span><span class="p">:</span> <span class="s2">"mcp"</span><span class="p">,</span>
+</span><span id="__span-25-3"><a href="#__codelineno-25-3" id="__codelineno-25-3" name="__codelineno-25-3"></a>    <span class="s2">"protocol_version"</span><span class="p">:</span> <span class="s2">"2024-11-05"</span><span class="p">,</span>
+</span><span id="__span-25-4"><a href="#__codelineno-25-4" id="__codelineno-25-4" name="__codelineno-25-4"></a>    <span class="s2">"adapter_class"</span><span class="p">:</span> <span class="s2">"MCPAdapter"</span><span class="p">,</span>
+</span><span id="__span-25-5"><a href="#__codelineno-25-5" id="__codelineno-25-5" name="__codelineno-25-5"></a>    <span class="s2">"supports_streaming"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="__span-25-6"><a href="#__codelineno-25-6" id="__codelineno-25-6" name="__codelineno-25-6"></a>    <span class="s2">"supports_batch"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-25-7"><a href="#__codelineno-25-7" id="__codelineno-25-7" name="__codelineno-25-7"></a>    <span class="s2">"module"</span><span class="p">:</span> <span class="s2">"sark.adapters.mcp"</span>
+</span><span id="__span-25-8"><a href="#__codelineno-25-8" id="__codelineno-25-8" name="__codelineno-25-8"></a><span class="p">}</span>
+</span></code></pre></div></p>
+<hr/>
+<h2 id="exception-handling">Exception Handling<a class="headerlink" href="#exception-handling" title="Permanent link">¶</a></h2>
+<h3 id="exception-hierarchy">Exception Hierarchy<a class="headerlink" href="#exception-hierarchy" title="Permanent link">¶</a></h3>
+<p>All adapter exceptions inherit from <code>AdapterError</code>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-26-1"><a href="#__codelineno-26-1" id="__codelineno-26-1" name="__codelineno-26-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sark.adapters.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span id="__span-26-2"><a href="#__codelineno-26-2" id="__codelineno-26-2" name="__codelineno-26-2"></a>    <span class="n">AdapterError</span><span class="p">,</span>              <span class="c1"># Base exception</span>
+</span><span id="__span-26-3"><a href="#__codelineno-26-3" id="__codelineno-26-3" name="__codelineno-26-3"></a>    <span class="n">DiscoveryError</span><span class="p">,</span>           <span class="c1"># Resource discovery failed</span>
+</span><span id="__span-26-4"><a href="#__codelineno-26-4" id="__codelineno-26-4" name="__codelineno-26-4"></a>    <span class="ne">ConnectionError</span><span class="p">,</span>          <span class="c1"># Cannot connect to resource</span>
+</span><span id="__span-26-5"><a href="#__codelineno-26-5" id="__codelineno-26-5" name="__codelineno-26-5"></a>    <span class="n">AuthenticationError</span><span class="p">,</span>      <span class="c1"># Authentication failed</span>
+</span><span id="__span-26-6"><a href="#__codelineno-26-6" id="__codelineno-26-6" name="__codelineno-26-6"></a>    <span class="n">ValidationError</span><span class="p">,</span>          <span class="c1"># Request validation failed</span>
+</span><span id="__span-26-7"><a href="#__codelineno-26-7" id="__codelineno-26-7" name="__codelineno-26-7"></a>    <span class="n">InvocationError</span><span class="p">,</span>          <span class="c1"># Invocation failed</span>
+</span><span id="__span-26-8"><a href="#__codelineno-26-8" id="__codelineno-26-8" name="__codelineno-26-8"></a>    <span class="n">ResourceNotFoundError</span><span class="p">,</span>    <span class="c1"># Resource not found</span>
+</span><span id="__span-26-9"><a href="#__codelineno-26-9" id="__codelineno-26-9" name="__codelineno-26-9"></a>    <span class="n">CapabilityNotFoundError</span><span class="p">,</span>  <span class="c1"># Capability not found</span>
+</span><span id="__span-26-10"><a href="#__codelineno-26-10" id="__codelineno-26-10" name="__codelineno-26-10"></a>    <span class="ne">TimeoutError</span><span class="p">,</span>             <span class="c1"># Operation timed out</span>
+</span><span id="__span-26-11"><a href="#__codelineno-26-11" id="__codelineno-26-11" name="__codelineno-26-11"></a>    <span class="n">ProtocolError</span><span class="p">,</span>            <span class="c1"># Protocol-specific error</span>
+</span><span id="__span-26-12"><a href="#__codelineno-26-12" id="__codelineno-26-12" name="__codelineno-26-12"></a>    <span class="n">StreamingError</span><span class="p">,</span>           <span class="c1"># Streaming operation failed</span>
+</span><span id="__span-26-13"><a href="#__codelineno-26-13" id="__codelineno-26-13" name="__codelineno-26-13"></a>    <span class="n">AdapterConfigurationError</span><span class="p">,</span>  <span class="c1"># Adapter config invalid</span>
+</span><span id="__span-26-14"><a href="#__codelineno-26-14" id="__codelineno-26-14" name="__codelineno-26-14"></a>    <span class="n">UnsupportedOperationError</span><span class="p">,</span>  <span class="c1"># Operation not supported</span>
+</span><span id="__span-26-15"><a href="#__codelineno-26-15" id="__codelineno-26-15" name="__codelineno-26-15"></a><span class="p">)</span>
+</span></code></pre></div>
+<h3 id="when-to-raise-exceptions">When to Raise Exceptions<a class="headerlink" href="#when-to-raise-exceptions" title="Permanent link">¶</a></h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Exceptions to Raise</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>discover_resources()</code></td>
+<td><code>DiscoveryError</code>, <code>ConnectionError</code>, <code>AuthenticationError</code>, <code>ValidationError</code></td>
+</tr>
+<tr>
+<td><code>get_capabilities()</code></td>
+<td><code>ResourceNotFoundError</code>, <code>ConnectionError</code></td>
+</tr>
+<tr>
+<td><code>validate_request()</code></td>
+<td><code>ValidationError</code> (MUST raise, not return False)</td>
+</tr>
+<tr>
+<td><code>invoke()</code></td>
+<td><code>InvocationError</code>, <code>TimeoutError</code>, <code>CapabilityNotFoundError</code></td>
+</tr>
+<tr>
+<td><code>health_check()</code></td>
+<td><strong>MUST NOT raise</strong> (return <code>False</code> instead)</td>
+</tr>
+<tr>
+<td><code>invoke_streaming()</code></td>
+<td><code>UnsupportedOperationError</code>, <code>StreamingError</code></td>
+</tr>
+<tr>
+<td><code>authenticate()</code></td>
+<td><code>AuthenticationError</code>, <code>UnsupportedOperationError</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="exception-best-practices">Exception Best Practices<a class="headerlink" href="#exception-best-practices" title="Permanent link">¶</a></h3>
+<ol>
+<li>
+<p><strong>Always include context:</strong>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-27-1"><a href="#__codelineno-27-1" id="__codelineno-27-1" name="__codelineno-27-1"></a><span class="k">raise</span> <span class="n">InvocationError</span><span class="p">(</span>
+</span><span id="__span-27-2"><a href="#__codelineno-27-2" id="__codelineno-27-2" name="__codelineno-27-2"></a>    <span class="s2">"Failed to call MCP tool 'read_file'"</span><span class="p">,</span>
+</span><span id="__span-27-3"><a href="#__codelineno-27-3" id="__codelineno-27-3" name="__codelineno-27-3"></a>    <span class="n">adapter_name</span><span class="o">=</span><span class="s2">"mcp"</span><span class="p">,</span>
+</span><span id="__span-27-4"><a href="#__codelineno-27-4" id="__codelineno-27-4" name="__codelineno-27-4"></a>    <span class="n">resource_id</span><span class="o">=</span><span class="s2">"mcp-filesystem"</span><span class="p">,</span>
+</span><span id="__span-27-5"><a href="#__codelineno-27-5" id="__codelineno-27-5" name="__codelineno-27-5"></a>    <span class="n">capability_id</span><span class="o">=</span><span class="s2">"read_file"</span><span class="p">,</span>
+</span><span id="__span-27-6"><a href="#__codelineno-27-6" id="__codelineno-27-6" name="__codelineno-27-6"></a>    <span class="n">protocol_error</span><span class="o">=</span><span class="s2">"FileNotFoundError: /missing.txt"</span>
+</span><span id="__span-27-7"><a href="#__codelineno-27-7" id="__codelineno-27-7" name="__codelineno-27-7"></a><span class="p">)</span>
+</span></code></pre></div></p>
+</li>
+<li>
+<p><strong>Use <code>details</code> for debugging:</strong>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-28-1"><a href="#__codelineno-28-1" id="__codelineno-28-1" name="__codelineno-28-1"></a><span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span>
+</span><span id="__span-28-2"><a href="#__codelineno-28-2" id="__codelineno-28-2" name="__codelineno-28-2"></a>    <span class="s2">"Invalid arguments for capability"</span><span class="p">,</span>
+</span><span id="__span-28-3"><a href="#__codelineno-28-3" id="__codelineno-28-3" name="__codelineno-28-3"></a>    <span class="n">validation_errors</span><span class="o">=</span><span class="p">[</span>
+</span><span id="__span-28-4"><a href="#__codelineno-28-4" id="__codelineno-28-4" name="__codelineno-28-4"></a>        <span class="p">{</span><span class="s2">"field"</span><span class="p">:</span> <span class="s2">"path"</span><span class="p">,</span> <span class="s2">"error"</span><span class="p">:</span> <span class="s2">"required"</span><span class="p">},</span>
+</span><span id="__span-28-5"><a href="#__codelineno-28-5" id="__codelineno-28-5" name="__codelineno-28-5"></a>        <span class="p">{</span><span class="s2">"field"</span><span class="p">:</span> <span class="s2">"depth"</span><span class="p">,</span> <span class="s2">"error"</span><span class="p">:</span> <span class="s2">"must be positive"</span><span class="p">}</span>
+</span><span id="__span-28-6"><a href="#__codelineno-28-6" id="__codelineno-28-6" name="__codelineno-28-6"></a>    <span class="p">]</span>
+</span><span id="__span-28-7"><a href="#__codelineno-28-7" id="__codelineno-28-7" name="__codelineno-28-7"></a><span class="p">)</span>
+</span></code></pre></div></p>
+</li>
+<li>
+<p><strong>Don't raise for normal failures in <code>invoke()</code>:</strong>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-29-1"><a href="#__codelineno-29-1" id="__codelineno-29-1" name="__codelineno-29-1"></a><span class="c1"># WRONG - don't raise for protocol errors</span>
+</span><span id="__span-29-2"><a href="#__codelineno-29-2" id="__codelineno-29-2" name="__codelineno-29-2"></a><span class="k">raise</span> <span class="n">InvocationError</span><span class="p">(</span><span class="s2">"File not found"</span><span class="p">)</span>
+</span><span id="__span-29-3"><a href="#__codelineno-29-3" id="__codelineno-29-3" name="__codelineno-29-3"></a>
+</span><span id="__span-29-4"><a href="#__codelineno-29-4" id="__codelineno-29-4" name="__codelineno-29-4"></a><span class="c1"># RIGHT - return failure result</span>
+</span><span id="__span-29-5"><a href="#__codelineno-29-5" id="__codelineno-29-5" name="__codelineno-29-5"></a><span class="k">return</span> <span class="n">InvocationResult</span><span class="p">(</span>
+</span><span id="__span-29-6"><a href="#__codelineno-29-6" id="__codelineno-29-6" name="__codelineno-29-6"></a>    <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-29-7"><a href="#__codelineno-29-7" id="__codelineno-29-7" name="__codelineno-29-7"></a>    <span class="n">error</span><span class="o">=</span><span class="s2">"File not found: /path/to/file"</span><span class="p">,</span>
+</span><span id="__span-29-8"><a href="#__codelineno-29-8" id="__codelineno-29-8" name="__codelineno-29-8"></a>    <span class="n">duration_ms</span><span class="o">=</span><span class="n">duration</span>
+</span><span id="__span-29-9"><a href="#__codelineno-29-9" id="__codelineno-29-9" name="__codelineno-29-9"></a><span class="p">)</span>
+</span></code></pre></div></p>
+</li>
+</ol>
+<hr/>
+<h2 id="integration-points">Integration Points<a class="headerlink" href="#integration-points" title="Permanent link">¶</a></h2>
+<h3 id="with-sark-core">With SARK Core<a class="headerlink" href="#with-sark-core" title="Permanent link">¶</a></h3>
+<h4 id="1-adapter-registry">1. Adapter Registry<a class="headerlink" href="#1-adapter-registry" title="Permanent link">¶</a></h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-30-1"><a href="#__codelineno-30-1" id="__codelineno-30-1" name="__codelineno-30-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sark.adapters</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_registry</span>
+</span><span id="__span-30-2"><a href="#__codelineno-30-2" id="__codelineno-30-2" name="__codelineno-30-2"></a>
+</span><span id="__span-30-3"><a href="#__codelineno-30-3" id="__codelineno-30-3" name="__codelineno-30-3"></a><span class="n">registry</span> <span class="o">=</span> <span class="n">get_registry</span><span class="p">()</span>
+</span><span id="__span-30-4"><a href="#__codelineno-30-4" id="__codelineno-30-4" name="__codelineno-30-4"></a><span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">MyAdapter</span><span class="p">())</span>
+</span><span id="__span-30-5"><a href="#__codelineno-30-5" id="__codelineno-30-5" name="__codelineno-30-5"></a>
+</span><span id="__span-30-6"><a href="#__codelineno-30-6" id="__codelineno-30-6" name="__codelineno-30-6"></a><span class="n">adapter</span> <span class="o">=</span> <span class="n">registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"myprotocol"</span><span class="p">)</span>
+</span></code></pre></div>
+<h4 id="2-resource-registration-flow">2. Resource Registration Flow<a class="headerlink" href="#2-resource-registration-flow" title="Permanent link">¶</a></h4>
+<div class="mermaid">sequenceDiagram
+    Client-&gt;&gt;API: POST /api/v2/resources
+    API-&gt;&gt;Registry: get(protocol)
+    Registry--&gt;&gt;API: adapter
+    API-&gt;&gt;Adapter: discover_resources(config)
+    Adapter--&gt;&gt;API: resources
+    API-&gt;&gt;Database: save resources &amp; capabilities
+    API--&gt;&gt;Client: 201 Created
+</div>
+<h4 id="3-authorization-flow">3. Authorization Flow<a class="headerlink" href="#3-authorization-flow" title="Permanent link">¶</a></h4>
+<div class="mermaid">sequenceDiagram
+    Client-&gt;&gt;API: POST /api/v2/authorize
+    API-&gt;&gt;Database: get capability &amp; resource
+    API-&gt;&gt;Registry: get(resource.protocol)
+    Registry--&gt;&gt;API: adapter
+    API-&gt;&gt;Adapter: validate_request(request)
+    Adapter--&gt;&gt;API: valid
+    API-&gt;&gt;OPA: evaluate policy
+    OPA--&gt;&gt;API: decision
+    alt decision.allow
+        API-&gt;&gt;Adapter: invoke(request)
+        Adapter--&gt;&gt;API: result
+        API-&gt;&gt;Audit: log_execution
+    else decision.deny
+        API-&gt;&gt;Audit: log_denial
+        API--&gt;&gt;Client: 403 Forbidden
+    end
+    API--&gt;&gt;Client: result
+</div>
+<h3 id="with-database">With Database<a class="headerlink" href="#with-database" title="Permanent link">¶</a></h3>
+<p>Adapters <strong>MUST NOT</strong> access the database directly. All database operations are handled by SARK core.</p>
+<p><strong>Resource Storage:</strong>
+- Core stores discovered resources in polymorphic <code>resources</code> table
+- Core stores capabilities in polymorphic <code>capabilities</code> table
+- Adapters only work with Pydantic schemas</p>
+<p><strong>Audit Trail:</strong>
+- Core logs all invocations to audit database
+- Adapters MAY include extra context in <code>InvocationResult.metadata</code></p>
+<hr/>
+<h2 id="testing-requirements">Testing Requirements<a class="headerlink" href="#testing-requirements" title="Permanent link">¶</a></h2>
+<p>All adapters MUST pass the base adapter contract tests.</p>
+<h3 id="contract-test-suite">Contract Test Suite<a class="headerlink" href="#contract-test-suite" title="Permanent link">¶</a></h3>
+<p>Location: <code>tests/adapters/test_adapter_base.py</code></p>
+<p><strong>Required Test Fixtures:</strong></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-31-1"><a href="#__codelineno-31-1" id="__codelineno-31-1" name="__codelineno-31-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+</span><span id="__span-31-2"><a href="#__codelineno-31-2" id="__codelineno-31-2" name="__codelineno-31-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tests.adapters.base_adapter_test</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseAdapterTest</span>
+</span><span id="__span-31-3"><a href="#__codelineno-31-3" id="__codelineno-31-3" name="__codelineno-31-3"></a>
+</span><span id="__span-31-4"><a href="#__codelineno-31-4" id="__codelineno-31-4" name="__codelineno-31-4"></a><span class="k">class</span><span class="w"> </span><span class="nc">TestMyAdapter</span><span class="p">(</span><span class="n">BaseAdapterTest</span><span class="p">):</span>
+</span><span id="__span-31-5"><a href="#__codelineno-31-5" id="__codelineno-31-5" name="__codelineno-31-5"></a>    <span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+</span><span id="__span-31-6"><a href="#__codelineno-31-6" id="__codelineno-31-6" name="__codelineno-31-6"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">adapter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="__span-31-7"><a href="#__codelineno-31-7" id="__codelineno-31-7" name="__codelineno-31-7"></a><span class="w">        </span><span class="sd">"""Return your adapter instance."""</span>
+</span><span id="__span-31-8"><a href="#__codelineno-31-8" id="__codelineno-31-8" name="__codelineno-31-8"></a>        <span class="k">return</span> <span class="n">MyAdapter</span><span class="p">()</span>
+</span><span id="__span-31-9"><a href="#__codelineno-31-9" id="__codelineno-31-9" name="__codelineno-31-9"></a>
+</span><span id="__span-31-10"><a href="#__codelineno-31-10" id="__codelineno-31-10" name="__codelineno-31-10"></a>    <span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+</span><span id="__span-31-11"><a href="#__codelineno-31-11" id="__codelineno-31-11" name="__codelineno-31-11"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">discovery_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="__span-31-12"><a href="#__codelineno-31-12" id="__codelineno-31-12" name="__codelineno-31-12"></a><span class="w">        </span><span class="sd">"""Return valid discovery config for your protocol."""</span>
+</span><span id="__span-31-13"><a href="#__codelineno-31-13" id="__codelineno-31-13" name="__codelineno-31-13"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">"endpoint"</span><span class="p">:</span> <span class="s2">"https://api.example.com"</span><span class="p">}</span>
+</span><span id="__span-31-14"><a href="#__codelineno-31-14" id="__codelineno-31-14" name="__codelineno-31-14"></a>
+</span><span id="__span-31-15"><a href="#__codelineno-31-15" id="__codelineno-31-15" name="__codelineno-31-15"></a>    <span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+</span><span id="__span-31-16"><a href="#__codelineno-31-16" id="__codelineno-31-16" name="__codelineno-31-16"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">sample_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="__span-31-17"><a href="#__codelineno-31-17" id="__codelineno-31-17" name="__codelineno-31-17"></a><span class="w">        </span><span class="sd">"""Return a valid ResourceSchema for your protocol."""</span>
+</span><span id="__span-31-18"><a href="#__codelineno-31-18" id="__codelineno-31-18" name="__codelineno-31-18"></a>        <span class="k">return</span> <span class="n">ResourceSchema</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">"test"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Test"</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="s2">"myprotocol"</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</span><span id="__span-31-19"><a href="#__codelineno-31-19" id="__codelineno-31-19" name="__codelineno-31-19"></a>
+</span><span id="__span-31-20"><a href="#__codelineno-31-20" id="__codelineno-31-20" name="__codelineno-31-20"></a>    <span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+</span><span id="__span-31-21"><a href="#__codelineno-31-21" id="__codelineno-31-21" name="__codelineno-31-21"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">sample_capability</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="__span-31-22"><a href="#__codelineno-31-22" id="__codelineno-31-22" name="__codelineno-31-22"></a><span class="w">        </span><span class="sd">"""Return a valid CapabilitySchema."""</span>
+</span><span id="__span-31-23"><a href="#__codelineno-31-23" id="__codelineno-31-23" name="__codelineno-31-23"></a>        <span class="k">return</span> <span class="n">CapabilitySchema</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">"test-cap"</span><span class="p">,</span> <span class="n">resource_id</span><span class="o">=</span><span class="s2">"test"</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</span><span id="__span-31-24"><a href="#__codelineno-31-24" id="__codelineno-31-24" name="__codelineno-31-24"></a>
+</span><span id="__span-31-25"><a href="#__codelineno-31-25" id="__codelineno-31-25" name="__codelineno-31-25"></a>    <span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+</span><span id="__span-31-26"><a href="#__codelineno-31-26" id="__codelineno-31-26" name="__codelineno-31-26"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">valid_invocation_request</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="__span-31-27"><a href="#__codelineno-31-27" id="__codelineno-31-27" name="__codelineno-31-27"></a><span class="w">        </span><span class="sd">"""Return a valid InvocationRequest."""</span>
+</span><span id="__span-31-28"><a href="#__codelineno-31-28" id="__codelineno-31-28" name="__codelineno-31-28"></a>        <span class="k">return</span> <span class="n">InvocationRequest</span><span class="p">(</span><span class="n">capability_id</span><span class="o">=</span><span class="s2">"test-cap"</span><span class="p">,</span> <span class="n">principal_id</span><span class="o">=</span><span class="s2">"user"</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</span></code></pre></div>
+<h3 id="test-coverage-requirements">Test Coverage Requirements<a class="headerlink" href="#test-coverage-requirements" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>Minimum:</strong> 85% code coverage</li>
+<li><strong>Required Tests:</strong></li>
+<li>✅ All abstract methods implemented</li>
+<li>✅ <code>protocol_name</code> and <code>protocol_version</code> return valid values</li>
+<li>✅ <code>discover_resources()</code> returns valid resources</li>
+<li>✅ <code>get_capabilities()</code> returns valid capabilities</li>
+<li>✅ <code>validate_request()</code> validates correctly</li>
+<li>✅ <code>validate_request()</code> raises <code>ValidationError</code> for invalid requests</li>
+<li>✅ <code>invoke()</code> returns valid <code>InvocationResult</code></li>
+<li>✅ <code>invoke()</code> handles errors gracefully (success=False)</li>
+<li>✅ <code>health_check()</code> returns bool without raising</li>
+<li>✅ Exception handling (all custom exceptions)</li>
+<li>✅ Edge cases (empty lists, None values, timeouts)</li>
+</ul>
+<h3 id="integration-tests">Integration Tests<a class="headerlink" href="#integration-tests" title="Permanent link">¶</a></h3>
+<p>Create integration tests with real protocol instances:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-32-1"><a href="#__codelineno-32-1" id="__codelineno-32-1" name="__codelineno-32-1"></a><span class="c1"># tests/integration/test_mcp_adapter_integration.py</span>
+</span><span id="__span-32-2"><a href="#__codelineno-32-2" id="__codelineno-32-2" name="__codelineno-32-2"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">test_mcp_adapter_real_server</span><span class="p">():</span>
+</span><span id="__span-32-3"><a href="#__codelineno-32-3" id="__codelineno-32-3" name="__codelineno-32-3"></a>    <span class="n">adapter</span> <span class="o">=</span> <span class="n">MCPAdapter</span><span class="p">()</span>
+</span><span id="__span-32-4"><a href="#__codelineno-32-4" id="__codelineno-32-4" name="__codelineno-32-4"></a>    <span class="n">resources</span> <span class="o">=</span> <span class="k">await</span> <span class="n">adapter</span><span class="o">.</span><span class="n">discover_resources</span><span class="p">({</span>
+</span><span id="__span-32-5"><a href="#__codelineno-32-5" id="__codelineno-32-5" name="__codelineno-32-5"></a>        <span class="s2">"transport"</span><span class="p">:</span> <span class="s2">"stdio"</span><span class="p">,</span>
+</span><span id="__span-32-6"><a href="#__codelineno-32-6" id="__codelineno-32-6" name="__codelineno-32-6"></a>        <span class="s2">"command"</span><span class="p">:</span> <span class="s2">"npx"</span><span class="p">,</span>
+</span><span id="__span-32-7"><a href="#__codelineno-32-7" id="__codelineno-32-7" name="__codelineno-32-7"></a>        <span class="s2">"args"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"-y"</span><span class="p">,</span> <span class="s2">"@modelcontextprotocol/server-filesystem"</span><span class="p">]</span>
+</span><span id="__span-32-8"><a href="#__codelineno-32-8" id="__codelineno-32-8" name="__codelineno-32-8"></a>    <span class="p">})</span>
+</span><span id="__span-32-9"><a href="#__codelineno-32-9" id="__codelineno-32-9" name="__codelineno-32-9"></a>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">resources</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+</span></code></pre></div>
+<hr/>
+<h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">¶</a></h2>
+<h3 id="complete-minimal-adapter">Complete Minimal Adapter<a class="headerlink" href="#complete-minimal-adapter" title="Permanent link">¶</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-33-1"><a href="#__codelineno-33-1" id="__codelineno-33-1" name="__codelineno-33-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sark.adapters.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProtocolAdapter</span>
+</span><span id="__span-33-2"><a href="#__codelineno-33-2" id="__codelineno-33-2" name="__codelineno-33-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sark.models.base</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+</span><span id="__span-33-3"><a href="#__codelineno-33-3" id="__codelineno-33-3" name="__codelineno-33-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sark.adapters.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+</span><span id="__span-33-4"><a href="#__codelineno-33-4" id="__codelineno-33-4" name="__codelineno-33-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+</span><span id="__span-33-5"><a href="#__codelineno-33-5" id="__codelineno-33-5" name="__codelineno-33-5"></a>
+</span><span id="__span-33-6"><a href="#__codelineno-33-6" id="__codelineno-33-6" name="__codelineno-33-6"></a><span class="k">class</span><span class="w"> </span><span class="nc">EchoAdapter</span><span class="p">(</span><span class="n">ProtocolAdapter</span><span class="p">):</span>
+</span><span id="__span-33-7"><a href="#__codelineno-33-7" id="__codelineno-33-7" name="__codelineno-33-7"></a><span class="w">    </span><span class="sd">"""Simple echo adapter for testing."""</span>
+</span><span id="__span-33-8"><a href="#__codelineno-33-8" id="__codelineno-33-8" name="__codelineno-33-8"></a>
+</span><span id="__span-33-9"><a href="#__codelineno-33-9" id="__codelineno-33-9" name="__codelineno-33-9"></a>    <span class="nd">@property</span>
+</span><span id="__span-33-10"><a href="#__codelineno-33-10" id="__codelineno-33-10" name="__codelineno-33-10"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">protocol_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="__span-33-11"><a href="#__codelineno-33-11" id="__codelineno-33-11" name="__codelineno-33-11"></a>        <span class="k">return</span> <span class="s2">"echo"</span>
+</span><span id="__span-33-12"><a href="#__codelineno-33-12" id="__codelineno-33-12" name="__codelineno-33-12"></a>
+</span><span id="__span-33-13"><a href="#__codelineno-33-13" id="__codelineno-33-13" name="__codelineno-33-13"></a>    <span class="nd">@property</span>
+</span><span id="__span-33-14"><a href="#__codelineno-33-14" id="__codelineno-33-14" name="__codelineno-33-14"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">protocol_version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="__span-33-15"><a href="#__codelineno-33-15" id="__codelineno-33-15" name="__codelineno-33-15"></a>        <span class="k">return</span> <span class="s2">"1.0"</span>
+</span><span id="__span-33-16"><a href="#__codelineno-33-16" id="__codelineno-33-16" name="__codelineno-33-16"></a>
+</span><span id="__span-33-17"><a href="#__codelineno-33-17" id="__codelineno-33-17" name="__codelineno-33-17"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">discover_resources</span><span class="p">(</span>
+</span><span id="__span-33-18"><a href="#__codelineno-33-18" id="__codelineno-33-18" name="__codelineno-33-18"></a>        <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-33-19"><a href="#__codelineno-33-19" id="__codelineno-33-19" name="__codelineno-33-19"></a>        <span class="n">discovery_config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+</span><span id="__span-33-20"><a href="#__codelineno-33-20" id="__codelineno-33-20" name="__codelineno-33-20"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ResourceSchema</span><span class="p">]:</span>
+</span><span id="__span-33-21"><a href="#__codelineno-33-21" id="__codelineno-33-21" name="__codelineno-33-21"></a>        <span class="c1"># Discover a single echo resource</span>
+</span><span id="__span-33-22"><a href="#__codelineno-33-22" id="__codelineno-33-22" name="__codelineno-33-22"></a>        <span class="k">return</span> <span class="p">[</span><span class="n">ResourceSchema</span><span class="p">(</span>
+</span><span id="__span-33-23"><a href="#__codelineno-33-23" id="__codelineno-33-23" name="__codelineno-33-23"></a>            <span class="nb">id</span><span class="o">=</span><span class="s2">"echo-1"</span><span class="p">,</span>
+</span><span id="__span-33-24"><a href="#__codelineno-33-24" id="__codelineno-33-24" name="__codelineno-33-24"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">"Echo Service"</span><span class="p">,</span>
+</span><span id="__span-33-25"><a href="#__codelineno-33-25" id="__codelineno-33-25" name="__codelineno-33-25"></a>            <span class="n">protocol</span><span class="o">=</span><span class="s2">"echo"</span><span class="p">,</span>
+</span><span id="__span-33-26"><a href="#__codelineno-33-26" id="__codelineno-33-26" name="__codelineno-33-26"></a>            <span class="n">endpoint</span><span class="o">=</span><span class="s2">"internal://echo"</span><span class="p">,</span>
+</span><span id="__span-33-27"><a href="#__codelineno-33-27" id="__codelineno-33-27" name="__codelineno-33-27"></a>            <span class="n">sensitivity_level</span><span class="o">=</span><span class="s2">"low"</span><span class="p">,</span>
+</span><span id="__span-33-28"><a href="#__codelineno-33-28" id="__codelineno-33-28" name="__codelineno-33-28"></a>            <span class="n">metadata</span><span class="o">=</span><span class="n">discovery_config</span><span class="p">,</span>
+</span><span id="__span-33-29"><a href="#__codelineno-33-29" id="__codelineno-33-29" name="__codelineno-33-29"></a>            <span class="n">created_at</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">(),</span>
+</span><span id="__span-33-30"><a href="#__codelineno-33-30" id="__codelineno-33-30" name="__codelineno-33-30"></a>            <span class="n">updated_at</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+</span><span id="__span-33-31"><a href="#__codelineno-33-31" id="__codelineno-33-31" name="__codelineno-33-31"></a>        <span class="p">)]</span>
+</span><span id="__span-33-32"><a href="#__codelineno-33-32" id="__codelineno-33-32" name="__codelineno-33-32"></a>
+</span><span id="__span-33-33"><a href="#__codelineno-33-33" id="__codelineno-33-33" name="__codelineno-33-33"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_capabilities</span><span class="p">(</span>
+</span><span id="__span-33-34"><a href="#__codelineno-33-34" id="__codelineno-33-34" name="__codelineno-33-34"></a>        <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-33-35"><a href="#__codelineno-33-35" id="__codelineno-33-35" name="__codelineno-33-35"></a>        <span class="n">resource</span><span class="p">:</span> <span class="n">ResourceSchema</span>
+</span><span id="__span-33-36"><a href="#__codelineno-33-36" id="__codelineno-33-36" name="__codelineno-33-36"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">CapabilitySchema</span><span class="p">]:</span>
+</span><span id="__span-33-37"><a href="#__codelineno-33-37" id="__codelineno-33-37" name="__codelineno-33-37"></a>        <span class="c1"># Echo has one capability: echo</span>
+</span><span id="__span-33-38"><a href="#__codelineno-33-38" id="__codelineno-33-38" name="__codelineno-33-38"></a>        <span class="k">return</span> <span class="p">[</span><span class="n">CapabilitySchema</span><span class="p">(</span>
+</span><span id="__span-33-39"><a href="#__codelineno-33-39" id="__codelineno-33-39" name="__codelineno-33-39"></a>            <span class="nb">id</span><span class="o">=</span><span class="s2">"echo-echo"</span><span class="p">,</span>
+</span><span id="__span-33-40"><a href="#__codelineno-33-40" id="__codelineno-33-40" name="__codelineno-33-40"></a>            <span class="n">resource_id</span><span class="o">=</span><span class="n">resource</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+</span><span id="__span-33-41"><a href="#__codelineno-33-41" id="__codelineno-33-41" name="__codelineno-33-41"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">"echo"</span><span class="p">,</span>
+</span><span id="__span-33-42"><a href="#__codelineno-33-42" id="__codelineno-33-42" name="__codelineno-33-42"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">"Echo back the input"</span><span class="p">,</span>
+</span><span id="__span-33-43"><a href="#__codelineno-33-43" id="__codelineno-33-43" name="__codelineno-33-43"></a>            <span class="n">input_schema</span><span class="o">=</span><span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"object"</span><span class="p">,</span> <span class="s2">"properties"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"message"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"string"</span><span class="p">}}},</span>
+</span><span id="__span-33-44"><a href="#__codelineno-33-44" id="__codelineno-33-44" name="__codelineno-33-44"></a>            <span class="n">output_schema</span><span class="o">=</span><span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"object"</span><span class="p">,</span> <span class="s2">"properties"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"echo"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"string"</span><span class="p">}}},</span>
+</span><span id="__span-33-45"><a href="#__codelineno-33-45" id="__codelineno-33-45" name="__codelineno-33-45"></a>            <span class="n">sensitivity_level</span><span class="o">=</span><span class="s2">"low"</span><span class="p">,</span>
+</span><span id="__span-33-46"><a href="#__codelineno-33-46" id="__codelineno-33-46" name="__codelineno-33-46"></a>            <span class="n">metadata</span><span class="o">=</span><span class="p">{}</span>
+</span><span id="__span-33-47"><a href="#__codelineno-33-47" id="__codelineno-33-47" name="__codelineno-33-47"></a>        <span class="p">)]</span>
+</span><span id="__span-33-48"><a href="#__codelineno-33-48" id="__codelineno-33-48" name="__codelineno-33-48"></a>
+</span><span id="__span-33-49"><a href="#__codelineno-33-49" id="__codelineno-33-49" name="__codelineno-33-49"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">validate_request</span><span class="p">(</span>
+</span><span id="__span-33-50"><a href="#__codelineno-33-50" id="__codelineno-33-50" name="__codelineno-33-50"></a>        <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-33-51"><a href="#__codelineno-33-51" id="__codelineno-33-51" name="__codelineno-33-51"></a>        <span class="n">request</span><span class="p">:</span> <span class="n">InvocationRequest</span>
+</span><span id="__span-33-52"><a href="#__codelineno-33-52" id="__codelineno-33-52" name="__codelineno-33-52"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="__span-33-53"><a href="#__codelineno-33-53" id="__codelineno-33-53" name="__codelineno-33-53"></a>        <span class="k">if</span> <span class="s2">"message"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">arguments</span><span class="p">:</span>
+</span><span id="__span-33-54"><a href="#__codelineno-33-54" id="__codelineno-33-54" name="__codelineno-33-54"></a>            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span>
+</span><span id="__span-33-55"><a href="#__codelineno-33-55" id="__codelineno-33-55" name="__codelineno-33-55"></a>                <span class="s2">"Missing 'message' field"</span><span class="p">,</span>
+</span><span id="__span-33-56"><a href="#__codelineno-33-56" id="__codelineno-33-56" name="__codelineno-33-56"></a>                <span class="n">validation_errors</span><span class="o">=</span><span class="p">[{</span><span class="s2">"field"</span><span class="p">:</span> <span class="s2">"message"</span><span class="p">,</span> <span class="s2">"error"</span><span class="p">:</span> <span class="s2">"required"</span><span class="p">}]</span>
+</span><span id="__span-33-57"><a href="#__codelineno-33-57" id="__codelineno-33-57" name="__codelineno-33-57"></a>            <span class="p">)</span>
+</span><span id="__span-33-58"><a href="#__codelineno-33-58" id="__codelineno-33-58" name="__codelineno-33-58"></a>        <span class="k">return</span> <span class="kc">True</span>
+</span><span id="__span-33-59"><a href="#__codelineno-33-59" id="__codelineno-33-59" name="__codelineno-33-59"></a>
+</span><span id="__span-33-60"><a href="#__codelineno-33-60" id="__codelineno-33-60" name="__codelineno-33-60"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">invoke</span><span class="p">(</span>
+</span><span id="__span-33-61"><a href="#__codelineno-33-61" id="__codelineno-33-61" name="__codelineno-33-61"></a>        <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-33-62"><a href="#__codelineno-33-62" id="__codelineno-33-62" name="__codelineno-33-62"></a>        <span class="n">request</span><span class="p">:</span> <span class="n">InvocationRequest</span>
+</span><span id="__span-33-63"><a href="#__codelineno-33-63" id="__codelineno-33-63" name="__codelineno-33-63"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InvocationResult</span><span class="p">:</span>
+</span><span id="__span-33-64"><a href="#__codelineno-33-64" id="__codelineno-33-64" name="__codelineno-33-64"></a>        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+</span><span id="__span-33-65"><a href="#__codelineno-33-65" id="__codelineno-33-65" name="__codelineno-33-65"></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="__span-33-66"><a href="#__codelineno-33-66" id="__codelineno-33-66" name="__codelineno-33-66"></a>            <span class="n">message</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">arguments</span><span class="p">[</span><span class="s2">"message"</span><span class="p">]</span>
+</span><span id="__span-33-67"><a href="#__codelineno-33-67" id="__codelineno-33-67" name="__codelineno-33-67"></a>            <span class="k">return</span> <span class="n">InvocationResult</span><span class="p">(</span>
+</span><span id="__span-33-68"><a href="#__codelineno-33-68" id="__codelineno-33-68" name="__codelineno-33-68"></a>                <span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="__span-33-69"><a href="#__codelineno-33-69" id="__codelineno-33-69" name="__codelineno-33-69"></a>                <span class="n">result</span><span class="o">=</span><span class="p">{</span><span class="s2">"echo"</span><span class="p">:</span> <span class="n">message</span><span class="p">},</span>
+</span><span id="__span-33-70"><a href="#__codelineno-33-70" id="__codelineno-33-70" name="__codelineno-33-70"></a>                <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"protocol"</span><span class="p">:</span> <span class="s2">"echo"</span><span class="p">},</span>
+</span><span id="__span-33-71"><a href="#__codelineno-33-71" id="__codelineno-33-71" name="__codelineno-33-71"></a>                <span class="n">duration_ms</span><span class="o">=</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+</span><span id="__span-33-72"><a href="#__codelineno-33-72" id="__codelineno-33-72" name="__codelineno-33-72"></a>            <span class="p">)</span>
+</span><span id="__span-33-73"><a href="#__codelineno-33-73" id="__codelineno-33-73" name="__codelineno-33-73"></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="__span-33-74"><a href="#__codelineno-33-74" id="__codelineno-33-74" name="__codelineno-33-74"></a>            <span class="k">return</span> <span class="n">InvocationResult</span><span class="p">(</span>
+</span><span id="__span-33-75"><a href="#__codelineno-33-75" id="__codelineno-33-75" name="__codelineno-33-75"></a>                <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-33-76"><a href="#__codelineno-33-76" id="__codelineno-33-76" name="__codelineno-33-76"></a>                <span class="n">error</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
+</span><span id="__span-33-77"><a href="#__codelineno-33-77" id="__codelineno-33-77" name="__codelineno-33-77"></a>                <span class="n">duration_ms</span><span class="o">=</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+</span><span id="__span-33-78"><a href="#__codelineno-33-78" id="__codelineno-33-78" name="__codelineno-33-78"></a>            <span class="p">)</span>
+</span><span id="__span-33-79"><a href="#__codelineno-33-79" id="__codelineno-33-79" name="__codelineno-33-79"></a>
+</span><span id="__span-33-80"><a href="#__codelineno-33-80" id="__codelineno-33-80" name="__codelineno-33-80"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">health_check</span><span class="p">(</span>
+</span><span id="__span-33-81"><a href="#__codelineno-33-81" id="__codelineno-33-81" name="__codelineno-33-81"></a>        <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-33-82"><a href="#__codelineno-33-82" id="__codelineno-33-82" name="__codelineno-33-82"></a>        <span class="n">resource</span><span class="p">:</span> <span class="n">ResourceSchema</span>
+</span><span id="__span-33-83"><a href="#__codelineno-33-83" id="__codelineno-33-83" name="__codelineno-33-83"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="__span-33-84"><a href="#__codelineno-33-84" id="__codelineno-33-84" name="__codelineno-33-84"></a>        <span class="c1"># Echo is always healthy</span>
+</span><span id="__span-33-85"><a href="#__codelineno-33-85" id="__codelineno-33-85" name="__codelineno-33-85"></a>        <span class="k">return</span> <span class="kc">True</span>
+</span></code></pre></div>
+<h3 id="registration-and-usage">Registration and Usage<a class="headerlink" href="#registration-and-usage" title="Permanent link">¶</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-34-1"><a href="#__codelineno-34-1" id="__codelineno-34-1" name="__codelineno-34-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sark.adapters</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_registry</span>
+</span><span id="__span-34-2"><a href="#__codelineno-34-2" id="__codelineno-34-2" name="__codelineno-34-2"></a>
+</span><span id="__span-34-3"><a href="#__codelineno-34-3" id="__codelineno-34-3" name="__codelineno-34-3"></a><span class="c1"># Register adapter</span>
+</span><span id="__span-34-4"><a href="#__codelineno-34-4" id="__codelineno-34-4" name="__codelineno-34-4"></a><span class="n">registry</span> <span class="o">=</span> <span class="n">get_registry</span><span class="p">()</span>
+</span><span id="__span-34-5"><a href="#__codelineno-34-5" id="__codelineno-34-5" name="__codelineno-34-5"></a><span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">EchoAdapter</span><span class="p">())</span>
+</span><span id="__span-34-6"><a href="#__codelineno-34-6" id="__codelineno-34-6" name="__codelineno-34-6"></a>
+</span><span id="__span-34-7"><a href="#__codelineno-34-7" id="__codelineno-34-7" name="__codelineno-34-7"></a><span class="c1"># Use adapter</span>
+</span><span id="__span-34-8"><a href="#__codelineno-34-8" id="__codelineno-34-8" name="__codelineno-34-8"></a><span class="n">adapter</span> <span class="o">=</span> <span class="n">registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"echo"</span><span class="p">)</span>
+</span><span id="__span-34-9"><a href="#__codelineno-34-9" id="__codelineno-34-9" name="__codelineno-34-9"></a><span class="n">resources</span> <span class="o">=</span> <span class="k">await</span> <span class="n">adapter</span><span class="o">.</span><span class="n">discover_resources</span><span class="p">({})</span>
+</span><span id="__span-34-10"><a href="#__codelineno-34-10" id="__codelineno-34-10" name="__codelineno-34-10"></a><span class="n">capabilities</span> <span class="o">=</span> <span class="k">await</span> <span class="n">adapter</span><span class="o">.</span><span class="n">get_capabilities</span><span class="p">(</span><span class="n">resources</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</span><span id="__span-34-11"><a href="#__codelineno-34-11" id="__codelineno-34-11" name="__codelineno-34-11"></a>
+</span><span id="__span-34-12"><a href="#__codelineno-34-12" id="__codelineno-34-12" name="__codelineno-34-12"></a><span class="n">request</span> <span class="o">=</span> <span class="n">InvocationRequest</span><span class="p">(</span>
+</span><span id="__span-34-13"><a href="#__codelineno-34-13" id="__codelineno-34-13" name="__codelineno-34-13"></a>    <span class="n">capability_id</span><span class="o">=</span><span class="s2">"echo-echo"</span><span class="p">,</span>
+</span><span id="__span-34-14"><a href="#__codelineno-34-14" id="__codelineno-34-14" name="__codelineno-34-14"></a>    <span class="n">principal_id</span><span class="o">=</span><span class="s2">"test-user"</span><span class="p">,</span>
+</span><span id="__span-34-15"><a href="#__codelineno-34-15" id="__codelineno-34-15" name="__codelineno-34-15"></a>    <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">"message"</span><span class="p">:</span> <span class="s2">"Hello, SARK!"</span><span class="p">}</span>
+</span><span id="__span-34-16"><a href="#__codelineno-34-16" id="__codelineno-34-16" name="__codelineno-34-16"></a><span class="p">)</span>
+</span><span id="__span-34-17"><a href="#__codelineno-34-17" id="__codelineno-34-17" name="__codelineno-34-17"></a>
+</span><span id="__span-34-18"><a href="#__codelineno-34-18" id="__codelineno-34-18" name="__codelineno-34-18"></a><span class="k">await</span> <span class="n">adapter</span><span class="o">.</span><span class="n">validate_request</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+</span><span id="__span-34-19"><a href="#__codelineno-34-19" id="__codelineno-34-19" name="__codelineno-34-19"></a><span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">adapter</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+</span><span id="__span-34-20"><a href="#__codelineno-34-20" id="__codelineno-34-20" name="__codelineno-34-20"></a>
+</span><span id="__span-34-21"><a href="#__codelineno-34-21" id="__codelineno-34-21" name="__codelineno-34-21"></a><span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">success</span> <span class="o">==</span> <span class="kc">True</span>
+</span><span id="__span-34-22"><a href="#__codelineno-34-22" id="__codelineno-34-22" name="__codelineno-34-22"></a><span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">result</span> <span class="o">==</span> <span class="p">{</span><span class="s2">"echo"</span><span class="p">:</span> <span class="s2">"Hello, SARK!"</span><span class="p">}</span>
+</span></code></pre></div>
+<hr/>
+<h2 id="sign-off">Sign-Off<a class="headerlink" href="#sign-off" title="Permanent link">¶</a></h2>
+<p>This interface contract MUST be reviewed and approved by all adapter engineers before implementation begins.</p>
+<h3 id="review-checklist">Review Checklist<a class="headerlink" href="#review-checklist" title="Permanent link">¶</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input disabled="" type="checkbox"><span class="task-list-indicator"></span></input></label> <strong>ENGINEER-1</strong> (Lead Architect) - Interface design approved</li>
+<li class="task-list-item"><label class="task-list-control"><input disabled="" type="checkbox"><span class="task-list-indicator"></span></input></label> <strong>ENGINEER-2</strong> (HTTP Adapter) - Can implement HTTP adapter with this interface</li>
+<li class="task-list-item"><label class="task-list-control"><input disabled="" type="checkbox"><span class="task-list-indicator"></span></input></label> <strong>ENGINEER-3</strong> (gRPC Adapter) - Can implement gRPC adapter with this interface</li>
+<li class="task-list-item"><label class="task-list-control"><input disabled="" type="checkbox"><span class="task-list-indicator"></span></input></label> <strong>ENGINEER-4</strong> (Federation) - Interface supports federation requirements</li>
+<li class="task-list-item"><label class="task-list-control"><input disabled="" type="checkbox"><span class="task-list-indicator"></span></input></label> <strong>ENGINEER-5</strong> (Advanced Features) - Interface supports cost attribution &amp; policies</li>
+<li class="task-list-item"><label class="task-list-control"><input disabled="" type="checkbox"><span class="task-list-indicator"></span></input></label> <strong>ENGINEER-6</strong> (Database) - Schema design aligns with interface</li>
+<li class="task-list-item"><label class="task-list-control"><input disabled="" type="checkbox"><span class="task-list-indicator"></span></input></label> <strong>QA-1</strong> (Testing) - Can create comprehensive test suite</li>
+<li class="task-list-item"><label class="task-list-control"><input disabled="" type="checkbox"><span class="task-list-indicator"></span></input></label> <strong>QA-2</strong> (Performance) - Interface supports performance testing</li>
+<li class="task-list-item"><label class="task-list-control"><input disabled="" type="checkbox"><span class="task-list-indicator"></span></input></label> <strong>DOCS-1</strong> (Documentation) - Interface is well-documented</li>
+<li class="task-list-item"><label class="task-list-control"><input disabled="" type="checkbox"><span class="task-list-indicator"></span></input></label> <strong>DOCS-2</strong> (Tutorials) - Can create tutorials using this interface</li>
+</ul>
+<h3 id="approval">Approval<a class="headerlink" href="#approval" title="Permanent link">¶</a></h3>
+<table>
+<thead>
+<tr>
+<th>Engineer</th>
+<th>Status</th>
+<th>Date</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ENGINEER-1</td>
+<td>✅ Approved</td>
+<td>2025-11-28</td>
+<td>Interface frozen for v2.0</td>
+</tr>
+<tr>
+<td>ENGINEER-2</td>
+<td>⏳ Pending</td>
+<td>-</td>
+<td>Awaiting review</td>
+</tr>
+<tr>
+<td>ENGINEER-3</td>
+<td>⏳ Pending</td>
+<td>-</td>
+<td>Awaiting review</td>
+</tr>
+<tr>
+<td>ENGINEER-4</td>
+<td>⏳ Pending</td>
+<td>-</td>
+<td>Awaiting review</td>
+</tr>
+<tr>
+<td>ENGINEER-5</td>
+<td>⏳ Pending</td>
+<td>-</td>
+<td>Awaiting review</td>
+</tr>
+<tr>
+<td>ENGINEER-6</td>
+<td>⏳ Pending</td>
+<td>-</td>
+<td>Awaiting review</td>
+</tr>
+<tr>
+<td>QA-1</td>
+<td>⏳ Pending</td>
+<td>-</td>
+<td>Awaiting review</td>
+</tr>
+<tr>
+<td>QA-2</td>
+<td>⏳ Pending</td>
+<td>-</td>
+<td>Awaiting review</td>
+</tr>
+<tr>
+<td>DOCS-1</td>
+<td>⏳ Pending</td>
+<td>-</td>
+<td>Awaiting review</td>
+</tr>
+<tr>
+<td>DOCS-2</td>
+<td>⏳ Pending</td>
+<td>-</td>
+<td>Awaiting review</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="change-log">Change Log<a class="headerlink" href="#change-log" title="Permanent link">¶</a></h2>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Date</th>
+<th>Author</th>
+<th>Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2.0.0</td>
+<td>2025-11-28</td>
+<td>ENGINEER-1</td>
+<td>Initial frozen interface contract</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="questions-support">Questions &amp; Support<a class="headerlink" href="#questions-support" title="Permanent link">¶</a></h2>
+<p><strong>Questions about this interface?</strong>
+- Escalate to ENGINEER-1 (Lead Architect)
+- Slack: <code>#sark-v2-architecture</code>
+- Email: engineer-1@grid.example.com</p>
+<p><strong>Need interface changes?</strong>
+1. Create architecture review request
+2. Get approval from ENGINEER-1
+3. Update this document
+4. Notify all dependent engineers</p>
+<hr/>
+<p><strong>🚨 This interface is now FROZEN for v2.0 development. All adapter implementations must conform to this contract. 🚨</strong></p>
+</article>
+</div>
+<script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+</div>
+<button class="md-top md-icon" data-md-component="top" hidden="" type="button">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"></path></svg>
+  Back to top
+</button>
+</main>
+<footer class="md-footer">
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+<div class="md-copyright__highlight">
+      Copyright © 2024 James R. A. Henry. All rights reserved.
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
+      Material for MkDocs
+    </a>
+</div>
+<div class="md-social">
+<a class="md-social__link" href="https://github.com/apathy-ca/sark" rel="noopener" target="_blank" title="github.com">
+<svg viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"></path></svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.path", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+<script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+<script type="module">import mermaid from "https://unpkg.com/mermaid@10.4.0/dist/mermaid.esm.min.mjs";
+mermaid.initialize({});</script></body>
+</html>

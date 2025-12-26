@@ -1,0 +1,2465 @@
+
+<!DOCTYPE html>
+
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="Enterprise-Grade MCP Governance System" name="description"/>
+<meta content="James R. A. Henry" name="author"/>
+<link href="https://sark.example.com/diagrams/04_transport_comparison/" rel="canonical"/>
+<link href="../../assets/images/favicon.png" rel="icon"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-9.7.1" name="generator"/>
+<title>MCP Transport Types Comparison - SARK - Security Audit and Resource Kontroler</title>
+<link href="../../assets/stylesheets/main.484c7ddc.min.css" rel="stylesheet"/>
+<link href="../../assets/stylesheets/palette.ab4e12ef.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config",""),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+<script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+</head>
+<body data-md-color-accent="indigo" data-md-color-primary="indigo" data-md-color-scheme="default" dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#mcp-transport-types-comparison">
+          Skip to content
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<div data-md-color-scheme="default" data-md-component="outdated" hidden="">
+</div>
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="SARK - Security Audit and Resource Kontroler" class="md-header__button md-logo" data-md-component="logo" href="../.." title="SARK - Security Audit and Resource Kontroler">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            SARK - Security Audit and Resource Kontroler
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              MCP Transport Types Comparison
+            
+          </span>
+</div>
+</div>
+</div>
+<form class="md-header__option" data-md-component="palette">
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="" data-md-color-primary="indigo" data-md-color-scheme="default" id="__palette_0" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="" data-md-color-primary="indigo" data-md-color-scheme="slate" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_0" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+</form>
+<script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<a aria-label="Share" class="md-search__icon md-icon" data-clipboard="" data-clipboard-text="" data-md-component="search-share" href="javascript:void(0)" tabindex="-1" title="Share">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"></path></svg>
+</a>
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+</button>
+</nav>
+<div class="md-search__suggest" data-md-component="search-suggest"></div>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="" tabindex="0">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initializing search
+          </div>
+<ol class="md-search-result__list" role="presentation"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="md-header__source">
+<a class="md-source" data-md-component="source" href="https://github.com/apathy-ca/sark" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+</div>
+<div class="md-source__repository">
+    apathy-ca/sark
+  </div>
+</a>
+</div>
+</nav>
+<nav aria-label="Tabs" class="md-tabs" data-md-component="tabs">
+<div class="md-grid">
+<ul class="md-tabs__list">
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../..">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../QUICK_START/">
+          
+  
+  
+    
+  
+  Getting Started
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../ARCHITECTURE/">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../DEPLOYMENT/">
+          
+  
+  
+    
+  
+  Deployment
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../AUTHENTICATION/">
+          
+  
+  
+    
+  
+  Authentication &amp; Authorization
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../OPA_POLICY_GUIDE/">
+          
+  
+  
+    
+  
+  Policies
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../MONITORING/">
+          
+  
+  
+    
+  
+  Operations
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../DATABASE_MIGRATIONS/">
+          
+  
+  
+    
+  
+  Database
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../PERFORMANCE_TESTING/">
+          
+  
+  
+    
+  
+  Performance
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../API_REFERENCE/">
+          
+  
+  
+    
+  
+  API Reference
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../DEVELOPMENT/">
+          
+  
+  
+    
+  
+  Development
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../EXECUTIVE_SUMMARY/">
+          
+  
+  
+    
+  
+  Reports
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../REPOSITORY_IMPROVEMENT_PLAN/">
+          
+  
+  
+    
+  
+  Planning
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../GLOSSARY/">
+          
+  
+  
+    
+  
+  Reference
+
+        </a>
+</li>
+</ul>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary md-nav--lifted" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="SARK - Security Audit and Resource Kontroler" class="md-nav__button md-logo" data-md-component="logo" href="../.." title="SARK - Security Audit and Resource Kontroler">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+    SARK - Security Audit and Resource Kontroler
+  </label>
+<div class="md-nav__source">
+<a class="md-source" data-md-component="source" href="https://github.com/apathy-ca/sark" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+</div>
+<div class="md-source__repository">
+    apathy-ca/sark
+  </div>
+</a>
+</div>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../..">
+<span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../QUICK_START/">
+<span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../QUICK_REFERENCE_SESSIONS/">
+<span class="md-ellipsis">
+    
+  
+    Quick Reference
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../installation/">
+<span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../ARCHITECTURE/">
+<span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../SECURITY/">
+<span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PERFORMANCE/">
+<span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_4">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../DEPLOYMENT/">
+<span class="md-ellipsis">
+    
+  
+    Deployment Guide
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../DOCKER_DEPLOYMENT/">
+<span class="md-ellipsis">
+    
+  
+    Docker Deployment
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PRODUCTION_DEPLOYMENT/">
+<span class="md-ellipsis">
+    
+  
+    Production Deployment
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PRODUCTION_CONFIG/">
+<span class="md-ellipsis">
+    
+  
+    Production Config
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PRODUCTION_READINESS/">
+<span class="md-ellipsis">
+    
+  
+    Production Readiness
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../DEPLOYMENT_CHECKLIST/">
+<span class="md-ellipsis">
+    
+  
+    Deployment Checklist
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../DISASTER_RECOVERY/">
+<span class="md-ellipsis">
+    
+  
+    Disaster Recovery
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../ROLLBACK_PROCEDURES/">
+<span class="md-ellipsis">
+    
+  
+    Rollback Procedures
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_5" type="checkbox"/>
+<label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Authentication &amp; Authorization
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_5_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_5">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Authentication &amp; Authorization
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../AUTHENTICATION/">
+<span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../AUTHORIZATION/">
+<span class="md-ellipsis">
+    
+  
+    Authorization
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../OIDC_SETUP/">
+<span class="md-ellipsis">
+    
+  
+    OIDC Setup
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../LDAP_SETUP/">
+<span class="md-ellipsis">
+    
+  
+    LDAP Setup
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../SAML_SETUP/">
+<span class="md-ellipsis">
+    
+  
+    SAML Setup
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../API_KEYS/">
+<span class="md-ellipsis">
+    
+  
+    API Keys
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_6" type="checkbox"/>
+<label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Policies
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_6_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_6">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Policies
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../OPA_POLICY_GUIDE/">
+<span class="md-ellipsis">
+    
+  
+    OPA Policy Guide
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../ADVANCED_OPA_POLICIES/">
+<span class="md-ellipsis">
+    
+  
+    Advanced OPA Policies
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../POLICY_OPTIMIZATION/">
+<span class="md-ellipsis">
+    
+  
+    Policy Optimization
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../POLICY_CACHING/">
+<span class="md-ellipsis">
+    
+  
+    Policy Caching
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../POLICY_AUDIT_GUIDE/">
+<span class="md-ellipsis">
+    
+  
+    Policy Audit Guide
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../POLICY_AUDIT_TRAIL/">
+<span class="md-ellipsis">
+    
+  
+    Policy Audit Trail
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_7" type="checkbox"/>
+<label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Operations
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_7_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_7">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Operations
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../MONITORING/">
+<span class="md-ellipsis">
+    
+  
+    Monitoring
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../MONITORING_SETUP/">
+<span class="md-ellipsis">
+    
+  
+    Monitoring Setup
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../OPERATIONAL_RUNBOOK/">
+<span class="md-ellipsis">
+    
+  
+    Operational Runbook
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../OPERATIONS_RUNBOOK/">
+<span class="md-ellipsis">
+    
+  
+    Operations Runbook
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../INCIDENT_RESPONSE/">
+<span class="md-ellipsis">
+    
+  
+    Incident Response
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../TROUBLESHOOTING/">
+<span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_8" type="checkbox"/>
+<label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Database
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_8_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_8">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Database
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../DATABASE_MIGRATIONS/">
+<span class="md-ellipsis">
+    
+  
+    Database Migrations
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../DATABASE_OPTIMIZATION/">
+<span class="md-ellipsis">
+    
+  
+    Database Optimization
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../REDIS_OPTIMIZATION/">
+<span class="md-ellipsis">
+    
+  
+    Redis Optimization
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_9" type="checkbox"/>
+<label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_9_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_9">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Performance
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PERFORMANCE_TESTING/">
+<span class="md-ellipsis">
+    
+  
+    Performance Testing
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PERFORMANCE_TUNING/">
+<span class="md-ellipsis">
+    
+  
+    Performance Tuning
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PERFORMANCE_OPTIMIZATION/">
+<span class="md-ellipsis">
+    
+  
+    Performance Optimization
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PERFORMANCE_REPORT/">
+<span class="md-ellipsis">
+    
+  
+    Performance Report
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../POLICY_PERFORMANCE_REPORT/">
+<span class="md-ellipsis">
+    
+  
+    Policy Performance
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_10" type="checkbox"/>
+<label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_10_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_10">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../API_REFERENCE/">
+<span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../API_INTEGRATION/">
+<span class="md-ellipsis">
+    
+  
+    API Integration
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_11" type="checkbox"/>
+<label class="md-nav__link" for="__nav_11" id="__nav_11_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_11_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_11">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../DEVELOPMENT/">
+<span class="md-ellipsis">
+    
+  
+    Development Guide
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../MIGRATION_GUIDE/">
+<span class="md-ellipsis">
+    
+  
+    Migration Guide
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../DEVELOPMENT_LOG/">
+<span class="md-ellipsis">
+    
+  
+    Development Log
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../TESTING_STRATEGY/">
+<span class="md-ellipsis">
+    
+  
+    Testing Strategy
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../INTEGRATION_TESTING/">
+<span class="md-ellipsis">
+    
+  
+    Integration Testing
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_12" type="checkbox"/>
+<label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Reports
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_12_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_12">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Reports
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../EXECUTIVE_SUMMARY/">
+<span class="md-ellipsis">
+    
+  
+    Executive Summary
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../ROADMAP/">
+<span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../IMPLEMENTATION_PLAN/">
+<span class="md-ellipsis">
+    
+  
+    Implementation Plan
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../GAP_ANALYSIS/">
+<span class="md-ellipsis">
+    
+  
+    Gap Analysis
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PHASE2_COMPLETION_REPORT/">
+<span class="md-ellipsis">
+    
+  
+    Phase 2 Completion
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../RELEASE_NOTES_v0.2.0/">
+<span class="md-ellipsis">
+    
+  
+    Release Notes v0.2.0
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../FINAL_TEST_REPORT/">
+<span class="md-ellipsis">
+    
+  
+    Final Test Report
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../TEST_COVERAGE_REPORT/">
+<span class="md-ellipsis">
+    
+  
+    Test Coverage Report
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../KNOWN_ISSUES/">
+<span class="md-ellipsis">
+    
+  
+    Known Issues
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../LESSONS_LEARNED/">
+<span class="md-ellipsis">
+    
+  
+    Lessons Learned
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_13" type="checkbox"/>
+<label class="md-nav__link" for="__nav_13" id="__nav_13_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Planning
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_13_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_13">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Planning
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../REPOSITORY_IMPROVEMENT_PLAN/">
+<span class="md-ellipsis">
+    
+  
+    Repository Improvement Plan
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../WORK_BREAKDOWN_SESSIONS/">
+<span class="md-ellipsis">
+    
+  
+    Work Breakdown Sessions
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../WORK_TASKS/">
+<span class="md-ellipsis">
+    
+  
+    Work Tasks
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PHASE2_3WEEK_PLAN/">
+<span class="md-ellipsis">
+    
+  
+    Phase 2 3-Week Plan
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../WEEK_2_SUMMARY/">
+<span class="md-ellipsis">
+    
+  
+    Week 2 Summary
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../WEEK_3_SUMMARY/">
+<span class="md-ellipsis">
+    
+  
+    Week 3 Summary
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_14" type="checkbox"/>
+<label class="md-nav__link" for="__nav_14" id="__nav_14_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_14_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_14">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../GLOSSARY/">
+<span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../FAQ/">
+<span class="md-ellipsis">
+    
+  
+    FAQ
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../SECURITY_BEST_PRACTICES/">
+<span class="md-ellipsis">
+    
+  
+    Security Best Practices
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../SECURITY_HARDENING/">
+<span class="md-ellipsis">
+    
+  
+    Security Hardening
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../SECURITY_AUDIT/">
+<span class="md-ellipsis">
+    
+  
+    Security Audit
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../PRODUCTION_HANDOFF/">
+<span class="md-ellipsis">
+    
+  
+    Production Handoff
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#overview">
+<span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#transport-architecture-overview">
+<span class="md-ellipsis">
+      
+        Transport Architecture Overview
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#http-transport">
+<span class="md-ellipsis">
+      
+        HTTP Transport
+      
+    </span>
+</a>
+<nav aria-label="HTTP Transport" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#requestresponse-flow">
+<span class="md-ellipsis">
+      
+        Request/Response Flow
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#http-configuration-example">
+<span class="md-ellipsis">
+      
+        HTTP Configuration Example
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#http-pros-cons">
+<span class="md-ellipsis">
+      
+        HTTP Pros &amp; Cons
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#stdio-transport">
+<span class="md-ellipsis">
+      
+        stdio Transport
+      
+    </span>
+</a>
+<nav aria-label="stdio Transport" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#process-execution-flow">
+<span class="md-ellipsis">
+      
+        Process Execution Flow
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#stdio-configuration-example">
+<span class="md-ellipsis">
+      
+        stdio Configuration Example
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#stdio-pros-cons">
+<span class="md-ellipsis">
+      
+        stdio Pros &amp; Cons
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#sse-server-sent-events-transport">
+<span class="md-ellipsis">
+      
+        SSE (Server-Sent Events) Transport
+      
+    </span>
+</a>
+<nav aria-label="SSE (Server-Sent Events) Transport" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#streaming-connection-flow">
+<span class="md-ellipsis">
+      
+        Streaming Connection Flow
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#sse-configuration-example">
+<span class="md-ellipsis">
+      
+        SSE Configuration Example
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#sse-event-format">
+<span class="md-ellipsis">
+      
+        SSE Event Format
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#sse-pros-cons">
+<span class="md-ellipsis">
+      
+        SSE Pros &amp; Cons
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#transport-comparison-matrix">
+<span class="md-ellipsis">
+      
+        Transport Comparison Matrix
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#performance-characteristics">
+<span class="md-ellipsis">
+      
+        Performance Characteristics
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#security-comparison">
+<span class="md-ellipsis">
+      
+        Security Comparison
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#decision-tree-which-transport-to-use">
+<span class="md-ellipsis">
+      
+        Decision Tree: Which Transport to Use?
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#transport-selection-guidelines">
+<span class="md-ellipsis">
+      
+        Transport Selection Guidelines
+      
+    </span>
+</a>
+<nav aria-label="Transport Selection Guidelines" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#use-http-when">
+<span class="md-ellipsis">
+      
+        Use HTTP When:
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#use-stdio-when">
+<span class="md-ellipsis">
+      
+        Use stdio When:
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#use-sse-when">
+<span class="md-ellipsis">
+      
+        Use SSE When:
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#code-examples">
+<span class="md-ellipsis">
+      
+        Code Examples
+      
+    </span>
+</a>
+<nav aria-label="Code Examples" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#http-transport-client">
+<span class="md-ellipsis">
+      
+        HTTP Transport - Client
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#stdio-transport-client">
+<span class="md-ellipsis">
+      
+        stdio Transport - Client
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#sse-transport-client">
+<span class="md-ellipsis">
+      
+        SSE Transport - Client
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#monitoring-observability">
+<span class="md-ellipsis">
+      
+        Monitoring &amp; Observability
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#next-steps">
+<span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<article class="md-content__inner md-typeset">
+<h1 id="mcp-transport-types-comparison">MCP Transport Types Comparison<a class="headerlink" href="#mcp-transport-types-comparison" title="Permanent link">¶</a></h1>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">¶</a></h2>
+<p>This document compares the three MCP transport types: HTTP, stdio (standard input/output), and SSE (Server-Sent Events). Each has different use cases, performance characteristics, and security implications.</p>
+<h2 id="transport-architecture-overview">Transport Architecture Overview<a class="headerlink" href="#transport-architecture-overview" title="Permanent link">¶</a></h2>
+<div class="mermaid">graph TB
+    subgraph "AI Client"
+        CLIENT[AI Assistant<br/>Claude, GPT, etc.]
+    end
+
+    subgraph "SARK Governance Layer"
+        SARK[SARK Gateway]
+    end
+
+    subgraph "MCP Servers - Different Transports"
+        direction TB
+
+        subgraph "HTTP Transport"
+            HTTP_MCP[MCP Server<br/>HTTP REST API]
+            HTTP_DESC[• Remote server<br/>• Stateless<br/>• Request/Response<br/>• Port: 8080/443]
+        end
+
+        subgraph "stdio Transport"
+            STDIO_MCP[MCP Server<br/>Local Process]
+            STDIO_DESC[• Local execution<br/>• Standard I/O<br/>• Subprocess<br/>• No network]
+        end
+
+        subgraph "SSE Transport"
+            SSE_MCP[MCP Server<br/>Server-Sent Events]
+            SSE_DESC[• Streaming<br/>• Long-lived connection<br/>• Push updates<br/>• HTTP/2]
+        end
+    end
+
+    CLIENT --&gt;|REST API| SARK
+    SARK --&gt;|HTTP POST| HTTP_MCP
+    SARK --&gt;|Process spawn| STDIO_MCP
+    SARK --&gt;|EventSource| SSE_MCP
+
+    HTTP_MCP -.-&gt; HTTP_DESC
+    STDIO_MCP -.-&gt; STDIO_DESC
+    SSE_MCP -.-&gt; SSE_DESC
+
+    classDef httpColor fill:#4a90e2,stroke:#2e5c8a,color:#fff
+    classDef stdioColor fill:#50c878,stroke:#2d7a4a,color:#fff
+    classDef sseColor fill:#ffd43b,stroke:#e6b800,color:#000
+
+    class HTTP_MCP,HTTP_DESC httpColor
+    class STDIO_MCP,STDIO_DESC stdioColor
+    class SSE_MCP,SSE_DESC sseColor
+</div>
+<h2 id="http-transport">HTTP Transport<a class="headerlink" href="#http-transport" title="Permanent link">¶</a></h2>
+<h3 id="requestresponse-flow">Request/Response Flow<a class="headerlink" href="#requestresponse-flow" title="Permanent link">¶</a></h3>
+<div class="mermaid">sequenceDiagram
+    participant AI as AI Client
+    participant SARK as SARK Gateway
+    participant MCP as MCP Server (HTTP)
+    participant Backend as Backend System
+
+    Note over AI,Backend: HTTP Transport - Synchronous Request/Response
+
+    AI-&gt;&gt;SARK: POST /api/v1/tools/invoke<br/>{tool_id: "...", params: {...}}
+    SARK-&gt;&gt;SARK: Authenticate &amp; Authorize
+
+    SARK-&gt;&gt;MCP: POST https://mcp-server.internal:8443/mcp/v1<br/>Content-Type: application/json<br/>Authorization: Bearer {token}<br/>{<br/>  jsonrpc: "2.0",<br/>  method: "tools/call",<br/>  params: {<br/>    name: "query_database",<br/>    arguments: {query: "SELECT ..."}}<br/>  }<br/>}
+
+    MCP-&gt;&gt;MCP: Parse JSON-RPC request
+    MCP-&gt;&gt;MCP: Validate parameters
+    MCP-&gt;&gt;Backend: Execute query
+    Backend--&gt;&gt;MCP: Query results
+
+    MCP-&gt;&gt;MCP: Format MCP response
+    MCP--&gt;&gt;SARK: 200 OK<br/>{<br/>  jsonrpc: "2.0",<br/>  result: {<br/>    content: [{<br/>      type: "text",<br/>      text: "Results: ..."<br/>    }]<br/>  }<br/>}
+
+    SARK-&gt;&gt;SARK: Log audit event
+    SARK--&gt;&gt;AI: Return results
+
+    Note over AI,Backend: Connection closed after response
+</div>
+<h3 id="http-configuration-example">HTTP Configuration Example<a class="headerlink" href="#http-configuration-example" title="Permanent link">¶</a></h3>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="p">{</span>
+</span><span id="__span-0-2"><a href="#__codelineno-0-2" id="__codelineno-0-2" name="__codelineno-0-2"></a><span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"finance-mcp-server"</span><span class="p">,</span>
+</span><span id="__span-0-3"><a href="#__codelineno-0-3" id="__codelineno-0-3" name="__codelineno-0-3"></a><span class="w">  </span><span class="nt">"transport"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http"</span><span class="p">,</span>
+</span><span id="__span-0-4"><a href="#__codelineno-0-4" id="__codelineno-0-4" name="__codelineno-0-4"></a><span class="w">  </span><span class="nt">"endpoint"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://finance-mcp.internal.company.com:8443"</span><span class="p">,</span>
+</span><span id="__span-0-5"><a href="#__codelineno-0-5" id="__codelineno-0-5" name="__codelineno-0-5"></a><span class="w">  </span><span class="nt">"health_endpoint"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://finance-mcp.internal.company.com:8443/health"</span><span class="p">,</span>
+</span><span id="__span-0-6"><a href="#__codelineno-0-6" id="__codelineno-0-6" name="__codelineno-0-6"></a><span class="w">  </span><span class="nt">"capabilities"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"tools"</span><span class="p">,</span><span class="w"> </span><span class="s2">"resources"</span><span class="p">],</span>
+</span><span id="__span-0-7"><a href="#__codelineno-0-7" id="__codelineno-0-7" name="__codelineno-0-7"></a><span class="w">  </span><span class="nt">"tls"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-8"><a href="#__codelineno-0-8" id="__codelineno-0-8" name="__codelineno-0-8"></a><span class="w">    </span><span class="nt">"enabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-0-9"><a href="#__codelineno-0-9" id="__codelineno-0-9" name="__codelineno-0-9"></a><span class="w">    </span><span class="nt">"verify_cert"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-0-10"><a href="#__codelineno-0-10" id="__codelineno-0-10" name="__codelineno-0-10"></a><span class="w">    </span><span class="nt">"client_cert_required"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+</span><span id="__span-0-11"><a href="#__codelineno-0-11" id="__codelineno-0-11" name="__codelineno-0-11"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-0-12"><a href="#__codelineno-0-12" id="__codelineno-0-12" name="__codelineno-0-12"></a><span class="w">  </span><span class="nt">"timeout_seconds"</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span>
+</span><span id="__span-0-13"><a href="#__codelineno-0-13" id="__codelineno-0-13" name="__codelineno-0-13"></a><span class="w">  </span><span class="nt">"retry_policy"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-14"><a href="#__codelineno-0-14" id="__codelineno-0-14" name="__codelineno-0-14"></a><span class="w">    </span><span class="nt">"max_retries"</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+</span><span id="__span-0-15"><a href="#__codelineno-0-15" id="__codelineno-0-15" name="__codelineno-0-15"></a><span class="w">    </span><span class="nt">"backoff"</span><span class="p">:</span><span class="w"> </span><span class="s2">"exponential"</span>
+</span><span id="__span-0-16"><a href="#__codelineno-0-16" id="__codelineno-0-16" name="__codelineno-0-16"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-0-17"><a href="#__codelineno-0-17" id="__codelineno-0-17" name="__codelineno-0-17"></a><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="http-pros-cons">HTTP Pros &amp; Cons<a class="headerlink" href="#http-pros-cons" title="Permanent link">¶</a></h3>
+<p><strong>Advantages:</strong>
+- ✅ <strong>Scalable</strong>: Can run on multiple servers behind load balancer
+- ✅ <strong>Remote</strong>: MCP server can be anywhere on network
+- ✅ <strong>Stateless</strong>: No connection state, easy to restart
+- ✅ <strong>Standard</strong>: Works with existing HTTP infrastructure (proxies, load balancers, WAF)
+- ✅ <strong>Secure</strong>: TLS encryption, certificate auth, mTLS support
+- ✅ <strong>Monitored</strong>: Standard HTTP metrics and logging</p>
+<p><strong>Disadvantages:</strong>
+- ❌ <strong>Network Overhead</strong>: HTTP headers, TCP handshake per request
+- ❌ <strong>Latency</strong>: Higher latency than local execution
+- ❌ <strong>Firewall</strong>: Requires open network ports
+- ❌ <strong>Request/Response Only</strong>: No streaming or push notifications</p>
+<p><strong>Best Use Cases:</strong>
+- Production MCP servers serving multiple clients
+- Cloud-deployed MCP services
+- Enterprise-managed MCP servers
+- High-availability requirements</p>
+<hr/>
+<h2 id="stdio-transport">stdio Transport<a class="headerlink" href="#stdio-transport" title="Permanent link">¶</a></h2>
+<h3 id="process-execution-flow">Process Execution Flow<a class="headerlink" href="#process-execution-flow" title="Permanent link">¶</a></h3>
+<div class="mermaid">sequenceDiagram
+    participant AI as AI Client
+    participant SARK as SARK Gateway
+    participant OS as Operating System
+    participant PROC as MCP Process<br/>(stdio)
+    participant FS as File System
+
+    Note over AI,FS: stdio Transport - Local Process Execution
+
+    AI-&gt;&gt;SARK: POST /api/v1/tools/invoke<br/>{tool_id: "local_tool", params: {...}}
+    SARK-&gt;&gt;SARK: Authenticate &amp; Authorize
+
+    SARK-&gt;&gt;OS: spawn process:<br/>python3 /opt/mcp-servers/file-tools/server.py
+
+    OS-&gt;&gt;PROC: Create process (stdin/stdout/stderr pipes)
+    PROC-&gt;&gt;PROC: Initialize MCP server
+    PROC--&gt;&gt;SARK: READY (via stdout)
+
+    SARK-&gt;&gt;PROC: Write to stdin:<br/>{<br/>  jsonrpc: "2.0",<br/>  method: "tools/call",<br/>  params: {<br/>    name: "read_file",<br/>    arguments: {path: "/data/report.txt"}<br/>  }<br/>}\n
+
+    PROC-&gt;&gt;PROC: Parse JSON from stdin
+    PROC-&gt;&gt;PROC: Validate parameters
+
+    PROC-&gt;&gt;FS: Read file: /data/report.txt
+    FS--&gt;&gt;PROC: File contents
+
+    PROC-&gt;&gt;PROC: Format response
+
+    PROC-&gt;&gt;SARK: Write to stdout:<br/>{<br/>  jsonrpc: "2.0",<br/>  result: {<br/>    content: [{<br/>      type: "text",<br/>      text: "File contents: ..."<br/>    }]<br/>  }<br/>}\n
+
+    SARK-&gt;&gt;SARK: Log audit event
+    SARK--&gt;&gt;AI: Return results
+
+    alt Keep Process Alive
+        Note over PROC: Process remains running<br/>for next request
+    else Terminate Process
+        SARK-&gt;&gt;PROC: Send EOF or SIGTERM
+        PROC-&gt;&gt;OS: Exit process
+    end
+</div>
+<h3 id="stdio-configuration-example">stdio Configuration Example<a class="headerlink" href="#stdio-configuration-example" title="Permanent link">¶</a></h3>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-1-1"><a href="#__codelineno-1-1" id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="p">{</span>
+</span><span id="__span-1-2"><a href="#__codelineno-1-2" id="__codelineno-1-2" name="__codelineno-1-2"></a><span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"local-file-tools"</span><span class="p">,</span>
+</span><span id="__span-1-3"><a href="#__codelineno-1-3" id="__codelineno-1-3" name="__codelineno-1-3"></a><span class="w">  </span><span class="nt">"transport"</span><span class="p">:</span><span class="w"> </span><span class="s2">"stdio"</span><span class="p">,</span>
+</span><span id="__span-1-4"><a href="#__codelineno-1-4" id="__codelineno-1-4" name="__codelineno-1-4"></a><span class="w">  </span><span class="nt">"command"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/usr/bin/python3 /opt/mcp-servers/file-tools/server.py"</span><span class="p">,</span>
+</span><span id="__span-1-5"><a href="#__codelineno-1-5" id="__codelineno-1-5" name="__codelineno-1-5"></a><span class="w">  </span><span class="nt">"env"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-6"><a href="#__codelineno-1-6" id="__codelineno-1-6" name="__codelineno-1-6"></a><span class="w">    </span><span class="nt">"MCP_SERVER_NAME"</span><span class="p">:</span><span class="w"> </span><span class="s2">"file-tools"</span><span class="p">,</span>
+</span><span id="__span-1-7"><a href="#__codelineno-1-7" id="__codelineno-1-7" name="__codelineno-1-7"></a><span class="w">    </span><span class="nt">"DATA_DIR"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/data"</span><span class="p">,</span>
+</span><span id="__span-1-8"><a href="#__codelineno-1-8" id="__codelineno-1-8" name="__codelineno-1-8"></a><span class="w">    </span><span class="nt">"LOG_LEVEL"</span><span class="p">:</span><span class="w"> </span><span class="s2">"INFO"</span>
+</span><span id="__span-1-9"><a href="#__codelineno-1-9" id="__codelineno-1-9" name="__codelineno-1-9"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-1-10"><a href="#__codelineno-1-10" id="__codelineno-1-10" name="__codelineno-1-10"></a><span class="w">  </span><span class="nt">"working_directory"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/opt/mcp-servers/file-tools"</span><span class="p">,</span>
+</span><span id="__span-1-11"><a href="#__codelineno-1-11" id="__codelineno-1-11" name="__codelineno-1-11"></a><span class="w">  </span><span class="nt">"capabilities"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"tools"</span><span class="p">],</span>
+</span><span id="__span-1-12"><a href="#__codelineno-1-12" id="__codelineno-1-12" name="__codelineno-1-12"></a><span class="w">  </span><span class="nt">"process_management"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-13"><a href="#__codelineno-1-13" id="__codelineno-1-13" name="__codelineno-1-13"></a><span class="w">    </span><span class="nt">"keep_alive"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-1-14"><a href="#__codelineno-1-14" id="__codelineno-1-14" name="__codelineno-1-14"></a><span class="w">    </span><span class="nt">"idle_timeout_seconds"</span><span class="p">:</span><span class="w"> </span><span class="mi">300</span><span class="p">,</span>
+</span><span id="__span-1-15"><a href="#__codelineno-1-15" id="__codelineno-1-15" name="__codelineno-1-15"></a><span class="w">    </span><span class="nt">"max_concurrent"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span>
+</span><span id="__span-1-16"><a href="#__codelineno-1-16" id="__codelineno-1-16" name="__codelineno-1-16"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-1-17"><a href="#__codelineno-1-17" id="__codelineno-1-17" name="__codelineno-1-17"></a><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="stdio-pros-cons">stdio Pros &amp; Cons<a class="headerlink" href="#stdio-pros-cons" title="Permanent link">¶</a></h3>
+<p><strong>Advantages:</strong>
+- ✅ <strong>Zero Latency</strong>: No network overhead, local execution
+- ✅ <strong>Simple</strong>: No HTTP server needed, just stdin/stdout
+- ✅ <strong>Secure</strong>: No network exposure, process isolation
+- ✅ <strong>Portable</strong>: Works on any OS with process execution
+- ✅ <strong>Lightweight</strong>: Minimal dependencies
+- ✅ <strong>File Access</strong>: Direct access to local file system</p>
+<p><strong>Disadvantages:</strong>
+- ❌ <strong>Local Only</strong>: Cannot access remote MCP servers
+- ❌ <strong>Process Management</strong>: Need to spawn/kill processes
+- ❌ <strong>Resource Limits</strong>: Limited by single machine resources
+- ❌ <strong>Not Scalable</strong>: Cannot distribute across multiple machines
+- ❌ <strong>No Load Balancing</strong>: All requests to same process
+- ❌ <strong>Process Crashes</strong>: Need restart logic</p>
+<p><strong>Best Use Cases:</strong>
+- Development and testing
+- Local tools (file operations, system commands)
+- Single-user scenarios
+- CLI applications
+- Resource-constrained environments</p>
+<hr/>
+<h2 id="sse-server-sent-events-transport">SSE (Server-Sent Events) Transport<a class="headerlink" href="#sse-server-sent-events-transport" title="Permanent link">¶</a></h2>
+<h3 id="streaming-connection-flow">Streaming Connection Flow<a class="headerlink" href="#streaming-connection-flow" title="Permanent link">¶</a></h3>
+<div class="mermaid">sequenceDiagram
+    participant AI as AI Client
+    participant SARK as SARK Gateway
+    participant MCP as MCP Server (SSE)
+    participant Backend as Backend System
+
+    Note over AI,Backend: SSE Transport - Streaming Connection
+
+    AI-&gt;&gt;SARK: POST /api/v1/tools/invoke<br/>{tool_id: "streaming_tool", params: {...}}
+    SARK-&gt;&gt;SARK: Authenticate &amp; Authorize
+
+    rect rgb(220, 240, 255)
+        Note over SARK,MCP: Establish SSE Connection (if not exists)
+        SARK-&gt;&gt;MCP: GET https://mcp-server.internal/mcp/v1/sse<br/>Accept: text/event-stream<br/>Authorization: Bearer {token}
+
+        MCP--&gt;&gt;SARK: 200 OK<br/>Content-Type: text/event-stream<br/>Connection: keep-alive
+
+        Note over SARK,MCP: Long-lived HTTP connection established
+    end
+
+    rect rgb(220, 255, 220)
+        Note over SARK,Backend: Send Tool Request
+        SARK-&gt;&gt;MCP: event: request<br/>data: {<br/>data:   "jsonrpc": "2.0",<br/>data:   "method": "tools/call",<br/>data:   "params": {<br/>data:     "name": "analyze_data",<br/>data:     "arguments": {...}<br/>data:   }<br/>data: }<br/><br/>
+
+        MCP-&gt;&gt;MCP: Parse event
+        MCP-&gt;&gt;Backend: Start analysis
+    end
+
+    rect rgb(255, 240, 220)
+        Note over MCP,SARK: Stream Progress Updates
+
+        loop While processing
+            Backend--&gt;&gt;MCP: Progress update
+            MCP-&gt;&gt;SARK: event: progress<br/>data: {<br/>data:   "status": "processing",<br/>data:   "percent": 25,<br/>data:   "message": "Analyzing chunk 1/4..."<br/>data: }<br/><br/>
+
+            SARK--&gt;&gt;AI: Forward progress update
+        end
+    end
+
+    rect rgb(255, 220, 220)
+        Note over MCP,SARK: Stream Final Result
+
+        Backend--&gt;&gt;MCP: Analysis complete
+
+        MCP-&gt;&gt;SARK: event: result<br/>data: {<br/>data:   "jsonrpc": "2.0",<br/>data:   "result": {<br/>data:     "content": [{<br/>data:       "type": "text",<br/>data:       "text": "Analysis results: ..."<br/>data:     }]<br/>data:   }<br/>data: }<br/><br/>
+
+        SARK-&gt;&gt;SARK: Log audit event
+        SARK--&gt;&gt;AI: Return final results
+    end
+
+    Note over SARK,MCP: Connection remains open for future requests
+</div>
+<h3 id="sse-configuration-example">SSE Configuration Example<a class="headerlink" href="#sse-configuration-example" title="Permanent link">¶</a></h3>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-2-1"><a href="#__codelineno-2-1" id="__codelineno-2-1" name="__codelineno-2-1"></a><span class="p">{</span>
+</span><span id="__span-2-2"><a href="#__codelineno-2-2" id="__codelineno-2-2" name="__codelineno-2-2"></a><span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"analytics-mcp-server"</span><span class="p">,</span>
+</span><span id="__span-2-3"><a href="#__codelineno-2-3" id="__codelineno-2-3" name="__codelineno-2-3"></a><span class="w">  </span><span class="nt">"transport"</span><span class="p">:</span><span class="w"> </span><span class="s2">"sse"</span><span class="p">,</span>
+</span><span id="__span-2-4"><a href="#__codelineno-2-4" id="__codelineno-2-4" name="__codelineno-2-4"></a><span class="w">  </span><span class="nt">"endpoint"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://analytics-mcp.internal.company.com/mcp/v1/sse"</span><span class="p">,</span>
+</span><span id="__span-2-5"><a href="#__codelineno-2-5" id="__codelineno-2-5" name="__codelineno-2-5"></a><span class="w">  </span><span class="nt">"capabilities"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"tools"</span><span class="p">,</span><span class="w"> </span><span class="s2">"resources"</span><span class="p">],</span>
+</span><span id="__span-2-6"><a href="#__codelineno-2-6" id="__codelineno-2-6" name="__codelineno-2-6"></a><span class="w">  </span><span class="nt">"connection"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-7"><a href="#__codelineno-2-7" id="__codelineno-2-7" name="__codelineno-2-7"></a><span class="w">    </span><span class="nt">"keep_alive"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-2-8"><a href="#__codelineno-2-8" id="__codelineno-2-8" name="__codelineno-2-8"></a><span class="w">    </span><span class="nt">"reconnect"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-2-9"><a href="#__codelineno-2-9" id="__codelineno-2-9" name="__codelineno-2-9"></a><span class="w">    </span><span class="nt">"reconnect_interval_seconds"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span>
+</span><span id="__span-2-10"><a href="#__codelineno-2-10" id="__codelineno-2-10" name="__codelineno-2-10"></a><span class="w">    </span><span class="nt">"heartbeat_interval_seconds"</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span>
+</span><span id="__span-2-11"><a href="#__codelineno-2-11" id="__codelineno-2-11" name="__codelineno-2-11"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-2-12"><a href="#__codelineno-2-12" id="__codelineno-2-12" name="__codelineno-2-12"></a><span class="w">  </span><span class="nt">"streaming"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-13"><a href="#__codelineno-2-13" id="__codelineno-2-13" name="__codelineno-2-13"></a><span class="w">    </span><span class="nt">"buffer_size_kb"</span><span class="p">:</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span>
+</span><span id="__span-2-14"><a href="#__codelineno-2-14" id="__codelineno-2-14" name="__codelineno-2-14"></a><span class="w">    </span><span class="nt">"max_message_size_kb"</span><span class="p">:</span><span class="w"> </span><span class="mi">1024</span>
+</span><span id="__span-2-15"><a href="#__codelineno-2-15" id="__codelineno-2-15" name="__codelineno-2-15"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-2-16"><a href="#__codelineno-2-16" id="__codelineno-2-16" name="__codelineno-2-16"></a><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="sse-event-format">SSE Event Format<a class="headerlink" href="#sse-event-format" title="Permanent link">¶</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a href="#__codelineno-3-1" id="__codelineno-3-1" name="__codelineno-3-1"></a>event: progress
+</span><span id="__span-3-2"><a href="#__codelineno-3-2" id="__codelineno-3-2" name="__codelineno-3-2"></a>id: 123
+</span><span id="__span-3-3"><a href="#__codelineno-3-3" id="__codelineno-3-3" name="__codelineno-3-3"></a>data: {"status": "processing", "percent": 25}
+</span><span id="__span-3-4"><a href="#__codelineno-3-4" id="__codelineno-3-4" name="__codelineno-3-4"></a>
+</span><span id="__span-3-5"><a href="#__codelineno-3-5" id="__codelineno-3-5" name="__codelineno-3-5"></a>event: log
+</span><span id="__span-3-6"><a href="#__codelineno-3-6" id="__codelineno-3-6" name="__codelineno-3-6"></a>id: 124
+</span><span id="__span-3-7"><a href="#__codelineno-3-7" id="__codelineno-3-7" name="__codelineno-3-7"></a>data: {"level": "info", "message": "Starting analysis"}
+</span><span id="__span-3-8"><a href="#__codelineno-3-8" id="__codelineno-3-8" name="__codelineno-3-8"></a>
+</span><span id="__span-3-9"><a href="#__codelineno-3-9" id="__codelineno-3-9" name="__codelineno-3-9"></a>event: result
+</span><span id="__span-3-10"><a href="#__codelineno-3-10" id="__codelineno-3-10" name="__codelineno-3-10"></a>id: 125
+</span><span id="__span-3-11"><a href="#__codelineno-3-11" id="__codelineno-3-11" name="__codelineno-3-11"></a>data: {"jsonrpc": "2.0", "result": {...}}
+</span><span id="__span-3-12"><a href="#__codelineno-3-12" id="__codelineno-3-12" name="__codelineno-3-12"></a>
+</span><span id="__span-3-13"><a href="#__codelineno-3-13" id="__codelineno-3-13" name="__codelineno-3-13"></a>event: error
+</span><span id="__span-3-14"><a href="#__codelineno-3-14" id="__codelineno-3-14" name="__codelineno-3-14"></a>id: 126
+</span><span id="__span-3-15"><a href="#__codelineno-3-15" id="__codelineno-3-15" name="__codelineno-3-15"></a>data: {"jsonrpc": "2.0", "error": {"code": -32603, "message": "Internal error"}}
+</span></code></pre></div>
+<h3 id="sse-pros-cons">SSE Pros &amp; Cons<a class="headerlink" href="#sse-pros-cons" title="Permanent link">¶</a></h3>
+<p><strong>Advantages:</strong>
+- ✅ <strong>Real-time Updates</strong>: Stream progress, logs, intermediate results
+- ✅ <strong>Efficient</strong>: Single connection for multiple requests
+- ✅ <strong>Push Notifications</strong>: Server can push updates without polling
+- ✅ <strong>Long-running Tasks</strong>: Perfect for tasks that take minutes/hours
+- ✅ <strong>HTTP-based</strong>: Works with existing infrastructure
+- ✅ <strong>Reconnection</strong>: Built-in automatic reconnection</p>
+<p><strong>Disadvantages:</strong>
+- ❌ <strong>Stateful</strong>: Requires connection management
+- ❌ <strong>Complexity</strong>: More complex than request/response
+- ❌ <strong>One-way</strong>: Server to client only (need separate channel for requests)
+- ❌ <strong>Connection Limits</strong>: Limited concurrent connections per client
+- ❌ <strong>Proxy Issues</strong>: Some proxies don't support long-lived connections
+- ❌ <strong>Resource Usage</strong>: Keeps connection open, uses server resources</p>
+<p><strong>Best Use Cases:</strong>
+- Long-running data analysis or processing
+- Real-time monitoring and dashboards
+- Progress reporting for multi-step workflows
+- Live log streaming
+- Continuous data feeds</p>
+<hr/>
+<h2 id="transport-comparison-matrix">Transport Comparison Matrix<a class="headerlink" href="#transport-comparison-matrix" title="Permanent link">¶</a></h2>
+<div class="mermaid">graph TB
+    subgraph "Transport Comparison"
+        direction TB
+
+        HEADER[Feature Comparison Matrix]
+
+        HTTP_FEAT[HTTP Transport]
+        STDIO_FEAT[stdio Transport]
+        SSE_FEAT[SSE Transport]
+    end
+
+    HTTP_FEAT --&gt; HTTP_TABLE["
+    <table>
+<tr><th>Feature</th><th>Rating</th></tr>
+<tr><td>Latency</td><td>⭐⭐⭐ (50-200ms)</td></tr>
+<tr><td>Scalability</td><td>⭐⭐⭐⭐⭐ (Excellent)</td></tr>
+<tr><td>Security</td><td>⭐⭐⭐⭐ (TLS, mTLS)</td></tr>
+<tr><td>Setup Complexity</td><td>⭐⭐⭐ (Moderate)</td></tr>
+<tr><td>Monitoring</td><td>⭐⭐⭐⭐⭐ (Standard)</td></tr>
+<tr><td>Streaming</td><td>❌ (No)</td></tr>
+</table>
+    "]
+
+    STDIO_FEAT --&gt; STDIO_TABLE["
+    <table>
+<tr><th>Feature</th><th>Rating</th></tr>
+<tr><td>Latency</td><td>⭐⭐⭐⭐⭐ (&lt;10ms)</td></tr>
+<tr><td>Scalability</td><td>⭐⭐ (Limited)</td></tr>
+<tr><td>Security</td><td>⭐⭐⭐⭐⭐ (Isolated)</td></tr>
+<tr><td>Setup Complexity</td><td>⭐⭐⭐⭐⭐ (Simple)</td></tr>
+<tr><td>Monitoring</td><td>⭐⭐ (Limited)</td></tr>
+<tr><td>Streaming</td><td>✅ (via stdout)</td></tr>
+</table>
+    "]
+
+    SSE_FEAT --&gt; SSE_TABLE["
+    <table>
+<tr><th>Feature</th><th>Rating</th></tr>
+<tr><td>Latency</td><td>⭐⭐⭐⭐ (Real-time)</td></tr>
+<tr><td>Scalability</td><td>⭐⭐⭐⭐ (Good)</td></tr>
+<tr><td>Security</td><td>⭐⭐⭐⭐ (TLS)</td></tr>
+<tr><td>Setup Complexity</td><td>⭐⭐ (Complex)</td></tr>
+<tr><td>Monitoring</td><td>⭐⭐⭐⭐ (Good)</td></tr>
+<tr><td>Streaming</td><td>✅ (Native)</td></tr>
+</table>
+    "]
+
+    style HTTP_FEAT fill:#4a90e2,color:#fff
+    style STDIO_FEAT fill:#50c878,color:#fff
+    style SSE_FEAT fill:#ffd43b,color:#000
+</div>
+<h2 id="performance-characteristics">Performance Characteristics<a class="headerlink" href="#performance-characteristics" title="Permanent link">¶</a></h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>HTTP</th>
+<th>stdio</th>
+<th>SSE</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Connection Setup</strong></td>
+<td>50-100ms (TCP + TLS)</td>
+<td>&lt;1ms (process spawn cached)</td>
+<td>50-100ms (initial), then reused</td>
+</tr>
+<tr>
+<td><strong>Request Latency</strong></td>
+<td>50-200ms</td>
+<td>&lt;10ms</td>
+<td>10-50ms (connection exists)</td>
+</tr>
+<tr>
+<td><strong>Throughput</strong></td>
+<td>100-10,000 req/s</td>
+<td>1,000-100,000 req/s</td>
+<td>Varies (streaming)</td>
+</tr>
+<tr>
+<td><strong>Memory Overhead</strong></td>
+<td>Low (per request)</td>
+<td>Medium (process memory)</td>
+<td>High (connection state)</td>
+</tr>
+<tr>
+<td><strong>Network Bandwidth</strong></td>
+<td>High (HTTP headers)</td>
+<td>None (local)</td>
+<td>Medium (efficient streaming)</td>
+</tr>
+<tr>
+<td><strong>Max Concurrent</strong></td>
+<td>Unlimited (horizontal scaling)</td>
+<td>Limited (process count)</td>
+<td>Limited (connection limits)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="security-comparison">Security Comparison<a class="headerlink" href="#security-comparison" title="Permanent link">¶</a></h2>
+<table>
+<thead>
+<tr>
+<th>Security Feature</th>
+<th>HTTP</th>
+<th>stdio</th>
+<th>SSE</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Encryption</strong></td>
+<td>✅ TLS 1.3</td>
+<td>❌ Not needed (local)</td>
+<td>✅ TLS 1.3</td>
+</tr>
+<tr>
+<td><strong>Authentication</strong></td>
+<td>✅ Bearer tokens, mTLS</td>
+<td>✅ Process isolation</td>
+<td>✅ Bearer tokens</td>
+</tr>
+<tr>
+<td><strong>Authorization</strong></td>
+<td>✅ SARK OPA policies</td>
+<td>✅ SARK OPA policies</td>
+<td>✅ SARK OPA policies</td>
+</tr>
+<tr>
+<td><strong>Network Isolation</strong></td>
+<td>❌ Exposed on network</td>
+<td>✅ No network exposure</td>
+<td>❌ Exposed on network</td>
+</tr>
+<tr>
+<td><strong>Certificate Auth</strong></td>
+<td>✅ Client certificates</td>
+<td>❌ N/A</td>
+<td>✅ Client certificates</td>
+</tr>
+<tr>
+<td><strong>Audit Logging</strong></td>
+<td>✅ Full request/response</td>
+<td>✅ stdin/stdout logs</td>
+<td>✅ Event stream logs</td>
+</tr>
+</tbody>
+</table>
+<h2 id="decision-tree-which-transport-to-use">Decision Tree: Which Transport to Use?<a class="headerlink" href="#decision-tree-which-transport-to-use" title="Permanent link">¶</a></h2>
+<div class="mermaid">graph TB
+    START{Choose MCP Transport}
+
+    START --&gt;|Need real-time updates?| SSE_Q{SSE Requirements}
+    START --&gt;|Simple, local tools?| STDIO_Q{stdio Requirements}
+    START --&gt;|Production, scalable?| HTTP_Q{HTTP Requirements}
+
+    SSE_Q --&gt;|Long-running tasks| SSE[Use SSE Transport]
+    SSE_Q --&gt;|Progress updates needed| SSE
+    SSE_Q --&gt;|Streaming data| SSE
+
+    STDIO_Q --&gt;|Local file access| STDIO[Use stdio Transport]
+    STDIO_Q --&gt;|Development/testing| STDIO
+    STDIO_Q --&gt;|CLI tools| STDIO
+    STDIO_Q --&gt;|Single user| STDIO
+
+    HTTP_Q --&gt;|Multiple clients| HTTP[Use HTTP Transport]
+    HTTP_Q --&gt;|Cloud deployment| HTTP
+    HTTP_Q --&gt;|Load balancing needed| HTTP
+    HTTP_Q --&gt;|Enterprise production| HTTP
+
+    style SSE fill:#ffd43b,color:#000
+    style STDIO fill:#50c878,color:#fff
+    style HTTP fill:#4a90e2,color:#fff
+</div>
+<h2 id="transport-selection-guidelines">Transport Selection Guidelines<a class="headerlink" href="#transport-selection-guidelines" title="Permanent link">¶</a></h2>
+<h3 id="use-http-when">Use HTTP When:<a class="headerlink" href="#use-http-when" title="Permanent link">¶</a></h3>
+<ul>
+<li>✅ Deploying to cloud or multiple servers</li>
+<li>✅ Need horizontal scaling and load balancing</li>
+<li>✅ Serving multiple concurrent clients</li>
+<li>✅ Integrating with existing HTTP infrastructure</li>
+<li>✅ Require enterprise security (mTLS, WAF, etc.)</li>
+<li>✅ <strong>Recommendation</strong>: Default choice for production</li>
+</ul>
+<h3 id="use-stdio-when">Use stdio When:<a class="headerlink" href="#use-stdio-when" title="Permanent link">¶</a></h3>
+<ul>
+<li>✅ Building local development tools</li>
+<li>✅ Need direct file system access</li>
+<li>✅ Single-user CLI applications</li>
+<li>✅ Minimal latency requirements (&lt;10ms)</li>
+<li>✅ No network connectivity available</li>
+<li>✅ <strong>Recommendation</strong>: Development, testing, local tools</li>
+</ul>
+<h3 id="use-sse-when">Use SSE When:<a class="headerlink" href="#use-sse-when" title="Permanent link">¶</a></h3>
+<ul>
+<li>✅ Long-running tasks (minutes to hours)</li>
+<li>✅ Need progress updates during execution</li>
+<li>✅ Real-time monitoring or dashboards</li>
+<li>✅ Live log streaming</li>
+<li>✅ Continuous data feeds</li>
+<li>✅ <strong>Recommendation</strong>: Analytics, monitoring, real-time systems</li>
+</ul>
+<h2 id="code-examples">Code Examples<a class="headerlink" href="#code-examples" title="Permanent link">¶</a></h2>
+<h3 id="http-transport-client">HTTP Transport - Client<a class="headerlink" href="#http-transport-client" title="Permanent link">¶</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a href="#__codelineno-4-1" id="__codelineno-4-1" name="__codelineno-4-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+</span><span id="__span-4-2"><a href="#__codelineno-4-2" id="__codelineno-4-2" name="__codelineno-4-2"></a>
+</span><span id="__span-4-3"><a href="#__codelineno-4-3" id="__codelineno-4-3" name="__codelineno-4-3"></a><span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+</span><span id="__span-4-4"><a href="#__codelineno-4-4" id="__codelineno-4-4" name="__codelineno-4-4"></a>    <span class="s2">"https://mcp-server.company.com/mcp/v1"</span><span class="p">,</span>
+</span><span id="__span-4-5"><a href="#__codelineno-4-5" id="__codelineno-4-5" name="__codelineno-4-5"></a>    <span class="n">headers</span><span class="o">=</span><span class="p">{</span>
+</span><span id="__span-4-6"><a href="#__codelineno-4-6" id="__codelineno-4-6" name="__codelineno-4-6"></a>        <span class="s2">"Content-Type"</span><span class="p">:</span> <span class="s2">"application/json"</span><span class="p">,</span>
+</span><span id="__span-4-7"><a href="#__codelineno-4-7" id="__codelineno-4-7" name="__codelineno-4-7"></a>        <span class="s2">"Authorization"</span><span class="p">:</span> <span class="s2">"Bearer YOUR_TOKEN"</span>
+</span><span id="__span-4-8"><a href="#__codelineno-4-8" id="__codelineno-4-8" name="__codelineno-4-8"></a>    <span class="p">},</span>
+</span><span id="__span-4-9"><a href="#__codelineno-4-9" id="__codelineno-4-9" name="__codelineno-4-9"></a>    <span class="n">json</span><span class="o">=</span><span class="p">{</span>
+</span><span id="__span-4-10"><a href="#__codelineno-4-10" id="__codelineno-4-10" name="__codelineno-4-10"></a>        <span class="s2">"jsonrpc"</span><span class="p">:</span> <span class="s2">"2.0"</span><span class="p">,</span>
+</span><span id="__span-4-11"><a href="#__codelineno-4-11" id="__codelineno-4-11" name="__codelineno-4-11"></a>        <span class="s2">"method"</span><span class="p">:</span> <span class="s2">"tools/call"</span><span class="p">,</span>
+</span><span id="__span-4-12"><a href="#__codelineno-4-12" id="__codelineno-4-12" name="__codelineno-4-12"></a>        <span class="s2">"params"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-4-13"><a href="#__codelineno-4-13" id="__codelineno-4-13" name="__codelineno-4-13"></a>            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"query_database"</span><span class="p">,</span>
+</span><span id="__span-4-14"><a href="#__codelineno-4-14" id="__codelineno-4-14" name="__codelineno-4-14"></a>            <span class="s2">"arguments"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"query"</span><span class="p">:</span> <span class="s2">"SELECT * FROM users LIMIT 10"</span><span class="p">}</span>
+</span><span id="__span-4-15"><a href="#__codelineno-4-15" id="__codelineno-4-15" name="__codelineno-4-15"></a>        <span class="p">},</span>
+</span><span id="__span-4-16"><a href="#__codelineno-4-16" id="__codelineno-4-16" name="__codelineno-4-16"></a>        <span class="s2">"id"</span><span class="p">:</span> <span class="mi">1</span>
+</span><span id="__span-4-17"><a href="#__codelineno-4-17" id="__codelineno-4-17" name="__codelineno-4-17"></a>    <span class="p">}</span>
+</span><span id="__span-4-18"><a href="#__codelineno-4-18" id="__codelineno-4-18" name="__codelineno-4-18"></a><span class="p">)</span>
+</span><span id="__span-4-19"><a href="#__codelineno-4-19" id="__codelineno-4-19" name="__codelineno-4-19"></a>
+</span><span id="__span-4-20"><a href="#__codelineno-4-20" id="__codelineno-4-20" name="__codelineno-4-20"></a><span class="n">result</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+</span><span id="__span-4-21"><a href="#__codelineno-4-21" id="__codelineno-4-21" name="__codelineno-4-21"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">"result"</span><span class="p">])</span>
+</span></code></pre></div>
+<h3 id="stdio-transport-client">stdio Transport - Client<a class="headerlink" href="#stdio-transport-client" title="Permanent link">¶</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a href="#__codelineno-5-1" id="__codelineno-5-1" name="__codelineno-5-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+</span><span id="__span-5-2"><a href="#__codelineno-5-2" id="__codelineno-5-2" name="__codelineno-5-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+</span><span id="__span-5-3"><a href="#__codelineno-5-3" id="__codelineno-5-3" name="__codelineno-5-3"></a>
+</span><span id="__span-5-4"><a href="#__codelineno-5-4" id="__codelineno-5-4" name="__codelineno-5-4"></a><span class="c1"># Spawn MCP server process</span>
+</span><span id="__span-5-5"><a href="#__codelineno-5-5" id="__codelineno-5-5" name="__codelineno-5-5"></a><span class="n">proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+</span><span id="__span-5-6"><a href="#__codelineno-5-6" id="__codelineno-5-6" name="__codelineno-5-6"></a>    <span class="p">[</span><span class="s2">"python3"</span><span class="p">,</span> <span class="s2">"mcp_server.py"</span><span class="p">],</span>
+</span><span id="__span-5-7"><a href="#__codelineno-5-7" id="__codelineno-5-7" name="__codelineno-5-7"></a>    <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+</span><span id="__span-5-8"><a href="#__codelineno-5-8" id="__codelineno-5-8" name="__codelineno-5-8"></a>    <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+</span><span id="__span-5-9"><a href="#__codelineno-5-9" id="__codelineno-5-9" name="__codelineno-5-9"></a>    <span class="n">text</span><span class="o">=</span><span class="kc">True</span>
+</span><span id="__span-5-10"><a href="#__codelineno-5-10" id="__codelineno-5-10" name="__codelineno-5-10"></a><span class="p">)</span>
+</span><span id="__span-5-11"><a href="#__codelineno-5-11" id="__codelineno-5-11" name="__codelineno-5-11"></a>
+</span><span id="__span-5-12"><a href="#__codelineno-5-12" id="__codelineno-5-12" name="__codelineno-5-12"></a><span class="c1"># Send request</span>
+</span><span id="__span-5-13"><a href="#__codelineno-5-13" id="__codelineno-5-13" name="__codelineno-5-13"></a><span class="n">request</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-5-14"><a href="#__codelineno-5-14" id="__codelineno-5-14" name="__codelineno-5-14"></a>    <span class="s2">"jsonrpc"</span><span class="p">:</span> <span class="s2">"2.0"</span><span class="p">,</span>
+</span><span id="__span-5-15"><a href="#__codelineno-5-15" id="__codelineno-5-15" name="__codelineno-5-15"></a>    <span class="s2">"method"</span><span class="p">:</span> <span class="s2">"tools/call"</span><span class="p">,</span>
+</span><span id="__span-5-16"><a href="#__codelineno-5-16" id="__codelineno-5-16" name="__codelineno-5-16"></a>    <span class="s2">"params"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-5-17"><a href="#__codelineno-5-17" id="__codelineno-5-17" name="__codelineno-5-17"></a>        <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"read_file"</span><span class="p">,</span>
+</span><span id="__span-5-18"><a href="#__codelineno-5-18" id="__codelineno-5-18" name="__codelineno-5-18"></a>        <span class="s2">"arguments"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"path"</span><span class="p">:</span> <span class="s2">"/data/report.txt"</span><span class="p">}</span>
+</span><span id="__span-5-19"><a href="#__codelineno-5-19" id="__codelineno-5-19" name="__codelineno-5-19"></a>    <span class="p">},</span>
+</span><span id="__span-5-20"><a href="#__codelineno-5-20" id="__codelineno-5-20" name="__codelineno-5-20"></a>    <span class="s2">"id"</span><span class="p">:</span> <span class="mi">1</span>
+</span><span id="__span-5-21"><a href="#__codelineno-5-21" id="__codelineno-5-21" name="__codelineno-5-21"></a><span class="p">}</span>
+</span><span id="__span-5-22"><a href="#__codelineno-5-22" id="__codelineno-5-22" name="__codelineno-5-22"></a>
+</span><span id="__span-5-23"><a href="#__codelineno-5-23" id="__codelineno-5-23" name="__codelineno-5-23"></a><span class="n">proc</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="__span-5-24"><a href="#__codelineno-5-24" id="__codelineno-5-24" name="__codelineno-5-24"></a><span class="n">proc</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+</span><span id="__span-5-25"><a href="#__codelineno-5-25" id="__codelineno-5-25" name="__codelineno-5-25"></a>
+</span><span id="__span-5-26"><a href="#__codelineno-5-26" id="__codelineno-5-26" name="__codelineno-5-26"></a><span class="c1"># Read response</span>
+</span><span id="__span-5-27"><a href="#__codelineno-5-27" id="__codelineno-5-27" name="__codelineno-5-27"></a><span class="n">response_line</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+</span><span id="__span-5-28"><a href="#__codelineno-5-28" id="__codelineno-5-28" name="__codelineno-5-28"></a><span class="n">result</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response_line</span><span class="p">)</span>
+</span><span id="__span-5-29"><a href="#__codelineno-5-29" id="__codelineno-5-29" name="__codelineno-5-29"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">"result"</span><span class="p">])</span>
+</span></code></pre></div>
+<h3 id="sse-transport-client">SSE Transport - Client<a class="headerlink" href="#sse-transport-client" title="Permanent link">¶</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a href="#__codelineno-6-1" id="__codelineno-6-1" name="__codelineno-6-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">sseclient</span>
+</span><span id="__span-6-2"><a href="#__codelineno-6-2" id="__codelineno-6-2" name="__codelineno-6-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+</span><span id="__span-6-3"><a href="#__codelineno-6-3" id="__codelineno-6-3" name="__codelineno-6-3"></a>
+</span><span id="__span-6-4"><a href="#__codelineno-6-4" id="__codelineno-6-4" name="__codelineno-6-4"></a><span class="c1"># Establish SSE connection</span>
+</span><span id="__span-6-5"><a href="#__codelineno-6-5" id="__codelineno-6-5" name="__codelineno-6-5"></a><span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+</span><span id="__span-6-6"><a href="#__codelineno-6-6" id="__codelineno-6-6" name="__codelineno-6-6"></a>    <span class="s2">"https://mcp-server.company.com/mcp/v1/sse"</span><span class="p">,</span>
+</span><span id="__span-6-7"><a href="#__codelineno-6-7" id="__codelineno-6-7" name="__codelineno-6-7"></a>    <span class="n">headers</span><span class="o">=</span><span class="p">{</span>
+</span><span id="__span-6-8"><a href="#__codelineno-6-8" id="__codelineno-6-8" name="__codelineno-6-8"></a>        <span class="s2">"Accept"</span><span class="p">:</span> <span class="s2">"text/event-stream"</span><span class="p">,</span>
+</span><span id="__span-6-9"><a href="#__codelineno-6-9" id="__codelineno-6-9" name="__codelineno-6-9"></a>        <span class="s2">"Authorization"</span><span class="p">:</span> <span class="s2">"Bearer YOUR_TOKEN"</span>
+</span><span id="__span-6-10"><a href="#__codelineno-6-10" id="__codelineno-6-10" name="__codelineno-6-10"></a>    <span class="p">},</span>
+</span><span id="__span-6-11"><a href="#__codelineno-6-11" id="__codelineno-6-11" name="__codelineno-6-11"></a>    <span class="n">stream</span><span class="o">=</span><span class="kc">True</span>
+</span><span id="__span-6-12"><a href="#__codelineno-6-12" id="__codelineno-6-12" name="__codelineno-6-12"></a><span class="p">)</span>
+</span><span id="__span-6-13"><a href="#__codelineno-6-13" id="__codelineno-6-13" name="__codelineno-6-13"></a>
+</span><span id="__span-6-14"><a href="#__codelineno-6-14" id="__codelineno-6-14" name="__codelineno-6-14"></a><span class="n">client</span> <span class="o">=</span> <span class="n">sseclient</span><span class="o">.</span><span class="n">SSEClient</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+</span><span id="__span-6-15"><a href="#__codelineno-6-15" id="__codelineno-6-15" name="__codelineno-6-15"></a>
+</span><span id="__span-6-16"><a href="#__codelineno-6-16" id="__codelineno-6-16" name="__codelineno-6-16"></a><span class="c1"># Send request (via separate channel or initial query params)</span>
+</span><span id="__span-6-17"><a href="#__codelineno-6-17" id="__codelineno-6-17" name="__codelineno-6-17"></a><span class="c1"># ...</span>
+</span><span id="__span-6-18"><a href="#__codelineno-6-18" id="__codelineno-6-18" name="__codelineno-6-18"></a>
+</span><span id="__span-6-19"><a href="#__codelineno-6-19" id="__codelineno-6-19" name="__codelineno-6-19"></a><span class="c1"># Listen for events</span>
+</span><span id="__span-6-20"><a href="#__codelineno-6-20" id="__codelineno-6-20" name="__codelineno-6-20"></a><span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">client</span><span class="o">.</span><span class="n">events</span><span class="p">():</span>
+</span><span id="__span-6-21"><a href="#__codelineno-6-21" id="__codelineno-6-21" name="__codelineno-6-21"></a>    <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">event</span> <span class="o">==</span> <span class="s2">"progress"</span><span class="p">:</span>
+</span><span id="__span-6-22"><a href="#__codelineno-6-22" id="__codelineno-6-22" name="__codelineno-6-22"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Progress: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">data</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="__span-6-23"><a href="#__codelineno-6-23" id="__codelineno-6-23" name="__codelineno-6-23"></a>    <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">event</span> <span class="o">==</span> <span class="s2">"result"</span><span class="p">:</span>
+</span><span id="__span-6-24"><a href="#__codelineno-6-24" id="__codelineno-6-24" name="__codelineno-6-24"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Result: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">data</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="__span-6-25"><a href="#__codelineno-6-25" id="__codelineno-6-25" name="__codelineno-6-25"></a>        <span class="k">break</span>
+</span></code></pre></div>
+<h2 id="monitoring-observability">Monitoring &amp; Observability<a class="headerlink" href="#monitoring-observability" title="Permanent link">¶</a></h2>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>HTTP</th>
+<th>stdio</th>
+<th>SSE</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Metrics</strong></td>
+<td>Standard HTTP metrics (latency, throughput, errors)</td>
+<td>Process metrics (CPU, memory, exit codes)</td>
+<td>Connection metrics + event counts</td>
+</tr>
+<tr>
+<td><strong>Logging</strong></td>
+<td>Access logs, error logs</td>
+<td>stdout/stderr capture</td>
+<td>Event stream logs</td>
+</tr>
+<tr>
+<td><strong>Tracing</strong></td>
+<td>Distributed tracing (OpenTelemetry)</td>
+<td>Local tracing only</td>
+<td>Distributed tracing</td>
+</tr>
+<tr>
+<td><strong>Health Checks</strong></td>
+<td>HTTP /health endpoint</td>
+<td>Process alive check</td>
+<td>Connection heartbeat</td>
+</tr>
+<tr>
+<td><strong>Alerting</strong></td>
+<td>HTTP error rates, latency spikes</td>
+<td>Process crashes, resource limits</td>
+<td>Connection drops, event errors</td>
+</tr>
+</tbody>
+</table>
+<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">¶</a></h2>
+<ul>
+<li>See <a href="../01_mcp_architecture/">MCP Architecture</a> for overall system design</li>
+<li>See <a href="../02_tool_invocation_flow/">Tool Invocation Flow</a> for detailed request flow</li>
+<li>See <a href="../../API_REFERENCE/">API Reference</a> for transport configuration</li>
+</ul>
+</article>
+</div>
+<script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+</div>
+<button class="md-top md-icon" data-md-component="top" hidden="" type="button">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"></path></svg>
+  Back to top
+</button>
+</main>
+<footer class="md-footer">
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+<div class="md-copyright__highlight">
+      Copyright © 2024 James R. A. Henry. All rights reserved.
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
+      Material for MkDocs
+    </a>
+</div>
+<div class="md-social">
+<a class="md-social__link" href="https://github.com/apathy-ca/sark" rel="noopener" target="_blank" title="github.com">
+<svg viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"></path></svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.path", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+<script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+<script type="module">import mermaid from "https://unpkg.com/mermaid@10.4.0/dist/mermaid.esm.min.mjs";
+mermaid.initialize({});</script></body>
+</html>

@@ -1,0 +1,6124 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Enterprise-Grade MCP Governance System">
+      
+      
+        <meta name="author" content="James R. A. Henry">
+      
+      
+        <link rel="canonical" href="https://sark.example.com/PRODUCTION_CONFIG/">
+      
+      
+        <link rel="prev" href="../PRODUCTION_DEPLOYMENT/">
+      
+      
+        <link rel="next" href="../PRODUCTION_READINESS/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Production Config - SARK - Security Audit and Resource Kontroler</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config",""),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#sark-production-configuration-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="SARK - Security Audit and Resource Kontroler" class="md-header__button md-logo" aria-label="SARK - Security Audit and Resource Kontroler" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SARK - Security Audit and Resource Kontroler
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Production Config
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/apathy-ca/sark" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    apathy-ca/sark
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../QUICK_START/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../ARCHITECTURE/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../DEPLOYMENT/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Deployment
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../AUTHENTICATION/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Authentication & Authorization
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../OPA_POLICY_GUIDE/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Policies
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../MONITORING/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Operations
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../DATABASE_MIGRATIONS/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Database
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../PERFORMANCE_TESTING/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Performance
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../API_REFERENCE/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../DEVELOPMENT/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../EXECUTIVE_SUMMARY/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Reports
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../REPOSITORY_IMPROVEMENT_PLAN/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Planning
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../GLOSSARY/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="SARK - Security Audit and Resource Kontroler" class="md-nav__button md-logo" aria-label="SARK - Security Audit and Resource Kontroler" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    SARK - Security Audit and Resource Kontroler
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/apathy-ca/sark" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    apathy-ca/sark
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../QUICK_START/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../QUICK_REFERENCE_SESSIONS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SECURITY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PERFORMANCE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEPLOYMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DOCKER_DEPLOYMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PRODUCTION_DEPLOYMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production Config
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production Config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Loading
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Start
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quick Start">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-create-production-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Create Production Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-generate-secure-secrets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Generate Secure Secrets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-validate-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Validate Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-deploy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Deploy
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-categories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Categories
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment-variables-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment Variables Reference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Environment Variables Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#application-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Application Settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-server-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API Server Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#security-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#postgresql-database-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PostgreSQL Database Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timescaledb-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TimescaleDB Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#redis-cache-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Redis Cache Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#splunk-siem-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Splunk SIEM Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datadog-siem-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Datadog SIEM Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#secrets-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Secrets Management
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Secrets Management">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overview_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommended-solutions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommended Solutions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hashicorp-vault-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HashiCorp Vault Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#secret-rotation-schedule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Secret Rotation Schedule
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#environment-specific-secrets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment-Specific Secrets
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deployment-scenarios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deployment Scenarios
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Deployment Scenarios">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#scenario-1-small-production-single-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 1: Small Production (Single Server)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scenario-2-medium-production-load-balanced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 2: Medium Production (Load Balanced)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scenario-3-large-production-kubernetes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 3: Large Production (Kubernetes)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Best Practices
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Security Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-secrets-security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Secrets Security
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-network-security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Network Security
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-authentication-authorization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Authentication &amp; Authorization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-audit-compliance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Audit &amp; Compliance
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration-not-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Not Loading
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#database-connection-failed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Database Connection Failed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#siem-events-not-forwarding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SIEM Events Not Forwarding
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#high-memory-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        High Memory Usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Validation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration Validation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#validation-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validation Script
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#manual-validation-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Manual Validation Checklist
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Additional Resources
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Support
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PRODUCTION_READINESS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production Readiness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEPLOYMENT_CHECKLIST/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment Checklist
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DISASTER_RECOVERY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Disaster Recovery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ROLLBACK_PROCEDURES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rollback Procedures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication & Authorization
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Authentication & Authorization
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AUTHENTICATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AUTHORIZATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authorization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../OIDC_SETUP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OIDC Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../LDAP_SETUP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LDAP Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SAML_SETUP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SAML Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../API_KEYS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Keys
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policies
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Policies
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../OPA_POLICY_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OPA Policy Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ADVANCED_OPA_POLICIES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced OPA Policies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../POLICY_OPTIMIZATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../POLICY_CACHING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Caching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../POLICY_AUDIT_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Audit Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../POLICY_AUDIT_TRAIL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Audit Trail
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Operations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MONITORING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MONITORING_SETUP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monitoring Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../OPERATIONAL_RUNBOOK/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operational Runbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../OPERATIONS_RUNBOOK/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations Runbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../INCIDENT_RESPONSE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incident Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../TROUBLESHOOTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Database
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DATABASE_MIGRATIONS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database Migrations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DATABASE_OPTIMIZATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../REDIS_OPTIMIZATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Redis Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Performance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PERFORMANCE_TESTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PERFORMANCE_TUNING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Tuning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PERFORMANCE_OPTIMIZATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PERFORMANCE_REPORT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../POLICY_PERFORMANCE_REPORT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../API_REFERENCE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../API_INTEGRATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_11" id="__nav_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEVELOPMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MIGRATION_GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migration Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEVELOPMENT_LOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../TESTING_STRATEGY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing Strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../INTEGRATION_TESTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integration Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reports
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reports
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../EXECUTIVE_SUMMARY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Executive Summary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../IMPLEMENTATION_PLAN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../GAP_ANALYSIS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gap Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PHASE2_COMPLETION_REPORT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 2 Completion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../RELEASE_NOTES_v0.2.0/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release Notes v0.2.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../FINAL_TEST_REPORT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Final Test Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../TEST_COVERAGE_REPORT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Test Coverage Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../KNOWN_ISSUES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Known Issues
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../LESSONS_LEARNED/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lessons Learned
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_13" id="__nav_13_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Planning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../REPOSITORY_IMPROVEMENT_PLAN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Repository Improvement Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WORK_BREAKDOWN_SESSIONS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Work Breakdown Sessions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WORK_TASKS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Work Tasks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PHASE2_3WEEK_PLAN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 2 3-Week Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WEEK_2_SUMMARY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Week 2 Summary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WEEK_3_SUMMARY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Week 3 Summary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_14" >
+        
+          
+          <label class="md-nav__link" for="__nav_14" id="__nav_14_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../GLOSSARY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../FAQ/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FAQ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SECURITY_BEST_PRACTICES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Best Practices
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SECURITY_HARDENING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Hardening
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SECURITY_AUDIT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PRODUCTION_HANDOFF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production Handoff
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Loading
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Start
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quick Start">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-create-production-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Create Production Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-generate-secure-secrets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Generate Secure Secrets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-validate-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Validate Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-deploy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Deploy
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-categories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Categories
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment-variables-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment Variables Reference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Environment Variables Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#application-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Application Settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-server-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API Server Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#security-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#postgresql-database-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PostgreSQL Database Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timescaledb-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TimescaleDB Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#redis-cache-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Redis Cache Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#splunk-siem-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Splunk SIEM Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datadog-siem-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Datadog SIEM Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#secrets-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Secrets Management
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Secrets Management">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overview_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommended-solutions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommended Solutions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hashicorp-vault-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HashiCorp Vault Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#secret-rotation-schedule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Secret Rotation Schedule
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#environment-specific-secrets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment-Specific Secrets
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deployment-scenarios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deployment Scenarios
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Deployment Scenarios">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#scenario-1-small-production-single-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 1: Small Production (Single Server)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scenario-2-medium-production-load-balanced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 2: Medium Production (Load Balanced)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scenario-3-large-production-kubernetes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 3: Large Production (Kubernetes)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Best Practices
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Security Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-secrets-security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Secrets Security
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-network-security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Network Security
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-authentication-authorization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Authentication &amp; Authorization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-audit-compliance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Audit &amp; Compliance
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration-not-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Not Loading
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#database-connection-failed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Database Connection Failed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#siem-events-not-forwarding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SIEM Events Not Forwarding
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#high-memory-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        High Memory Usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Validation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration Validation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#validation-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validation Script
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#manual-validation-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Manual Validation Checklist
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Additional Resources
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Support
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href=".." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    Home
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../DEPLOYMENT/" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Deployment
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="sark-production-configuration-guide">SARK Production Configuration Guide<a class="headerlink" href="#sark-production-configuration-guide" title="Permanent link">&para;</a></h1>
+<p><strong>Version:</strong> 0.1.0
+<strong>Last Updated:</strong> 2025-11-22
+<strong>Audience:</strong> DevOps Engineers, SREs, Platform Engineers</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link">&para;</a></h2>
+<ol>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#quick-start">Quick Start</a></li>
+<li><a href="#configuration-categories">Configuration Categories</a></li>
+<li><a href="#environment-variables-reference">Environment Variables Reference</a></li>
+<li><a href="#secrets-management">Secrets Management</a></li>
+<li><a href="#deployment-scenarios">Deployment Scenarios</a></li>
+<li><a href="#security-best-practices">Security Best Practices</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+<li><a href="#configuration-validation">Configuration Validation</a></li>
+</ol>
+<hr />
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>SARK uses environment variables for all configuration, following the <strong>12-Factor App</strong> methodology. This approach provides:</p>
+<ul>
+<li><strong>Portability</strong>: Same code deployed across all environments</li>
+<li><strong>Security</strong>: Secrets separated from code</li>
+<li><strong>Flexibility</strong>: Easy configuration changes without code changes</li>
+<li><strong>Scalability</strong>: Environment-specific scaling parameters</li>
+</ul>
+<h3 id="configuration-loading">Configuration Loading<a class="headerlink" href="#configuration-loading" title="Permanent link">&para;</a></h3>
+<p>Configuration is loaded in the following order (later sources override earlier):</p>
+<ol>
+<li><strong>Default values</strong> (defined in <code>src/sark/config/settings.py</code>)</li>
+<li><strong>.env file</strong> (if present in working directory)</li>
+<li><strong>Environment variables</strong> (system or container environment)</li>
+</ol>
+<h3 id="configuration-files">Configuration Files<a class="headerlink" href="#configuration-files" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+<th>Commit to Git?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.env.production.example</code></td>
+<td>Production configuration template</td>
+<td>✅ Yes</td>
+</tr>
+<tr>
+<td><code>.env</code></td>
+<td>Active configuration (development)</td>
+<td>❌ No</td>
+</tr>
+<tr>
+<td><code>.env.production</code></td>
+<td>Production configuration</td>
+<td>❌ No</td>
+</tr>
+<tr>
+<td><code>.env.staging</code></td>
+<td>Staging configuration</td>
+<td>❌ No</td>
+</tr>
+<tr>
+<td><code>docs/PRODUCTION_CONFIG.md</code></td>
+<td>This documentation</td>
+<td>✅ Yes</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
+<h3 id="1-create-production-configuration">1. Create Production Configuration<a class="headerlink" href="#1-create-production-configuration" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Copy the production template</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>cp<span class="w"> </span>.env.production.example<span class="w"> </span>.env.production
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Edit with your production values</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>nano<span class="w"> </span>.env.production
+</span></code></pre></div>
+<h3 id="2-generate-secure-secrets">2. Generate Secure Secrets<a class="headerlink" href="#2-generate-secure-secrets" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Generate SECRET_KEY (48+ characters recommended)</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import secrets; print(&#39;SECRET_KEY=&#39; + secrets.token_urlsafe(48))&quot;</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Generate database passwords (32 characters)</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import secrets; print(&#39;POSTGRES_PASSWORD=&#39; + secrets.token_urlsafe(32))&quot;</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import secrets; print(&#39;TIMESCALE_PASSWORD=&#39; + secrets.token_urlsafe(32))&quot;</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import secrets; print(&#39;REDIS_PASSWORD=&#39; + secrets.token_urlsafe(32))&quot;</span>
+</span></code></pre></div>
+<h3 id="3-validate-configuration">3. Validate Configuration<a class="headerlink" href="#3-validate-configuration" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Run configuration validation script</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>python<span class="w"> </span>scripts/validate_config.py<span class="w"> </span>--env-file<span class="w"> </span>.env.production
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Check for common misconfigurations</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>python<span class="w"> </span>scripts/validate_config.py<span class="w"> </span>--env-file<span class="w"> </span>.env.production<span class="w"> </span>--strict
+</span></code></pre></div>
+<h3 id="4-deploy">4. Deploy<a class="headerlink" href="#4-deploy" title="Permanent link">&para;</a></h3>
+<p>See <a href="../DEPLOYMENT_CHECKLIST/">DEPLOYMENT_CHECKLIST.md</a> for complete deployment steps.</p>
+<hr />
+<h2 id="configuration-categories">Configuration Categories<a class="headerlink" href="#configuration-categories" title="Permanent link">&para;</a></h2>
+<p>SARK configuration is organized into the following categories:</p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Required</th>
+<th>Variables</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Application</strong></td>
+<td>✅ Yes</td>
+<td>6</td>
+<td>Basic app settings (environment, debug, logging)</td>
+</tr>
+<tr>
+<td><strong>API Server</strong></td>
+<td>✅ Yes</td>
+<td>4</td>
+<td>HTTP server configuration</td>
+</tr>
+<tr>
+<td><strong>Security</strong></td>
+<td>✅ Yes</td>
+<td>3</td>
+<td>Authentication, CORS, JWT</td>
+</tr>
+<tr>
+<td><strong>PostgreSQL</strong></td>
+<td>✅ Yes</td>
+<td>8</td>
+<td>Main application database</td>
+</tr>
+<tr>
+<td><strong>TimescaleDB</strong></td>
+<td>✅ Yes</td>
+<td>5</td>
+<td>Audit event database</td>
+</tr>
+<tr>
+<td><strong>Redis</strong></td>
+<td>⚠️ Recommended</td>
+<td>5</td>
+<td>Caching layer</td>
+</tr>
+<tr>
+<td><strong>Consul</strong></td>
+<td>⚠️ Optional</td>
+<td>4</td>
+<td>Service discovery</td>
+</tr>
+<tr>
+<td><strong>OPA</strong></td>
+<td>⚠️ Optional</td>
+<td>3</td>
+<td>Policy engine</td>
+</tr>
+<tr>
+<td><strong>Vault</strong></td>
+<td>⚠️ Optional</td>
+<td>4</td>
+<td>Secrets management</td>
+</tr>
+<tr>
+<td><strong>Kafka</strong></td>
+<td>⚠️ Optional</td>
+<td>4</td>
+<td>High-scale event streaming</td>
+</tr>
+<tr>
+<td><strong>Discovery</strong></td>
+<td>⚠️ Optional</td>
+<td>4</td>
+<td>MCP server discovery</td>
+</tr>
+<tr>
+<td><strong>Audit</strong></td>
+<td>✅ Yes</td>
+<td>3</td>
+<td>Audit configuration</td>
+</tr>
+<tr>
+<td><strong>Splunk SIEM</strong></td>
+<td>⚠️ Optional</td>
+<td>10</td>
+<td>Splunk integration</td>
+</tr>
+<tr>
+<td><strong>Datadog SIEM</strong></td>
+<td>⚠️ Optional</td>
+<td>10</td>
+<td>Datadog integration</td>
+</tr>
+<tr>
+<td><strong>Observability</strong></td>
+<td>⚠️ Recommended</td>
+<td>4</td>
+<td>Metrics and tracing</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Legend:</strong>
+- ✅ <strong>Required</strong>: Must be configured for production
+- ⚠️ <strong>Recommended</strong>: Should be configured for production use
+- ⚠️ <strong>Optional</strong>: Configure based on deployment requirements</p>
+<hr />
+<h2 id="environment-variables-reference">Environment Variables Reference<a class="headerlink" href="#environment-variables-reference" title="Permanent link">&para;</a></h2>
+<h3 id="application-settings">Application Settings<a class="headerlink" href="#application-settings" title="Permanent link">&para;</a></h3>
+<p>Core application configuration that controls basic behavior.</p>
+<h4 id="environment"><code>ENVIRONMENT</code><a class="headerlink" href="#environment" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String (enum)
+<strong>Default:</strong> <code>development</code>
+<strong>Required:</strong> ✅ Yes
+<strong>Values:</strong> <code>development</code>, <code>staging</code>, <code>production</code></p>
+<p><strong>Description:</strong> Deployment environment. Controls security features:
+- <code>production</code>: Enables HSTS, stricter validation, production logging
+- <code>staging</code>: Pre-production testing environment
+- <code>development</code>: Local development, debug mode allowed</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Production deployment</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nv">ENVIRONMENT</span><span class="o">=</span>production
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Staging environment</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="nv">ENVIRONMENT</span><span class="o">=</span>staging
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># Local development</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="nv">ENVIRONMENT</span><span class="o">=</span>development
+</span></code></pre></div></p>
+<p><strong>Security Impact:</strong>
+- <code>production</code>: HSTS headers enabled, debug mode forbidden
+- Non-production: Relaxed security for development convenience</p>
+<hr />
+<h4 id="app_name"><code>APP_NAME</code><a class="headerlink" href="#app_name" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String
+<strong>Default:</strong> <code>SARK</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> Application name for logging and identification.</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nv">APP_NAME</span><span class="o">=</span>SARK
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nv">APP_NAME</span><span class="o">=</span>SARK-Production-US-East-1
+</span></code></pre></div></p>
+<hr />
+<h4 id="app_version"><code>APP_VERSION</code><a class="headerlink" href="#app_version" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String
+<strong>Default:</strong> <code>0.1.0</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> Application version for tracking and metrics.</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nv">APP_VERSION</span><span class="o">=</span><span class="m">0</span>.1.0
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nv">APP_VERSION</span><span class="o">=</span><span class="m">1</span>.2.3
+</span></code></pre></div></p>
+<hr />
+<h4 id="debug"><code>DEBUG</code><a class="headerlink" href="#debug" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> Boolean
+<strong>Default:</strong> <code>false</code>
+<strong>Required:</strong> ✅ Yes
+<strong>Production Value:</strong> <code>false</code></p>
+<p><strong>Description:</strong> Enable debug mode (detailed error messages, auto-reload).</p>
+<p><strong>Security Warning:</strong> ⚠️ <strong>MUST be <code>false</code> in production!</strong>
+Debug mode exposes:
+- Internal code paths
+- Detailed stack traces
+- Configuration values
+- Database query details</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Production (required)</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nv">DEBUG</span><span class="o">=</span><span class="nb">false</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Development</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="nv">DEBUG</span><span class="o">=</span><span class="nb">true</span>
+</span></code></pre></div></p>
+<hr />
+<h4 id="log_level"><code>LOG_LEVEL</code><a class="headerlink" href="#log_level" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String (enum)
+<strong>Default:</strong> <code>INFO</code>
+<strong>Required:</strong> ⚠️ Recommended
+<strong>Values:</strong> <code>DEBUG</code>, <code>INFO</code>, <code>WARNING</code>, <code>ERROR</code>, <code>CRITICAL</code></p>
+<p><strong>Description:</strong> Logging verbosity level.</p>
+<p><strong>Recommendations:</strong>
+- <strong>Production:</strong> <code>INFO</code> or <code>WARNING</code>
+- <strong>Staging:</strong> <code>INFO</code> or <code>DEBUG</code>
+- <strong>Development:</strong> <code>DEBUG</code></p>
+<p><strong>Log Volume Impact:</strong>
+- <code>DEBUG</code>: Very high (all operations logged)
+- <code>INFO</code>: Moderate (important events logged)
+- <code>WARNING</code>: Low (warnings and errors only)
+- <code>ERROR</code>: Very low (errors only)</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Production - balanced logging</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nv">LOG_LEVEL</span><span class="o">=</span>INFO
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Production - minimal logging</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="nv">LOG_LEVEL</span><span class="o">=</span>WARNING
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="c1"># Debugging issues</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="nv">LOG_LEVEL</span><span class="o">=</span>DEBUG
+</span></code></pre></div></p>
+<hr />
+<h3 id="api-server-configuration">API Server Configuration<a class="headerlink" href="#api-server-configuration" title="Permanent link">&para;</a></h3>
+<p>HTTP server settings for the FastAPI application.</p>
+<h4 id="api_host"><code>API_HOST</code><a class="headerlink" href="#api_host" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String (IP address)
+<strong>Default:</strong> <code>0.0.0.0</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> IP address to bind the API server.</p>
+<p><strong>Values:</strong>
+- <code>0.0.0.0</code>: Bind to all network interfaces (typical for production)
+- <code>127.0.0.1</code>: Localhost only (development or behind reverse proxy)
+- Specific IP: Bind to specific network interface</p>
+<p><strong>Security Note:</strong> Use firewall or reverse proxy to restrict access.</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Production - all interfaces (behind load balancer)</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nv">API_HOST</span><span class="o">=</span><span class="m">0</span>.0.0.0
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># Development - localhost only</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="nv">API_HOST</span><span class="o">=</span><span class="m">127</span>.0.0.1
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="c1"># Specific interface</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="nv">API_HOST</span><span class="o">=</span><span class="m">10</span>.0.1.50
+</span></code></pre></div></p>
+<hr />
+<h4 id="api_port"><code>API_PORT</code><a class="headerlink" href="#api_port" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> Integer
+<strong>Default:</strong> <code>8000</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> TCP port for the API server.</p>
+<p><strong>Recommendations:</strong>
+- Standard HTTP: <code>80</code> (requires root or capabilities)
+- Standard HTTPS: <code>443</code> (requires root or capabilities)
+- Unprivileged port: <code>8000</code>, <code>8080</code>, <code>3000</code>
+- Behind reverse proxy: Any unprivileged port</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Default</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nv">API_PORT</span><span class="o">=</span><span class="m">8000</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="c1"># Behind Nginx/HAProxy</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="nv">API_PORT</span><span class="o">=</span><span class="m">8080</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="c1"># Custom port</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="nv">API_PORT</span><span class="o">=</span><span class="m">3000</span>
+</span></code></pre></div></p>
+<hr />
+<h4 id="api_workers"><code>API_WORKERS</code><a class="headerlink" href="#api_workers" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> Integer
+<strong>Default:</strong> <code>4</code>
+<strong>Required:</strong> ⚠️ Recommended</p>
+<p><strong>Description:</strong> Number of Uvicorn worker processes.</p>
+<p><strong>Formula:</strong> <code>(2 × CPU cores) + 1</code></p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># 2 CPU cores → 5 workers</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nv">API_WORKERS</span><span class="o">=</span><span class="m">5</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1"># 4 CPU cores → 9 workers</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="nv">API_WORKERS</span><span class="o">=</span><span class="m">9</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="c1"># 8 CPU cores → 17 workers</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="nv">API_WORKERS</span><span class="o">=</span><span class="m">17</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="c1"># Memory constrained → fewer workers</span>
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="nv">API_WORKERS</span><span class="o">=</span><span class="m">4</span>
+</span></code></pre></div></p>
+<p><strong>Resource Considerations:</strong>
+- Each worker consumes memory (~100-200 MB)
+- More workers = better concurrency, more memory
+- Monitor memory usage and adjust accordingly</p>
+<hr />
+<h4 id="api_reload"><code>API_RELOAD</code><a class="headerlink" href="#api_reload" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> Boolean
+<strong>Default:</strong> <code>false</code>
+<strong>Required:</strong> ⚠️ Optional
+<strong>Production Value:</strong> <code>false</code></p>
+<p><strong>Description:</strong> Auto-reload server on code changes (development only).</p>
+<p><strong>Security Warning:</strong> ⚠️ <strong>MUST be <code>false</code> in production!</strong></p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># Production (required)</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="nv">API_RELOAD</span><span class="o">=</span><span class="nb">false</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="c1"># Development (convenience)</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="nv">API_RELOAD</span><span class="o">=</span><span class="nb">true</span>
+</span></code></pre></div></p>
+<hr />
+<h3 id="security-configuration">Security Configuration<a class="headerlink" href="#security-configuration" title="Permanent link">&para;</a></h3>
+<p>Authentication, authorization, and CORS settings.</p>
+<h4 id="secret_key"><code>SECRET_KEY</code><a class="headerlink" href="#secret_key" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String
+<strong>Default:</strong> <code>dev-secret-key-change-in-production-min-32-chars</code>
+<strong>Required:</strong> ✅ Yes (CRITICAL)
+<strong>Minimum Length:</strong> 32 characters
+<strong>Recommended Length:</strong> 48+ characters</p>
+<p><strong>Description:</strong> Secret key for JWT signing, encryption, and CSRF tokens.</p>
+<p><strong>Security Requirements:</strong>
+- ⚠️ <strong>MUST be changed from default in production</strong>
+- Generate cryptographically random value
+- Minimum 32 characters (enforced by validation)
+- Treat as highly sensitive credential
+- Rotate every 180 days</p>
+<p><strong>Generation:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Recommended (48 characters)</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import secrets; print(secrets.token_urlsafe(48))&quot;</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="c1"># Minimum (32 characters)</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import secrets; print(secrets.token_urlsafe(32))&quot;</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="c1"># OpenSSL alternative</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>openssl<span class="w"> </span>rand<span class="w"> </span>-base64<span class="w"> </span><span class="m">48</span>
+</span></code></pre></div></p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># ❌ NEVER use default in production</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="nv">SECRET_KEY</span><span class="o">=</span>dev-secret-key-change-in-production-min-32-chars
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="c1"># ✅ Properly generated (example - generate your own!)</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="nv">SECRET_KEY</span><span class="o">=</span>xI9vN2kL8mP5qR7tU0wY3zA6bC9dE2fG5hJ8kM1nP4qS7tV0xY3z
+</span></code></pre></div></p>
+<p><strong>Key Rotation:</strong>
+When rotating SECRET_KEY, all existing JWT tokens become invalid and users must re-authenticate.</p>
+<hr />
+<h4 id="access_token_expire_minutes"><code>ACCESS_TOKEN_EXPIRE_MINUTES</code><a class="headerlink" href="#access_token_expire_minutes" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> Integer
+<strong>Default:</strong> <code>15</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> JWT access token expiration time in minutes.</p>
+<p><strong>Security Tradeoff:</strong>
+- <strong>Shorter (5-15 min)</strong>: More secure, more frequent re-authentication
+- <strong>Longer (30-60 min)</strong>: Less secure, better UX</p>
+<p><strong>Recommendations:</strong>
+- <strong>High security:</strong> 5-15 minutes
+- <strong>Balanced:</strong> 15-30 minutes
+- <strong>User convenience:</strong> 30-60 minutes</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># High security</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="nv">ACCESS_TOKEN_EXPIRE_MINUTES</span><span class="o">=</span><span class="m">5</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="c1"># Recommended balance</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="nv">ACCESS_TOKEN_EXPIRE_MINUTES</span><span class="o">=</span><span class="m">15</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="c1"># Extended session</span>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="nv">ACCESS_TOKEN_EXPIRE_MINUTES</span><span class="o">=</span><span class="m">60</span>
+</span></code></pre></div></p>
+<hr />
+<h4 id="cors_origins"><code>CORS_ORIGINS</code><a class="headerlink" href="#cors_origins" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> Comma-separated list
+<strong>Default:</strong> <code>http://localhost:3000</code>
+<strong>Required:</strong> ✅ Yes</p>
+<p><strong>Description:</strong> Allowed origins for Cross-Origin Resource Sharing (CORS).</p>
+<p><strong>Security Requirements:</strong>
+- ⚠️ <strong>NEVER use <code>*</code> (wildcard) in production</strong>
+- List only trusted frontend domains
+- Include protocol (http:// or https://)
+- Include port if non-standard</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># Single origin</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="nv">CORS_ORIGINS</span><span class="o">=</span>https://app.example.com
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="c1"># Multiple origins</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="nv">CORS_ORIGINS</span><span class="o">=</span>https://app.example.com,https://admin.example.com
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="c1"># With non-standard port</span>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="nv">CORS_ORIGINS</span><span class="o">=</span>https://app.example.com:8443
+</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>
+</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="c1"># Development</span>
+</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="nv">CORS_ORIGINS</span><span class="o">=</span>http://localhost:3000,http://localhost:3001
+</span><span id="__span-15-12"><a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a>
+</span><span id="__span-15-13"><a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a><span class="c1"># ❌ NEVER in production</span>
+</span><span id="__span-15-14"><a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a><span class="nv">CORS_ORIGINS</span><span class="o">=</span>*
+</span></code></pre></div></p>
+<hr />
+<h3 id="postgresql-database-configuration">PostgreSQL Database Configuration<a class="headerlink" href="#postgresql-database-configuration" title="Permanent link">&para;</a></h3>
+<p>Main application database for servers, policies, and operational data.</p>
+<h4 id="postgres_host"><code>POSTGRES_HOST</code><a class="headerlink" href="#postgres_host" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String (hostname/IP)
+<strong>Default:</strong> <code>localhost</code>
+<strong>Required:</strong> ✅ Yes</p>
+<p><strong>Description:</strong> PostgreSQL server hostname or IP address.</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># Localhost</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="nv">POSTGRES_HOST</span><span class="o">=</span>localhost
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="c1"># External server</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="nv">POSTGRES_HOST</span><span class="o">=</span>postgres.example.com
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="c1"># Private IP</span>
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="nv">POSTGRES_HOST</span><span class="o">=</span><span class="m">10</span>.0.1.100
+</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>
+</span><span id="__span-16-10"><a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="c1"># Kubernetes service</span>
+</span><span id="__span-16-11"><a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a><span class="nv">POSTGRES_HOST</span><span class="o">=</span>postgres-service.database.svc.cluster.local
+</span></code></pre></div></p>
+<hr />
+<h4 id="postgres_port"><code>POSTGRES_PORT</code><a class="headerlink" href="#postgres_port" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> Integer
+<strong>Default:</strong> <code>5432</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> PostgreSQL server TCP port.</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># Default PostgreSQL port</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="nv">POSTGRES_PORT</span><span class="o">=</span><span class="m">5432</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="c1"># Custom port</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="nv">POSTGRES_PORT</span><span class="o">=</span><span class="m">5433</span>
+</span></code></pre></div></p>
+<hr />
+<h4 id="postgres_user"><code>POSTGRES_USER</code><a class="headerlink" href="#postgres_user" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String
+<strong>Default:</strong> <code>sark</code>
+<strong>Required:</strong> ✅ Yes</p>
+<p><strong>Description:</strong> PostgreSQL database user.</p>
+<p><strong>Security Recommendations:</strong>
+- Use dedicated application user (not <code>postgres</code> superuser)
+- Grant minimum required privileges
+- Different users for different environments</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># Application user</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="nv">POSTGRES_USER</span><span class="o">=</span>sark
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="c1"># Environment-specific user</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="nv">POSTGRES_USER</span><span class="o">=</span>sark_production
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="nv">POSTGRES_USER</span><span class="o">=</span>sark_staging
+</span></code></pre></div></p>
+<hr />
+<h4 id="postgres_password"><code>POSTGRES_PASSWORD</code><a class="headerlink" href="#postgres_password" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String
+<strong>Default:</strong> <code>sark</code>
+<strong>Required:</strong> ✅ Yes (CRITICAL)</p>
+<p><strong>Description:</strong> PostgreSQL database password.</p>
+<p><strong>Security Requirements:</strong>
+- ⚠️ <strong>MUST be changed from default in production</strong>
+- Minimum 20 characters recommended
+- Use cryptographically random password
+- Store in secrets manager
+- Rotate every 90 days</p>
+<p><strong>Generation:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1"># Generate secure password (32 characters)</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import secrets; print(secrets.token_urlsafe(32))&quot;</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="c1"># Alternative with special characters</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import secrets, string; print(&#39;&#39;.join(secrets.choice(string.ascii_letters + string.digits + string.punctuation) for _ in range(32)))&quot;</span>
+</span></code></pre></div></p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="c1"># ❌ NEVER use default in production</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="nv">POSTGRES_PASSWORD</span><span class="o">=</span>sark
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="c1"># ✅ Properly generated (example - generate your own!)</span>
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="nv">POSTGRES_PASSWORD</span><span class="o">=</span>kL8mN2pQ5rS8tU1wX4yZ7aC0bE3dF6gH9jK2lM5nP8qR1sT4uV7w
+</span></code></pre></div></p>
+<hr />
+<h4 id="postgres_db"><code>POSTGRES_DB</code><a class="headerlink" href="#postgres_db" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String
+<strong>Default:</strong> <code>sark</code>
+<strong>Required:</strong> ✅ Yes</p>
+<p><strong>Description:</strong> PostgreSQL database name.</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># Default</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="nv">POSTGRES_DB</span><span class="o">=</span>sark
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="c1"># Environment-specific</span>
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="nv">POSTGRES_DB</span><span class="o">=</span>sark_production
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="nv">POSTGRES_DB</span><span class="o">=</span>sark_staging
+</span></code></pre></div></p>
+<hr />
+<h4 id="postgres_pool_size"><code>POSTGRES_POOL_SIZE</code><a class="headerlink" href="#postgres_pool_size" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> Integer
+<strong>Default:</strong> <code>20</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> Number of database connections to maintain in the connection pool.</p>
+<p><strong>Sizing Guidelines:</strong>
+- <strong>Small deployment (1-2 workers):</strong> 5-10
+- <strong>Medium deployment (4-8 workers):</strong> 20-40
+- <strong>Large deployment (16+ workers):</strong> 50-100</p>
+<p><strong>Formula:</strong> <code>workers × expected_concurrent_queries_per_worker</code></p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1"># Small deployment</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="nv">POSTGRES_POOL_SIZE</span><span class="o">=</span><span class="m">10</span>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="c1"># Medium deployment (default)</span>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="nv">POSTGRES_POOL_SIZE</span><span class="o">=</span><span class="m">20</span>
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>
+</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="c1"># Large deployment</span>
+</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="nv">POSTGRES_POOL_SIZE</span><span class="o">=</span><span class="m">50</span>
+</span></code></pre></div></p>
+<p><strong>Database Limits:</strong>
+PostgreSQL has a <code>max_connections</code> limit (default: 100). Ensure:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>total_connections &lt; max_connections
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>where total_connections = pool_size + max_overflow (per instance)
+</span></code></pre></div></p>
+<hr />
+<h4 id="postgres_max_overflow"><code>POSTGRES_MAX_OVERFLOW</code><a class="headerlink" href="#postgres_max_overflow" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> Integer
+<strong>Default:</strong> <code>10</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> Additional connections allowed beyond pool_size during high load.</p>
+<p><strong>Total Connections:</strong> <code>pool_size + max_overflow</code></p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="c1"># Conservative</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="nv">POSTGRES_MAX_OVERFLOW</span><span class="o">=</span><span class="m">5</span>
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>
+</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="c1"># Default</span>
+</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="nv">POSTGRES_MAX_OVERFLOW</span><span class="o">=</span><span class="m">10</span>
+</span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a>
+</span><span id="__span-24-7"><a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="c1"># High burst capacity</span>
+</span><span id="__span-24-8"><a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a><span class="nv">POSTGRES_MAX_OVERFLOW</span><span class="o">=</span><span class="m">20</span>
+</span></code></pre></div></p>
+<hr />
+<h3 id="timescaledb-configuration">TimescaleDB Configuration<a class="headerlink" href="#timescaledb-configuration" title="Permanent link">&para;</a></h3>
+<p>Audit event database optimized for time-series data.</p>
+<h4 id="timescale_host"><code>TIMESCALE_HOST</code><a class="headerlink" href="#timescale_host" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String (hostname/IP)
+<strong>Default:</strong> <code>localhost</code>
+<strong>Required:</strong> ✅ Yes</p>
+<p><strong>Description:</strong> TimescaleDB server hostname or IP address.</p>
+<p><strong>Deployment Options:</strong>
+1. <strong>Shared instance</strong>: Same server as PostgreSQL, different database
+2. <strong>Dedicated instance</strong>: Separate TimescaleDB server (recommended for high audit volume)</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="c1"># Shared with PostgreSQL</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="nv">TIMESCALE_HOST</span><span class="o">=</span>localhost
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>
+</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="c1"># Dedicated TimescaleDB server</span>
+</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="nv">TIMESCALE_HOST</span><span class="o">=</span>timescale.example.com
+</span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>
+</span><span id="__span-25-7"><a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="c1"># Kubernetes</span>
+</span><span id="__span-25-8"><a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="nv">TIMESCALE_HOST</span><span class="o">=</span>timescale-service.database.svc.cluster.local
+</span></code></pre></div></p>
+<hr />
+<h4 id="timescale_port"><code>TIMESCALE_PORT</code><a class="headerlink" href="#timescale_port" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> Integer
+<strong>Default:</strong> <code>5432</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="nv">TIMESCALE_PORT</span><span class="o">=</span><span class="m">5432</span>
+</span></code></pre></div></p>
+<hr />
+<h4 id="timescale_user"><code>TIMESCALE_USER</code><a class="headerlink" href="#timescale_user" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String
+<strong>Default:</strong> <code>sark</code>
+<strong>Required:</strong> ✅ Yes</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="nv">TIMESCALE_USER</span><span class="o">=</span>sark
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="nv">TIMESCALE_USER</span><span class="o">=</span>sark_audit
+</span></code></pre></div></p>
+<hr />
+<h4 id="timescale_password"><code>TIMESCALE_PASSWORD</code><a class="headerlink" href="#timescale_password" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String
+<strong>Default:</strong> <code>sark</code>
+<strong>Required:</strong> ✅ Yes (CRITICAL)</p>
+<p><strong>Security:</strong> Same requirements as <code>POSTGRES_PASSWORD</code>.</p>
+<p><strong>Generation:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import secrets; print(secrets.token_urlsafe(32))&quot;</span>
+</span></code></pre></div></p>
+<hr />
+<h4 id="timescale_db"><code>TIMESCALE_DB</code><a class="headerlink" href="#timescale_db" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String
+<strong>Default:</strong> <code>sark_audit</code>
+<strong>Required:</strong> ✅ Yes</p>
+<p><strong>Description:</strong> TimescaleDB database name for audit events.</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="c1"># Default</span>
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="nv">TIMESCALE_DB</span><span class="o">=</span>sark_audit
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>
+</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="c1"># Environment-specific</span>
+</span><span id="__span-29-5"><a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a><span class="nv">TIMESCALE_DB</span><span class="o">=</span>sark_audit_production
+</span></code></pre></div></p>
+<hr />
+<h3 id="redis-cache-configuration">Redis Cache Configuration<a class="headerlink" href="#redis-cache-configuration" title="Permanent link">&para;</a></h3>
+<p>In-memory cache for performance optimization.</p>
+<h4 id="redis_host"><code>REDIS_HOST</code><a class="headerlink" href="#redis_host" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String (hostname/IP)
+<strong>Default:</strong> <code>localhost</code>
+<strong>Required:</strong> ✅ Yes (if using Redis)</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="nv">REDIS_HOST</span><span class="o">=</span>localhost
+</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="nv">REDIS_HOST</span><span class="o">=</span>redis.example.com
+</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="nv">REDIS_HOST</span><span class="o">=</span>redis-master.cache.svc.cluster.local
+</span></code></pre></div></p>
+<hr />
+<h4 id="redis_port"><code>REDIS_PORT</code><a class="headerlink" href="#redis_port" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> Integer
+<strong>Default:</strong> <code>6379</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="nv">REDIS_PORT</span><span class="o">=</span><span class="m">6379</span>
+</span></code></pre></div></p>
+<hr />
+<h4 id="redis_password"><code>REDIS_PASSWORD</code><a class="headerlink" href="#redis_password" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String
+<strong>Default:</strong> None (empty)
+<strong>Required:</strong> ✅ Yes (production)</p>
+<p><strong>Security:</strong> Required for production deployments.</p>
+<p><strong>Generation:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import secrets; print(secrets.token_urlsafe(32))&quot;</span>
+</span></code></pre></div></p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="c1"># Production (required)</span>
+</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="nv">REDIS_PASSWORD</span><span class="o">=</span>secure-random-password-here
+</span><span id="__span-33-3"><a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>
+</span><span id="__span-33-4"><a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="c1"># Development (unauthenticated)</span>
+</span><span id="__span-33-5"><a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="nv">REDIS_PASSWORD</span><span class="o">=</span>
+</span></code></pre></div></p>
+<hr />
+<h4 id="redis_db"><code>REDIS_DB</code><a class="headerlink" href="#redis_db" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> Integer
+<strong>Default:</strong> <code>0</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> Redis database number (0-15).</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="c1"># Default database</span>
+</span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="nv">REDIS_DB</span><span class="o">=</span><span class="m">0</span>
+</span><span id="__span-34-3"><a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a>
+</span><span id="__span-34-4"><a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="c1"># Separate database per environment</span>
+</span><span id="__span-34-5"><a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a><span class="nv">REDIS_DB</span><span class="o">=</span><span class="m">0</span><span class="w">  </span><span class="c1"># production</span>
+</span><span id="__span-34-6"><a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a><span class="nv">REDIS_DB</span><span class="o">=</span><span class="m">1</span><span class="w">  </span><span class="c1"># staging</span>
+</span><span id="__span-34-7"><a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a><span class="nv">REDIS_DB</span><span class="o">=</span><span class="m">2</span><span class="w">  </span><span class="c1"># development</span>
+</span></code></pre></div></p>
+<hr />
+<h4 id="redis_pool_size"><code>REDIS_POOL_SIZE</code><a class="headerlink" href="#redis_pool_size" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> Integer
+<strong>Default:</strong> <code>50</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> Maximum Redis connections in the connection pool.</p>
+<p><strong>Sizing:</strong>
+- <strong>Low traffic:</strong> 20-50
+- <strong>Medium traffic:</strong> 50-100
+- <strong>High traffic:</strong> 100-200</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-35-1"><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="nv">REDIS_POOL_SIZE</span><span class="o">=</span><span class="m">50</span>
+</span><span id="__span-35-2"><a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="nv">REDIS_POOL_SIZE</span><span class="o">=</span><span class="m">100</span>
+</span></code></pre></div></p>
+<hr />
+<h3 id="splunk-siem-configuration">Splunk SIEM Configuration<a class="headerlink" href="#splunk-siem-configuration" title="Permanent link">&para;</a></h3>
+<p>Splunk HTTP Event Collector (HEC) integration for audit events.</p>
+<h4 id="splunk_enabled"><code>SPLUNK_ENABLED</code><a class="headerlink" href="#splunk_enabled" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> Boolean
+<strong>Default:</strong> <code>false</code>
+<strong>Required:</strong> ✅ Yes (if using Splunk)</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-36-1"><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="c1"># Enable Splunk integration</span>
+</span><span id="__span-36-2"><a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="nv">SPLUNK_ENABLED</span><span class="o">=</span><span class="nb">true</span>
+</span><span id="__span-36-3"><a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a>
+</span><span id="__span-36-4"><a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a><span class="c1"># Disable Splunk integration</span>
+</span><span id="__span-36-5"><a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a><span class="nv">SPLUNK_ENABLED</span><span class="o">=</span><span class="nb">false</span>
+</span></code></pre></div></p>
+<hr />
+<h4 id="splunk_hec_url"><code>SPLUNK_HEC_URL</code><a class="headerlink" href="#splunk_hec_url" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String (URL)
+<strong>Default:</strong> <code>https://localhost:8088/services/collector</code>
+<strong>Required:</strong> ✅ Yes (if Splunk enabled)</p>
+<p><strong>Description:</strong> Splunk HTTP Event Collector endpoint URL.</p>
+<p><strong>Format:</strong> <code>https://&lt;splunk-host&gt;:&lt;hec-port&gt;/services/collector</code></p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-37-1"><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="c1"># Default HEC port</span>
+</span><span id="__span-37-2"><a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a><span class="nv">SPLUNK_HEC_URL</span><span class="o">=</span>https://splunk.example.com:8088/services/collector
+</span><span id="__span-37-3"><a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a>
+</span><span id="__span-37-4"><a id="__codelineno-37-4" name="__codelineno-37-4" href="#__codelineno-37-4"></a><span class="c1"># Load balancer</span>
+</span><span id="__span-37-5"><a id="__codelineno-37-5" name="__codelineno-37-5" href="#__codelineno-37-5"></a><span class="nv">SPLUNK_HEC_URL</span><span class="o">=</span>https://splunk-hec-lb.example.com/services/collector
+</span><span id="__span-37-6"><a id="__codelineno-37-6" name="__codelineno-37-6" href="#__codelineno-37-6"></a>
+</span><span id="__span-37-7"><a id="__codelineno-37-7" name="__codelineno-37-7" href="#__codelineno-37-7"></a><span class="c1"># Splunk Cloud</span>
+</span><span id="__span-37-8"><a id="__codelineno-37-8" name="__codelineno-37-8" href="#__codelineno-37-8"></a><span class="nv">SPLUNK_HEC_URL</span><span class="o">=</span>https://inputs.prd-p-12345.splunkcloud.com:8088/services/collector
+</span></code></pre></div></p>
+<hr />
+<h4 id="splunk_hec_token"><code>SPLUNK_HEC_TOKEN</code><a class="headerlink" href="#splunk_hec_token" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String (UUID)
+<strong>Default:</strong> Empty
+<strong>Required:</strong> ✅ Yes (if Splunk enabled) (CRITICAL)</p>
+<p><strong>Description:</strong> Splunk HEC authentication token.</p>
+<p><strong>Format:</strong> UUID (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)</p>
+<p><strong>Obtaining HEC Token:</strong>
+1. Log in to Splunk Web
+2. Settings → Data Inputs → HTTP Event Collector
+3. Click "New Token" or copy existing token
+4. Save token securely (cannot be retrieved after creation)</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-38-1"><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="nv">SPLUNK_HEC_TOKEN</span><span class="o">=</span><span class="m">12345678</span>-1234-1234-1234-123456789012
+</span></code></pre></div></p>
+<p><strong>Security:</strong> Store in secrets manager, rotate regularly.</p>
+<hr />
+<h4 id="splunk_index"><code>SPLUNK_INDEX</code><a class="headerlink" href="#splunk_index" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String
+<strong>Default:</strong> <code>sark_audit</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> Splunk index for SARK audit events.</p>
+<p><strong>Requirements:</strong>
+- Index must exist in Splunk
+- HEC token must have permission to write to index</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-39-1"><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="c1"># Default</span>
+</span><span id="__span-39-2"><a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a><span class="nv">SPLUNK_INDEX</span><span class="o">=</span>sark_audit
+</span><span id="__span-39-3"><a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a>
+</span><span id="__span-39-4"><a id="__codelineno-39-4" name="__codelineno-39-4" href="#__codelineno-39-4"></a><span class="c1"># Environment-specific</span>
+</span><span id="__span-39-5"><a id="__codelineno-39-5" name="__codelineno-39-5" href="#__codelineno-39-5"></a><span class="nv">SPLUNK_INDEX</span><span class="o">=</span>production_sark_audit
+</span><span id="__span-39-6"><a id="__codelineno-39-6" name="__codelineno-39-6" href="#__codelineno-39-6"></a><span class="nv">SPLUNK_INDEX</span><span class="o">=</span>staging_sark_audit
+</span><span id="__span-39-7"><a id="__codelineno-39-7" name="__codelineno-39-7" href="#__codelineno-39-7"></a>
+</span><span id="__span-39-8"><a id="__codelineno-39-8" name="__codelineno-39-8" href="#__codelineno-39-8"></a><span class="c1"># Shared index with source type filtering</span>
+</span><span id="__span-39-9"><a id="__codelineno-39-9" name="__codelineno-39-9" href="#__codelineno-39-9"></a><span class="nv">SPLUNK_INDEX</span><span class="o">=</span>security_audit
+</span></code></pre></div></p>
+<hr />
+<h4 id="splunk_sourcetype"><code>SPLUNK_SOURCETYPE</code><a class="headerlink" href="#splunk_sourcetype" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String
+<strong>Default:</strong> <code>sark:audit:event</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> Splunk sourcetype for event parsing and field extraction.</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-40-1"><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="c1"># Default (recommended)</span>
+</span><span id="__span-40-2"><a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a><span class="nv">SPLUNK_SOURCETYPE</span><span class="o">=</span>sark:audit:event
+</span><span id="__span-40-3"><a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a>
+</span><span id="__span-40-4"><a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a><span class="c1"># Custom sourcetype</span>
+</span><span id="__span-40-5"><a id="__codelineno-40-5" name="__codelineno-40-5" href="#__codelineno-40-5"></a><span class="nv">SPLUNK_SOURCETYPE</span><span class="o">=</span>custom:sark:audit
+</span></code></pre></div></p>
+<hr />
+<h4 id="splunk_source"><code>SPLUNK_SOURCE</code><a class="headerlink" href="#splunk_source" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String
+<strong>Default:</strong> <code>sark</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> Splunk source field for event categorization.</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-41-1"><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="c1"># Default</span>
+</span><span id="__span-41-2"><a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a><span class="nv">SPLUNK_SOURCE</span><span class="o">=</span>sark
+</span><span id="__span-41-3"><a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a>
+</span><span id="__span-41-4"><a id="__codelineno-41-4" name="__codelineno-41-4" href="#__codelineno-41-4"></a><span class="c1"># Environment-specific</span>
+</span><span id="__span-41-5"><a id="__codelineno-41-5" name="__codelineno-41-5" href="#__codelineno-41-5"></a><span class="nv">SPLUNK_SOURCE</span><span class="o">=</span>sark-production
+</span><span id="__span-41-6"><a id="__codelineno-41-6" name="__codelineno-41-6" href="#__codelineno-41-6"></a><span class="nv">SPLUNK_SOURCE</span><span class="o">=</span>sark-staging
+</span></code></pre></div></p>
+<hr />
+<h4 id="splunk_host"><code>SPLUNK_HOST</code><a class="headerlink" href="#splunk_host" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String
+<strong>Default:</strong> None (uses system hostname)
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> Override hostname in Splunk events.</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-42-1"><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="c1"># Use system hostname (default)</span>
+</span><span id="__span-42-2"><a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a><span class="nv">SPLUNK_HOST</span><span class="o">=</span>
+</span><span id="__span-42-3"><a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a>
+</span><span id="__span-42-4"><a id="__codelineno-42-4" name="__codelineno-42-4" href="#__codelineno-42-4"></a><span class="c1"># Custom hostname</span>
+</span><span id="__span-42-5"><a id="__codelineno-42-5" name="__codelineno-42-5" href="#__codelineno-42-5"></a><span class="nv">SPLUNK_HOST</span><span class="o">=</span>sark-app-01
+</span><span id="__span-42-6"><a id="__codelineno-42-6" name="__codelineno-42-6" href="#__codelineno-42-6"></a><span class="nv">SPLUNK_HOST</span><span class="o">=</span>sark-production-us-east-1a
+</span></code></pre></div></p>
+<hr />
+<h4 id="splunk_verify_ssl"><code>SPLUNK_VERIFY_SSL</code><a class="headerlink" href="#splunk_verify_ssl" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> Boolean
+<strong>Default:</strong> <code>true</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> Verify SSL/TLS certificate when connecting to Splunk HEC.</p>
+<p><strong>Security Recommendations:</strong>
+- <strong>Production:</strong> <code>true</code> (verify SSL certificates)
+- <strong>Development/Testing:</strong> <code>false</code> (self-signed certificates)</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-43-1"><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="c1"># Production (recommended)</span>
+</span><span id="__span-43-2"><a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a><span class="nv">SPLUNK_VERIFY_SSL</span><span class="o">=</span><span class="nb">true</span>
+</span><span id="__span-43-3"><a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a>
+</span><span id="__span-43-4"><a id="__codelineno-43-4" name="__codelineno-43-4" href="#__codelineno-43-4"></a><span class="c1"># Development with self-signed cert</span>
+</span><span id="__span-43-5"><a id="__codelineno-43-5" name="__codelineno-43-5" href="#__codelineno-43-5"></a><span class="nv">SPLUNK_VERIFY_SSL</span><span class="o">=</span><span class="nb">false</span>
+</span></code></pre></div></p>
+<hr />
+<h4 id="splunk_batch_size"><code>SPLUNK_BATCH_SIZE</code><a class="headerlink" href="#splunk_batch_size" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> Integer
+<strong>Default:</strong> <code>100</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> Number of events to batch before sending to Splunk.</p>
+<p><strong>Tuning:</strong>
+- <strong>Low latency:</strong> 50-100 (faster indexing, more requests)
+- <strong>High throughput:</strong> 500-1000 (fewer requests, higher latency)
+- <strong>Splunk Cloud:</strong> 100-500 (respect API limits)</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-44-1"><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a><span class="c1"># Default (balanced)</span>
+</span><span id="__span-44-2"><a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a><span class="nv">SPLUNK_BATCH_SIZE</span><span class="o">=</span><span class="m">100</span>
+</span><span id="__span-44-3"><a id="__codelineno-44-3" name="__codelineno-44-3" href="#__codelineno-44-3"></a>
+</span><span id="__span-44-4"><a id="__codelineno-44-4" name="__codelineno-44-4" href="#__codelineno-44-4"></a><span class="c1"># High throughput</span>
+</span><span id="__span-44-5"><a id="__codelineno-44-5" name="__codelineno-44-5" href="#__codelineno-44-5"></a><span class="nv">SPLUNK_BATCH_SIZE</span><span class="o">=</span><span class="m">500</span>
+</span><span id="__span-44-6"><a id="__codelineno-44-6" name="__codelineno-44-6" href="#__codelineno-44-6"></a>
+</span><span id="__span-44-7"><a id="__codelineno-44-7" name="__codelineno-44-7" href="#__codelineno-44-7"></a><span class="c1"># Low latency</span>
+</span><span id="__span-44-8"><a id="__codelineno-44-8" name="__codelineno-44-8" href="#__codelineno-44-8"></a><span class="nv">SPLUNK_BATCH_SIZE</span><span class="o">=</span><span class="m">50</span>
+</span></code></pre></div></p>
+<hr />
+<h4 id="splunk_batch_timeout_seconds"><code>SPLUNK_BATCH_TIMEOUT_SECONDS</code><a class="headerlink" href="#splunk_batch_timeout_seconds" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> Integer
+<strong>Default:</strong> <code>5</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> Maximum seconds to wait before flushing partial batch.</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-45-1"><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a><span class="c1"># Default (5 seconds)</span>
+</span><span id="__span-45-2"><a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a><span class="nv">SPLUNK_BATCH_TIMEOUT_SECONDS</span><span class="o">=</span><span class="m">5</span>
+</span><span id="__span-45-3"><a id="__codelineno-45-3" name="__codelineno-45-3" href="#__codelineno-45-3"></a>
+</span><span id="__span-45-4"><a id="__codelineno-45-4" name="__codelineno-45-4" href="#__codelineno-45-4"></a><span class="c1"># Real-time indexing (1 second)</span>
+</span><span id="__span-45-5"><a id="__codelineno-45-5" name="__codelineno-45-5" href="#__codelineno-45-5"></a><span class="nv">SPLUNK_BATCH_TIMEOUT_SECONDS</span><span class="o">=</span><span class="m">1</span>
+</span><span id="__span-45-6"><a id="__codelineno-45-6" name="__codelineno-45-6" href="#__codelineno-45-6"></a>
+</span><span id="__span-45-7"><a id="__codelineno-45-7" name="__codelineno-45-7" href="#__codelineno-45-7"></a><span class="c1"># Batch processing (30 seconds)</span>
+</span><span id="__span-45-8"><a id="__codelineno-45-8" name="__codelineno-45-8" href="#__codelineno-45-8"></a><span class="nv">SPLUNK_BATCH_TIMEOUT_SECONDS</span><span class="o">=</span><span class="m">30</span>
+</span></code></pre></div></p>
+<hr />
+<h4 id="splunk_retry_attempts"><code>SPLUNK_RETRY_ATTEMPTS</code><a class="headerlink" href="#splunk_retry_attempts" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> Integer
+<strong>Default:</strong> <code>3</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> Number of retry attempts for failed Splunk requests.</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-46-1"><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="c1"># Default</span>
+</span><span id="__span-46-2"><a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a><span class="nv">SPLUNK_RETRY_ATTEMPTS</span><span class="o">=</span><span class="m">3</span>
+</span><span id="__span-46-3"><a id="__codelineno-46-3" name="__codelineno-46-3" href="#__codelineno-46-3"></a>
+</span><span id="__span-46-4"><a id="__codelineno-46-4" name="__codelineno-46-4" href="#__codelineno-46-4"></a><span class="c1"># High reliability</span>
+</span><span id="__span-46-5"><a id="__codelineno-46-5" name="__codelineno-46-5" href="#__codelineno-46-5"></a><span class="nv">SPLUNK_RETRY_ATTEMPTS</span><span class="o">=</span><span class="m">5</span>
+</span><span id="__span-46-6"><a id="__codelineno-46-6" name="__codelineno-46-6" href="#__codelineno-46-6"></a>
+</span><span id="__span-46-7"><a id="__codelineno-46-7" name="__codelineno-46-7" href="#__codelineno-46-7"></a><span class="c1"># No retries (use fallback logging)</span>
+</span><span id="__span-46-8"><a id="__codelineno-46-8" name="__codelineno-46-8" href="#__codelineno-46-8"></a><span class="nv">SPLUNK_RETRY_ATTEMPTS</span><span class="o">=</span><span class="m">0</span>
+</span></code></pre></div></p>
+<hr />
+<h3 id="datadog-siem-configuration">Datadog SIEM Configuration<a class="headerlink" href="#datadog-siem-configuration" title="Permanent link">&para;</a></h3>
+<p>Datadog Logs API integration for audit events.</p>
+<h4 id="datadog_enabled"><code>DATADOG_ENABLED</code><a class="headerlink" href="#datadog_enabled" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> Boolean
+<strong>Default:</strong> <code>false</code>
+<strong>Required:</strong> ✅ Yes (if using Datadog)</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-47-1"><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a><span class="nv">DATADOG_ENABLED</span><span class="o">=</span><span class="nb">true</span>
+</span><span id="__span-47-2"><a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a><span class="nv">DATADOG_ENABLED</span><span class="o">=</span><span class="nb">false</span>
+</span></code></pre></div></p>
+<hr />
+<h4 id="datadog_api_key"><code>DATADOG_API_KEY</code><a class="headerlink" href="#datadog_api_key" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String
+<strong>Default:</strong> Empty
+<strong>Required:</strong> ✅ Yes (if Datadog enabled) (CRITICAL)</p>
+<p><strong>Description:</strong> Datadog API key for authentication.</p>
+<p><strong>Obtaining API Key:</strong>
+1. Log in to Datadog
+2. Organization Settings → API Keys
+3. Create new API key or copy existing
+4. Store securely (can be regenerated if compromised)</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-48-1"><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a><span class="nv">DATADOG_API_KEY</span><span class="o">=</span>1234567890abcdef1234567890abcdef
+</span></code></pre></div></p>
+<p><strong>Security:</strong> Store in secrets manager, rotate regularly.</p>
+<hr />
+<h4 id="datadog_app_key"><code>DATADOG_APP_KEY</code><a class="headerlink" href="#datadog_app_key" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String
+<strong>Default:</strong> Empty
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> Datadog Application key for advanced features.</p>
+<p><strong>Note:</strong> Not required for sending logs, but enables additional API access.</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-49-1"><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a><span class="nv">DATADOG_APP_KEY</span><span class="o">=</span>1234567890abcdefghijklmnopqrstuvwxyz1234567890ab
+</span></code></pre></div></p>
+<hr />
+<h4 id="datadog_site"><code>DATADOG_SITE</code><a class="headerlink" href="#datadog_site" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String
+<strong>Default:</strong> <code>datadoghq.com</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> Datadog site/region.</p>
+<p><strong>Available Sites:</strong>
+- <code>datadoghq.com</code> - US1 (default)
+- <code>datadoghq.eu</code> - EU (Europe)
+- <code>us3.datadoghq.com</code> - US3
+- <code>us5.datadoghq.com</code> - US5
+- <code>ap1.datadoghq.com</code> - AP1 (Asia Pacific)
+- <code>ddog-gov.com</code> - US1-FED (Government)</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-50-1"><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a><span class="c1"># US1 (default)</span>
+</span><span id="__span-50-2"><a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a><span class="nv">DATADOG_SITE</span><span class="o">=</span>datadoghq.com
+</span><span id="__span-50-3"><a id="__codelineno-50-3" name="__codelineno-50-3" href="#__codelineno-50-3"></a>
+</span><span id="__span-50-4"><a id="__codelineno-50-4" name="__codelineno-50-4" href="#__codelineno-50-4"></a><span class="c1"># EU</span>
+</span><span id="__span-50-5"><a id="__codelineno-50-5" name="__codelineno-50-5" href="#__codelineno-50-5"></a><span class="nv">DATADOG_SITE</span><span class="o">=</span>datadoghq.eu
+</span><span id="__span-50-6"><a id="__codelineno-50-6" name="__codelineno-50-6" href="#__codelineno-50-6"></a>
+</span><span id="__span-50-7"><a id="__codelineno-50-7" name="__codelineno-50-7" href="#__codelineno-50-7"></a><span class="c1"># US3</span>
+</span><span id="__span-50-8"><a id="__codelineno-50-8" name="__codelineno-50-8" href="#__codelineno-50-8"></a><span class="nv">DATADOG_SITE</span><span class="o">=</span>us3.datadoghq.com
+</span></code></pre></div></p>
+<hr />
+<h4 id="datadog_service"><code>DATADOG_SERVICE</code><a class="headerlink" href="#datadog_service" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String
+<strong>Default:</strong> <code>sark</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> Service name tag for Datadog logs and APM.</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-51-1"><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a><span class="c1"># Default</span>
+</span><span id="__span-51-2"><a id="__codelineno-51-2" name="__codelineno-51-2" href="#__codelineno-51-2"></a><span class="nv">DATADOG_SERVICE</span><span class="o">=</span>sark
+</span><span id="__span-51-3"><a id="__codelineno-51-3" name="__codelineno-51-3" href="#__codelineno-51-3"></a>
+</span><span id="__span-51-4"><a id="__codelineno-51-4" name="__codelineno-51-4" href="#__codelineno-51-4"></a><span class="c1"># Environment-specific</span>
+</span><span id="__span-51-5"><a id="__codelineno-51-5" name="__codelineno-51-5" href="#__codelineno-51-5"></a><span class="nv">DATADOG_SERVICE</span><span class="o">=</span>sark-production
+</span><span id="__span-51-6"><a id="__codelineno-51-6" name="__codelineno-51-6" href="#__codelineno-51-6"></a><span class="nv">DATADOG_SERVICE</span><span class="o">=</span>sark-staging
+</span></code></pre></div></p>
+<hr />
+<h4 id="datadog_environment"><code>DATADOG_ENVIRONMENT</code><a class="headerlink" href="#datadog_environment" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String
+<strong>Default:</strong> <code>production</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> Environment tag for Datadog logs and APM.</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-52-1"><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a><span class="nv">DATADOG_ENVIRONMENT</span><span class="o">=</span>production
+</span><span id="__span-52-2"><a id="__codelineno-52-2" name="__codelineno-52-2" href="#__codelineno-52-2"></a><span class="nv">DATADOG_ENVIRONMENT</span><span class="o">=</span>staging
+</span><span id="__span-52-3"><a id="__codelineno-52-3" name="__codelineno-52-3" href="#__codelineno-52-3"></a><span class="nv">DATADOG_ENVIRONMENT</span><span class="o">=</span>development
+</span></code></pre></div></p>
+<hr />
+<h4 id="datadog_hostname"><code>DATADOG_HOSTNAME</code><a class="headerlink" href="#datadog_hostname" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> String
+<strong>Default:</strong> None (uses system hostname)
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> Override hostname in Datadog logs.</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-53-1"><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a><span class="c1"># Use system hostname (default)</span>
+</span><span id="__span-53-2"><a id="__codelineno-53-2" name="__codelineno-53-2" href="#__codelineno-53-2"></a><span class="nv">DATADOG_HOSTNAME</span><span class="o">=</span>
+</span><span id="__span-53-3"><a id="__codelineno-53-3" name="__codelineno-53-3" href="#__codelineno-53-3"></a>
+</span><span id="__span-53-4"><a id="__codelineno-53-4" name="__codelineno-53-4" href="#__codelineno-53-4"></a><span class="c1"># Custom hostname</span>
+</span><span id="__span-53-5"><a id="__codelineno-53-5" name="__codelineno-53-5" href="#__codelineno-53-5"></a><span class="nv">DATADOG_HOSTNAME</span><span class="o">=</span>sark-app-01
+</span></code></pre></div></p>
+<hr />
+<h4 id="datadog_verify_ssl"><code>DATADOG_VERIFY_SSL</code><a class="headerlink" href="#datadog_verify_ssl" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> Boolean
+<strong>Default:</strong> <code>true</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> Verify SSL/TLS certificate when connecting to Datadog.</p>
+<p><strong>Recommendation:</strong> Always <code>true</code> in production.</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-54-1"><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a><span class="nv">DATADOG_VERIFY_SSL</span><span class="o">=</span><span class="nb">true</span>
+</span></code></pre></div></p>
+<hr />
+<h4 id="datadog_batch_size"><code>DATADOG_BATCH_SIZE</code><a class="headerlink" href="#datadog_batch_size" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> Integer
+<strong>Default:</strong> <code>100</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> Number of events to batch before sending to Datadog.</p>
+<p><strong>Limits:</strong> Datadog supports up to 1000 logs per request.</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-55-1"><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a><span class="c1"># Default (balanced)</span>
+</span><span id="__span-55-2"><a id="__codelineno-55-2" name="__codelineno-55-2" href="#__codelineno-55-2"></a><span class="nv">DATADOG_BATCH_SIZE</span><span class="o">=</span><span class="m">100</span>
+</span><span id="__span-55-3"><a id="__codelineno-55-3" name="__codelineno-55-3" href="#__codelineno-55-3"></a>
+</span><span id="__span-55-4"><a id="__codelineno-55-4" name="__codelineno-55-4" href="#__codelineno-55-4"></a><span class="c1"># High throughput</span>
+</span><span id="__span-55-5"><a id="__codelineno-55-5" name="__codelineno-55-5" href="#__codelineno-55-5"></a><span class="nv">DATADOG_BATCH_SIZE</span><span class="o">=</span><span class="m">500</span>
+</span><span id="__span-55-6"><a id="__codelineno-55-6" name="__codelineno-55-6" href="#__codelineno-55-6"></a>
+</span><span id="__span-55-7"><a id="__codelineno-55-7" name="__codelineno-55-7" href="#__codelineno-55-7"></a><span class="c1"># Maximum</span>
+</span><span id="__span-55-8"><a id="__codelineno-55-8" name="__codelineno-55-8" href="#__codelineno-55-8"></a><span class="nv">DATADOG_BATCH_SIZE</span><span class="o">=</span><span class="m">1000</span>
+</span></code></pre></div></p>
+<hr />
+<h4 id="datadog_batch_timeout_seconds"><code>DATADOG_BATCH_TIMEOUT_SECONDS</code><a class="headerlink" href="#datadog_batch_timeout_seconds" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> Integer
+<strong>Default:</strong> <code>5</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> Maximum seconds to wait before flushing partial batch.</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-56-1"><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a><span class="nv">DATADOG_BATCH_TIMEOUT_SECONDS</span><span class="o">=</span><span class="m">5</span>
+</span><span id="__span-56-2"><a id="__codelineno-56-2" name="__codelineno-56-2" href="#__codelineno-56-2"></a><span class="nv">DATADOG_BATCH_TIMEOUT_SECONDS</span><span class="o">=</span><span class="m">10</span>
+</span></code></pre></div></p>
+<hr />
+<h4 id="datadog_retry_attempts"><code>DATADOG_RETRY_ATTEMPTS</code><a class="headerlink" href="#datadog_retry_attempts" title="Permanent link">&para;</a></h4>
+<p><strong>Type:</strong> Integer
+<strong>Default:</strong> <code>3</code>
+<strong>Required:</strong> ⚠️ Optional</p>
+<p><strong>Description:</strong> Number of retry attempts for failed Datadog requests.</p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-57-1"><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a><span class="nv">DATADOG_RETRY_ATTEMPTS</span><span class="o">=</span><span class="m">3</span>
+</span><span id="__span-57-2"><a id="__codelineno-57-2" name="__codelineno-57-2" href="#__codelineno-57-2"></a><span class="nv">DATADOG_RETRY_ATTEMPTS</span><span class="o">=</span><span class="m">5</span>
+</span></code></pre></div></p>
+<hr />
+<h2 id="secrets-management">Secrets Management<a class="headerlink" href="#secrets-management" title="Permanent link">&para;</a></h2>
+<h3 id="overview_1">Overview<a class="headerlink" href="#overview_1" title="Permanent link">&para;</a></h3>
+<p><strong>NEVER</strong> commit real secrets to version control. Use dedicated secrets management solutions.</p>
+<h3 id="recommended-solutions">Recommended Solutions<a class="headerlink" href="#recommended-solutions" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Solution</th>
+<th>Best For</th>
+<th>Complexity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>HashiCorp Vault</strong></td>
+<td>Enterprise, multi-cloud</td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>AWS Secrets Manager</strong></td>
+<td>AWS deployments</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Azure Key Vault</strong></td>
+<td>Azure deployments</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>GCP Secret Manager</strong></td>
+<td>GCP deployments</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><strong>Kubernetes Secrets</strong></td>
+<td>Kubernetes clusters</td>
+<td>Low</td>
+</tr>
+<tr>
+<td><strong>Docker Secrets</strong></td>
+<td>Docker Swarm</td>
+<td>Low</td>
+</tr>
+</tbody>
+</table>
+<h3 id="hashicorp-vault-integration">HashiCorp Vault Integration<a class="headerlink" href="#hashicorp-vault-integration" title="Permanent link">&para;</a></h3>
+<p>SARK has built-in Vault integration:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-58-1"><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a><span class="c1"># Vault configuration</span>
+</span><span id="__span-58-2"><a id="__codelineno-58-2" name="__codelineno-58-2" href="#__codelineno-58-2"></a><span class="nv">VAULT_URL</span><span class="o">=</span>https://vault.example.com
+</span><span id="__span-58-3"><a id="__codelineno-58-3" name="__codelineno-58-3" href="#__codelineno-58-3"></a><span class="nv">VAULT_TOKEN</span><span class="o">=</span>your-vault-token
+</span><span id="__span-58-4"><a id="__codelineno-58-4" name="__codelineno-58-4" href="#__codelineno-58-4"></a><span class="nv">VAULT_NAMESPACE</span><span class="o">=</span>engineering
+</span><span id="__span-58-5"><a id="__codelineno-58-5" name="__codelineno-58-5" href="#__codelineno-58-5"></a><span class="nv">VAULT_MOUNT_POINT</span><span class="o">=</span>sark-secrets
+</span><span id="__span-58-6"><a id="__codelineno-58-6" name="__codelineno-58-6" href="#__codelineno-58-6"></a>
+</span><span id="__span-58-7"><a id="__codelineno-58-7" name="__codelineno-58-7" href="#__codelineno-58-7"></a><span class="c1"># Vault will be used to fetch:</span>
+</span><span id="__span-58-8"><a id="__codelineno-58-8" name="__codelineno-58-8" href="#__codelineno-58-8"></a><span class="c1"># - Database passwords</span>
+</span><span id="__span-58-9"><a id="__codelineno-58-9" name="__codelineno-58-9" href="#__codelineno-58-9"></a><span class="c1"># - API tokens</span>
+</span><span id="__span-58-10"><a id="__codelineno-58-10" name="__codelineno-58-10" href="#__codelineno-58-10"></a><span class="c1"># - JWT secret keys</span>
+</span></code></pre></div>
+<h3 id="secret-rotation-schedule">Secret Rotation Schedule<a class="headerlink" href="#secret-rotation-schedule" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Secret Type</th>
+<th>Rotation Frequency</th>
+<th>Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SECRET_KEY</code></td>
+<td>180 days</td>
+<td>All users re-authenticate</td>
+</tr>
+<tr>
+<td>Database passwords</td>
+<td>90 days</td>
+<td>Brief service restart</td>
+</tr>
+<tr>
+<td>API tokens (Splunk, Datadog)</td>
+<td>30-90 days</td>
+<td>Configuration update</td>
+</tr>
+<tr>
+<td>Redis password</td>
+<td>90 days</td>
+<td>Brief service restart</td>
+</tr>
+</tbody>
+</table>
+<h3 id="environment-specific-secrets">Environment-Specific Secrets<a class="headerlink" href="#environment-specific-secrets" title="Permanent link">&para;</a></h3>
+<p>Use separate secrets for each environment:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-59-1"><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a>Production:  .env.production
+</span><span id="__span-59-2"><a id="__codelineno-59-2" name="__codelineno-59-2" href="#__codelineno-59-2"></a>Staging:     .env.staging
+</span><span id="__span-59-3"><a id="__codelineno-59-3" name="__codelineno-59-3" href="#__codelineno-59-3"></a>Development: .env.development
+</span></code></pre></div>
+<p>Never use production secrets in non-production environments.</p>
+<hr />
+<h2 id="deployment-scenarios">Deployment Scenarios<a class="headerlink" href="#deployment-scenarios" title="Permanent link">&para;</a></h2>
+<h3 id="scenario-1-small-production-single-server">Scenario 1: Small Production (Single Server)<a class="headerlink" href="#scenario-1-small-production-single-server" title="Permanent link">&para;</a></h3>
+<p><strong>Specs:</strong> 4 CPU, 16 GB RAM, 100 GB SSD</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-60-1"><a id="__codelineno-60-1" name="__codelineno-60-1" href="#__codelineno-60-1"></a><span class="nv">ENVIRONMENT</span><span class="o">=</span>production
+</span><span id="__span-60-2"><a id="__codelineno-60-2" name="__codelineno-60-2" href="#__codelineno-60-2"></a><span class="nv">API_WORKERS</span><span class="o">=</span><span class="m">9</span>
+</span><span id="__span-60-3"><a id="__codelineno-60-3" name="__codelineno-60-3" href="#__codelineno-60-3"></a><span class="nv">POSTGRES_POOL_SIZE</span><span class="o">=</span><span class="m">10</span>
+</span><span id="__span-60-4"><a id="__codelineno-60-4" name="__codelineno-60-4" href="#__codelineno-60-4"></a><span class="nv">POSTGRES_MAX_OVERFLOW</span><span class="o">=</span><span class="m">5</span>
+</span><span id="__span-60-5"><a id="__codelineno-60-5" name="__codelineno-60-5" href="#__codelineno-60-5"></a><span class="nv">REDIS_POOL_SIZE</span><span class="o">=</span><span class="m">50</span>
+</span><span id="__span-60-6"><a id="__codelineno-60-6" name="__codelineno-60-6" href="#__codelineno-60-6"></a><span class="nv">SPLUNK_ENABLED</span><span class="o">=</span><span class="nb">true</span>
+</span><span id="__span-60-7"><a id="__codelineno-60-7" name="__codelineno-60-7" href="#__codelineno-60-7"></a><span class="nv">SPLUNK_BATCH_SIZE</span><span class="o">=</span><span class="m">100</span>
+</span></code></pre></div>
+<h3 id="scenario-2-medium-production-load-balanced">Scenario 2: Medium Production (Load Balanced)<a class="headerlink" href="#scenario-2-medium-production-load-balanced" title="Permanent link">&para;</a></h3>
+<p><strong>Specs:</strong> 3 instances × (8 CPU, 32 GB RAM)</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-61-1"><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a><span class="nv">ENVIRONMENT</span><span class="o">=</span>production
+</span><span id="__span-61-2"><a id="__codelineno-61-2" name="__codelineno-61-2" href="#__codelineno-61-2"></a><span class="nv">API_WORKERS</span><span class="o">=</span><span class="m">17</span>
+</span><span id="__span-61-3"><a id="__codelineno-61-3" name="__codelineno-61-3" href="#__codelineno-61-3"></a><span class="nv">POSTGRES_POOL_SIZE</span><span class="o">=</span><span class="m">20</span>
+</span><span id="__span-61-4"><a id="__codelineno-61-4" name="__codelineno-61-4" href="#__codelineno-61-4"></a><span class="nv">POSTGRES_MAX_OVERFLOW</span><span class="o">=</span><span class="m">10</span>
+</span><span id="__span-61-5"><a id="__codelineno-61-5" name="__codelineno-61-5" href="#__codelineno-61-5"></a><span class="nv">REDIS_POOL_SIZE</span><span class="o">=</span><span class="m">100</span>
+</span><span id="__span-61-6"><a id="__codelineno-61-6" name="__codelineno-61-6" href="#__codelineno-61-6"></a><span class="nv">SPLUNK_ENABLED</span><span class="o">=</span><span class="nb">true</span>
+</span><span id="__span-61-7"><a id="__codelineno-61-7" name="__codelineno-61-7" href="#__codelineno-61-7"></a><span class="nv">SPLUNK_BATCH_SIZE</span><span class="o">=</span><span class="m">500</span>
+</span><span id="__span-61-8"><a id="__codelineno-61-8" name="__codelineno-61-8" href="#__codelineno-61-8"></a><span class="nv">DATADOG_ENABLED</span><span class="o">=</span><span class="nb">true</span>
+</span><span id="__span-61-9"><a id="__codelineno-61-9" name="__codelineno-61-9" href="#__codelineno-61-9"></a><span class="nv">DATADOG_BATCH_SIZE</span><span class="o">=</span><span class="m">500</span>
+</span></code></pre></div>
+<h3 id="scenario-3-large-production-kubernetes">Scenario 3: Large Production (Kubernetes)<a class="headerlink" href="#scenario-3-large-production-kubernetes" title="Permanent link">&para;</a></h3>
+<p><strong>Specs:</strong> Auto-scaling (10-50 pods), external services</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-62-1"><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a><span class="nv">ENVIRONMENT</span><span class="o">=</span>production
+</span><span id="__span-62-2"><a id="__codelineno-62-2" name="__codelineno-62-2" href="#__codelineno-62-2"></a><span class="nv">API_WORKERS</span><span class="o">=</span><span class="m">4</span><span class="w">  </span><span class="c1"># per pod</span>
+</span><span id="__span-62-3"><a id="__codelineno-62-3" name="__codelineno-62-3" href="#__codelineno-62-3"></a><span class="nv">POSTGRES_HOST</span><span class="o">=</span>postgres-service.database.svc.cluster.local
+</span><span id="__span-62-4"><a id="__codelineno-62-4" name="__codelineno-62-4" href="#__codelineno-62-4"></a><span class="nv">REDIS_HOST</span><span class="o">=</span>redis-service.cache.svc.cluster.local
+</span><span id="__span-62-5"><a id="__codelineno-62-5" name="__codelineno-62-5" href="#__codelineno-62-5"></a><span class="nv">KAFKA_ENABLED</span><span class="o">=</span><span class="nb">true</span>
+</span><span id="__span-62-6"><a id="__codelineno-62-6" name="__codelineno-62-6" href="#__codelineno-62-6"></a><span class="nv">KAFKA_BOOTSTRAP_SERVERS</span><span class="o">=</span>kafka-0.kafka:9092,kafka-1.kafka:9092,kafka-2.kafka:9092
+</span><span id="__span-62-7"><a id="__codelineno-62-7" name="__codelineno-62-7" href="#__codelineno-62-7"></a><span class="nv">DISCOVERY_K8S_ENABLED</span><span class="o">=</span><span class="nb">true</span>
+</span><span id="__span-62-8"><a id="__codelineno-62-8" name="__codelineno-62-8" href="#__codelineno-62-8"></a><span class="nv">SPLUNK_ENABLED</span><span class="o">=</span><span class="nb">true</span>
+</span><span id="__span-62-9"><a id="__codelineno-62-9" name="__codelineno-62-9" href="#__codelineno-62-9"></a><span class="nv">DATADOG_ENABLED</span><span class="o">=</span><span class="nb">true</span>
+</span></code></pre></div>
+<hr />
+<h2 id="security-best-practices">Security Best Practices<a class="headerlink" href="#security-best-practices" title="Permanent link">&para;</a></h2>
+<h3 id="1-secrets-security">1. Secrets Security<a class="headerlink" href="#1-secrets-security" title="Permanent link">&para;</a></h3>
+<p>✅ <strong>DO:</strong>
+- Use secrets manager (Vault, AWS Secrets Manager, etc.)
+- Generate cryptographically random secrets
+- Rotate secrets regularly
+- Use different secrets per environment
+- Restrict access with least privilege</p>
+<p>❌ <strong>DON'T:</strong>
+- Commit secrets to git
+- Use default passwords in production
+- Share secrets across environments
+- Store secrets in plain text
+- Use weak or predictable secrets</p>
+<h3 id="2-network-security">2. Network Security<a class="headerlink" href="#2-network-security" title="Permanent link">&para;</a></h3>
+<p>✅ <strong>DO:</strong>
+- Use TLS/SSL for all connections
+- Verify SSL certificates (<code>VERIFY_SSL=true</code>)
+- Use private networks for databases
+- Implement firewall rules
+- Use VPNs for remote access</p>
+<p>❌ <strong>DON'T:</strong>
+- Expose databases to public internet
+- Disable SSL verification in production
+- Use unencrypted connections
+- Trust all network traffic</p>
+<h3 id="3-authentication-authorization">3. Authentication &amp; Authorization<a class="headerlink" href="#3-authentication-authorization" title="Permanent link">&para;</a></h3>
+<p>✅ <strong>DO:</strong>
+- Use strong JWT secret keys
+- Implement short token expiration
+- Restrict CORS to trusted origins
+- Use dedicated database users
+- Implement role-based access control</p>
+<p>❌ <strong>DON'T:</strong>
+- Use wildcard CORS (<code>*</code>)
+- Set long token expiration
+- Use superuser database accounts
+- Skip authentication in production</p>
+<h3 id="4-audit-compliance">4. Audit &amp; Compliance<a class="headerlink" href="#4-audit-compliance" title="Permanent link">&para;</a></h3>
+<p>✅ <strong>DO:</strong>
+- Enable SIEM integration (Splunk/Datadog)
+- Set appropriate audit retention
+- Monitor security events
+- Regular security audits
+- Document configuration changes</p>
+<p>❌ <strong>DON'T:</strong>
+- Disable audit logging
+- Delete audit events prematurely
+- Ignore security alerts</p>
+<hr />
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<h3 id="configuration-not-loading">Configuration Not Loading<a class="headerlink" href="#configuration-not-loading" title="Permanent link">&para;</a></h3>
+<p><strong>Problem:</strong> Environment variables not being read</p>
+<p><strong>Solutions:</strong>
+1. Check <code>.env</code> file location (must be in working directory)
+2. Verify environment variable syntax (no spaces around <code>=</code>)
+3. Check for typos in variable names
+4. Verify file permissions (readable by application user)</p>
+<h3 id="database-connection-failed">Database Connection Failed<a class="headerlink" href="#database-connection-failed" title="Permanent link">&para;</a></h3>
+<p><strong>Problem:</strong> Cannot connect to PostgreSQL/TimescaleDB</p>
+<p><strong>Solutions:</strong>
+1. Verify host and port: <code>telnet &lt;host&gt; &lt;port&gt;</code>
+2. Check database credentials
+3. Verify database exists: <code>psql -h &lt;host&gt; -U &lt;user&gt; -l</code>
+4. Check firewall rules
+5. Verify SSL mode matches database configuration</p>
+<h3 id="siem-events-not-forwarding">SIEM Events Not Forwarding<a class="headerlink" href="#siem-events-not-forwarding" title="Permanent link">&para;</a></h3>
+<p><strong>Problem:</strong> Audit events not appearing in Splunk/Datadog</p>
+<p><strong>Solutions:</strong>
+1. Verify <code>SPLUNK_ENABLED=true</code> or <code>DATADOG_ENABLED=true</code>
+2. Check HEC token/API key validity
+3. Verify network connectivity to SIEM
+4. Check SIEM index/service exists
+5. Review application logs for errors
+6. Verify SSL certificate if <code>VERIFY_SSL=true</code></p>
+<h3 id="high-memory-usage">High Memory Usage<a class="headerlink" href="#high-memory-usage" title="Permanent link">&para;</a></h3>
+<p><strong>Problem:</strong> Application consuming too much memory</p>
+<p><strong>Solutions:</strong>
+1. Reduce <code>API_WORKERS</code>
+2. Reduce <code>POSTGRES_POOL_SIZE</code> and <code>POSTGRES_MAX_OVERFLOW</code>
+3. Reduce <code>REDIS_POOL_SIZE</code>
+4. Monitor memory per worker
+5. Consider horizontal scaling instead of vertical</p>
+<hr />
+<h2 id="configuration-validation">Configuration Validation<a class="headerlink" href="#configuration-validation" title="Permanent link">&para;</a></h2>
+<h3 id="validation-script">Validation Script<a class="headerlink" href="#validation-script" title="Permanent link">&para;</a></h3>
+<p>Use the provided validation script:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-63-1"><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a><span class="c1"># Validate configuration file</span>
+</span><span id="__span-63-2"><a id="__codelineno-63-2" name="__codelineno-63-2" href="#__codelineno-63-2"></a>python<span class="w"> </span>scripts/validate_config.py<span class="w"> </span>--env-file<span class="w"> </span>.env.production
+</span><span id="__span-63-3"><a id="__codelineno-63-3" name="__codelineno-63-3" href="#__codelineno-63-3"></a>
+</span><span id="__span-63-4"><a id="__codelineno-63-4" name="__codelineno-63-4" href="#__codelineno-63-4"></a><span class="c1"># Strict mode (fails on warnings)</span>
+</span><span id="__span-63-5"><a id="__codelineno-63-5" name="__codelineno-63-5" href="#__codelineno-63-5"></a>python<span class="w"> </span>scripts/validate_config.py<span class="w"> </span>--env-file<span class="w"> </span>.env.production<span class="w"> </span>--strict
+</span><span id="__span-63-6"><a id="__codelineno-63-6" name="__codelineno-63-6" href="#__codelineno-63-6"></a>
+</span><span id="__span-63-7"><a id="__codelineno-63-7" name="__codelineno-63-7" href="#__codelineno-63-7"></a><span class="c1"># Check specific category</span>
+</span><span id="__span-63-8"><a id="__codelineno-63-8" name="__codelineno-63-8" href="#__codelineno-63-8"></a>python<span class="w"> </span>scripts/validate_config.py<span class="w"> </span>--env-file<span class="w"> </span>.env.production<span class="w"> </span>--category<span class="w"> </span>security
+</span><span id="__span-63-9"><a id="__codelineno-63-9" name="__codelineno-63-9" href="#__codelineno-63-9"></a>
+</span><span id="__span-63-10"><a id="__codelineno-63-10" name="__codelineno-63-10" href="#__codelineno-63-10"></a><span class="c1"># Output JSON report</span>
+</span><span id="__span-63-11"><a id="__codelineno-63-11" name="__codelineno-63-11" href="#__codelineno-63-11"></a>python<span class="w"> </span>scripts/validate_config.py<span class="w"> </span>--env-file<span class="w"> </span>.env.production<span class="w"> </span>--format<span class="w"> </span>json
+</span></code></pre></div>
+<h3 id="manual-validation-checklist">Manual Validation Checklist<a class="headerlink" href="#manual-validation-checklist" title="Permanent link">&para;</a></h3>
+<p>Before deploying to production:</p>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>ENVIRONMENT=production</code></li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>DEBUG=false</code></li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>SECRET_KEY</code> changed from default (48+ characters)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> All <code>PASSWORD</code> fields changed from defaults</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>CORS_ORIGINS</code> restricted to trusted domains</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Database connection details correct</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> SIEM integration configured and tested</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> SSL verification enabled (<code>VERIFY_SSL=true</code>)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Worker and pool sizes appropriate for server resources</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Secrets stored in secrets manager (not plain text)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Configuration validated with <code>validate_config.py</code></li>
+</ul>
+<hr />
+<h2 id="additional-resources">Additional Resources<a class="headerlink" href="#additional-resources" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../DEPLOYMENT_CHECKLIST/">Deployment Checklist</a> - Step-by-step deployment guide</li>
+<li><a href="../siem/SPLUNK_SETUP/">Splunk Setup Guide</a> - Splunk HEC configuration</li>
+<li><a href="../siem/DATADOG_SETUP/">Datadog Setup Guide</a> - Datadog Logs API configuration</li>
+<li><a href="../siem/EVENT_SCHEMA/">Event Schema Reference</a> - Audit event field documentation</li>
+<li><a href="../reports/SECURITY_FIXES_REPORT.md">Security Fixes Report</a> - Recent security updates</li>
+</ul>
+<hr />
+<h2 id="support">Support<a class="headerlink" href="#support" title="Permanent link">&para;</a></h2>
+<p>For configuration issues:</p>
+<ol>
+<li>Run validation script: <code>python scripts/validate_config.py</code></li>
+<li>Review application logs: <code>LOG_LEVEL=DEBUG</code></li>
+<li>Check troubleshooting section above</li>
+<li>Contact DevOps team or file GitHub issue</li>
+</ol>
+<hr />
+<p><strong>Document Version:</strong> 1.0
+<strong>Last Updated:</strong> 2025-11-22
+<strong>Maintained By:</strong> Engineer 3 (SIEM Lead)</p>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2024 James R. A. Henry. All rights reserved.
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/apathy-ca/sark" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.path", "navigation.top", "navigation.indexes", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
