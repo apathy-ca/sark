@@ -43,8 +43,18 @@ jobs:
       - name: Run performance benchmarks
         id: benchmarks
         run: |
-          pytest tests/performance/test_comprehensive_benchmarks.py::test_generate_full_report -v -s
+          mkdir -p reports
+          pytest tests/performance/test_comprehensive_benchmarks.py::test_generate_full_report -v -s --basetemp=reports
         continue-on-error: true
+
+      - name: Copy benchmark reports to expected location
+        if: always()
+        run: |
+          # Find and copy benchmark reports from pytest temp directory
+          find reports -name "latest_benchmark.json" -exec cp {} reports/performance/ \; || true
+          find reports -name "*.html" -path "*/performance/*" -exec cp {} reports/performance/ \; || true
+          find reports -name "benchmark_history.jsonl" -exec cp {} reports/performance/ \; || true
+          ls -la reports/performance/ || echo "No reports found"
 
       - name: Check for regressions
         id: regression_check
