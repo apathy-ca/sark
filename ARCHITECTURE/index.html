@@ -240,6 +240,17 @@
         </a>
 </li>
 <li class="md-tabs__item">
+<a class="md-tabs__link" href="../v1.3.0/RELEASE_NOTES/">
+          
+  
+  
+    
+  
+  v1.3.0 Release
+
+        </a>
+</li>
+<li class="md-tabs__item">
 <a class="md-tabs__link" href="../EXECUTIVE_SUMMARY/">
           
   
@@ -1253,11 +1264,11 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../REDIS_OPTIMIZATION/">
+<a class="md-nav__link" href="../VALKEY_OPTIMIZATION/">
 <span class="md-ellipsis">
     
   
-    Redis Optimization
+    Valkey Optimization
   
 
     
@@ -1495,7 +1506,7 @@
 <span class="md-ellipsis">
     
   
-    Reports
+    v1.3.0 Release
   
 
     
@@ -1504,6 +1515,56 @@
 </label>
 <nav aria-expanded="false" aria-labelledby="__nav_12_label" class="md-nav" data-md-level="1">
 <label class="md-nav__title" for="__nav_12">
+<span class="md-nav__icon md-icon"></span>
+            
+  
+    v1.3.0 Release
+  
+
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../v1.3.0/RELEASE_NOTES/">
+<span class="md-ellipsis">
+    
+  
+    Release Notes
+  
+
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../v1.3.0/MIGRATION_GUIDE/">
+<span class="md-ellipsis">
+    
+  
+    Migration Guide
+  
+
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_13" type="checkbox"/>
+<label class="md-nav__link" for="__nav_13" id="__nav_13_label" tabindex="0">
+<span class="md-ellipsis">
+    
+  
+    Reports
+  
+
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_13_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_13">
 <span class="md-nav__icon md-icon"></span>
             
   
@@ -1636,8 +1697,8 @@
 </nav>
 </li>
 <li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_13" type="checkbox"/>
-<label class="md-nav__link" for="__nav_13" id="__nav_13_label" tabindex="0">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_14" type="checkbox"/>
+<label class="md-nav__link" for="__nav_14" id="__nav_14_label" tabindex="0">
 <span class="md-ellipsis">
     
   
@@ -1648,8 +1709,8 @@
   </span>
 <span class="md-nav__icon md-icon"></span>
 </label>
-<nav aria-expanded="false" aria-labelledby="__nav_13_label" class="md-nav" data-md-level="1">
-<label class="md-nav__title" for="__nav_13">
+<nav aria-expanded="false" aria-labelledby="__nav_14_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_14">
 <span class="md-nav__icon md-icon"></span>
             
   
@@ -1734,8 +1795,8 @@
 </nav>
 </li>
 <li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_14" type="checkbox"/>
-<label class="md-nav__link" for="__nav_14" id="__nav_14_label" tabindex="0">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_15" type="checkbox"/>
+<label class="md-nav__link" for="__nav_15" id="__nav_15_label" tabindex="0">
 <span class="md-ellipsis">
     
   
@@ -1746,8 +1807,8 @@
   </span>
 <span class="md-nav__icon md-icon"></span>
 </label>
-<nav aria-expanded="false" aria-labelledby="__nav_14_label" class="md-nav" data-md-level="1">
-<label class="md-nav__title" for="__nav_14">
+<nav aria-expanded="false" aria-labelledby="__nav_15_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_15">
 <span class="md-nav__icon md-icon"></span>
             
   
@@ -2228,7 +2289,7 @@
     end
 
     subgraph "Data Layer"
-        CACHE[(Redis Cache)]
+        CACHE[(Valkey Cache)]
         DB[(Primary Database)]
         QUEUE[(Message Queue)]
         BLOB[(Object Storage)]
@@ -2290,7 +2351,7 @@
     participant API as SARK API
     participant Auth as Auth Service
     participant LDAP as LDAP Server
-    participant Redis as Redis (Sessions)
+    participant Valkey as Valkey (Sessions)
     participant DB as PostgreSQL
 
     Client-&gt;&gt;API: POST /api/v1/auth/login/ldap<br/>{username, password}
@@ -2320,7 +2381,7 @@
     participant API as SARK API
     participant Auth as Auth Service
     participant IdP as OIDC Provider<br/>(Google/Okta/Auth0)
-    participant Redis as Redis
+    participant Valkey as Redis
     participant DB as PostgreSQL
 
     User-&gt;&gt;API: GET /api/v1/auth/oidc/login
@@ -2357,7 +2418,7 @@
     participant User as User Browser
     participant API as SARK API/SP
     participant IdP as SAML Identity Provider
-    participant Redis as Redis
+    participant Valkey as Redis
     participant DB as PostgreSQL
 
     User-&gt;&gt;API: GET /api/auth/saml/login
@@ -2393,7 +2454,7 @@
     participant Client
     participant API as SARK API
     participant Auth as Auth Service
-    participant Redis as Redis
+    participant Valkey as Redis
     participant DB as PostgreSQL
 
     Note over Client,DB: Initial Login (see Authentication Flows above)
@@ -2473,7 +2534,7 @@
     participant Client
     participant API as SARK API
     participant AuthZ as Authorization Service
-    participant Redis as Redis (Policy Cache)
+    participant Valkey as Valkey (Policy Cache)
     participant OPA as Open Policy Agent
     participant DB as PostgreSQL (Audit)
     participant SIEM as SIEM<br/>(Splunk/Datadog)
@@ -2531,7 +2592,7 @@
     participant App as SARK Application
     participant Queue as SIEM Event Queue<br/>(In-Memory)
     participant Forwarder as SIEM Forwarder
-    participant Redis as Redis<br/>(Circuit Breaker)
+    participant Valkey as Redis<br/>(Circuit Breaker)
     participant Splunk as Splunk HEC
     participant Datadog as Datadog Logs API
 
@@ -2635,7 +2696,7 @@
     participant Client
     participant API as SARK API
     participant RateLimit as Rate Limiter
-    participant Redis as Redis
+    participant Valkey as Redis
     participant Handler as Request Handler
 
     Client-&gt;&gt;API: API Request<br/>Authorization: Bearer {token}
@@ -2878,7 +2939,7 @@
     end
 
     subgraph "Shared Services"
-        REDIS[(Redis Cluster)]
+        REDIS[(Valkey Cluster)]
         PG[(PostgreSQL)]
         MQ[(RabbitMQ/Kafka)]
         S3[(Object Storage)]
@@ -3009,7 +3070,7 @@
 <li><strong>API Layer</strong>: Stateless design allows unlimited horizontal scaling</li>
 <li><strong>Worker Pool</strong>: Auto-scaling based on queue depth and CPU/memory metrics</li>
 <li><strong>Database</strong>: Read replicas for query distribution, sharding for write scaling</li>
-<li><strong>Cache</strong>: Redis cluster with consistent hashing for distribution</li>
+<li><strong>Cache</strong>: Valkey cluster with consistent hashing for distribution</li>
 </ul>
 <h3 id="performance-optimization">Performance Optimization<a class="headerlink" href="#performance-optimization" title="Permanent link">¶</a></h3>
 <ul>
@@ -3088,7 +3149,7 @@
 <h3 id="technology-evaluation">Technology Evaluation<a class="headerlink" href="#technology-evaluation" title="Permanent link">¶</a></h3>
 <ul>
 <li>Database architecture (PostgreSQL + TimescaleDB for time-series)</li>
-<li>Caching strategy (Redis Cluster + local caching)</li>
+<li>Caching strategy (Valkey Cluster + local caching)</li>
 <li>Message queue selection (Kafka for high-throughput, RabbitMQ for reliability)</li>
 <li>Service mesh adoption timeline</li>
 <li>Kubernetes vs. Docker Swarm for orchestration</li>
