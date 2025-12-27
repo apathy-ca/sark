@@ -157,3 +157,4 @@ __pycache__/
 # Czarina orchestration
 .czarina/status/
 .czarina/
+.aider*

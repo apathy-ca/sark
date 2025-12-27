@@ -446,10 +446,14 @@ class TestOPAClient:
         mock_response = MagicMock()
         mock_response.status_code = 200
 
+        # Mock the cache health check to avoid Redis connection
         with patch.object(client.client, "get", new=AsyncMock(return_value=mock_response)):
-            result = await client.health_check()
+            with patch.object(client.cache, "health_check", new=AsyncMock(return_value=True)):
+                result = await client.health_check()
 
-            assert result is True
+                assert result["opa"] is True
+                assert result["cache"] is True
+                assert result["overall"] is True
 
     @pytest.mark.asyncio
     async def test_health_check_failure_non_200(self, client):
@@ -458,9 +462,12 @@ class TestOPAClient:
         mock_response.status_code = 503
 
         with patch.object(client.client, "get", new=AsyncMock(return_value=mock_response)):
-            result = await client.health_check()
+            with patch.object(client.cache, "health_check", new=AsyncMock(return_value=True)):
+                result = await client.health_check()
 
-            assert result is False
+                assert result["opa"] is False
+                assert result["cache"] is True
+                assert result["overall"] is False
 
     @pytest.mark.asyncio
     async def test_health_check_failure_exception(self, client):
@@ -470,9 +477,12 @@ class TestOPAClient:
             "get",
             new=AsyncMock(side_effect=httpx.ConnectError("Connection refused")),
         ):
-            result = await client.health_check()
+            with patch.object(client.cache, "health_check", new=AsyncMock(return_value=True)):
+                result = await client.health_check()
 
-            assert result is False
+                assert result["opa"] is False
+                assert result["cache"] is True
+                assert result["overall"] is False
 
     # ===== close Tests =====
 
