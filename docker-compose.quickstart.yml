@@ -53,10 +53,10 @@ services:
       - DATABASE_POOL_SIZE=20
       - DATABASE_MAX_OVERFLOW=10
 
-      # Redis (Session store & cache)
-      - REDIS_DSN=redis://:redis_password@redis:6379/0
-      - REDIS_SESSION_DB=1
-      - REDIS_POOL_SIZE=50
+      # Valkey (Session store & cache)
+      - VALKEY_DSN=redis://:redis_password@redis:6379/0
+      - VALKEY_SESSION_DB=1
+      - VALKEY_POOL_SIZE=50
 
       # Authentication
       - JWT_SECRET_KEY=dev-secret-change-in-production-32-chars-minimum
@@ -93,7 +93,7 @@ services:
       - RATE_LIMIT_IP_REQUESTS_PER_MINUTE=100
       - RATE_LIMIT_IP_BURST=20
       - RATE_LIMIT_STORAGE=redis
-      - RATE_LIMIT_REDIS_DB=2
+      - RATE_LIMIT_VALKEY_DB=2
 
       # SIEM (Audit event forwarding)
       - SIEM_ENABLED=false
@@ -175,26 +175,26 @@ services:
     restart: unless-stopped
 
   # ============================================================================
-  # Redis - Session Store & Cache
+  # Valkey - Session Store & Cache
   # ============================================================================
   redis:
-    image: redis:7-alpine
+    image: valkey/valkey:7-alpine
     container_name: sark-redis
     command: >
-      redis-server
+      valkey-server
       --requirepass redis_password
       --maxmemory 2gb
       --maxmemory-policy allkeys-lru
       --save ""
       --appendonly no
     volumes:
-      - redis-data:/data
+      - valkey-data:/data
     ports:
       - "6379:6379"
     networks:
       - sark-network
     healthcheck:
-      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "redis_password", "ping"]
+      test: ["CMD", "valkey-cli", "--no-auth-warning", "-a", "redis_password", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -366,8 +366,8 @@ volumes:
     name: sark-postgres-data
   timescale-data:
     name: sark-timescale-data
-  redis-data:
-    name: sark-redis-data
+  valkey-data:
+    name: sark-valkey-data
   consul-data:
     name: sark-consul-data
   prometheus-data:

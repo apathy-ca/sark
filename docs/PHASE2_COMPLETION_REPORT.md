@@ -117,7 +117,7 @@ Week 3: Optimization & Production Readiness
 - Database connection pool utilization optimized (from 95% to 65%)
 - TimescaleDB compression reduces audit log storage by 90%+
 
-#### 2. Redis Optimization Guide (docs/REDIS_OPTIMIZATION.md)
+#### 2. Redis Optimization Guide (docs/VALKEY_OPTIMIZATION.md)
 **Lines**: 2,400+
 **Sections**: 11 major sections
 
@@ -325,7 +325,7 @@ Week 3: Optimization & Production Readiness
 | **INCIDENT_RESPONSE.md** | Incident response playbooks | 1,100+ | ✅ Complete |
 | **WEEK_3_SUMMARY.md** | Week 3 deliverables summary | 800+ | ✅ Complete |
 | **DATABASE_OPTIMIZATION.md** | Database optimization | 2,800+ | ✅ Complete |
-| **REDIS_OPTIMIZATION.md** | Redis optimization | 2,400+ | ✅ Complete |
+| **VALKEY_OPTIMIZATION.md** | Redis optimization | 2,400+ | ✅ Complete |
 | **SECURITY_HARDENING.md** | Security hardening checklist | 2,600+ | ✅ Complete |
 | **PRODUCTION_DEPLOYMENT.md** | Production deployment procedures | 2,200+ | ✅ Complete |
 | **DISASTER_RECOVERY.md** | Disaster recovery plan | 2,500+ | ✅ Complete |
@@ -759,7 +759,7 @@ The system is now ready for production deployment with:
 | **Performance** | PERFORMANCE_TESTING.md | Performance testing methodology |
 | **Performance** | PERFORMANCE_TUNING.md | Performance optimization |
 | **Performance** | DATABASE_OPTIMIZATION.md | Database optimization |
-| **Performance** | REDIS_OPTIMIZATION.md | Redis optimization |
+| **Performance** | VALKEY_OPTIMIZATION.md | Redis optimization |
 | **Security** | SECURITY_BEST_PRACTICES.md | Security development practices |
 | **Security** | SECURITY_HARDENING.md | Security hardening checklist |
 | **Disaster Recovery** | DISASTER_RECOVERY.md | Disaster recovery procedures |

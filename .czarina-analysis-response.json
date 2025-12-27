@@ -1,0 +1,400 @@
+{
+  "analysis": {
+    "project_name": "SARK v1.3.1",
+    "project_type": "API Gateway / Security Platform",
+    "complexity": "high",
+    "tech_stack": {
+      "backend": ["Python 3.11+", "FastAPI", "SQLAlchemy", "PostgreSQL", "Valkey", "Open Policy Agent"],
+      "frontend": ["React 19.2", "Vite", "CodeMirror"],
+      "database": ["PostgreSQL 15+", "TimescaleDB", "Valkey 7+"],
+      "infrastructure": ["Docker", "Kubernetes", "pytest", "GitHub Actions", "Helm", "Terraform"]
+    },
+    "total_tokens_projected": 1410000,
+    "recommended_workers": 8,
+    "recommended_versions": 8,
+    "efficiency_factors": {
+      "testing_comprehensive": 1.2,
+      "security_critical": 1.3,
+      "documentation_extensive": 1.1,
+      "legacy_test_infrastructure": 1.4
+    }
+  },
+
+  "feature_analysis": [
+    {
+      "feature": "Quick Wins & Release",
+      "description": "Fix version mismatch, finalize v1.3.0 release notes, create migration guide, update docs navigation, publish GitHub release",
+      "complexity": "medium",
+      "tokens_estimated": 100000,
+      "dependencies": [],
+      "workers_suggested": ["release-manager"],
+      "version_suggested": "v1.3.1-phase1",
+      "completion_criteria": [
+        "Version consistency across codebase (src/sark/__init__.py = 1.3.0)",
+        "v1.3.0 GitHub release published with benchmarks",
+        "Migration guide created following docs/MIGRATION_GUIDE.md pattern",
+        "Documentation indexed in mkdocs.yml"
+      ]
+    },
+    {
+      "feature": "Integration Test Infrastructure",
+      "description": "Fix async fixture scoping, create missing Docker Compose config, fix 84 test collection errors, consolidate fixture docs, re-enable CI tests",
+      "complexity": "high",
+      "tokens_estimated": 220000,
+      "dependencies": ["v1.3.1-phase1"],
+      "workers_suggested": ["test-infra"],
+      "version_suggested": "v1.3.1-phase2",
+      "completion_criteria": [
+        "0 test collection errors (currently 84)",
+        "Fixture scope warnings resolved",
+        "CI tests enabled in .github/workflows/ci.yml",
+        "Docker integration tests runnable locally",
+        "tests/fixtures/docker-compose.integration.yml created"
+      ]
+    },
+    {
+      "feature": "Policy & Security Test Coverage",
+      "description": "Test coverage for policy cache (259 stmts), OPA client (216 stmts), MFA system (245 stmts), anomaly alerts (151 stmts), security config (91 stmts)",
+      "complexity": "high",
+      "tokens_estimated": 180000,
+      "dependencies": ["v1.3.1-phase2"],
+      "workers_suggested": ["policy-tester"],
+      "version_suggested": "v1.3.1-phase3a",
+      "completion_criteria": [
+        "Policy cache coverage: 0% → 85% (220 statements covered)",
+        "OPA client coverage: 0% → 85% (183 statements covered)",
+        "MFA system coverage: 56% → 85%",
+        "Anomaly alerts coverage: 51% → 85%",
+        "Security config coverage: 63% → 85%",
+        "~90-100 new tests written"
+      ]
+    },
+    {
+      "feature": "Configuration Test Coverage",
+      "description": "Test coverage for settings module (209 statements) including env loading, validation, JWT/LDAP/OIDC config",
+      "complexity": "medium",
+      "tokens_estimated": 96000,
+      "dependencies": ["v1.3.1-phase2"],
+      "workers_suggested": ["config-tester"],
+      "version_suggested": "v1.3.1-phase3b",
+      "completion_criteria": [
+        "Settings module coverage: 0% → 85% (177 statements covered)",
+        "~25-30 tests written for configuration validation",
+        "Environment variable loading tested",
+        "JWT, LDAP, OIDC configuration validation covered"
+      ]
+    },
+    {
+      "feature": "Adapter Test Coverage",
+      "description": "Test coverage for MCP adapter (236 stmts), gRPC adapter (226 stmts), HTTP adapter (217 stmts)",
+      "complexity": "high",
+      "tokens_estimated": 168000,
+      "dependencies": ["v1.3.1-phase2"],
+      "workers_suggested": ["adapter-tester"],
+      "version_suggested": "v1.3.1-phase3c",
+      "completion_criteria": [
+        "MCP adapter coverage: 0% → 85% (200 statements covered)",
+        "gRPC adapter coverage: 0% → 85% (192 statements covered)",
+        "HTTP adapter coverage: 0% → 85% (184 statements covered)",
+        "~56-69 tests written across all adapters"
+      ]
+    },
+    {
+      "feature": "API Router Test Coverage",
+      "description": "Test coverage for auth router, policy router, API keys router, gateway router, SAML router",
+      "complexity": "high",
+      "tokens_estimated": 216000,
+      "dependencies": ["v1.3.1-phase2"],
+      "workers_suggested": ["router-tester"],
+      "version_suggested": "v1.3.1-phase3d",
+      "completion_criteria": [
+        "Auth router coverage: 0% → 85% (security critical)",
+        "Policy router coverage: 0% → 85%",
+        "API keys router coverage: 0% → 85%",
+        "Gateway router coverage: 0% → 85%",
+        "SAML router coverage: 0% → 85%",
+        "~95-118 tests written using FastAPI TestClient"
+      ]
+    },
+    {
+      "feature": "Auth Services Test Coverage",
+      "description": "Test coverage for JWT handler, API key service, session management, auth providers (OIDC, SAML, LDAP)",
+      "complexity": "high",
+      "tokens_estimated": 240000,
+      "dependencies": ["v1.3.1-phase2"],
+      "workers_suggested": ["auth-tester"],
+      "version_suggested": "v1.3.1-phase3e",
+      "completion_criteria": [
+        "JWT handler coverage: 0% → 85%",
+        "API key service coverage: 0% → 85%",
+        "Session management coverage: 0% → 85%",
+        "Auth providers coverage: 0% → 85% (OIDC, SAML, LDAP)",
+        "~95-120 tests written for authentication flows"
+      ]
+    },
+    {
+      "feature": "Audit Documentation",
+      "description": "Security evidence collection, dependency audit report, test coverage audit report, configuration security review, enhanced audit runbook",
+      "complexity": "medium",
+      "tokens_estimated": 190000,
+      "dependencies": ["v1.3.1-phase3a", "v1.3.1-phase3b", "v1.3.1-phase3c", "v1.3.1-phase3d", "v1.3.1-phase3e"],
+      "workers_suggested": ["audit-doc"],
+      "version_suggested": "v1.3.1-phase4",
+      "completion_criteria": [
+        "SECURITY_EVIDENCE.md created with auth flows, control matrix, encryption docs",
+        "DEPENDENCY_AUDIT.md created with pip-audit results and CVE mitigations",
+        "TEST_COVERAGE_AUDIT.md created with coverage metrics and strategy",
+        "CONFIGURATION_SECURITY.md created with security implications",
+        "SECURITY_AUDIT_PREP.md enhanced with v1.3.0 procedures",
+        "Auditors can independently assess SARK security posture"
+      ]
+    }
+  ],
+
+  "version_plan": [
+    {
+      "version": "v1.3.1-phase1",
+      "description": "Quick Wins & Release - Version fix, release finalization, migration guide",
+      "features_included": ["Quick Wins & Release"],
+      "token_budget": {
+        "projected": 100000
+      },
+      "workers_assigned": ["release-manager"],
+      "dependencies": [],
+      "completion_criteria": [
+        "src/sark/__init__.py version updated to 1.3.0",
+        "docs/v1.3.0/RELEASE_NOTES.md finalized with date",
+        "docs/v1.3.0/MIGRATION_GUIDE.md created",
+        "mkdocs.yml navigation updated",
+        "GitHub release v1.3.0 published",
+        "Token budget: ≤ 110K"
+      ]
+    },
+    {
+      "version": "v1.3.1-phase2",
+      "description": "Integration Test Infrastructure - Fix async fixtures, enable CI tests",
+      "features_included": ["Integration Test Infrastructure"],
+      "token_budget": {
+        "projected": 220000
+      },
+      "workers_assigned": ["test-infra"],
+      "dependencies": ["v1.3.1-phase1"],
+      "completion_criteria": [
+        "tests/fixtures/integration_docker.py fixture scoping fixed",
+        "tests/fixtures/docker-compose.integration.yml created",
+        "0 test collection errors (down from 84)",
+        "tests/fixtures/README.md created",
+        ".github/workflows/ci.yml tests re-enabled",
+        "Token budget: ≤ 242K"
+      ]
+    },
+    {
+      "version": "v1.3.1-phase3a",
+      "description": "Policy & Security Test Coverage - Critical security module testing",
+      "features_included": ["Policy & Security Test Coverage"],
+      "token_budget": {
+        "projected": 180000
+      },
+      "workers_assigned": ["policy-tester"],
+      "dependencies": ["v1.3.1-phase2"],
+      "completion_criteria": [
+        "tests/services/policy/test_cache.py created (20-25 tests)",
+        "tests/services/policy/test_opa_client.py created (18-22 tests)",
+        "tests/security/test_mfa.py enhanced (+10-15 tests)",
+        "tests/security/test_anomaly_alerts.py created (+15-20 tests)",
+        "Coverage: Policy cache 85%+, OPA client 85%+, MFA 85%+, Anomaly 85%+",
+        "Token budget: ≤ 198K"
+      ]
+    },
+    {
+      "version": "v1.3.1-phase3b",
+      "description": "Configuration Test Coverage - Settings module comprehensive testing",
+      "features_included": ["Configuration Test Coverage"],
+      "token_budget": {
+        "projected": 96000
+      },
+      "workers_assigned": ["config-tester"],
+      "dependencies": ["v1.3.1-phase2"],
+      "completion_criteria": [
+        "tests/config/test_settings.py created (25-30 tests)",
+        "Settings module coverage: 0% → 85%",
+        "Environment variable loading tested",
+        "Configuration validation coverage complete",
+        "Token budget: ≤ 106K"
+      ]
+    },
+    {
+      "version": "v1.3.1-phase3c",
+      "description": "Adapter Test Coverage - MCP, gRPC, HTTP adapter testing",
+      "features_included": ["Adapter Test Coverage"],
+      "token_budget": {
+        "projected": 168000
+      },
+      "workers_assigned": ["adapter-tester"],
+      "dependencies": ["v1.3.1-phase2"],
+      "completion_criteria": [
+        "tests/adapters/test_mcp_adapter.py enhanced (20-25 tests)",
+        "tests/adapters/test_grpc_adapter.py enhanced (18-22 tests)",
+        "tests/adapters/test_http_adapter.py enhanced (18-22 tests)",
+        "All adapter coverage: 0% → 85%",
+        "Token budget: ≤ 185K"
+      ]
+    },
+    {
+      "version": "v1.3.1-phase3d",
+      "description": "API Router Test Coverage - Critical API endpoint testing",
+      "features_included": ["API Router Test Coverage"],
+      "token_budget": {
+        "projected": 216000
+      },
+      "workers_assigned": ["router-tester"],
+      "dependencies": ["v1.3.1-phase2"],
+      "completion_criteria": [
+        "tests/api/routers/test_auth.py created (25-30 tests)",
+        "tests/api/routers/test_policy.py created (20-25 tests)",
+        "tests/api/routers/test_api_keys.py created (15-20 tests)",
+        "tests/api/routers/test_gateway.py created (20-25 tests)",
+        "tests/api/routers/test_saml.py created (15-18 tests)",
+        "All router coverage: 0% → 85%",
+        "Token budget: ≤ 238K"
+      ]
+    },
+    {
+      "version": "v1.3.1-phase3e",
+      "description": "Auth Services Test Coverage - Authentication system comprehensive testing",
+      "features_included": ["Auth Services Test Coverage"],
+      "token_budget": {
+        "projected": 240000
+      },
+      "workers_assigned": ["auth-tester"],
+      "dependencies": ["v1.3.1-phase2"],
+      "completion_criteria": [
+        "tests/services/auth/test_jwt.py created (20-25 tests)",
+        "tests/services/auth/test_api_key.py created (15-18 tests)",
+        "tests/services/auth/test_session.py and test_sessions.py created (40-50 tests)",
+        "Auth provider tests created for OIDC, SAML, LDAP (45-60 tests)",
+        "All auth service coverage: 0% → 85%",
+        "Token budget: ≤ 264K"
+      ]
+    },
+    {
+      "version": "v1.3.1-phase4",
+      "description": "Audit Documentation - Security audit preparation and evidence",
+      "features_included": ["Audit Documentation"],
+      "token_budget": {
+        "projected": 190000
+      },
+      "workers_assigned": ["audit-doc"],
+      "dependencies": ["v1.3.1-phase3a", "v1.3.1-phase3b", "v1.3.1-phase3c", "v1.3.1-phase3d", "v1.3.1-phase3e"],
+      "completion_criteria": [
+        "docs/v1.3.0/SECURITY_EVIDENCE.md created",
+        "docs/v1.3.0/DEPENDENCY_AUDIT.md created with pip-audit results",
+        "docs/v1.3.0/TEST_COVERAGE_AUDIT.md created",
+        "docs/v1.3.0/CONFIGURATION_SECURITY.md created",
+        "docs/v1.3.0/SECURITY_AUDIT_PREP.md enhanced",
+        "Overall test coverage ≥ 85%",
+        "Token budget: ≤ 209K"
+      ]
+    }
+  ],
+
+  "worker_recommendations": [
+    {
+      "id": "release-manager",
+      "role": "Release Manager",
+      "agent": "claude-code",
+      "description": "Handles version updates, release finalization, migration guide creation, and documentation updates for v1.3.0/v1.3.1 release",
+      "versions_assigned": ["v1.3.1-phase1"],
+      "total_token_budget": 100000,
+      "rationale": "Single worker for quick wins phase - handles documentation and release tasks efficiently. Claude Code excels at documentation writing and following existing patterns."
+    },
+    {
+      "id": "test-infra",
+      "role": "Test Infrastructure Engineer",
+      "agent": "claude-code",
+      "description": "Fixes async fixture scoping issues, creates Docker Compose configuration, resolves test collection errors, and re-enables CI testing",
+      "versions_assigned": ["v1.3.1-phase2"],
+      "total_token_budget": 220000,
+      "rationale": "Critical blocker phase - must be completed before test coverage work. Claude Code handles pytest, Docker, and CI/CD configurations well."
+    },
+    {
+      "id": "policy-tester",
+      "role": "Policy & Security Test Engineer",
+      "agent": "claude-code",
+      "description": "Writes comprehensive tests for policy cache, OPA client, MFA system, anomaly detection, and security configuration modules",
+      "versions_assigned": ["v1.3.1-phase3a"],
+      "total_token_budget": 180000,
+      "rationale": "Security-critical testing workstream. Claude Code understands security patterns and can write thorough test coverage for complex security modules."
+    },
+    {
+      "id": "config-tester",
+      "role": "Configuration Test Engineer",
+      "agent": "claude-code",
+      "description": "Writes tests for settings module including environment variable loading, validation, and authentication provider configurations",
+      "versions_assigned": ["v1.3.1-phase3b"],
+      "total_token_budget": 96000,
+      "rationale": "Smallest Phase 3 workstream - focuses on configuration validation. Can run in parallel with other Phase 3 workers."
+    },
+    {
+      "id": "adapter-tester",
+      "role": "Adapter Test Engineer",
+      "agent": "claude-code",
+      "description": "Writes tests for MCP, gRPC, and HTTP adapters covering protocol handling, serialization, and error cases",
+      "versions_assigned": ["v1.3.1-phase3c"],
+      "total_token_budget": 168000,
+      "rationale": "Protocol adapter testing requires understanding of MCP, gRPC, and HTTP. Claude Code handles multi-protocol testing well."
+    },
+    {
+      "id": "router-tester",
+      "role": "API Router Test Engineer",
+      "agent": "claude-code",
+      "description": "Writes tests for auth, policy, API keys, gateway, and SAML routers using FastAPI TestClient",
+      "versions_assigned": ["v1.3.1-phase3d"],
+      "total_token_budget": 216000,
+      "rationale": "Largest Phase 3 workstream - critical API endpoint testing. Claude Code excels at FastAPI testing patterns and security-focused test scenarios."
+    },
+    {
+      "id": "auth-tester",
+      "role": "Authentication Test Engineer",
+      "agent": "claude-code",
+      "description": "Writes tests for JWT handler, API key service, session management, and authentication providers (OIDC, SAML, LDAP)",
+      "versions_assigned": ["v1.3.1-phase3e"],
+      "total_token_budget": 240000,
+      "rationale": "Highest token budget Phase 3 workstream - authentication is complex and security-critical. Claude Code handles auth flows and provider testing well."
+    },
+    {
+      "id": "audit-doc",
+      "role": "Security Audit Documentation Writer",
+      "agent": "claude-code",
+      "description": "Creates comprehensive security audit documentation including evidence collection, dependency audit, test coverage report, and configuration security review",
+      "versions_assigned": ["v1.3.1-phase4"],
+      "total_token_budget": 190000,
+      "rationale": "Final phase - aggregates all Phase 3 work into audit-ready documentation. Claude Code excels at technical writing and security documentation."
+    }
+  ],
+
+  "generated_prompts": {
+    "release-manager": "# Release Manager\n\n## Role\nHandle version updates, release finalization, migration guide creation, and documentation updates for SARK v1.3.0/v1.3.1 release.\n\n## Version Assignments\nv1.3.1-phase1 (Quick Wins & Release)\n\n## Responsibilities\n\n### v1.3.1-phase1 (Quick Wins & Release - 100K tokens)\n- Fix version mismatch in src/sark/__init__.py (change 1.1.0 → 1.3.0)\n- Finalize docs/v1.3.0/RELEASE_NOTES.md (set release date, review features)\n- Create docs/v1.3.0/MIGRATION_GUIDE.md following docs/MIGRATION_GUIDE.md pattern\n- Update mkdocs.yml navigation to include v1.3.0 release docs\n- Create GitHub release v1.3.0 with performance benchmarks attached\n\n## Files\n- src/sark/__init__.py\n- docs/v1.3.0/RELEASE_NOTES.md\n- docs/v1.3.0/MIGRATION_GUIDE.md (NEW)\n- mkdocs.yml\n- pyproject.toml (verify version alignment)\n- reports/PERFORMANCE_BENCHMARKS.md (for release attachment)\n\n## Tech Stack\n- Python version management\n- MkDocs Material documentation\n- GitHub CLI (gh) for release creation\n- Git tagging and release workflows\n\n## Token Budget\nTotal: 100K tokens\n- v1.3.1-phase1: 100K tokens\n\n## Git Workflow\nBranch: feat/v1.3.1-phase1-release\n\nWhen complete:\n1. Commit all changes to branch\n2. Push to remote\n3. Create PR to main\n4. Update token metrics in czarina status\n\n## Pattern Library\nReview before starting:\n- docs/MIGRATION_GUIDE.md (pattern to follow)\n- docs/v1.2.0/RELEASE_NOTES.md (historical reference)\n- CHANGELOG.md (Keep a Changelog format)\n\n## Version Completion Criteria\n\n### v1.3.1-phase1 Complete When:\n- [ ] src/sark/__init__.py version = \"1.3.0\"\n- [ ] docs/v1.3.0/RELEASE_NOTES.md has release date set\n- [ ] docs/v1.3.0/MIGRATION_GUIDE.md created with all sections\n- [ ] mkdocs.yml includes v1.3.0 release navigation\n- [ ] GitHub release v1.3.0 published with benchmarks\n- [ ] Token budget: ≤ 110K",
+
+    "test-infra": "# Test Infrastructure Engineer\n\n## Role\nFix async fixture scoping issues, create Docker Compose configuration, resolve test collection errors, and re-enable CI testing infrastructure.\n\n## Version Assignments\nv1.3.1-phase2 (Integration Test Infrastructure)\n\n## Responsibilities\n\n### v1.3.1-phase2 (Integration Test Infrastructure - 220K tokens)\n- Fix async fixture scoping in tests/fixtures/integration_docker.py (lines 84, 148, 212)\n- Create tests/fixtures/docker-compose.integration.yml with all required services\n- Fix 84 test collection errors by running pytest --collect-only and debugging\n- Create tests/fixtures/README.md documenting fixture hierarchy\n- Re-enable CI tests in .github/workflows/ci.yml (replace skip with proper test execution)\n\n## Files\n- tests/fixtures/integration_docker.py (fixture scoping fixes)\n- tests/fixtures/docker-compose.integration.yml (NEW)\n- tests/fixtures/README.md (NEW)\n- tests/conftest.py (verify compatibility)\n- tests/integration/conftest.py (verify compatibility)\n- .github/workflows/ci.yml (re-enable tests)\n- pyproject.toml (pytest configuration)\n\n## Tech Stack\n- pytest with pytest-asyncio\n- Docker Compose v2\n- pytest-docker plugin\n- GitHub Actions workflows\n- PostgreSQL, TimescaleDB, Redis, OPA containers\n\n## Token Budget\nTotal: 220K tokens\n- v1.3.1-phase2: 220K tokens\n\n## Git Workflow\nBranch: feat/v1.3.1-phase2-test-infra\n\nWhen complete:\n1. Commit all changes to branch\n2. Push to remote\n3. Create PR to main\n4. Update token metrics in czarina status\n\n## Pattern Library\nReview before starting:\n- tests/fixtures/integration_docker.py (current implementation)\n- pyproject.toml pytest configuration\n- .github/workflows/ci.yml (current skip logic)\n\n## Version Completion Criteria\n\n### v1.3.1-phase2 Complete When:\n- [ ] pytest --collect-only shows 0 errors (down from 84)\n- [ ] Fixture scope warnings resolved\n- [ ] tests/fixtures/docker-compose.integration.yml created and tested\n- [ ] tests/fixtures/README.md created\n- [ ] .github/workflows/ci.yml tests re-enabled\n- [ ] Unit tests run successfully in CI\n- [ ] Token budget: ≤ 242K",
+
+    "policy-tester": "# Policy & Security Test Engineer\n\n## Role\nWrite comprehensive tests for policy cache, OPA client, MFA system, anomaly detection, and security configuration modules to achieve 85%+ coverage.\n\n## Version Assignments\nv1.3.1-phase3a (Policy & Security Test Coverage)\n\n## Responsibilities\n\n### v1.3.1-phase3a (Policy & Security Test Coverage - 180K tokens)\n- Create tests/services/policy/test_cache.py (20-25 tests for 259 statements)\n- Create tests/services/policy/test_opa_client.py (18-22 tests for 216 statements)\n- Enhance tests/security/test_mfa.py (+10-15 tests, 56% → 85%)\n- Create/enhance tests/security/test_anomaly_alerts.py (+15-20 tests, 51% → 85%)\n- Enhance tests/security/test_config.py (+8-10 tests, 63% → 85%)\n\n## Files\n- tests/services/policy/test_cache.py (NEW)\n- tests/services/policy/test_opa_client.py (NEW)\n- tests/security/test_mfa.py (ENHANCE)\n- tests/security/test_anomaly_alerts.py (ENHANCE)\n- tests/security/test_config.py (ENHANCE)\n- src/sark/services/policy/cache.py (source under test)\n- src/sark/services/policy/opa_client.py (source under test)\n- src/sark/security/mfa.py (source under test)\n- src/sark/security/anomaly_alerts.py (source under test)\n- src/sark/security/config.py (source under test)\n\n## Tech Stack\n- pytest with pytest-asyncio\n- pytest-httpx for HTTP mocking\n- Mock Redis (use existing mock_redis fixture)\n- OPA client mocking\n- AAA pattern (Arrange, Act, Assert)\n\n## Token Budget\nTotal: 180K tokens\n- v1.3.1-phase3a: 180K tokens\n\n## Git Workflow\nBranch: feat/v1.3.1-phase3a-policy-tests\n\nWhen complete:\n1. Commit all changes to branch\n2. Push to remote\n3. Create PR to main\n4. Update token metrics in czarina status\n\n## Pattern Library\nReview before starting:\n- tests/conftest.py (existing fixtures: mock_redis, opa_client)\n- Existing test files in tests/security/ for patterns\n- pyproject.toml pytest configuration\n\n## Version Completion Criteria\n\n### v1.3.1-phase3a Complete When:\n- [ ] Policy cache coverage: 0% → 85% (220+ statements)\n- [ ] OPA client coverage: 0% → 85% (183+ statements)\n- [ ] MFA system coverage: 56% → 85%\n- [ ] Anomaly alerts coverage: 51% → 85%\n- [ ] Security config coverage: 63% → 85%\n- [ ] ~90-100 total tests written\n- [ ] All tests pass in CI\n- [ ] Token budget: ≤ 198K",
+
+    "config-tester": "# Configuration Test Engineer\n\n## Role\nWrite comprehensive tests for the settings module including environment variable loading, validation, and authentication provider configurations.\n\n## Version Assignments\nv1.3.1-phase3b (Configuration Test Coverage)\n\n## Responsibilities\n\n### v1.3.1-phase3b (Configuration Test Coverage - 96K tokens)\n- Create tests/config/test_settings.py (25-30 tests for 209 statements)\n- Test environment variable loading and parsing\n- Test configuration validation (patterns, min_length, etc.)\n- Test JWT configuration variants (HS256, RS256)\n- Test LDAP, OIDC, SAML configuration validation\n- Test secret key requirements and defaults\n\n## Files\n- tests/config/test_settings.py (NEW)\n- src/sark/config/settings.py (source under test)\n- tests/conftest.py (use existing mocking patterns)\n\n## Tech Stack\n- pytest with pytest-asyncio\n- Environment variable mocking (monkeypatch)\n- Pydantic validation testing\n- Configuration testing patterns\n\n## Token Budget\nTotal: 96K tokens\n- v1.3.1-phase3b: 96K tokens\n\n## Git Workflow\nBranch: feat/v1.3.1-phase3b-config-tests\n\nWhen complete:\n1. Commit all changes to branch\n2. Push to remote\n3. Create PR to main\n4. Update token metrics in czarina status\n\n## Pattern Library\nReview before starting:\n- tests/conftest.py (existing fixtures)\n- src/sark/config/settings.py (understand configuration structure)\n- pyproject.toml pytest configuration\n\n## Version Completion Criteria\n\n### v1.3.1-phase3b Complete When:\n- [ ] Settings module coverage: 0% → 85% (177+ statements)\n- [ ] ~25-30 tests written\n- [ ] Environment variable loading tested\n- [ ] Configuration validation coverage complete\n- [ ] JWT, LDAP, OIDC config validation tested\n- [ ] All tests pass in CI\n- [ ] Token budget: ≤ 106K",
+
+    "adapter-tester": "# Adapter Test Engineer\n\n## Role\nWrite comprehensive tests for MCP, gRPC, and HTTP adapters covering protocol handling, serialization, error cases, and connection management.\n\n## Version Assignments\nv1.3.1-phase3c (Adapter Test Coverage)\n\n## Responsibilities\n\n### v1.3.1-phase3c (Adapter Test Coverage - 168K tokens)\n- Enhance tests/adapters/test_mcp_adapter.py (20-25 tests for 236 statements)\n- Enhance tests/adapters/test_grpc_adapter.py (18-22 tests for 226 statements)\n- Enhance tests/adapters/test_http_adapter.py (18-22 tests for 217 statements)\n- Test tool invocation, serialization, error handling, connection management\n- Test protocol-specific features (MCP, gRPC channels, HTTP retries)\n\n## Files\n- tests/adapters/test_mcp_adapter.py (ENHANCE)\n- tests/adapters/test_grpc_adapter.py (ENHANCE)\n- tests/adapters/test_http_adapter.py (ENHANCE)\n- src/sark/adapters/mcp_adapter.py (source under test)\n- src/sark/adapters/grpc_adapter.py (source under test)\n- src/sark/adapters/http/http_adapter.py (source under test)\n\n## Tech Stack\n- pytest with pytest-asyncio\n- pytest-httpx for HTTP mocking\n- gRPC mocking\n- MCP protocol testing\n- AAA pattern\n\n## Token Budget\nTotal: 168K tokens\n- v1.3.1-phase3c: 168K tokens\n\n## Git Workflow\nBranch: feat/v1.3.1-phase3c-adapter-tests\n\nWhen complete:\n1. Commit all changes to branch\n2. Push to remote\n3. Create PR to main\n4. Update token metrics in czarina status\n\n## Pattern Library\nReview before starting:\n- tests/conftest.py (existing fixtures)\n- Existing adapter test files for patterns\n- pyproject.toml pytest configuration\n\n## Version Completion Criteria\n\n### v1.3.1-phase3c Complete When:\n- [ ] MCP adapter coverage: 0% → 85% (200+ statements)\n- [ ] gRPC adapter coverage: 0% → 85% (192+ statements)\n- [ ] HTTP adapter coverage: 0% → 85% (184+ statements)\n- [ ] ~56-69 tests written across all adapters\n- [ ] All tests pass in CI\n- [ ] Token budget: ≤ 185K",
+
+    "router-tester": "# API Router Test Engineer\n\n## Role\nWrite comprehensive tests for auth, policy, API keys, gateway, and SAML routers using FastAPI TestClient to achieve 85%+ coverage.\n\n## Version Assignments\nv1.3.1-phase3d (API Router Test Coverage)\n\n## Responsibilities\n\n### v1.3.1-phase3d (API Router Test Coverage - 216K tokens)\n- Create tests/api/routers/test_auth.py (25-30 tests, security critical)\n- Create tests/api/routers/test_policy.py (20-25 tests)\n- Create tests/api/routers/test_api_keys.py (15-20 tests)\n- Create tests/api/routers/test_gateway.py (20-25 tests)\n- Create tests/api/routers/test_saml.py (15-18 tests)\n- Test all API endpoints, authorization checks, error handling\n\n## Files\n- tests/api/routers/test_auth.py (NEW)\n- tests/api/routers/test_policy.py (NEW)\n- tests/api/routers/test_api_keys.py (NEW)\n- tests/api/routers/test_gateway.py (NEW)\n- tests/api/routers/test_saml.py (NEW)\n- src/sark/api/routers/* (sources under test)\n\n## Tech Stack\n- pytest with pytest-asyncio\n- FastAPI TestClient\n- HTTP status code testing\n- Authorization testing\n- Mock dependencies\n\n## Token Budget\nTotal: 216K tokens\n- v1.3.1-phase3d: 216K tokens\n\n## Git Workflow\nBranch: feat/v1.3.1-phase3d-router-tests\n\nWhen complete:\n1. Commit all changes to branch\n2. Push to remote\n3. Create PR to main\n4. Update token metrics in czarina status\n\n## Pattern Library\nReview before starting:\n- tests/integration/conftest.py (FastAPI test client patterns)\n- tests/conftest.py (existing fixtures)\n- pyproject.toml pytest configuration\n\n## Version Completion Criteria\n\n### v1.3.1-phase3d Complete When:\n- [ ] Auth router coverage: 0% → 85%\n- [ ] Policy router coverage: 0% → 85%\n- [ ] API keys router coverage: 0% → 85%\n- [ ] Gateway router coverage: 0% → 85%\n- [ ] SAML router coverage: 0% → 85%\n- [ ] ~95-118 tests written using FastAPI TestClient\n- [ ] All tests pass in CI\n- [ ] Token budget: ≤ 238K",
+
+    "auth-tester": "# Authentication Test Engineer\n\n## Role\nWrite comprehensive tests for JWT handler, API key service, session management, and authentication providers (OIDC, SAML, LDAP) to achieve 85%+ coverage.\n\n## Version Assignments\nv1.3.1-phase3e (Auth Services Test Coverage)\n\n## Responsibilities\n\n### v1.3.1-phase3e (Auth Services Test Coverage - 240K tokens)\n- Create tests/services/auth/test_jwt.py (20-25 tests)\n- Create tests/services/auth/test_api_key.py (15-18 tests)\n- Create tests/services/auth/test_session.py and test_sessions.py (40-50 tests)\n- Create auth provider tests for OIDC, SAML, LDAP (45-60 tests total)\n- Test token creation, validation, expiration, rotation, provider flows\n\n## Files\n- tests/services/auth/test_jwt.py (NEW)\n- tests/services/auth/test_api_key.py (NEW)\n- tests/services/auth/test_session.py (NEW)\n- tests/services/auth/test_sessions.py (NEW)\n- tests/services/auth/providers/test_oidc.py (NEW)\n- tests/services/auth/providers/test_saml.py (NEW)\n- tests/services/auth/providers/test_ldap.py (NEW)\n- src/sark/services/auth/* (sources under test)\n\n## Tech Stack\n- pytest with pytest-asyncio\n- JWT testing (HS256, RS256)\n- Mock Redis for session storage\n- OIDC/SAML/LDAP mocking\n- Cryptography testing\n\n## Token Budget\nTotal: 240K tokens\n- v1.3.1-phase3e: 240K tokens\n\n## Git Workflow\nBranch: feat/v1.3.1-phase3e-auth-tests\n\nWhen complete:\n1. Commit all changes to branch\n2. Push to remote\n3. Create PR to main\n4. Update token metrics in czarina status\n\n## Pattern Library\nReview before starting:\n- tests/integration/conftest.py (auth fixtures)\n- tests/conftest.py (mock_redis fixture)\n- pyproject.toml pytest configuration\n\n## Version Completion Criteria\n\n### v1.3.1-phase3e Complete When:\n- [ ] JWT handler coverage: 0% → 85%\n- [ ] API key service coverage: 0% → 85%\n- [ ] Session management coverage: 0% → 85%\n- [ ] Auth providers coverage: 0% → 85% (OIDC, SAML, LDAP)\n- [ ] ~95-120 tests written for authentication flows\n- [ ] All tests pass in CI\n- [ ] Token budget: ≤ 264K",
+
+    "audit-doc": "# Security Audit Documentation Writer\n\n## Role\nCreate comprehensive security audit documentation including evidence collection, dependency audit, test coverage report, configuration security review, and enhanced audit runbook.\n\n## Version Assignments\nv1.3.1-phase4 (Audit Documentation)\n\n## Responsibilities\n\n### v1.3.1-phase4 (Audit Documentation - 190K tokens)\n- Create docs/v1.3.0/SECURITY_EVIDENCE.md (auth flows, control matrix, encryption docs)\n- Create docs/v1.3.0/DEPENDENCY_AUDIT.md (pip-audit results, CVE mitigations)\n- Create docs/v1.3.0/TEST_COVERAGE_AUDIT.md (coverage metrics, strategy)\n- Create docs/v1.3.0/CONFIGURATION_SECURITY.md (security implications)\n- Enhance docs/v1.3.0/SECURITY_AUDIT_PREP.md (v1.3.0 procedures)\n\n## Files\n- docs/v1.3.0/SECURITY_EVIDENCE.md (NEW)\n- docs/v1.3.0/DEPENDENCY_AUDIT.md (NEW)\n- docs/v1.3.0/TEST_COVERAGE_AUDIT.md (NEW)\n- docs/v1.3.0/CONFIGURATION_SECURITY.md (NEW)\n- docs/v1.3.0/SECURITY_AUDIT_PREP.md (ENHANCE)\n- reports/coverage/ (HTML coverage reports)\n\n## Tech Stack\n- pip-audit for dependency scanning\n- pytest coverage reporting\n- MkDocs Material documentation\n- Security documentation patterns\n\n## Token Budget\nTotal: 190K tokens\n- v1.3.1-phase4: 190K tokens\n\n## Git Workflow\nBranch: feat/v1.3.1-phase4-audit-docs\n\nWhen complete:\n1. Commit all changes to branch\n2. Push to remote\n3. Create PR to main\n4. Update token metrics in czarina status\n\n## Pattern Library\nReview before starting:\n- docs/OPERATIONAL_RUNBOOK.md (runbook pattern)\n- docs/SECURITY.md (security documentation pattern)\n- docs/v1.3.0/RELEASE_NOTES.md (v1.3.0 features reference)\n\n## Version Completion Criteria\n\n### v1.3.1-phase4 Complete When:\n- [ ] SECURITY_EVIDENCE.md created with all sections\n- [ ] DEPENDENCY_AUDIT.md created with pip-audit results\n- [ ] TEST_COVERAGE_AUDIT.md created (overall coverage ≥ 85%)\n- [ ] CONFIGURATION_SECURITY.md created\n- [ ] SECURITY_AUDIT_PREP.md enhanced with v1.3.0 procedures\n- [ ] Auditors can independently assess SARK security posture\n- [ ] Token budget: ≤ 209K"
+  },
+
+  "analysis_metadata": {
+    "analyzed_at": "2025-12-26T20:00:00Z",
+    "analyzer_version": "claude-code-1.0",
+    "input_file": "/home/jhenry/.claude/plans/structured-prancing-flask.md",
+    "analysis_tokens_used": 8100
+  }
+}

@@ -32,7 +32,7 @@ cp .env.example .env
 # - GATEWAY_API_KEY (generate with: openssl rand -hex 32)
 # - SARK_API_KEY (will generate after starting SARK)
 # - POSTGRES_PASSWORD
-# - REDIS_PASSWORD
+# - VALKEY_PASSWORD
 # - JWT_SECRET_KEY (generate with: openssl rand -hex 32)
 nano .env
 ```

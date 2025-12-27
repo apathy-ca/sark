@@ -43,7 +43,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: sark-redis
+  name: sark-valkey
   namespace: sark
   labels:
     app.kubernetes.io/name: sark

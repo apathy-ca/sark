@@ -1043,22 +1043,22 @@ spec:
 **Redis Cluster (recommended for >100K RPS):**
 ```yaml
 # High throughput, automatic sharding
-REDIS_MODE=cluster
+VALKEY_MODE=cluster
 REDIS_CLUSTER_NODES=redis-1:6379,redis-2:6379,redis-3:6379
 ```
 
 **Redis Sentinel (recommended for high availability):**
 ```yaml
 # Automatic failover, simpler setup
-REDIS_MODE=sentinel
-REDIS_SENTINEL_MASTER=mymaster
+VALKEY_MODE=sentinel
+VALKEY_SENTINEL_MASTER=mymaster
 REDIS_SENTINEL_NODES=sentinel-1:26379,sentinel-2:26379
 ```
 
 **Single Redis (dev/small deployments):**
 ```yaml
-REDIS_MODE=standalone
-REDIS_URL=redis://localhost:6379
+VALKEY_MODE=standalone
+VALKEY_URL=redis://localhost:6379
 ```
 
 **Benchmark:** Cluster provides 3-5x throughput of single Redis.

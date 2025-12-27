@@ -234,7 +234,7 @@ See [SECURITY_HARDENING.md](./SECURITY_HARDENING.md) for complete checklist.
 
 ### Performance & Optimization Checklist
 
-See [DATABASE_OPTIMIZATION.md](./DATABASE_OPTIMIZATION.md) and [REDIS_OPTIMIZATION.md](./REDIS_OPTIMIZATION.md).
+See [DATABASE_OPTIMIZATION.md](./DATABASE_OPTIMIZATION.md) and [VALKEY_OPTIMIZATION.md](./VALKEY_OPTIMIZATION.md).
 
 **Database**:
 - [ ] Indexes created on critical columns

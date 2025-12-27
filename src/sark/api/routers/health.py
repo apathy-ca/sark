@@ -4,7 +4,7 @@ import asyncio
 
 from fastapi import APIRouter
 from pydantic import BaseModel
-import redis.asyncio as aioredis
+import valkey.asyncio as aioredis
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine
 import structlog

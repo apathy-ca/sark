@@ -5,7 +5,7 @@ from collections.abc import Generator
 import httpx
 import psycopg2
 import pytest
-import redis
+import valkey
 
 # Check if pytest-docker is available
 try:
@@ -81,7 +81,7 @@ def is_postgres_responsive(host: str, port: int) -> bool:
         return False
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 async def postgres_connection(postgres_service):
     """
     Provide async PostgreSQL connection for tests.
@@ -145,7 +145,7 @@ def timescaledb_service(docker_services: Services) -> Generator[dict, None, None
     yield timescale_config
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 async def timescaledb_connection(timescaledb_service):
     """Provide async TimescaleDB connection for tests."""
     import asyncpg
@@ -166,42 +166,42 @@ async def timescaledb_connection(timescaledb_service):
 
 
 # =============================================================================
-# Redis Fixtures
+# Valkey (Redis-compatible) Fixtures
 # =============================================================================
 
 
 @pytest.fixture(scope="session")
-def redis_service(docker_services: Services) -> Generator[dict, None, None]:
+def valkey_service(docker_services: Services) -> Generator[dict, None, None]:
     """
-    Start Redis Docker container and wait for it to be ready.
+    Start Valkey Docker container and wait for it to be ready.
 
     Yields:
-        Dictionary with Redis connection details
+        Dictionary with Valkey connection details
     """
     docker_services.wait_until_responsive(
         timeout=60.0,
         pause=0.5,
-        check=lambda: is_redis_responsive(
-            docker_services.docker_ip, docker_services.port_for("redis", 6379)
+        check=lambda: is_valkey_responsive(
+            docker_services.docker_ip, docker_services.port_for("cache", 6379)
         ),
     )
 
     host = docker_services.docker_ip
-    port = docker_services.port_for("redis", 6379)
+    port = docker_services.port_for("cache", 6379)
 
-    redis_config = {
+    valkey_config = {
         "host": host,
         "port": port,
-        "url": f"redis://{host}:{port}",
+        "url": f"redis://{host}:{port}",  # Protocol remains redis://
     }
 
-    yield redis_config
+    yield valkey_config
 
 
-def is_redis_responsive(host: str, port: int) -> bool:
-    """Check if Redis is responsive."""
+def is_valkey_responsive(host: str, port: int) -> bool:
+    """Check if Valkey is responsive."""
     try:
-        client = redis.Redis(host=host, port=port, socket_timeout=2)
+        client = valkey.Valkey(host=host, port=port, socket_timeout=2)
         client.ping()
         client.close()
         return True
@@ -209,20 +209,20 @@ def is_redis_responsive(host: str, port: int) -> bool:
         return False
 
 
-@pytest.fixture
-async def redis_connection(redis_service):
-    """Provide async Redis connection for tests."""
-    import redis.asyncio as aioredis
+@pytest.fixture(scope="function")
+async def valkey_connection(valkey_service):
+    """Provide async Valkey connection for tests."""
+    import valkey.asyncio as aiovalkey
 
-    client = aioredis.Redis(
-        host=redis_service["host"],
-        port=redis_service["port"],
+    client = aiovalkey.Valkey(
+        host=valkey_service["host"],
+        port=valkey_service["port"],
         decode_responses=True,
     )
 
     yield client
 
-    await client.close()
+    await client.aclose()
 
 
 # =============================================================================
@@ -336,7 +336,7 @@ def is_grpc_mock_responsive(host: str, port: int) -> bool:
 def all_services(
     postgres_service,
     timescaledb_service,
-    redis_service,
+    valkey_service,
     opa_service,
     grpc_mock_service,
 ) -> dict:
@@ -349,7 +349,7 @@ def all_services(
     return {
         "postgres": postgres_service,
         "timescaledb": timescaledb_service,
-        "redis": redis_service,
+        "valkey": valkey_service,
         "opa": opa_service,
         "grpc_mock": grpc_mock_service,
     }
@@ -360,7 +360,7 @@ def all_services(
 # =============================================================================
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 async def initialized_db(postgres_connection):
     """
     Provide a PostgreSQL connection with initialized schema.
@@ -424,15 +424,15 @@ async def initialized_db(postgres_connection):
         await conn.execute("DROP TABLE IF EXISTS users CASCADE")
 
 
-@pytest.fixture
-async def clean_redis(redis_connection):
+@pytest.fixture(scope="function")
+async def clean_valkey(valkey_connection):
     """
-    Provide Redis connection and flush before/after tests.
+    Provide Valkey connection and flush before/after tests.
     """
     # Clean before test
-    await redis_connection.flushdb()
+    await valkey_connection.flushdb()
 
-    yield redis_connection
+    yield valkey_connection
 
     # Clean after test
-    await redis_connection.flushdb()
+    await valkey_connection.flushdb()

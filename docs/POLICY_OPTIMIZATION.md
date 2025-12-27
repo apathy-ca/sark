@@ -726,11 +726,11 @@ rate(sark_policy_cache_revalidations_total[5m]) * 100
 
 ```bash
 # Redis configuration
-REDIS_HOST=localhost
-REDIS_PORT=6379
-REDIS_PASSWORD=
-REDIS_DB=0
-REDIS_POOL_SIZE=50  # Increased from 20 for batch operations
+VALKEY_HOST=localhost
+VALKEY_PORT=6379
+VALKEY_PASSWORD=
+VALKEY_DB=0
+VALKEY_POOL_SIZE=50  # Increased from 20 for batch operations
 
 # Policy cache configuration
 POLICY_CACHE_ENABLED=true

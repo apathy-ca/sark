@@ -182,7 +182,7 @@ kubectl apply -f k8s/
 
 - Python 3.11+
 - Docker with Docker Compose v2
-- PostgreSQL 15+, Redis 7+
+- PostgreSQL 15+, Valkey 7+ (Redis-compatible)
 - Open Policy Agent 0.60+
 - Kong Gateway 3.8+ (production)
 - Kubernetes 1.28+ (production)

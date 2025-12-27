@@ -119,8 +119,8 @@ POSTGRES_USER=sark
 POSTGRES_PASSWORD=your-db-password
 
 # Redis
-REDIS_HOST=redis
-REDIS_PASSWORD=your-redis-password
+VALKEY_HOST=redis
+VALKEY_PASSWORD=your-redis-password
 
 # Alerting
 SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK/URL

@@ -125,7 +125,7 @@ services:
       - prometheus
 
   # ============================================================================
-  # Redis Exporter - Cache Metrics
+  # Valkey Exporter - Cache Metrics
   # ============================================================================
   redis-exporter:
     image: oliver006/redis_exporter:v1.55.0
@@ -134,8 +134,8 @@ services:
     ports:
       - "9121:9121"
     environment:
-      REDIS_ADDR: "${REDIS_HOST:-redis}:6379"
-      REDIS_PASSWORD: "${REDIS_PASSWORD:-}"
+      VALKEY_ADDR: "${VALKEY_HOST:-redis}:6379"
+      VALKEY_PASSWORD: "${VALKEY_PASSWORD:-}"
     networks:
       - sark-monitoring
     depends_on:

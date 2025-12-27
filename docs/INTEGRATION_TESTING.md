@@ -75,7 +75,7 @@ docker run -d --name opa -p 8181:8181 openpolicyagent/opa:latest run --server
 ```bash
 # .env.test
 export POSTGRES_DSN=postgresql+asyncpg://sark:sark@localhost:5432/sark_test
-export REDIS_DSN=redis://localhost:6379/1
+export VALKEY_DSN=redis://localhost:6379/1
 export OPA_URL=http://localhost:8181
 export JWT_SECRET_KEY=test-secret-key-for-testing-only
 ```
@@ -389,7 +389,7 @@ jobs:
         run: pytest --cov=sark --cov-report=xml
         env:
           POSTGRES_DSN: postgresql+asyncpg://sark:sark@postgres:5432/sark_test
-          REDIS_DSN: redis://redis:6379/1
+          VALKEY_DSN: redis://redis:6379/1
           OPA_URL: http://opa:8181
 
       - name: Upload coverage

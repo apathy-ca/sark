@@ -28,7 +28,7 @@ graph TB
     end
 
     subgraph "Data Layer"
-        CACHE[(Redis Cache)]
+        CACHE[(Valkey Cache)]
         DB[(Primary Database)]
         QUEUE[(Message Queue)]
         BLOB[(Object Storage)]
@@ -95,7 +95,7 @@ sequenceDiagram
     participant API as SARK API
     participant Auth as Auth Service
     participant LDAP as LDAP Server
-    participant Redis as Redis (Sessions)
+    participant Valkey as Valkey (Sessions)
     participant DB as PostgreSQL
 
     Client->>API: POST /api/v1/auth/login/ldap<br/>{username, password}
@@ -128,7 +128,7 @@ sequenceDiagram
     participant API as SARK API
     participant Auth as Auth Service
     participant IdP as OIDC Provider<br/>(Google/Okta/Auth0)
-    participant Redis as Redis
+    participant Valkey as Redis
     participant DB as PostgreSQL
 
     User->>API: GET /api/v1/auth/oidc/login
@@ -168,7 +168,7 @@ sequenceDiagram
     participant User as User Browser
     participant API as SARK API/SP
     participant IdP as SAML Identity Provider
-    participant Redis as Redis
+    participant Valkey as Redis
     participant DB as PostgreSQL
 
     User->>API: GET /api/auth/saml/login
@@ -208,7 +208,7 @@ sequenceDiagram
     participant Client
     participant API as SARK API
     participant Auth as Auth Service
-    participant Redis as Redis
+    participant Valkey as Redis
     participant DB as PostgreSQL
 
     Note over Client,DB: Initial Login (see Authentication Flows above)
@@ -292,7 +292,7 @@ sequenceDiagram
     participant Client
     participant API as SARK API
     participant AuthZ as Authorization Service
-    participant Redis as Redis (Policy Cache)
+    participant Valkey as Valkey (Policy Cache)
     participant OPA as Open Policy Agent
     participant DB as PostgreSQL (Audit)
     participant SIEM as SIEM<br/>(Splunk/Datadog)
@@ -354,7 +354,7 @@ sequenceDiagram
     participant App as SARK Application
     participant Queue as SIEM Event Queue<br/>(In-Memory)
     participant Forwarder as SIEM Forwarder
-    participant Redis as Redis<br/>(Circuit Breaker)
+    participant Valkey as Redis<br/>(Circuit Breaker)
     participant Splunk as Splunk HEC
     participant Datadog as Datadog Logs API
 
@@ -462,7 +462,7 @@ sequenceDiagram
     participant Client
     participant API as SARK API
     participant RateLimit as Rate Limiter
-    participant Redis as Redis
+    participant Valkey as Redis
     participant Handler as Request Handler
 
     Client->>API: API Request<br/>Authorization: Bearer {token}
@@ -716,7 +716,7 @@ graph TB
     end
 
     subgraph "Shared Services"
-        REDIS[(Redis Cluster)]
+        REDIS[(Valkey Cluster)]
         PG[(PostgreSQL)]
         MQ[(RabbitMQ/Kafka)]
         S3[(Object Storage)]
@@ -855,7 +855,7 @@ graph TB
 - **API Layer**: Stateless design allows unlimited horizontal scaling
 - **Worker Pool**: Auto-scaling based on queue depth and CPU/memory metrics
 - **Database**: Read replicas for query distribution, sharding for write scaling
-- **Cache**: Redis cluster with consistent hashing for distribution
+- **Cache**: Valkey cluster with consistent hashing for distribution
 
 ### Performance Optimization
 
@@ -934,7 +934,7 @@ graph TB
 ### Technology Evaluation
 
 - Database architecture (PostgreSQL + TimescaleDB for time-series)
-- Caching strategy (Redis Cluster + local caching)
+- Caching strategy (Valkey Cluster + local caching)
 - Message queue selection (Kafka for high-throughput, RabbitMQ for reliability)
 - Service mesh adoption timeline
 - Kubernetes vs. Docker Swarm for orchestration

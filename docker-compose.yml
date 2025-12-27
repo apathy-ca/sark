@@ -6,7 +6,7 @@
 #
 # Profiles:
 # - minimal:  App only (connect to external services via .env)
-# - standard: App + PostgreSQL + Redis (good for development)
+# - standard: App + PostgreSQL + Valkey (good for development)
 # - full:     Complete stack with Kong, OPA, monitoring (staging/demo)
 #
 # Usage:
@@ -45,12 +45,12 @@ services:
       - POSTGRES_DB=${POSTGRES_DB:-sark}
       - POSTGRES_USER=${POSTGRES_USER:-sark}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-sark}
-      # Redis configuration
-      - REDIS_ENABLED=${REDIS_ENABLED:-false}
-      - REDIS_MODE=${REDIS_MODE:-managed}
-      - REDIS_HOST=${REDIS_HOST:-cache}
-      - REDIS_PORT=${REDIS_PORT:-6379}
-      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+      # Valkey (Redis-compatible) configuration
+      - VALKEY_ENABLED=${VALKEY_ENABLED:-false}
+      - VALKEY_MODE=${VALKEY_MODE:-managed}
+      - VALKEY_HOST=${VALKEY_HOST:-cache}
+      - VALKEY_PORT=${VALKEY_PORT:-6379}
+      - VALKEY_PASSWORD=${VALKEY_PASSWORD:-}
       # Kong configuration
       - KONG_ENABLED=${KONG_ENABLED:-false}
       - KONG_MODE=${KONG_MODE:-managed}
@@ -145,27 +145,27 @@ services:
     restart: unless-stopped
 
   # ============================================================================
-  # Redis Cache (Managed Service)
+  # Valkey Cache (Managed Service)
   # ============================================================================
   # Included in 'standard' and 'full' profiles
-  # For external Redis, configure via .env file
+  # For external Valkey, configure via .env file
   # ============================================================================
   cache:
-    image: redis:7-alpine
+    image: valkey/valkey:7-alpine
     container_name: sark-cache
     profiles:
       - standard  # Primary profile
       - managed   # Alias for backward compatibility
       - full      # Included in full stack
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
+    command: valkey-server --appendonly yes --requirepass ${VALKEY_PASSWORD:-}
     volumes:
-      - redis-data:/data
+      - valkey-data:/data
     ports:
-      - "${REDIS_PORT:-6379}:6379"
+      - "${VALKEY_PORT:-6379}:6379"
     networks:
       - sark-network
     healthcheck:
-      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD:-}", "ping"]
+      test: ["CMD", "valkey-cli", "--no-auth-warning", "-a", "${VALKEY_PASSWORD:-}", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -269,7 +269,7 @@ volumes:
     name: sark-pip-cache
   postgres-data:
     name: sark-postgres-data
-  redis-data:
-    name: sark-redis-data
+  valkey-data:
+    name: sark-valkey-data
   kong-data:
     name: sark-kong-data

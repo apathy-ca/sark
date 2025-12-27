@@ -1038,7 +1038,7 @@ For comprehensive known issues documentation, see **KNOWN_ISSUES.md**. Critical 
 **Workaround**:
 ```bash
 # Increase pool size temporarily
-kubectl set env deployment/sark REDIS_POOL_SIZE=30 -n production
+kubectl set env deployment/sark VALKEY_POOL_SIZE=30 -n production
 
 # Or restart pods to clear stale connections
 kubectl rollout restart deployment/sark -n production
@@ -1257,7 +1257,7 @@ All SARK documentation is located in the `/docs` directory. This comprehensive d
 |----------|---------|----------|
 | **PERFORMANCE_TESTING.md** | Performance testing methodology | QA, performance engineers |
 | **DATABASE_OPTIMIZATION.md** | Database optimization guide | DBAs, engineers |
-| **REDIS_OPTIMIZATION.md** | Redis optimization guide | Ops team, engineers |
+| **VALKEY_OPTIMIZATION.md** | Redis optimization guide | Ops team, engineers |
 
 ### Security and Compliance
 

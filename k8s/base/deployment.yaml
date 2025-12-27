@@ -67,7 +67,7 @@ spec:
           command: ['sh', '-c']
           args:
             - |
-              until nc -z sark-redis 6379; do
+              until nc -z sark-valkey 6379; do
                 echo "Waiting for Redis..."
                 sleep 2
               done

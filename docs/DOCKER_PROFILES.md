@@ -51,11 +51,11 @@ POSTGRES_USER=sark_user
 POSTGRES_PASSWORD=secure_password
 
 # Redis
-REDIS_ENABLED=true
-REDIS_MODE=external
-REDIS_HOST=your-redis-host
-REDIS_PORT=6379
-REDIS_PASSWORD=redis_password
+VALKEY_ENABLED=true
+VALKEY_MODE=external
+VALKEY_HOST=your-redis-host
+VALKEY_PORT=6379
+VALKEY_PASSWORD=redis_password
 ```
 
 **Pros:**
@@ -312,9 +312,9 @@ POSTGRES_USER=sark
 POSTGRES_PASSWORD=change_me_in_production
 
 # Redis (managed)
-REDIS_ENABLED=true
-REDIS_MODE=managed
-REDIS_PASSWORD=  # Empty for development
+VALKEY_ENABLED=true
+VALKEY_MODE=managed
+VALKEY_PASSWORD=  # Empty for development
 ```
 
 ### Minimal Profile with External Services
@@ -334,11 +334,11 @@ POSTGRES_USER=sark_prod
 POSTGRES_PASSWORD=super_secure_password_from_vault
 
 # Redis (external)
-REDIS_ENABLED=true
-REDIS_MODE=external
-REDIS_HOST=redis.example.com
-REDIS_PORT=6379
-REDIS_PASSWORD=redis_secure_password
+VALKEY_ENABLED=true
+VALKEY_MODE=external
+VALKEY_HOST=redis.example.com
+VALKEY_PORT=6379
+VALKEY_PASSWORD=redis_secure_password
 
 # Kong (external)
 KONG_ENABLED=true
@@ -360,7 +360,7 @@ If ports are already in use:
 # Change ports in .env
 SARK_PORT=8001
 POSTGRES_PORT=5433
-REDIS_PORT=6380
+VALKEY_PORT=6380
 ```
 
 ### Services Not Starting

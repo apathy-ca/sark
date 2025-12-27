@@ -949,9 +949,9 @@ docker exec -it redis redis-cli PING
 **From SARK container:**
 ```bash
 docker exec -it sark-app env | grep REDIS
-# REDIS_HOST=redis
-# REDIS_PORT=6379
-# REDIS_PASSWORD=...
+# VALKEY_HOST=redis
+# VALKEY_PORT=6379
+# VALKEY_PASSWORD=...
 
 # Test connection
 docker exec -it sark-app curl http://redis:6379
@@ -1198,9 +1198,9 @@ DB_PASSWORD=...
 DB_NAME=sark
 
 # Redis
-REDIS_HOST=redis
-REDIS_PORT=6379
-REDIS_PASSWORD=...
+VALKEY_HOST=redis
+VALKEY_PORT=6379
+VALKEY_PASSWORD=...
 
 # OPA
 OPA_URL=http://opa:8181
@@ -1220,7 +1220,7 @@ REQUIRED_VARS=(
   "GATEWAY_ENABLED"
   "GATEWAY_URL"
   "DB_HOST"
-  "REDIS_HOST"
+  "VALKEY_HOST"
   "OPA_URL"
   "JWT_SECRET_KEY"
 )

@@ -247,8 +247,8 @@ test_env_configuration() {
 ENVIRONMENT=test
 POSTGRES_ENABLED=true
 POSTGRES_MODE=managed
-REDIS_ENABLED=true
-REDIS_MODE=managed
+VALKEY_ENABLED=true
+VALKEY_MODE=managed
 LOG_LEVEL=DEBUG
 EOF
 

@@ -6,7 +6,7 @@ import logging
 from typing import Any
 import uuid
 
-from redis.asyncio import Redis
+from valkey.asyncio import Redis
 
 from sark.models.session import Session
 

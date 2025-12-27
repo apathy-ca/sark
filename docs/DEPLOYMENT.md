@@ -707,9 +707,9 @@ docker push sarkregistry.azurecr.io/sark:0.1.0
 
 ## Configuration
 
-### Redis Session Store Setup
+### Valkey Session Store Setup
 
-SARK uses Redis for session management (refresh tokens) and policy caching.
+SARK uses Valkey for session management (refresh tokens) and policy caching.
 
 #### Deploy Redis
 
@@ -753,16 +753,16 @@ spec:
     spec:
       containers:
       - name: redis
-        image: redis:7-alpine
+        image: valkey:7-alpine
         ports:
         - containerPort: 6379
         command:
         - redis-server
         - --maxmemory 4gb
         - --maxmemory-policy allkeys-lru
-        - --requirepass $(REDIS_PASSWORD)
+        - --requirepass $(VALKEY_PASSWORD)
         env:
-        - name: REDIS_PASSWORD
+        - name: VALKEY_PASSWORD
           valueFrom:
             secretKeyRef:
               name: sark-secrets
@@ -804,10 +804,10 @@ kubectl create secret generic sark-secrets \
   --namespace production
 
 # Configure connection string
-REDIS_DSN=redis://:your-redis-password@redis:6379/0
+VALKEY_DSN=valkey://:your-redis-password@valkey:6379/0
 ```
 
-#### Redis Configuration for Production
+#### Valkey Configuration for Production
 
 ```bash
 # Memory management
@@ -819,7 +819,7 @@ REDIS_SAVE=""  # Disable RDB snapshots for pure cache
 REDIS_APPENDONLY=no  # Disable AOF
 
 # Connection pooling
-REDIS_POOL_SIZE=50  # Per SARK pod
+VALKEY_POOL_SIZE=50  # Per SARK pod
 REDIS_POOL_TIMEOUT=5  # seconds
 
 # Monitoring
@@ -1069,12 +1069,12 @@ DATABASE_POOL_RECYCLE=3600
 DATABASE_ECHO=false  # Disable SQL logging in production
 ```
 
-#### Redis Configuration
+#### Valkey Configuration
 
 ```bash
 # Connection
-REDIS_DSN=redis://:password@redis:6379/0
-REDIS_POOL_SIZE=50
+VALKEY_DSN=valkey://:password@valkey:6379/0
+VALKEY_POOL_SIZE=50
 REDIS_POOL_TIMEOUT=5
 REDIS_SOCKET_KEEPALIVE=true
 
@@ -1200,7 +1200,7 @@ RATE_LIMIT_ADMIN_BYPASS=true
 
 # Storage backend
 RATE_LIMIT_STORAGE=redis  # redis or memory
-RATE_LIMIT_REDIS_DB=2     # Separate Redis DB for rate limits
+RATE_LIMIT_VALKEY_DB=2     # Separate Valkey DB for rate limits
 
 # Response headers
 RATE_LIMIT_HEADERS_ENABLED=true
@@ -1287,7 +1287,7 @@ annotations:
 For production deployments, follow these optimization guides to ensure optimal performance, security, and reliability:
 
 - **[DATABASE_OPTIMIZATION.md](./DATABASE_OPTIMIZATION.md)** - Database indexing, query tuning, connection pooling
-- **[REDIS_OPTIMIZATION.md](./REDIS_OPTIMIZATION.md)** - Redis connection pooling, cache tuning, memory management
+- **[VALKEY_OPTIMIZATION.md](./VALKEY_OPTIMIZATION.md)** - Valkey connection pooling, cache tuning, memory management
 - **[SECURITY_HARDENING.md](./SECURITY_HARDENING.md)** - Security headers, hardening checklist, production security
 - **[PERFORMANCE_TUNING.md](./PERFORMANCE_TUNING.md)** - Application and infrastructure performance tuning
 
@@ -1609,19 +1609,19 @@ reserve_pool_size = 5
 max_db_connections = 100
 ```
 
-### Redis Connection Pooling
+### Valkey Connection Pooling
 
 **Application configuration**:
 
 ```python
-REDIS_POOL_SIZE=20             # Connections per pod
-REDIS_SOCKET_TIMEOUT=5         # 5 second timeout
-REDIS_SOCKET_CONNECT_TIMEOUT=2 # 2 second connect timeout
-REDIS_HEALTH_CHECK_INTERVAL=30 # Health check every 30s
+VALKEY_POOL_SIZE=20             # Connections per pod
+VALKEY_SOCKET_TIMEOUT=5         # 5 second timeout
+VALKEY_SOCKET_CONNECT_TIMEOUT=2 # 2 second connect timeout
+VALKEY_HEALTH_CHECK_INTERVAL=30 # Health check every 30s
 
 # Total connections = pods × pool_size
 # Example: 4 pods × 20 = 80 connections
-# Redis maxclients: 10000 (default, plenty of headroom)
+# Valkey maxclients: 10000 (default, plenty of headroom)
 ```
 
 ### Database Optimization Checklist
@@ -1655,9 +1655,9 @@ CREATE INDEX idx_sessions_expires ON sessions(expires_at) WHERE expires_at > NOW
 ALTER DATABASE sark SET statement_timeout = '30s';
 ```
 
-### Redis Optimization Checklist
+### Valkey Optimization Checklist
 
-See [REDIS_OPTIMIZATION.md](./REDIS_OPTIMIZATION.md) for complete guide.
+See [VALKEY_OPTIMIZATION.md](./VALKEY_OPTIMIZATION.md) for complete guide.
 
 **Quick Checklist**:
 - [ ] Set maxmemory limit (512MB-2GB recommended)
@@ -1667,10 +1667,10 @@ See [REDIS_OPTIMIZATION.md](./REDIS_OPTIMIZATION.md) for complete guide.
 - [ ] Enable I/O threading for high concurrency (io-threads 4)
 - [ ] Set appropriate TTLs for cached data (5 min - 1 hour)
 - [ ] Monitor memory usage and eviction rate
-- [ ] Configure Redis Sentinel for high availability
+- [ ] Configure Valkey Sentinel for high availability
 - [ ] Use password authentication (requirepass)
 
-**Example Redis configuration**:
+**Example Valkey configuration**:
 ```conf
 maxmemory 1gb
 maxmemory-policy allkeys-lru
@@ -1749,7 +1749,7 @@ spec:
 | CPU Utilization | 50-70% | > 85% |
 | Memory Utilization | 60-80% | > 90% |
 | Database Connections | < 80% max | > 90% max |
-| Redis Memory Usage | < 70% | > 90% |
+| Valkey Memory Usage | < 70% | > 90% |
 | Cache Hit Ratio | > 90% | < 80% |
 | Pod Availability | 100% | < 90% |
 
@@ -1822,7 +1822,7 @@ spec:
 Import these dashboard IDs in Grafana:
 - **Kubernetes Cluster Monitoring**: Dashboard ID 7249
 - **PostgreSQL Database**: Dashboard ID 9628
-- **Redis Dashboard**: Dashboard ID 11835
+- **Valkey Dashboard**: Dashboard ID 11835
 - **NGINX Ingress Controller**: Dashboard ID 9614
 
 ### Log Aggregation

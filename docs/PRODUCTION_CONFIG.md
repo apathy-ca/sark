@@ -70,7 +70,7 @@ python3 -c "import secrets; print('SECRET_KEY=' + secrets.token_urlsafe(48))"
 # Generate database passwords (32 characters)
 python3 -c "import secrets; print('POSTGRES_PASSWORD=' + secrets.token_urlsafe(32))"
 python3 -c "import secrets; print('TIMESCALE_PASSWORD=' + secrets.token_urlsafe(32))"
-python3 -c "import secrets; print('REDIS_PASSWORD=' + secrets.token_urlsafe(32))"
+python3 -c "import secrets; print('VALKEY_PASSWORD=' + secrets.token_urlsafe(32))"
 ```
 
 ### 3. Validate Configuration
@@ -757,7 +757,7 @@ TIMESCALE_DB=sark_audit_production
 
 In-memory cache for performance optimization.
 
-#### `REDIS_HOST`
+#### `VALKEY_HOST`
 
 **Type:** String (hostname/IP)
 **Default:** `localhost`
@@ -765,14 +765,14 @@ In-memory cache for performance optimization.
 
 **Examples:**
 ```bash
-REDIS_HOST=localhost
-REDIS_HOST=redis.example.com
-REDIS_HOST=redis-master.cache.svc.cluster.local
+VALKEY_HOST=localhost
+VALKEY_HOST=redis.example.com
+VALKEY_HOST=redis-master.cache.svc.cluster.local
 ```
 
 ---
 
-#### `REDIS_PORT`
+#### `VALKEY_PORT`
 
 **Type:** Integer
 **Default:** `6379`
@@ -780,12 +780,12 @@ REDIS_HOST=redis-master.cache.svc.cluster.local
 
 **Examples:**
 ```bash
-REDIS_PORT=6379
+VALKEY_PORT=6379
 ```
 
 ---
 
-#### `REDIS_PASSWORD`
+#### `VALKEY_PASSWORD`
 
 **Type:** String
 **Default:** None (empty)
@@ -801,15 +801,15 @@ python3 -c "import secrets; print(secrets.token_urlsafe(32))"
 **Examples:**
 ```bash
 # Production (required)
-REDIS_PASSWORD=secure-random-password-here
+VALKEY_PASSWORD=secure-random-password-here
 
 # Development (unauthenticated)
-REDIS_PASSWORD=
+VALKEY_PASSWORD=
 ```
 
 ---
 
-#### `REDIS_DB`
+#### `VALKEY_DB`
 
 **Type:** Integer
 **Default:** `0`
@@ -820,17 +820,17 @@ REDIS_PASSWORD=
 **Examples:**
 ```bash
 # Default database
-REDIS_DB=0
+VALKEY_DB=0
 
 # Separate database per environment
-REDIS_DB=0  # production
-REDIS_DB=1  # staging
-REDIS_DB=2  # development
+VALKEY_DB=0  # production
+VALKEY_DB=1  # staging
+VALKEY_DB=2  # development
 ```
 
 ---
 
-#### `REDIS_POOL_SIZE`
+#### `VALKEY_POOL_SIZE`
 
 **Type:** Integer
 **Default:** `50`
@@ -845,8 +845,8 @@ REDIS_DB=2  # development
 
 **Examples:**
 ```bash
-REDIS_POOL_SIZE=50
-REDIS_POOL_SIZE=100
+VALKEY_POOL_SIZE=50
+VALKEY_POOL_SIZE=100
 ```
 
 ---
@@ -1386,7 +1386,7 @@ ENVIRONMENT=production
 API_WORKERS=9
 POSTGRES_POOL_SIZE=10
 POSTGRES_MAX_OVERFLOW=5
-REDIS_POOL_SIZE=50
+VALKEY_POOL_SIZE=50
 SPLUNK_ENABLED=true
 SPLUNK_BATCH_SIZE=100
 ```
@@ -1400,7 +1400,7 @@ ENVIRONMENT=production
 API_WORKERS=17
 POSTGRES_POOL_SIZE=20
 POSTGRES_MAX_OVERFLOW=10
-REDIS_POOL_SIZE=100
+VALKEY_POOL_SIZE=100
 SPLUNK_ENABLED=true
 SPLUNK_BATCH_SIZE=500
 DATADOG_ENABLED=true
@@ -1415,7 +1415,7 @@ DATADOG_BATCH_SIZE=500
 ENVIRONMENT=production
 API_WORKERS=4  # per pod
 POSTGRES_HOST=postgres-service.database.svc.cluster.local
-REDIS_HOST=redis-service.cache.svc.cluster.local
+VALKEY_HOST=redis-service.cache.svc.cluster.local
 KAFKA_ENABLED=true
 KAFKA_BOOTSTRAP_SERVERS=kafka-0.kafka:9092,kafka-1.kafka:9092,kafka-2.kafka:9092
 DISCOVERY_K8S_ENABLED=true
@@ -1531,7 +1531,7 @@ DATADOG_ENABLED=true
 **Solutions:**
 1. Reduce `API_WORKERS`
 2. Reduce `POSTGRES_POOL_SIZE` and `POSTGRES_MAX_OVERFLOW`
-3. Reduce `REDIS_POOL_SIZE`
+3. Reduce `VALKEY_POOL_SIZE`
 4. Monitor memory per worker
 5. Consider horizontal scaling instead of vertical
 

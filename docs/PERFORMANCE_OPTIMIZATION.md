@@ -81,7 +81,7 @@ print(f"Checked in: {pool.checkedin()}")
 
 Redis uses asyncio connection pooling with the following optimizations:
 
-- **Max Connections**: 50 (configurable via `REDIS_POOL_SIZE`)
+- **Max Connections**: 50 (configurable via `VALKEY_POOL_SIZE`)
 - **Socket Timeout**: 5 seconds
 - **Socket Keepalive**: Enabled
 - **Health Check Interval**: 30 seconds
@@ -383,10 +383,10 @@ export POSTGRES_POOL_RECYCLE=3600
 export POSTGRES_POOL_PRE_PING=true
 
 # Redis Connection Pool
-export REDIS_POOL_SIZE=50
-export REDIS_SOCKET_TIMEOUT=5
+export VALKEY_POOL_SIZE=50
+export VALKEY_SOCKET_TIMEOUT=5
 export REDIS_SOCKET_KEEPALIVE=true
-export REDIS_HEALTH_CHECK_INTERVAL=30
+export VALKEY_HEALTH_CHECK_INTERVAL=30
 
 # HTTP Connection Pool
 export HTTP_POOL_CONNECTIONS=100
@@ -408,7 +408,7 @@ export CACHE_SERVER_DETAIL_TTL=300
 # Increase connection pools
 export POSTGRES_POOL_SIZE=50
 export POSTGRES_MAX_OVERFLOW=20
-export REDIS_POOL_SIZE=100
+export VALKEY_POOL_SIZE=100
 export HTTP_POOL_CONNECTIONS=200
 
 # Aggressive caching
@@ -422,7 +422,7 @@ export CACHE_SERVER_DETAIL_TTL=600
 # Smaller pools, faster recycling
 export POSTGRES_POOL_SIZE=10
 export POSTGRES_POOL_RECYCLE=1800
-export REDIS_SOCKET_TIMEOUT=2
+export VALKEY_SOCKET_TIMEOUT=2
 
 # Shorter cache TTLs for freshness
 export CACHE_SERVER_LIST_TTL=15
@@ -528,8 +528,8 @@ WHERE state != 'idle' AND now() - pg_stat_activity.query_start > interval '5 min
 
 **Solutions**:
 1. Verify Redis is running: `redis-cli ping`
-2. Check pool size: `REDIS_POOL_SIZE=100`
-3. Increase timeout: `REDIS_SOCKET_TIMEOUT=10`
+2. Check pool size: `VALKEY_POOL_SIZE=100`
+3. Increase timeout: `VALKEY_SOCKET_TIMEOUT=10`
 4. Check network connectivity
 
 ### Slow Queries

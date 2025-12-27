@@ -203,7 +203,7 @@ lsof -i :8000
 # Change ports in .env file
 SARK_PORT=8001
 POSTGRES_PORT=5433
-REDIS_PORT=6380
+VALKEY_PORT=6380
 ```
 
 #### Permission Issues

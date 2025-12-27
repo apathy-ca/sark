@@ -177,21 +177,21 @@ main() {
 
     # Redis checks
     log_section "Redis Configuration"
-    check_env_var "REDIS_ENABLED" true "Redis enabled" || true
-    check_env_var "REDIS_MODE" true "Redis mode" || true
+    check_env_var "VALKEY_ENABLED" true "Valkey enabled" || true
+    check_env_var "VALKEY_MODE" true "Valkey mode" || true
 
-    if [ "${REDIS_MODE:-}" = "managed" ]; then
-        log_error "Redis mode is 'managed' - production should use external managed cache"
-    elif [ "${REDIS_MODE:-}" = "external" ]; then
-        log_success "Redis mode is 'external' (recommended for production)"
-        check_env_var "REDIS_HOST" true "Redis host" || true
-        check_env_var "REDIS_PORT" true "Redis port" || true
-        check_env_var "REDIS_PASSWORD" false "Redis password" || true
+    if [ "${VALKEY_MODE:-}" = "managed" ]; then
+        log_error "Valkey mode is 'managed' - production should use external managed cache"
+    elif [ "${VALKEY_MODE:-}" = "external" ]; then
+        log_success "Valkey mode is 'external' (recommended for production)"
+        check_env_var "VALKEY_HOST" true "Valkey host" || true
+        check_env_var "VALKEY_PORT" true "Valkey port" || true
+        check_env_var "VALKEY_PASSWORD" false "Valkey password" || true
 
-        if [ -n "${REDIS_PASSWORD:-}" ]; then
-            check_password_strength "REDIS_PASSWORD" "Redis password" || true
+        if [ -n "${VALKEY_PASSWORD:-}" ]; then
+            check_password_strength "VALKEY_PASSWORD" "Valkey password" || true
         else
-            log_warning "Redis password is not set (recommended for production)"
+            log_warning "Valkey password is not set (recommended for production)"
         fi
     fi
 

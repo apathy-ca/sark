@@ -1,4 +1,4 @@
-# Redis Optimization Guide
+# Valkey Optimization Guide
 
 **Document Version**: 1.0
 **Last Updated**: November 22, 2025
@@ -9,7 +9,7 @@
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [Redis Architecture in SARK](#redis-architecture-in-sark)
+2. [Valkey Architecture in SARK](#redis-architecture-in-sark)
 3. [Connection Pooling](#connection-pooling)
 4. [Cache Optimization](#cache-optimization)
 5. [Memory Management](#memory-management)
@@ -24,7 +24,7 @@
 
 ## Overview
 
-SARK uses Redis for multiple critical functions:
+SARK uses Valkey for multiple critical functions:
 - **Session Storage**: User sessions and JWT token tracking
 - **Policy Decision Caching**: OPA policy evaluation results
 - **Rate Limiting**: Request rate tracking and enforcement
@@ -45,13 +45,13 @@ SARK uses Redis for multiple critical functions:
 
 ---
 
-## Redis Architecture in SARK
+## Valkey Architecture in SARK
 
 ### Data Structure Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                         Redis Keyspace                           │
+│                         Valkey Keyspace                           │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                   │
 │  Database 0 (Default)                                            │
@@ -117,7 +117,7 @@ Memory Per Data Type:
 - SIEM Event (List): ~1 KB × 10,000 = 10 MB
 - Total Data: ~25-30 MB
 
-Redis Overhead (40%): ~12 MB
+Valkey Overhead (40%): ~12 MB
 Total Memory: ~40-50 MB (typical)
 Recommended Memory Limit: 512 MB (10× headroom)
 ```
@@ -130,7 +130,7 @@ Recommended Memory Limit: 512 MB (10× headroom)
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                  Redis Connection Pool Architecture              │
+│                  Valkey Connection Pool Architecture              │
 └─────────────────────────────────────────────────────────────────┘
 
          Application Servers (4 pods × 20 connections = 80)
@@ -143,13 +143,13 @@ Recommended Memory Limit: 512 MB (10× headroom)
                          │        │                  │
                          ▼        ▼                  ▼
                     ┌────────────────────────────────────┐
-                    │         Redis Server               │
+                    │         Valkey Server               │
                     │         maxclients = 10000         │
                     │         Used: ~100 (1%)            │
                     └────────────────────────────────────┘
 ```
 
-### Python Redis Connection Pool (redis-py)
+### Python Valkey Connection Pool (redis-py)
 
 **Configuration** (`src/sark/cache.py`):
 ```python
@@ -157,16 +157,16 @@ import redis
 from redis.connection import ConnectionPool
 import os
 
-# Redis connection URL
-REDIS_URL = os.getenv("REDIS_URL", "redis://redis:6379/0")
-REDIS_PASSWORD = os.getenv("REDIS_PASSWORD")
+# Valkey connection URL
+VALKEY_URL = os.getenv("VALKEY_URL", "valkey://valkey:6379/0")
+VALKEY_PASSWORD = os.getenv("VALKEY_PASSWORD")
 
 # Create connection pool
 redis_pool = ConnectionPool(
     host="redis",
     port=6379,
     db=0,
-    password=REDIS_PASSWORD,
+    password=VALKEY_PASSWORD,
     max_connections=20,          # Maximum connections in pool
     socket_timeout=5,            # Socket timeout (5 seconds)
     socket_connect_timeout=2,    # Connection timeout (2 seconds)
@@ -181,30 +181,30 @@ redis_pool = ConnectionPool(
     decode_responses=True        # Auto-decode bytes to strings
 )
 
-# Create Redis client
+# Create Valkey client
 redis_client = redis.Redis(connection_pool=redis_pool)
 
 # Test connection
 try:
     redis_client.ping()
-    print("✓ Redis connection successful")
+    print("✓ Valkey connection successful")
 except redis.ConnectionError as e:
-    print(f"✗ Redis connection failed: {e}")
+    print(f"✗ Valkey connection failed: {e}")
 ```
 
 **Environment Variables**:
 ```bash
-# Redis connection
-REDIS_URL=redis://redis:6379/0
-REDIS_PASSWORD=your-secure-password-here
-REDIS_POOL_SIZE=20
-REDIS_SOCKET_TIMEOUT=5
-REDIS_SOCKET_CONNECT_TIMEOUT=2
-REDIS_HEALTH_CHECK_INTERVAL=30
+# Valkey connection
+VALKEY_URL=valkey://valkey:6379/0
+VALKEY_PASSWORD=your-secure-password-here
+VALKEY_POOL_SIZE=20
+VALKEY_SOCKET_TIMEOUT=5
+VALKEY_SOCKET_CONNECT_TIMEOUT=2
+VALKEY_HEALTH_CHECK_INTERVAL=30
 
-# Redis Sentinel (HA setup)
-REDIS_SENTINEL_HOSTS=sentinel1:26379,sentinel2:26379,sentinel3:26379
-REDIS_SENTINEL_MASTER=mymaster
+# Valkey Sentinel (HA setup)
+VALKEY_SENTINEL_HOSTS=sentinel1:26379,sentinel2:26379,sentinel3:26379
+VALKEY_SENTINEL_MASTER=mymaster
 ```
 
 ### Connection Pool Sizing
@@ -218,13 +218,13 @@ Example:
 - Pool Size per Pod: 20
 - Total Connections: 80
 
-Redis maxclients: 10000 (default)
+Valkey maxclients: 10000 (default)
 Utilization: 80 / 10000 = 0.8%
 ```
 
 **Recommended Sizing by Workload**:
 
-| Workload Type | Pool Size | Total (4 pods) | Redis maxclients |
+| Workload Type | Pool Size | Total (4 pods) | Valkey maxclients |
 |---------------|-----------|----------------|------------------|
 | **Low** (< 100 req/s) | 10 | 40 | 1000 |
 | **Medium** (100-500 req/s) | 20 | 80 | 10000 (default) |
@@ -246,7 +246,7 @@ utilization = (redis_pool._created_connections - redis_pool._available_connectio
 print(f"Pool utilization: {utilization:.2f}%")
 ```
 
-**Redis Server Connection Stats**:
+**Valkey Server Connection Stats**:
 ```bash
 # Check current connections
 redis-cli INFO clients
@@ -270,7 +270,7 @@ redis-cli CONFIG SET maxclients 10000
 
 ### Cache Strategy
 
-SARK uses Redis caching for OPA policy evaluation results to reduce latency from ~50ms (OPA call) to <5ms (Redis cache hit).
+SARK uses Valkey caching for OPA policy evaluation results to reduce latency from ~50ms (OPA call) to <5ms (Valkey cache hit).
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -439,7 +439,7 @@ invalidate_policy_cache("server_access_policy")
 def invalidate_user_cache(user_id: str) -> int:
     """Invalidate all cached decisions for a user."""
     # Since we hash the entire input, we need to track user keys separately
-    # Option 1: Use Redis Sets to track keys per user
+    # Option 1: Use Valkey Sets to track keys per user
     # Option 2: Use key prefix with user_id (less efficient for lookups)
 
     # For simplicity, use pattern matching (less efficient)
@@ -596,15 +596,15 @@ maxclients 10000
 **Docker Compose**:
 ```yaml
 services:
-  redis:
-    image: redis:7-alpine
+  valkey:
+    image: valkey:7-alpine
     command: >
       redis-server
       --maxmemory 512mb
       --maxmemory-policy allkeys-lru
       --save ""
       --appendonly no
-      --requirepass ${REDIS_PASSWORD}
+      --requirepass ${VALKEY_PASSWORD}
     ports:
       - "6379:6379"
     volumes:
@@ -737,7 +737,7 @@ redis-cli --scan --pattern "session:*" | wc -l
 **Python Script for Memory Analysis**:
 ```python
 def analyze_memory():
-    """Analyze Redis memory usage by key pattern."""
+    """Analyze Valkey memory usage by key pattern."""
     info = redis_client.info("memory")
 
     print(f"Used Memory: {info['used_memory_human']}")
@@ -838,7 +838,7 @@ auto-aof-rewrite-min-size 64mb
 
 ### Recommended Configuration for SARK
 
-Since SARK uses Redis primarily for caching (sessions, policy decisions, rate limits), **no persistence** is recommended for optimal performance. Data can be rebuilt on restart:
+Since SARK uses Valkey primarily for caching (sessions, policy decisions, rate limits), **no persistence** is recommended for optimal performance. Data can be rebuilt on restart:
 
 - **Sessions**: Users re-authenticate
 - **Policy Cache**: Rebuilds on first evaluation
@@ -855,7 +855,7 @@ appendfsync everysec
 
 ## Performance Tuning
 
-### Redis Server Configuration
+### Valkey Server Configuration
 
 ```conf
 # ===========================
@@ -869,7 +869,7 @@ tcp-backlog 511
 # tcp-nodelay no
 
 # ===========================
-# Threading (Redis 6+)
+# Threading (Valkey 6+)
 # ===========================
 
 # I/O threads (for handling network I/O)
@@ -997,12 +997,12 @@ redis_client.zadd("leaderboard", {"user-1": 100, "user-2": 200})
 
 ## High Availability
 
-### Redis Sentinel (Recommended for Production)
+### Valkey Sentinel (Recommended for Production)
 
 **Architecture**:
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                     Redis Sentinel Architecture                  │
+│                     Valkey Sentinel Architecture                  │
 └─────────────────────────────────────────────────────────────────┘
 
                       ┌──────────────┐
@@ -1020,7 +1020,7 @@ redis_client.zadd("leaderboard", {"user-1": 100, "user-2": 200})
          └────────┬──────────┘
                   │
          ┌────────▼─────────┐
-         │   Redis Master   │
+         │   Valkey Master   │
          │   (Read/Write)   │
          └────────┬─────────┘
                   │
@@ -1058,25 +1058,25 @@ sentinel parallel-syncs mymaster 1
 ```yaml
 services:
   redis-master:
-    image: redis:7-alpine
+    image: valkey:7-alpine
     command: redis-server --requirepass password --masterauth password
     ports:
       - "6379:6379"
 
   redis-replica-1:
-    image: redis:7-alpine
+    image: valkey:7-alpine
     command: redis-server --replicaof redis-master 6379 --requirepass password --masterauth password
     depends_on:
       - redis-master
 
   redis-replica-2:
-    image: redis:7-alpine
+    image: valkey:7-alpine
     command: redis-server --replicaof redis-master 6379 --requirepass password --masterauth password
     depends_on:
       - redis-master
 
   sentinel-1:
-    image: redis:7-alpine
+    image: valkey:7-alpine
     command: redis-sentinel /etc/sentinel.conf
     volumes:
       - ./sentinel.conf:/etc/sentinel.conf
@@ -1084,7 +1084,7 @@ services:
       - redis-master
 
   sentinel-2:
-    image: redis:7-alpine
+    image: valkey:7-alpine
     command: redis-sentinel /etc/sentinel.conf
     volumes:
       - ./sentinel.conf:/etc/sentinel.conf
@@ -1092,7 +1092,7 @@ services:
       - redis-master
 
   sentinel-3:
-    image: redis:7-alpine
+    image: valkey:7-alpine
     command: redis-sentinel /etc/sentinel.conf
     volumes:
       - ./sentinel.conf:/etc/sentinel.conf
@@ -1189,7 +1189,7 @@ redis-cli INFO stats | grep keyspace
 **Python Monitoring Script**:
 ```python
 def get_cache_stats():
-    """Get Redis cache statistics."""
+    """Get Valkey cache statistics."""
     info = redis_client.info("stats")
 
     hits = info["keyspace_hits"]
@@ -1216,13 +1216,13 @@ def get_cache_stats():
 
 ### Prometheus Metrics
 
-**Redis Exporter** (`docker-compose.yml`):
+**Valkey Exporter** (`docker-compose.yml`):
 ```yaml
 redis-exporter:
   image: oliver006/redis_exporter:latest
   environment:
-    REDIS_ADDR: "redis:6379"
-    REDIS_PASSWORD: "${REDIS_PASSWORD}"
+    VALKEY_ADDR: "valkey:6379"
+    VALKEY_PASSWORD: "${VALKEY_PASSWORD}"
   ports:
     - "9121:9121"
 ```
@@ -1245,7 +1245,7 @@ rate(redis_commands_processed_total[1m])
 rate(redis_evicted_keys_total[5m])
 ```
 
-**Grafana Dashboard**: Use dashboard ID 11835 (Redis Dashboard for Prometheus Redis Exporter)
+**Grafana Dashboard**: Use dashboard ID 11835 (Valkey Dashboard for Prometheus Valkey Exporter)
 
 ---
 
@@ -1344,7 +1344,7 @@ redis-cli MONITOR
 
 ### Production Best Practices
 
-1. **Use Redis Sentinel** for high availability
+1. **Use Valkey Sentinel** for high availability
 2. **Set maxmemory** and eviction policy
 3. **Disable persistence** for pure cache (better performance)
 4. **Enable I/O threading** for high concurrency
@@ -1359,13 +1359,13 @@ redis-cli MONITOR
 
 ## Summary
 
-This guide covers comprehensive Redis optimization for SARK:
+This guide covers comprehensive Valkey optimization for SARK:
 
 - **Connection Pooling**: Proper pool sizing, health checks, Sentinel support
 - **Cache Optimization**: Smart TTL strategy, efficient invalidation, cache warming
 - **Memory Management**: Eviction policies, data structure optimization, memory monitoring
 - **Performance Tuning**: Pipelining, Lua scripts, I/O threading
-- **High Availability**: Redis Sentinel for automatic failover
+- **High Availability**: Valkey Sentinel for automatic failover
 - **Monitoring**: Key metrics, Prometheus integration, troubleshooting
 
-Following these practices ensures SARK's Redis cache performs optimally with high availability and minimal latency.
+Following these practices ensures SARK's Valkey cache performs optimally with high availability and minimal latency.

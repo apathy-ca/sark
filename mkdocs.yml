@@ -128,7 +128,7 @@ nav:
   - Database:
     - Database Migrations: DATABASE_MIGRATIONS.md
     - Database Optimization: DATABASE_OPTIMIZATION.md
-    - Redis Optimization: REDIS_OPTIMIZATION.md
+    - Valkey Optimization: VALKEY_OPTIMIZATION.md
   - Performance:
     - Performance Testing: PERFORMANCE_TESTING.md
     - Performance Tuning: PERFORMANCE_TUNING.md
@@ -144,6 +144,9 @@ nav:
     - Development Log: DEVELOPMENT_LOG.md
     - Testing Strategy: TESTING_STRATEGY.md
     - Integration Testing: INTEGRATION_TESTING.md
+  - v1.3.0 Release:
+    - Release Notes: v1.3.0/RELEASE_NOTES.md
+    - Migration Guide: v1.3.0/MIGRATION_GUIDE.md
   - Reports:
     - Executive Summary: EXECUTIVE_SUMMARY.md
     - Roadmap: ROADMAP.md

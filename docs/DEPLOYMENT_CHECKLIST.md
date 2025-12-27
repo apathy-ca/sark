@@ -161,7 +161,7 @@ Complete all steps in this section **before** deploying to production.
   - [ ] `SECRET_KEY` (JWT signing key, 48+ chars)
   - [ ] `POSTGRES_PASSWORD`
   - [ ] `TIMESCALE_PASSWORD`
-  - [ ] `REDIS_PASSWORD`
+  - [ ] `VALKEY_PASSWORD`
   - [ ] `SPLUNK_HEC_TOKEN` or `DATADOG_API_KEY`
   - [ ] `CONSUL_TOKEN` (if using Consul ACLs)
   - [ ] `VAULT_TOKEN` (if using Vault)
@@ -204,8 +204,8 @@ Complete all steps in this section **before** deploying to production.
   - [ ] `TIMESCALE_DB=sark_audit`
 
   **Redis:**
-  - [ ] `REDIS_HOST=<redis-server>`
-  - [ ] `REDIS_PASSWORD=<secure-password>`
+  - [ ] `VALKEY_HOST=<redis-server>`
+  - [ ] `VALKEY_PASSWORD=<secure-password>`
 
   **SIEM (Splunk or Datadog):**
   - [ ] `SPLUNK_ENABLED=true` (or `DATADOG_ENABLED=true`)
@@ -234,7 +234,7 @@ Complete all steps in this section **before** deploying to production.
   - [ ] `SECRET_KEY` (not default)
   - [ ] `POSTGRES_PASSWORD` (not `sark`)
   - [ ] `TIMESCALE_PASSWORD` (not `sark`)
-  - [ ] `REDIS_PASSWORD` (not empty)
+  - [ ] `VALKEY_PASSWORD` (not empty)
 
 - [ ] **Verify security settings**
   - [ ] `DEBUG=false`

@@ -49,9 +49,9 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 
       # Redis
-      - REDIS_HOST=sark-redis
-      - REDIS_PORT=6379
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - VALKEY_HOST=sark-redis
+      - VALKEY_PORT=6379
+      - VALKEY_PASSWORD=${VALKEY_PASSWORD}
 
       # Security
       - SECRET_KEY=${SECRET_KEY}
@@ -173,29 +173,29 @@ services:
       - no-new-privileges:true
 
   # ===========================================================================
-  # Redis Cache and Session Store
+  # Valkey Cache and Session Store
   # ===========================================================================
   sark-redis:
-    image: redis:7-alpine
+    image: valkey/valkey:7-alpine
     container_name: sark-redis
     restart: unless-stopped
     command: >
-      redis-server
+      valkey-server
       --appendonly yes
-      --requirepass ${REDIS_PASSWORD}
+      --requirepass ${VALKEY_PASSWORD}
       --maxmemory 512mb
       --maxmemory-policy allkeys-lru
       --save 900 1
       --save 300 10
       --save 60 10000
     volumes:
-      - redis-data:/data
+      - valkey-data:/data
     ports:
-      - "${REDIS_PORT:-6379}:6379"
+      - "${VALKEY_PORT:-6379}:6379"
     networks:
       - sark-backend
     healthcheck:
-      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD}", "ping"]
+      test: ["CMD", "valkey-cli", "--no-auth-warning", "-a", "${VALKEY_PASSWORD}", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -386,8 +386,8 @@ volumes:
   postgres-data:
     name: sark-postgres-data
     driver: local
-  redis-data:
-    name: sark-redis-data
+  valkey-data:
+    name: sark-valkey-data
     driver: local
   kong-data:
     name: sark-kong-data

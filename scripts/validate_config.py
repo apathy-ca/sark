@@ -540,25 +540,25 @@ class ConfigValidator:
 
         environment = self.get_var("ENVIRONMENT", "development")
 
-        # Redis password required in production
+        # Valkey password required in production
         if environment == "production":
-            password = self.get_var("REDIS_PASSWORD")
+            password = self.get_var("VALKEY_PASSWORD")
             if not password:
                 self.result.add_issue(
                     Severity.WARNING,
                     category,
-                    "REDIS_PASSWORD",
-                    "Redis password not set in production",
-                    "Set a strong Redis password for production security",
+                    "VALKEY_PASSWORD",
+                    "Valkey password not set in production",
+                    "Set a strong Valkey password for production security",
                 )
 
         # Pool size
-        pool_size = self.get_int("REDIS_POOL_SIZE", 50)
+        pool_size = self.get_int("VALKEY_POOL_SIZE", 50)
         if pool_size and pool_size > 500:
             self.result.add_issue(
                 Severity.WARNING,
                 category,
-                "REDIS_POOL_SIZE",
+                "VALKEY_POOL_SIZE",
                 f"Very large Redis connection pool ({pool_size})",
                 "Typical range: 50-200 connections",
             )

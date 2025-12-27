@@ -1,0 +1,48 @@
+{
+  "project": {
+    "name": "sark",
+    "slug": "sark",
+    "repository": "/home/jhenry/Source/sark",
+    "orchestration_dir": ".czarina"
+  },
+  "workers": [
+    {
+      "id": "auth-policy",
+      "agent": "aider",
+      "branch": "feat/tests-auth-policy",
+      "description": "Workstream 1: Auth & Policy tests (20 modules)"
+    },
+    {
+      "id": "discovery-federation",
+      "agent": "aider",
+      "branch": "feat/tests-discovery-federation",
+      "description": "Workstream 2: Discovery & Federation tests (15 modules)"
+    },
+    {
+      "id": "gateway-adapters",
+      "agent": "aider",
+      "branch": "feat/tests-gateway-adapters",
+      "description": "Workstream 3: Gateway & Adapters tests (12 modules)"
+    },
+    {
+      "id": "services-api",
+      "agent": "aider",
+      "branch": "feat/tests-services-api",
+      "description": "Workstream 4: Services & API tests (18 modules)"
+    },
+    {
+      "id": "e2e-integration",
+      "agent": "aider",
+      "branch": "feat/tests-e2e-integration",
+      "description": "Workstream 5: E2E & Integration tests (10 modules)"
+    }
+  ],
+  "daemon": {
+    "enabled": true,
+    "auto_approve": [
+      "read",
+      "write",
+      "commit"
+    ]
+  }
+}

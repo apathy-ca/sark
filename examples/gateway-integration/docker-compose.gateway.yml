@@ -22,17 +22,17 @@ services:
     networks:
       - sark-network
 
-  # Redis Cache
+  # Valkey Cache
   redis:
-    image: redis:7-alpine
+    image: valkey/valkey:7-alpine
     container_name: sark-redis
-    command: redis-server --requirepass ${REDIS_PASSWORD:-redis_password}
+    command: valkey-server --requirepass ${VALKEY_PASSWORD:-redis_password}
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "valkey-cli", "ping"]
       interval: 10s
       timeout: 3s
       retries: 5
@@ -81,8 +81,8 @@ services:
       # Database Configuration
       DATABASE_URL: postgresql://sark:${POSTGRES_PASSWORD:-sark_password}@postgres:5432/sark
 
-      # Redis Configuration
-      REDIS_URL: redis://:${REDIS_PASSWORD:-redis_password}@redis:6379/0
+      # Valkey Configuration
+      VALKEY_URL: redis://:${VALKEY_PASSWORD:-redis_password}@redis:6379/0
 
       # OPA Configuration
       OPA_URL: http://opa:8181

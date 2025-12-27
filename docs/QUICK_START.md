@@ -83,8 +83,8 @@ JWT_SECRET_KEY=dev-secret-change-in-production
 JWT_EXPIRATION_MINUTES=60
 REFRESH_TOKEN_EXPIRATION_DAYS=7
 
-# Redis (Session Store)
-REDIS_DSN=redis://:password@redis:6379/0
+# Valkey (Session Store)
+VALKEY_DSN=valkey://:password@valkey:6379/0
 
 # LDAP (Optional - for LDAP authentication)
 LDAP_ENABLED=true
@@ -857,14 +857,14 @@ docker compose exec opa opa test /policies -v
 docker compose logs opa
 ```
 
-#### 4. Redis Connection Issues
+#### 4. Valkey Connection Issues
 
 ```bash
 # Check Redis
 docker compose exec redis redis-cli ping
 # Should respond: PONG
 
-# Test Redis connection
+# Test Valkey connection
 docker compose exec redis redis-cli
 127.0.0.1:6379> AUTH password
 127.0.0.1:6379> PING

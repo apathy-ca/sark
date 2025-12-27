@@ -126,8 +126,8 @@ Edit `.env` and set the mode for each service:
 # Example: Use all managed services (development)
 POSTGRES_ENABLED=true
 POSTGRES_MODE=managed
-REDIS_ENABLED=true
-REDIS_MODE=managed
+VALKEY_ENABLED=true
+VALKEY_MODE=managed
 KONG_ENABLED=true
 KONG_MODE=managed
 ```
@@ -432,11 +432,11 @@ For external Redis, gather:
 
 ```bash
 # .env
-REDIS_ENABLED=true
-REDIS_MODE=managed
-REDIS_HOST=cache
-REDIS_PORT=6379
-REDIS_PASSWORD=your_redis_password
+VALKEY_ENABLED=true
+VALKEY_MODE=managed
+VALKEY_HOST=cache
+VALKEY_PORT=6379
+VALKEY_PASSWORD=your_redis_password
 ```
 
 Start Redis:
@@ -449,18 +449,18 @@ docker-compose --profile managed up -d
 
 ```bash
 # .env
-REDIS_ENABLED=true
-REDIS_MODE=external
+VALKEY_ENABLED=true
+VALKEY_MODE=external
 
 # Connection details
-REDIS_HOST=redis.example.com
-REDIS_PORT=6379
-REDIS_DB=0
-REDIS_PASSWORD=your_redis_password_here
+VALKEY_HOST=redis.example.com
+VALKEY_PORT=6379
+VALKEY_DB=0
+VALKEY_PASSWORD=your_redis_password_here
 
 # Advanced settings
-REDIS_MAX_CONNECTIONS=100
-REDIS_SSL=true
+VALKEY_MAX_CONNECTIONS=100
+VALKEY_SSL=true
 ```
 
 #### External Redis Sentinel (High Availability)
@@ -469,19 +469,19 @@ For production deployments with Redis Sentinel:
 
 ```bash
 # .env
-REDIS_ENABLED=true
-REDIS_MODE=external
+VALKEY_ENABLED=true
+VALKEY_MODE=external
 
 # Sentinel configuration
-REDIS_SENTINEL_ENABLED=true
-REDIS_SENTINEL_SERVICE_NAME=mymaster
-REDIS_SENTINEL_HOSTS=sentinel1.example.com:26379,sentinel2.example.com:26379,sentinel3.example.com:26379
+VALKEY_SENTINEL_ENABLED=true
+VALKEY_SENTINEL_SERVICE_NAME=mymaster
+VALKEY_SENTINEL_HOSTS=sentinel1.example.com:26379,sentinel2.example.com:26379,sentinel3.example.com:26379
 
 # Authentication and SSL
-REDIS_PASSWORD=your_redis_password_here
-REDIS_SSL=true
-REDIS_DB=0
-REDIS_MAX_CONNECTIONS=100
+VALKEY_PASSWORD=your_redis_password_here
+VALKEY_SSL=true
+VALKEY_DB=0
+VALKEY_MAX_CONNECTIONS=100
 ```
 
 ### Usage in Code
@@ -558,17 +558,17 @@ All configuration is done via environment variables in the `.env` file.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `REDIS_ENABLED` | `false` | Enable Redis |
-| `REDIS_MODE` | `managed` | `managed` or `external` |
-| `REDIS_HOST` | `cache` | Redis hostname |
-| `REDIS_PORT` | `6379` | Redis port |
-| `REDIS_DB` | `0` | Redis database number |
-| `REDIS_PASSWORD` | `` | Redis password |
-| `REDIS_MAX_CONNECTIONS` | `50` | Max connections |
-| `REDIS_SSL` | `false` | Enable SSL |
-| `REDIS_SENTINEL_ENABLED` | `false` | Use Redis Sentinel |
-| `REDIS_SENTINEL_SERVICE_NAME` | `` | Sentinel service name |
-| `REDIS_SENTINEL_HOSTS` | `` | Sentinel hosts |
+| `VALKEY_ENABLED` | `false` | Enable Redis |
+| `VALKEY_MODE` | `managed` | `managed` or `external` |
+| `VALKEY_HOST` | `cache` | Redis hostname |
+| `VALKEY_PORT` | `6379` | Redis port |
+| `VALKEY_DB` | `0` | Redis database number |
+| `VALKEY_PASSWORD` | `` | Redis password |
+| `VALKEY_MAX_CONNECTIONS` | `50` | Max connections |
+| `VALKEY_SSL` | `false` | Enable SSL |
+| `VALKEY_SENTINEL_ENABLED` | `false` | Use Redis Sentinel |
+| `VALKEY_SENTINEL_SERVICE_NAME` | `` | Sentinel service name |
+| `VALKEY_SENTINEL_HOSTS` | `` | Sentinel hosts |
 
 #### Kong Settings
 
@@ -624,9 +624,9 @@ POSTGRES_POOL_SIZE=20  # Adjust based on load
 
 ```bash
 # Production Redis configuration
-REDIS_PASSWORD=<strong-password-from-secrets-manager>
-REDIS_SSL=true
-REDIS_MAX_CONNECTIONS=100
+VALKEY_PASSWORD=<strong-password-from-secrets-manager>
+VALKEY_SSL=true
+VALKEY_MAX_CONNECTIONS=100
 ```
 
 ### 5. Kong Security
@@ -713,7 +713,7 @@ POSTGRES_MAX_OVERFLOW=100
 
 **Solutions:**
 ```bash
-REDIS_PASSWORD=your_redis_password
+VALKEY_PASSWORD=your_redis_password
 ```
 
 #### "Connection timeout"
@@ -721,9 +721,9 @@ REDIS_PASSWORD=your_redis_password
 **Problem:** Cannot reach Redis.
 
 **Solutions:**
-1. Verify `REDIS_HOST` and `REDIS_PORT`
+1. Verify `VALKEY_HOST` and `VALKEY_PORT`
 2. Check network connectivity
-3. For Sentinel: verify `REDIS_SENTINEL_HOSTS`
+3. For Sentinel: verify `VALKEY_SENTINEL_HOSTS`
 
 ### Kong Issues
 
@@ -792,8 +792,8 @@ DEBUG=true
 # Use Docker Compose for all services
 POSTGRES_ENABLED=true
 POSTGRES_MODE=managed
-REDIS_ENABLED=true
-REDIS_MODE=managed
+VALKEY_ENABLED=true
+VALKEY_MODE=managed
 KONG_ENABLED=true
 KONG_MODE=managed
 ```
@@ -820,13 +820,13 @@ POSTGRES_USER=sark_app
 POSTGRES_PASSWORD=${DB_PASSWORD}  # From secrets manager
 POSTGRES_SSL_MODE=verify-full
 
-REDIS_ENABLED=true
-REDIS_MODE=external
-REDIS_SENTINEL_ENABLED=true
-REDIS_SENTINEL_SERVICE_NAME=mymaster
-REDIS_SENTINEL_HOSTS=sentinel1:26379,sentinel2:26379,sentinel3:26379
-REDIS_PASSWORD=${REDIS_PASSWORD}
-REDIS_SSL=true
+VALKEY_ENABLED=true
+VALKEY_MODE=external
+VALKEY_SENTINEL_ENABLED=true
+VALKEY_SENTINEL_SERVICE_NAME=mymaster
+VALKEY_SENTINEL_HOSTS=sentinel1:26379,sentinel2:26379,sentinel3:26379
+VALKEY_PASSWORD=${VALKEY_PASSWORD}
+VALKEY_SSL=true
 
 KONG_ENABLED=true
 KONG_MODE=external
@@ -852,8 +852,8 @@ POSTGRES_ENABLED=true
 POSTGRES_MODE=managed
 
 # Use managed Redis for testing
-REDIS_ENABLED=true
-REDIS_MODE=managed
+VALKEY_ENABLED=true
+VALKEY_MODE=managed
 
 # Connect to shared Kong gateway
 KONG_ENABLED=true

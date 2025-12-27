@@ -1,6 +1,6 @@
 # SARK v1.3.0 Release Notes
 
-**Release Date**: TBD (Week 8 Complete)
+**Release Date**: December 26, 2025
 **Code Name**: Advanced Lethal Trifecta Security Mitigations
 **Type**: Feature Release
 
