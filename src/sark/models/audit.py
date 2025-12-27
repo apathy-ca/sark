@@ -26,6 +26,7 @@ class AuditEventType(str, Enum):
     USER_LOGIN = "user_login"
     USER_LOGOUT = "user_logout"
     SECURITY_VIOLATION = "security_violation"
+    CONFIGURATION_CHANGED = "configuration_changed"
 
 
 class SeverityLevel(str, Enum):
