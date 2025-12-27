@@ -9,9 +9,9 @@ including Redis Sentinel for high availability.
 import logging
 from typing import Any
 
-import redis
-from redis import Redis
-from redis.sentinel import Sentinel
+import valkey
+from valkey import Redis
+from valkey.sentinel import Sentinel
 
 from sark.config import RedisConfig
 
@@ -92,10 +92,10 @@ class CacheManager:
             ValueError: If sentinel configuration is invalid
         """
         if not self.config.sentinel_hosts:
-            raise ValueError("REDIS_SENTINEL_HOSTS must be set when sentinel is enabled")
+            raise ValueError("VALKEY_SENTINEL_HOSTS must be set when sentinel is enabled")
 
         if not self.config.sentinel_service_name:
-            raise ValueError("REDIS_SENTINEL_SERVICE_NAME must be set when sentinel is enabled")
+            raise ValueError("VALKEY_SENTINEL_SERVICE_NAME must be set when sentinel is enabled")
 
         # Parse sentinel hosts (format: "host1:port1,host2:port2,host3:port3")
         sentinel_nodes = []

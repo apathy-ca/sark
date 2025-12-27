@@ -356,7 +356,7 @@ Instead of a traditional 3-week sprint, Phase 2 was executed as:
 6. **INCIDENT_RESPONSE.md** (1,100+ lines) - Incident response playbooks
 7. **WEEK_3_SUMMARY.md** (800+ lines) - Week 3 deliverables summary
 8. **DATABASE_OPTIMIZATION.md** (2,800+ lines) - Complete database optimization
-9. **REDIS_OPTIMIZATION.md** (2,400+ lines) - Complete Redis optimization
+9. **VALKEY_OPTIMIZATION.md** (2,400+ lines) - Complete Redis optimization
 10. **SECURITY_HARDENING.md** (2,600+ lines) - Security hardening checklist
 11. **PRODUCTION_DEPLOYMENT.md** (2,200+ lines) - Production deployment procedures
 12. **DISASTER_RECOVERY.md** (2,500+ lines) - Complete DR plan
@@ -453,7 +453,7 @@ Discovery Module: 85%+ coverage
 **Documentation Types:**
 - **User Documentation:** QUICK_START.md, API reference
 - **Operational Documentation:** OPERATIONS_RUNBOOK.md, DISASTER_RECOVERY.md
-- **Technical Documentation:** DATABASE_OPTIMIZATION.md, REDIS_OPTIMIZATION.md
+- **Technical Documentation:** DATABASE_OPTIMIZATION.md, VALKEY_OPTIMIZATION.md
 - **Security Documentation:** SECURITY_HARDENING.md, SECURITY_BEST_PRACTICES.md
 
 **Impact:**
@@ -602,7 +602,7 @@ All configuration examples in documentation match actual `.env.example` and depl
 env:
   - name: POSTGRES_HOST
     value: "postgresql"
-  - name: REDIS_HOST
+  - name: VALKEY_HOST
     value: "redis"
 ```
 
@@ -615,7 +615,7 @@ env:
 **Solution:**
 - **Single Source of Truth (SSOT)** approach:
   - DATABASE_OPTIMIZATION.md is SSOT for database optimization
-  - REDIS_OPTIMIZATION.md is SSOT for Redis optimization
+  - VALKEY_OPTIMIZATION.md is SSOT for Redis optimization
   - SECURITY_HARDENING.md is SSOT for security hardening
 - **Cross-referencing** instead of duplication:
   - DEPLOYMENT.md references DATABASE_OPTIMIZATION.md for details

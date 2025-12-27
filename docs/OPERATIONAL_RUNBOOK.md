@@ -106,7 +106,7 @@ kubectl exec -it <redis-pod> -- redis-cli
 JWT_EXPIRATION_MINUTES=60           # Access token lifetime
 REFRESH_TOKEN_EXPIRATION_DAYS=7     # Refresh token lifetime
 REFRESH_TOKEN_ROTATION_ENABLED=true # Rotate on refresh
-REDIS_DSN=redis://redis:6379/0      # Redis connection
+VALKEY_DSN=redis://redis:6379/0      # Redis connection
 ```
 
 ### Session Monitoring

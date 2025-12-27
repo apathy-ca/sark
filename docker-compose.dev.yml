@@ -76,12 +76,12 @@ services:
       - POSTGRES_DB=sark
       - POSTGRES_USER=sark
       - POSTGRES_PASSWORD=sark
-      # Redis configuration
-      - REDIS_ENABLED=true
-      - REDIS_MODE=managed
-      - REDIS_HOST=cache
-      - REDIS_PORT=6379
-      - REDIS_PASSWORD=
+      # Valkey configuration
+      - VALKEY_ENABLED=true
+      - VALKEY_MODE=managed
+      - VALKEY_HOST=cache
+      - VALKEY_PORT=6379
+      - VALKEY_PASSWORD=
       # CORS for dev frontend
       - ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
     ports:
@@ -125,20 +125,20 @@ services:
     restart: unless-stopped
 
   # ==========================================================================
-  # Redis Cache
+  # Valkey Cache
   # ==========================================================================
   cache:
-    image: redis:7-alpine
+    image: valkey/valkey:7-alpine
     container_name: sark-cache-dev
-    command: redis-server --appendonly yes
+    command: valkey-server --appendonly yes
     volumes:
-      - redis-dev-data:/data
+      - valkey-dev-data:/data
     ports:
       - "6379:6379"
     networks:
       - sark-network
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "valkey-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -177,5 +177,5 @@ volumes:
     name: sark-dev-pip-cache
   postgres-dev-data:
     name: sark-dev-postgres-data
-  redis-dev-data:
-    name: sark-dev-redis-data
+  valkey-dev-data:
+    name: sark-dev-valkey-data

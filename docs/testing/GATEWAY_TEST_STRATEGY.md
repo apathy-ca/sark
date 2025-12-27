@@ -219,7 +219,7 @@ pip install pytest-benchmark pytest-xdist locust
 ```bash
 # Test configuration
 export TEST_DATABASE_URL="postgresql://test:test@localhost:5432/sark_test"
-export TEST_REDIS_URL="redis://localhost:6379/1"
+export TEST_VALKEY_URL="redis://localhost:6379/1"
 export TEST_OPA_URL="http://localhost:8181"
 export GATEWAY_ENABLED="true"
 export GATEWAY_URL="http://localhost:8000"

@@ -90,7 +90,7 @@ POSTGRES_DB=sark
 POSTGRES_USER=sark
 
 # Redis
-REDIS_PASSWORD=sark_redis_dev_password
+VALKEY_PASSWORD=sark_redis_dev_password
 
 # OPA
 OPA_URL=http://opa:8181

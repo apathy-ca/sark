@@ -90,7 +90,7 @@ POSTGRES_USER=sark_user
 POSTGRES_PASSWORD=<STRONG_PASSWORD>
 
 # Redis
-REDIS_PASSWORD=<STRONG_PASSWORD>
+VALKEY_PASSWORD=<STRONG_PASSWORD>
 
 # Security
 SECRET_KEY=<GENERATE_WITH: python -c "import secrets; print(secrets.token_urlsafe(32))">
@@ -163,7 +163,7 @@ curl http://localhost:8000/health
 docker-compose -f docker-compose.production.yml exec sark-db pg_isready
 
 # Redis health
-docker-compose -f docker-compose.production.yml exec sark-redis redis-cli -a $REDIS_PASSWORD ping
+docker-compose -f docker-compose.production.yml exec sark-redis redis-cli -a $VALKEY_PASSWORD ping
 
 # Kong health
 curl http://localhost:8001/status
@@ -246,7 +246,7 @@ kubectl create namespace sark
 kubectl create secret generic sark-secrets \
   --from-literal=POSTGRES_USER=sark \
   --from-literal=POSTGRES_PASSWORD=<PASSWORD> \
-  --from-literal=REDIS_PASSWORD=<PASSWORD> \
+  --from-literal=VALKEY_PASSWORD=<PASSWORD> \
   --from-literal=SECRET_KEY=<SECRET> \
   --from-literal=JWT_SECRET_KEY=<SECRET> \
   --from-literal=OIDC_CLIENT_ID=<ID> \
@@ -656,9 +656,9 @@ kubectl cp sark/sark-redis-0:/data/dump.rdb ./redis-backup.rdb
 
 **Redis Connection Pool:**
 ```yaml
-- name: REDIS_POOL_SIZE
+- name: VALKEY_POOL_SIZE
   value: "50"
-- name: REDIS_MAX_CONNECTIONS
+- name: VALKEY_MAX_CONNECTIONS
   value: "100"
 ```
 

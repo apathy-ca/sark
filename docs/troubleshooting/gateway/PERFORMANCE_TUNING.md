@@ -248,16 +248,16 @@ Example:
 **Redis Connection Pool:**
 ```bash
 # Default settings
-REDIS_POOL_SIZE=50                 # Max connections
-REDIS_MAX_CONNECTIONS=100          # Hard limit
-REDIS_SOCKET_TIMEOUT=5             # Socket timeout (seconds)
-REDIS_SOCKET_CONNECT_TIMEOUT=2     # Connection timeout
+VALKEY_POOL_SIZE=50                 # Max connections
+VALKEY_MAX_CONNECTIONS=100          # Hard limit
+VALKEY_SOCKET_TIMEOUT=5             # Socket timeout (seconds)
+VALKEY_SOCKET_CONNECT_TIMEOUT=2     # Connection timeout
 
 # High-traffic settings
-REDIS_POOL_SIZE=100
-REDIS_MAX_CONNECTIONS=200
-REDIS_SOCKET_TIMEOUT=3
-REDIS_SOCKET_CONNECT_TIMEOUT=1
+VALKEY_POOL_SIZE=100
+VALKEY_MAX_CONNECTIONS=200
+VALKEY_SOCKET_TIMEOUT=3
+VALKEY_SOCKET_CONNECT_TIMEOUT=1
 ```
 
 ---

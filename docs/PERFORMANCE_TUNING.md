@@ -258,10 +258,10 @@ REDIS_APPENDONLY=no  # Disable AOF
 
 ```python
 # Redis connection pool settings
-REDIS_POOL_SIZE=50  # Per pod
+VALKEY_POOL_SIZE=50  # Per pod
 REDIS_POOL_TIMEOUT=5  # seconds
 REDIS_SOCKET_KEEPALIVE=true
-REDIS_SOCKET_TIMEOUT=5
+VALKEY_SOCKET_TIMEOUT=5
 ```
 
 #### Cache Key Design
@@ -430,7 +430,7 @@ REDIS_CLUSTER_ENABLED=true
 REDIS_CLUSTER_NODES=3
 
 # Connection pooling
-REDIS_POOL_SIZE=200  # Higher for high session count
+VALKEY_POOL_SIZE=200  # Higher for high session count
 
 # Memory estimate
 # 1000 bytes/session × 10,000 users = 10 MB
@@ -871,7 +871,7 @@ DATABASE_MAX_OVERFLOW=10
 DATABASE_POOL_RECYCLE=3600
 
 # Redis
-REDIS_POOL_SIZE=50
+VALKEY_POOL_SIZE=50
 REDIS_MAX_MEMORY=4gb
 REDIS_MAX_MEMORY_POLICY=allkeys-lru
 

@@ -97,28 +97,28 @@ class RedisConfig:
     @classmethod
     def from_env(cls) -> "RedisConfig":
         """Load Redis configuration from environment variables."""
-        mode = ServiceMode(os.getenv("REDIS_MODE", "managed"))
+        mode = ServiceMode(os.getenv("VALKEY_MODE", "managed"))
 
         # Default values depend on mode
         if mode == ServiceMode.MANAGED:
             default_host = "cache"  # Docker Compose service name
             default_port = 6379
         else:
-            default_host = os.getenv("REDIS_HOST", "localhost")
-            default_port = int(os.getenv("REDIS_PORT", "6379"))
+            default_host = os.getenv("VALKEY_HOST", "localhost")
+            default_port = int(os.getenv("VALKEY_PORT", "6379"))
 
         return cls(
-            enabled=os.getenv("REDIS_ENABLED", "false").lower() == "true",
+            enabled=os.getenv("VALKEY_ENABLED", "false").lower() == "true",
             mode=mode,
-            host=os.getenv("REDIS_HOST", default_host),
-            port=int(os.getenv("REDIS_PORT", str(default_port))),
-            database=int(os.getenv("REDIS_DB", "0")),
-            password=os.getenv("REDIS_PASSWORD"),
-            max_connections=int(os.getenv("REDIS_MAX_CONNECTIONS", "50")),
-            ssl=os.getenv("REDIS_SSL", "false").lower() == "true",
-            sentinel_enabled=os.getenv("REDIS_SENTINEL_ENABLED", "false").lower() == "true",
-            sentinel_service_name=os.getenv("REDIS_SENTINEL_SERVICE_NAME"),
-            sentinel_hosts=os.getenv("REDIS_SENTINEL_HOSTS"),
+            host=os.getenv("VALKEY_HOST", default_host),
+            port=int(os.getenv("VALKEY_PORT", str(default_port))),
+            database=int(os.getenv("VALKEY_DB", "0")),
+            password=os.getenv("VALKEY_PASSWORD"),
+            max_connections=int(os.getenv("VALKEY_MAX_CONNECTIONS", "50")),
+            ssl=os.getenv("VALKEY_SSL", "false").lower() == "true",
+            sentinel_enabled=os.getenv("VALKEY_SENTINEL_ENABLED", "false").lower() == "true",
+            sentinel_service_name=os.getenv("VALKEY_SENTINEL_SERVICE_NAME"),
+            sentinel_hosts=os.getenv("VALKEY_SENTINEL_HOSTS"),
         )
 
 
@@ -256,9 +256,9 @@ class AppConfig:
         # Validate Redis configuration
         if self.redis.enabled and self.redis.mode == ServiceMode.EXTERNAL:
             if not self.redis.host or self.redis.host == "cache":
-                errors.append("REDIS_HOST must be set when using external Redis deployment")
+                errors.append("VALKEY_HOST must be set when using external Redis deployment")
             if self.redis.sentinel_enabled and not self.redis.sentinel_hosts:
-                errors.append("REDIS_SENTINEL_HOSTS must be set when Redis Sentinel is enabled")
+                errors.append("VALKEY_SENTINEL_HOSTS must be set when Redis Sentinel is enabled")
 
         # Validate Kong configuration
         if self.kong.enabled and self.kong.mode == ServiceMode.EXTERNAL:

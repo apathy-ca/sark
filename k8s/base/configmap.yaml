@@ -18,8 +18,8 @@ data:
   POSTGRES_DB: "sark"
 
   # Redis Configuration
-  REDIS_HOST: "sark-redis"
-  REDIS_PORT: "6379"
+  VALKEY_HOST: "sark-valkey"
+  VALKEY_PORT: "6379"
 
   # Kong Configuration
   KONG_ENABLED: "true"
@@ -29,7 +29,7 @@ data:
   # Performance Configuration
   POSTGRES_POOL_SIZE: "20"
   POSTGRES_MAX_OVERFLOW: "40"
-  REDIS_POOL_SIZE: "50"
+  VALKEY_POOL_SIZE: "50"
 
   # Rate Limiting
   RATE_LIMIT_ENABLED: "true"

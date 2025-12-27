@@ -149,7 +149,7 @@ kubectl create namespace sark
 kubectl create secret generic sark-secrets \
   --namespace=sark \
   --from-literal=POSTGRES_PASSWORD=<your-password> \
-  --from-literal=REDIS_PASSWORD=<your-password> \
+  --from-literal=VALKEY_PASSWORD=<your-password> \
   --from-literal=SECRET_KEY=<your-secret-key>
 ```
 
@@ -338,7 +338,7 @@ data:
 kubectl create secret generic sark-secrets \
   --namespace=sark \
   --from-literal=POSTGRES_PASSWORD=<password> \
-  --from-literal=REDIS_PASSWORD=<password> \
+  --from-literal=VALKEY_PASSWORD=<password> \
   --from-literal=SECRET_KEY=<secret-key> \
   --from-literal=JWT_SECRET_KEY=<jwt-secret>
 ```

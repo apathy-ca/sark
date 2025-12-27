@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import logging
 import time
 
-import redis.asyncio as aioredis
+import valkey.asyncio as aioredis
 
 logger = logging.getLogger(__name__)
 

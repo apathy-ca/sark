@@ -233,11 +233,11 @@ sark_policy_cache_latency_ms_bucket{le="5"} 1000
 
 ```bash
 # Redis connection
-REDIS_HOST=localhost
-REDIS_PORT=6379
-REDIS_PASSWORD=secret
-REDIS_DB=0
-REDIS_POOL_SIZE=50
+VALKEY_HOST=localhost
+VALKEY_PORT=6379
+VALKEY_PASSWORD=secret
+VALKEY_DB=0
+VALKEY_POOL_SIZE=50
 
 # OPA
 OPA_URL=http://localhost:8181

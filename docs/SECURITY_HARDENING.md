@@ -224,7 +224,7 @@ JWT_SECRET_KEY="super-secret-key-12345"
 # ✓ GOOD: Environment variables
 JWT_SECRET_KEY="${JWT_SECRET_KEY}"
 DATABASE_PASSWORD="${DATABASE_PASSWORD}"
-REDIS_PASSWORD="${REDIS_PASSWORD}"
+VALKEY_PASSWORD="${VALKEY_PASSWORD}"
 ```
 
 **.env.example** (commit this):
@@ -244,8 +244,8 @@ DATABASE_URL=postgresql://sark:PASSWORD@postgres:5432/sark
 DATABASE_POOL_SIZE=20
 
 # Redis
-REDIS_URL=redis://redis:6379/0
-REDIS_PASSWORD=<CHANGE_ME>
+VALKEY_URL=redis://redis:6379/0
+VALKEY_PASSWORD=<CHANGE_ME>
 
 # Security
 ALLOWED_HOSTS=api.example.com
@@ -258,7 +258,7 @@ RATE_LIMIT_ENABLED=true
 # Actual secrets (generated)
 JWT_SECRET_KEY=a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6
 DATABASE_URL=postgresql://sark:Y9mPx3K7sL2Q@postgres:5432/sark
-REDIS_PASSWORD=R8tGv5Nx2Wp9Ld4K
+VALKEY_PASSWORD=R8tGv5Nx2Wp9Ld4K
 ```
 
 ### Generate Strong Secrets

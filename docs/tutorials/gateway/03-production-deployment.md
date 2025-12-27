@@ -125,14 +125,14 @@ kubectl config set-context --current --namespace=mcp-production
 # Generate strong secrets
 export JWT_SECRET=$(openssl rand -base64 32)
 export POSTGRES_PASSWORD=$(openssl rand -base64 32)
-export REDIS_PASSWORD=$(openssl rand -base64 32)
+export VALKEY_PASSWORD=$(openssl rand -base64 32)
 export GATEWAY_API_KEY=$(openssl rand -hex 32)
 
 # Create Kubernetes secrets
 kubectl create secret generic sark-secrets \
   --from-literal=jwt-secret-key="$JWT_SECRET" \
   --from-literal=postgres-password="$POSTGRES_PASSWORD" \
-  --from-literal=redis-password="$REDIS_PASSWORD" \
+  --from-literal=redis-password="$VALKEY_PASSWORD" \
   --from-literal=gateway-api-key="$GATEWAY_API_KEY" \
   -n mcp-production
 
@@ -172,9 +172,9 @@ data:
   POSTGRES_POOL_SIZE: "20"
 
   # Redis
-  REDIS_HOST: "redis-cluster.mcp-production.svc.cluster.local"
-  REDIS_PORT: "6379"
-  REDIS_MAX_CONNECTIONS: "50"
+  VALKEY_HOST: "redis-cluster.mcp-production.svc.cluster.local"
+  VALKEY_PORT: "6379"
+  VALKEY_MAX_CONNECTIONS: "50"
   REDIS_CLUSTER_MODE: "true"
 
   # OPA
@@ -372,9 +372,9 @@ spec:
         - --appendonly
         - "yes"
         - --requirepass
-        - $(REDIS_PASSWORD)
+        - $(VALKEY_PASSWORD)
         env:
-        - name: REDIS_PASSWORD
+        - name: VALKEY_PASSWORD
           valueFrom:
             secretKeyRef:
               name: sark-secrets
@@ -404,8 +404,8 @@ spec:
 
 ```yaml
 data:
-  REDIS_HOST: "sark-redis.abc123.cache.amazonaws.com"
-  REDIS_PORT: "6379"
+  VALKEY_HOST: "sark-redis.abc123.cache.amazonaws.com"
+  VALKEY_PORT: "6379"
   REDIS_CLUSTER_MODE: "false"
   REDIS_TLS: "true"
 ```
@@ -505,7 +505,7 @@ spec:
             secretKeyRef:
               name: sark-secrets
               key: postgres-password
-        - name: REDIS_PASSWORD
+        - name: VALKEY_PASSWORD
           valueFrom:
             secretKeyRef:
               name: sark-secrets

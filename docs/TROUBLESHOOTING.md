@@ -46,7 +46,7 @@ curl http://localhost:8000/health/detailed | jq
 | 401 Unauthorized | Token expired or invalid | Refresh access token or re-authenticate |
 | 403 Forbidden | Policy denied request | Check OPA logs, verify user roles/permissions |
 | 429 Too Many Requests | Rate limit exceeded | Wait for rate limit window to reset |
-| 500 Internal Server Error | Database/Redis/OPA down | Check `docker compose logs` for errors |
+| 500 Internal Server Error | Database/Valkey/OPA down | Check `docker compose logs` for errors |
 | Slow responses (>1s) | Policy cache miss or DB slow | Check `/health/detailed` latency metrics |
 
 ---
@@ -176,7 +176,7 @@ docker compose exec openldap ldapsearch -x \
 
 ```bash
 # Clear Redis session state
-docker compose exec redis redis-cli
+docker compose exec cache valkey-cli
 127.0.0.1:6379> AUTH redis_password
 127.0.0.1:6379> KEYS "oidc:state:*"
 127.0.0.1:6379> DEL oidc:state:{state_id}
@@ -218,7 +218,7 @@ sudo ntpdate -s time.nist.gov
 
 ```bash
 # Check if refresh token exists in Redis
-docker compose exec redis redis-cli -a redis_password
+docker compose exec cache valkey-cli -a redis_password
 127.0.0.1:6379> GET "refresh_token:user:{user_id}:{token_id}"
 
 # Check TTL (should be positive)
@@ -237,7 +237,7 @@ docker compose exec redis redis-cli -a redis_password
 #### 3. Redis Data Loss
 ```bash
 # Check Redis uptime
-docker compose exec redis redis-cli -a redis_password INFO server | grep uptime_in_seconds
+docker compose exec cache valkey-cli -a redis_password INFO server | grep uptime_in_seconds
 
 # If Redis restarted recently, sessions may be lost
 # Fix: Enable Redis persistence in production (AOF or RDB)
@@ -397,7 +397,7 @@ curl http://localhost:8000/metrics | grep policy_cache
 
 ```bash
 # Flush policy cache in Redis
-docker compose exec redis redis-cli -a redis_password
+docker compose exec cache valkey-cli -a redis_password
 127.0.0.1:6379> KEYS "policy:decision:*"
 127.0.0.1:6379> DEL policy:decision:{key}
 
@@ -470,7 +470,7 @@ docker compose restart api
 
 ```bash
 # Check user's active sessions
-docker compose exec redis redis-cli -a redis_password
+docker compose exec cache valkey-cli -a redis_password
 127.0.0.1:6379> KEYS "refresh_token:user:{user_id}:*"
 
 # Count sessions
@@ -505,7 +505,7 @@ docker compose restart api
 # In production, use Kubernetes CronJob
 
 # Example cleanup script
-*/10 * * * * docker compose exec redis redis-cli -a redis_password EVAL "$(cat cleanup-sessions.lua)" 0
+*/10 * * * * docker compose exec cache valkey-cli -a redis_password EVAL "$(cat cleanup-sessions.lua)" 0
 ```
 
 ---
@@ -626,7 +626,7 @@ docker compose restart postgres
 
 ---
 
-## Redis Issues
+## Valkey Issues
 
 ### Problem: Redis Connection Errors
 
@@ -642,7 +642,7 @@ docker compose restart postgres
 docker compose ps redis
 
 # Test connection
-docker compose exec redis redis-cli -a redis_password ping
+docker compose exec cache valkey-cli -a redis_password ping
 # Expected: PONG
 
 # Check logs
@@ -662,24 +662,24 @@ docker compose up -d redis
 
 ```bash
 # Check Redis password in .env
-echo $REDIS_PASSWORD
+echo $VALKEY_PASSWORD
 
 # Test with correct password
-docker compose exec redis redis-cli -a $REDIS_PASSWORD ping
+docker compose exec cache valkey-cli -a $VALKEY_PASSWORD ping
 ```
 
 #### 3. Redis Out of Memory
 
 ```bash
 # Check memory usage
-docker compose exec redis redis-cli -a redis_password INFO memory
+docker compose exec cache valkey-cli -a redis_password INFO memory
 
 # used_memory_human:1.5G
 # maxmemory:2.0G
 
 # Fix: Increase max memory or enable eviction
-docker compose exec redis redis-cli -a redis_password CONFIG SET maxmemory 4gb
-docker compose exec redis redis-cli -a redis_password CONFIG SET maxmemory-policy allkeys-lru
+docker compose exec cache valkey-cli -a redis_password CONFIG SET maxmemory 4gb
+docker compose exec cache valkey-cli -a redis_password CONFIG SET maxmemory-policy allkeys-lru
 ```
 
 ---
@@ -690,10 +690,10 @@ docker compose exec redis redis-cli -a redis_password CONFIG SET maxmemory-polic
 
 ```bash
 # Check latency
-docker compose exec redis redis-cli -a redis_password --latency
+docker compose exec cache valkey-cli -a redis_password --latency
 
 # Check slow log
-docker compose exec redis redis-cli -a redis_password SLOWLOG GET 10
+docker compose exec cache valkey-cli -a redis_password SLOWLOG GET 10
 ```
 
 **Solutions:**
@@ -702,7 +702,7 @@ docker compose exec redis redis-cli -a redis_password SLOWLOG GET 10
 
 ```bash
 # Count keys
-docker compose exec redis redis-cli -a redis_password DBSIZE
+docker compose exec cache valkey-cli -a redis_password DBSIZE
 
 # Fix: Enable key expiration, increase memory, or use Redis cluster
 ```
@@ -711,7 +711,7 @@ docker compose exec redis redis-cli -a redis_password DBSIZE
 
 ```bash
 # Find large keys
-docker compose exec redis redis-cli -a redis_password --bigkeys
+docker compose exec cache valkey-cli -a redis_password --bigkeys
 
 # Fix: Reduce value size or split into smaller keys
 ```
@@ -739,7 +739,7 @@ curl http://localhost:8000/metrics | grep siem_events
 # siem_events_failed_total{siem="splunk"} 150
 
 # Check circuit breaker state
-docker compose exec redis redis-cli -a redis_password
+docker compose exec cache valkey-cli -a redis_password
 127.0.0.1:6379> GET circuit:splunk:state
 # "open" means circuit is broken due to failures
 ```

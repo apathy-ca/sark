@@ -59,16 +59,16 @@ services:
       - /var/lib/postgresql/data
 
   # ==========================================================================
-  # Redis - Cache
+  # Valkey - Cache
   # ==========================================================================
   redis:
-    image: redis:7-alpine
+    image: valkey/valkey:7-alpine
     container_name: sark_test_redis
-    command: redis-server --appendonly no --save ""  # Disable persistence for tests
+    command: valkey-server --appendonly no --save ""  # Disable persistence for tests
     ports:
       - "6380:6379"  # Use different port
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "valkey-cli", "ping"]
       interval: 3s
       timeout: 2s
       retries: 10

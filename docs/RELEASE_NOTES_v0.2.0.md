@@ -407,7 +407,7 @@ class ServerRegistrationRequest(BaseModel):
 ### Performance & Optimization
 - **PERFORMANCE_TESTING.md** (1,200+ lines) - Performance testing methodology (Locust, k6, JMeter)
 - **DATABASE_OPTIMIZATION.md** (2,800+ lines) - Complete database optimization guide
-- **REDIS_OPTIMIZATION.md** (2,400+ lines) - Complete Redis optimization guide
+- **VALKEY_OPTIMIZATION.md** (2,400+ lines) - Complete Redis optimization guide
 
 ### Security
 - **SECURITY_BEST_PRACTICES.md** (1,400+ lines) - Security development practices
@@ -644,7 +644,7 @@ See **KNOWN_ISSUES.md** for complete list.
 
 **High Priority**:
 1. Redis connection pool exhaustion under extreme load (>2,000 req/s)
-   - **Workaround**: Increase `REDIS_POOL_SIZE` to 30
+   - **Workaround**: Increase `VALKEY_POOL_SIZE` to 30
 2. TimescaleDB compression job failures on large chunks (>10 GB)
    - **Workaround**: Manually compress failed chunks during low-traffic hours
 

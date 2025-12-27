@@ -149,9 +149,9 @@ export LDAP_USER_BASE_DN=ou=users,dc=example,dc=com
 ### 2. Configure Redis (Required)
 
 ```bash
-export REDIS_HOST=localhost
-export REDIS_PORT=6379
-export REDIS_PASSWORD=your-redis-password  # Optional
+export VALKEY_HOST=localhost
+export VALKEY_PORT=6379
+export VALKEY_PASSWORD=your-redis-password  # Optional
 ```
 
 ### 3. Start SARK
@@ -601,9 +601,9 @@ curl -H "Authorization: Bearer TOKEN" \
 1. Verify Redis is running: `redis-cli ping`
 2. Check connection settings:
    ```bash
-   REDIS_HOST=localhost
-   REDIS_PORT=6379
-   REDIS_PASSWORD=your-password
+   VALKEY_HOST=localhost
+   VALKEY_PORT=6379
+   VALKEY_PASSWORD=your-password
    ```
 3. Test connection: `redis-cli -h localhost -p 6379 ping`
 

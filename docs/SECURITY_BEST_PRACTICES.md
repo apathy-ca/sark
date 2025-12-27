@@ -869,7 +869,7 @@ tls-ca-cert-file /etc/redis/ca.crt
 tls-auth-clients yes  # Require client certificates
 
 # Connection string
-REDIS_DSN=rediss://:password@redis:6379/0?ssl_cert_reqs=required
+VALKEY_DSN=rediss://:password@redis:6379/0?ssl_cert_reqs=required
 ```
 
 ---
@@ -1007,7 +1007,7 @@ spec:
             secretKeyRef:
               name: sark-secrets
               key: database-password
-        - name: REDIS_PASSWORD
+        - name: VALKEY_PASSWORD
           valueFrom:
             secretKeyRef:
               name: sark-secrets

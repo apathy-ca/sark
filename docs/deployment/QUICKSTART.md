@@ -29,12 +29,12 @@ POSTGRES_USER=your_user
 POSTGRES_PASSWORD=your_password
 POSTGRES_SSL_MODE=require
 
-REDIS_ENABLED=true
-REDIS_MODE=external
-REDIS_HOST=your-redis-host.example.com
-REDIS_PORT=6379
-REDIS_PASSWORD=your_redis_password
-REDIS_SSL=true
+VALKEY_ENABLED=true
+VALKEY_MODE=external
+VALKEY_HOST=your-redis-host.example.com
+VALKEY_PORT=6379
+VALKEY_PASSWORD=your_redis_password
+VALKEY_SSL=true
 
 KONG_ENABLED=true
 KONG_MODE=external
@@ -59,8 +59,8 @@ You have existing Kong, but want to deploy PostgreSQL and Redis locally for test
 POSTGRES_ENABLED=true
 POSTGRES_MODE=managed
 
-REDIS_ENABLED=true
-REDIS_MODE=managed
+VALKEY_ENABLED=true
+VALKEY_MODE=managed
 
 KONG_ENABLED=true
 KONG_MODE=external
@@ -84,8 +84,8 @@ You want to deploy everything locally for development.
 POSTGRES_ENABLED=true
 POSTGRES_MODE=managed
 
-REDIS_ENABLED=true
-REDIS_MODE=managed
+VALKEY_ENABLED=true
+VALKEY_MODE=managed
 
 KONG_ENABLED=true
 KONG_MODE=managed
@@ -190,24 +190,24 @@ POSTGRES_SSL_MODE=disable
 
 ```bash
 # Development (managed)
-REDIS_HOST=cache
-REDIS_PORT=6379
+VALKEY_HOST=cache
+VALKEY_PORT=6379
 
 # External with password
-REDIS_HOST=redis.prod.example.com
-REDIS_PORT=6379
-REDIS_PASSWORD=your_password
-REDIS_SSL=true
+VALKEY_HOST=redis.prod.example.com
+VALKEY_PORT=6379
+VALKEY_PASSWORD=your_password
+VALKEY_SSL=true
 
 # AWS ElastiCache
-REDIS_HOST=myredis.abc123.use1.cache.amazonaws.com
-REDIS_PORT=6379
-REDIS_SSL=true
+VALKEY_HOST=myredis.abc123.use1.cache.amazonaws.com
+VALKEY_PORT=6379
+VALKEY_SSL=true
 
 # Redis Sentinel (HA)
-REDIS_SENTINEL_ENABLED=true
-REDIS_SENTINEL_SERVICE_NAME=mymaster
-REDIS_SENTINEL_HOSTS=sentinel1:26379,sentinel2:26379,sentinel3:26379
+VALKEY_SENTINEL_ENABLED=true
+VALKEY_SENTINEL_SERVICE_NAME=mymaster
+VALKEY_SENTINEL_HOSTS=sentinel1:26379,sentinel2:26379,sentinel3:26379
 ```
 
 ### Kong
@@ -272,7 +272,7 @@ curl -H "Kong-Admin-Token: your_key" \
 ```bash
 # Temporary: Disable SSL verification (NOT for production!)
 POSTGRES_SSL_MODE=require  # Instead of verify-full
-REDIS_SSL=false
+VALKEY_SSL=false
 KONG_VERIFY_SSL=false
 
 # Permanent: Add CA certificate to system trust store
@@ -314,7 +314,7 @@ ENVIRONMENT=development
 DEBUG=true
 LOG_LEVEL=DEBUG
 POSTGRES_MODE=managed
-REDIS_MODE=managed
+VALKEY_MODE=managed
 KONG_MODE=managed
 ```
 
@@ -326,8 +326,8 @@ DEBUG=false
 LOG_LEVEL=INFO
 POSTGRES_MODE=external
 POSTGRES_HOST=postgres.staging.example.com
-REDIS_MODE=external
-REDIS_HOST=redis.staging.example.com
+VALKEY_MODE=external
+VALKEY_HOST=redis.staging.example.com
 KONG_MODE=external
 KONG_ADMIN_URL=https://kong.staging.example.com
 ```
@@ -342,9 +342,9 @@ POSTGRES_MODE=external
 POSTGRES_HOST=postgres.prod.example.com
 POSTGRES_SSL_MODE=verify-full
 POSTGRES_POOL_SIZE=50
-REDIS_MODE=external
-REDIS_SENTINEL_ENABLED=true
-REDIS_SSL=true
+VALKEY_MODE=external
+VALKEY_SENTINEL_ENABLED=true
+VALKEY_SSL=true
 KONG_MODE=external
 KONG_ADMIN_URL=https://kong.prod.example.com
 KONG_VERIFY_SSL=true

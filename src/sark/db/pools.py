@@ -9,8 +9,8 @@ import logging
 from typing import Any
 
 import httpx
-import redis.asyncio as aioredis
-from redis.asyncio import ConnectionPool
+import valkey.asyncio as aioredis
+from valkey.asyncio import ConnectionPool
 
 from sark.config import get_settings
 

@@ -44,7 +44,7 @@ async def test_cache_service_failures(app_client, mock_user_token, monkeypatch):
     """Test handling of cache service failures."""
 
     # Point to invalid Redis
-    monkeypatch.setenv("REDIS_URL", "redis://invalid:6379/0")
+    monkeypatch.setenv("VALKEY_URL", "redis://invalid:6379/0")
 
     response = await app_client.post(
         "/api/v1/gateway/authorize",

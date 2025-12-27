@@ -5,7 +5,7 @@ from collections.abc import Generator
 import httpx
 import psycopg2
 import pytest
-import redis
+import valkey
 
 # Check if pytest-docker is available
 try:

@@ -263,14 +263,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - LDAP/Active Directory integration with connection pooling
 - SAML 2.0 SP implementation (Azure AD, Okta)
 - API Key management with scoped permissions and rotation
-- Session management with Redis backend
+- Session management with Valkey backend
 - Multi-factor authentication (MFA) support with TOTP
 - Rate limiting per API key and per user
 
 **Authorization**:
 - Open Policy Agent (OPA) integration
 - Default RBAC, team-based, and sensitivity-level policies
-- Policy caching with Redis (95%+ hit rate)
+- Policy caching with Valkey (95%+ hit rate)
 - Environment-based policy templates (dev/staging/prod)
 - Policy versioning and rollback mechanism
 - Time-based access controls
@@ -299,11 +299,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Query optimization with EXPLAIN ANALYZE
 - Continuous aggregates for dashboards
 
-**Redis Optimizations**:
+**Valkey Optimizations**:
 - Connection pooling (20 connections per instance)
 - Tiered TTL caching strategy (5min-1hour)
 - I/O threading for high concurrency (4 threads)
-- Redis Sentinel HA (3 nodes)
+- Valkey Sentinel HA (3 nodes)
 - 95%+ cache hit rate
 
 **Security**:
@@ -325,7 +325,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - SECURITY_BEST_PRACTICES.md - Security development practices
 - INCIDENT_RESPONSE.md - 6 incident response playbooks
 - DATABASE_OPTIMIZATION.md - Complete database optimization guide
-- REDIS_OPTIMIZATION.md - Complete Redis optimization guide
+- REDIS_OPTIMIZATION.md - Complete Valkey optimization guide
 - SECURITY_HARDENING.md - Security hardening checklist (60+ items)
 - PRODUCTION_DEPLOYMENT.md - Production deployment procedures
 - DISASTER_RECOVERY.md - Complete DR plan (RTO < 4h, RPO < 15min)
@@ -355,7 +355,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - API response time (p99): 150ms (target: <200ms) ✅
 - Policy evaluation (p95): <50ms ✅
 - Database query (p95): 40ms ✅
-- Redis GET latency (p95): 0.8ms ✅
+- Valkey GET latency (p95): 0.8ms ✅
 - Throughput: 1,200 req/s (target: >1,000) ✅
 
 ### Security

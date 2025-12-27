@@ -20,7 +20,7 @@ services:
       - SARK_NODE_ENDPOINT=https://sark-node-a:8443
       - POSTGRES_HOST=postgres-a
       - POSTGRES_DB=sark_org_a
-      - REDIS_HOST=redis-a
+      - VALKEY_HOST=redis-a
       - OPA_URL=http://opa-a:8181
       - FEATURE_PROTOCOL_ADAPTERS=true
       - FEATURE_FEDERATION=true
@@ -50,7 +50,7 @@ services:
       - SARK_NODE_ENDPOINT=https://sark-node-b:8443
       - POSTGRES_HOST=postgres-b
       - POSTGRES_DB=sark_org_b
-      - REDIS_HOST=redis-b
+      - VALKEY_HOST=redis-b
       - OPA_URL=http://opa-b:8181
       - FEATURE_PROTOCOL_ADAPTERS=true
       - FEATURE_FEDERATION=true
@@ -79,7 +79,7 @@ services:
       - SARK_NODE_ENDPOINT=https://sark-node-c:8443
       - POSTGRES_HOST=postgres-c
       - POSTGRES_DB=sark_org_c
-      - REDIS_HOST=redis-c
+      - VALKEY_HOST=redis-c
       - OPA_URL=http://opa-c:8181
       - FEATURE_PROTOCOL_ADAPTERS=true
       - FEATURE_FEDERATION=true
@@ -139,11 +139,11 @@ services:
       - postgres-c-data:/var/lib/postgresql/data
 
   # ============================================================================
-  # Redis Services (one per SARK node)
+  # Valkey Services (one per SARK node)
   # ============================================================================
 
   redis-a:
-    image: redis:7-alpine
+    image: valkey/valkey:7-alpine
     container_name: redis-a
     networks:
       - sark-v2-test
@@ -151,7 +151,7 @@ services:
       - redis-a-data:/data
 
   redis-b:
-    image: redis:7-alpine
+    image: valkey/valkey:7-alpine
     container_name: redis-b
     networks:
       - sark-v2-test
@@ -159,7 +159,7 @@ services:
       - redis-b-data:/data
 
   redis-c:
-    image: redis:7-alpine
+    image: valkey/valkey:7-alpine
     container_name: redis-c
     networks:
       - sark-v2-test
