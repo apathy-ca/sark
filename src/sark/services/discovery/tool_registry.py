@@ -307,14 +307,14 @@ class ToolRegistry:
         if self.audit_db:
             audit_service = AuditService(self.audit_db)
             await audit_service.log_event(
-                event_type=AuditEventType.CONFIGURATION_CHANGED,
+                event_type=AuditEventType.SERVER_UPDATED,  # Tool sensitivity is a server configuration change
                 severity=SeverityLevel.MEDIUM,
                 user_id=user_id,
                 user_email=user_email,
-                tool_id=tool_id,
+                server_id=tool.server_id,
+                tool_name=tool.name,
                 details={
-                    "tool_name": tool.name,
-                    "server_id": str(tool.server_id),
+                    "tool_id": str(tool_id),
                     "old_sensitivity": old_sensitivity.value,
                     "new_sensitivity": new_sensitivity.value,
                     "reason": reason,
