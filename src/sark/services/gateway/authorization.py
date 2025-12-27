@@ -235,7 +235,7 @@ async def filter_servers_by_permission(
                 "action": "list",
                 "resource": {
                     "type": "server",
-                    "server": server.name,
+                    "server": server.server_name,
                 },
             }
 
@@ -300,7 +300,7 @@ async def filter_tools_by_permission(
                 "resource": {
                     "type": "tool",
                     "server": tool.server_name,
-                    "tool": tool.name,
+                    "tool": tool.tool_name,
                     "sensitivity": (
                         tool.sensitivity_level.value if tool.sensitivity_level else "medium"
                     ),
@@ -351,7 +351,6 @@ def _get_cache_ttl(sensitivity_level: SensitivityLevel | None) -> int:
         return 300  # 5 minutes default
 
     ttl_map = {
-        SensitivityLevel.PUBLIC: 3600,  # 1 hour
         SensitivityLevel.LOW: 1800,  # 30 minutes
         SensitivityLevel.MEDIUM: 300,  # 5 minutes
         SensitivityLevel.HIGH: 60,  # 1 minute
