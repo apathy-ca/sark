@@ -4,7 +4,7 @@
 # This Docker Compose file provides all services needed for integration testing:
 # - PostgreSQL (main database)
 # - TimescaleDB (audit logs)
-# - Redis (caching)
+# - Valkey (caching - Redis-compatible)
 # - OPA (policy engine)
 # - gRPC mock server (for gRPC tests)
 #
@@ -59,11 +59,11 @@ services:
       - /var/lib/postgresql/data
 
   # ==========================================================================
-  # Valkey - Cache
+  # Valkey - Cache (Redis-compatible)
   # ==========================================================================
-  redis:
+  cache:
     image: valkey/valkey:7-alpine
-    container_name: sark_test_redis
+    container_name: sark_test_valkey
     command: valkey-server --appendonly no --save ""  # Disable persistence for tests
     ports:
       - "6380:6379"  # Use different port
