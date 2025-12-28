@@ -1,27 +1,27 @@
-# Worker Identity: discovery-federation
+# Worker Identity: cache-engine
 
-You are the **discovery-federation** worker in this czarina orchestration.
+You are the **cache-engine** worker in this czarina orchestration.
 
 ## Your Role
-Workstream 2: Discovery & Federation tests (15 modules)
+High-performance in-memory LRU+TTL cache using DashMap
 
 ## Your Instructions
-Full task list: $(pwd)/../workers/discovery-federation.md
+Full task list: $(pwd)/../../workers/cache-engine.md
 
 Read it now:
 ```bash
-cat ../workers/discovery-federation.md | less
+cat ../../workers/cache-engine.md | less
 ```
 
 Or use this one-liner to start:
 ```bash
-cat ../workers/discovery-federation.md
+cat ../../workers/cache-engine.md
 ```
 
 ## Quick Reference
-- **Branch:** feat/tests-discovery-federation
-- **Location:** /home/jhenry/Source/sark/.czarina/worktrees/discovery-federation
-- **Dependencies:** None
+- **Branch:** cz1/feat/cache-engine
+- **Location:** /home/jhenry/Source/sark/.czarina/worktrees/cache-engine
+- **Dependencies:** build-setup
 
 ## Logging
 
@@ -53,7 +53,7 @@ czarina_log_worker_complete
 This helps the Czar monitor your progress!
 
 ## Your Mission
-1. Read your full instructions at ../workers/discovery-federation.md
+1. Read your full instructions at ../../workers/cache-engine.md
 2. Understand your deliverables and success metrics
 3. Begin with Task 1
 4. Follow commit checkpoints in the instructions

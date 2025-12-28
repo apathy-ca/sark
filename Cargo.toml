@@ -1,0 +1,7 @@
+[workspace]
+members = ["rust/sark-cache"]
+resolver = "2"
+
+[workspace.dependencies]
+dashmap = "6.1"
+pyo3 = { version = "0.22", features = ["extension-module", "abi3-py311"] }

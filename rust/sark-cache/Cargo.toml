@@ -1,0 +1,13 @@
+[package]
+name = "sark-cache"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.70"
+
+[lib]
+name = "sark_cache"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+dashmap = { workspace = true }
+pyo3 = { workspace = true }
