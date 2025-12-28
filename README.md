@@ -32,7 +32,7 @@ SARK provides zero-trust governance for AI deployments at scale. Built for Model
 
 **Prerequisites:**
 - Python 3.11+
-- Rust 1.70+ ([install Rust](https://rustup.rs/)) - Required for building native extensions
+- Rust 1.92+ ([install Rust](https://rustup.rs/)) - Required for building native extensions
 
 ```bash
 # 1. Clone and setup

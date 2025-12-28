@@ -18,7 +18,7 @@ This guide explains how to build and work with SARK's Rust extensions.
 ### Required Tools
 
 - **Python 3.9+** - The main application runtime
-- **Rust 1.70+** - For building native extension modules
+- **Rust 1.92+** - For building native extension modules
 - **Maturin 1.4+** - Python/Rust build tool
 
 ### Installing Rust
@@ -38,7 +38,7 @@ Download and run [rustup-init.exe](https://rustup.rs/).
 
 ```bash
 # Check Rust version
-rustc --version  # Should be 1.70.0 or higher
+rustc --version  # Should be 1.92.0 or higher
 cargo --version
 
 # Check Python version
@@ -249,7 +249,7 @@ pip install -e ".[dev]"
 
 1. **Wrong Rust version:**
    ```bash
-   rustc --version  # Must be 1.70+
+   rustc --version  # Must be 1.92+
    rustup update
    ```
 
