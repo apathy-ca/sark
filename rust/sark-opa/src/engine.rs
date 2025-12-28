@@ -1,8 +1,7 @@
 //! Core OPA policy evaluation engine using Regorus.
 
 use crate::error::{OPAError, Result};
-use regorus::Engine as RegorusEngine;
-use serde_json::Value;
+use regorus::{Engine as RegorusEngine, Value};
 use std::collections::HashMap;
 
 /// High-performance OPA policy evaluation engine
@@ -82,7 +81,31 @@ impl OPAEngine {
             ));
         }
 
-        // Add the policy to Regorus engine
+        // If a policy with this name already exists, we need to clear and reload
+        // because Regorus doesn't support updating policies in place
+        if self.policies.contains_key(&name) {
+            // Clear all policies and reload them except the old version
+            let old_policies: Vec<(String, String)> = self
+                .policies
+                .iter()
+                .filter(|(k, _)| *k != &name)
+                .map(|(k, v)| (k.clone(), v.clone()))
+                .collect();
+
+            // Create new engine
+            self.engine = RegorusEngine::new();
+            self.policies.clear();
+
+            // Reload all policies except the one being replaced
+            for (policy_name, policy_code) in old_policies {
+                self.engine
+                    .add_policy(policy_name.clone(), policy_code.clone())
+                    .map_err(|e| OPAError::CompilationError(e.to_string()))?;
+                self.policies.insert(policy_name, policy_code);
+            }
+        }
+
+        // Add the new policy to Regorus engine
         self.engine
             .add_policy(name.clone(), rego.clone())
             .map_err(|e| OPAError::CompilationError(e.to_string()))?;
@@ -108,7 +131,9 @@ impl OPAEngine {
     ///
     /// ```
     /// # use sark_opa::engine::OPAEngine;
-    /// # use serde_json::json;
+    /// # use regorus::Value;
+    /// # use std::collections::BTreeMap;
+    /// # use std::sync::Arc;
     /// let mut engine = OPAEngine::new().unwrap();
     ///
     /// let policy = r#"
@@ -120,9 +145,11 @@ impl OPAEngine {
     ///
     /// engine.load_policy("example".to_string(), policy.to_string()).unwrap();
     ///
-    /// let input = json!({"user": "admin"});
+    /// let mut input_map = BTreeMap::new();
+    /// input_map.insert(Value::String("user".into()), Value::String("admin".into()));
+    /// let input = Value::Object(Arc::new(input_map));
     /// let result = engine.evaluate("data.example.allow", input).unwrap();
-    /// assert_eq!(result, json!(true));
+    /// assert_eq!(result, Value::Bool(true));
     /// ```
     pub fn evaluate(&mut self, query: &str, input: Value) -> Result<Value> {
         if query.is_empty() {
@@ -132,17 +159,28 @@ impl OPAEngine {
         }
 
         // Set the input data
-        self.engine
-            .set_input(input)
-            .map_err(|e| OPAError::EvaluationError(format!("Failed to set input: {}", e)))?;
+        self.engine.set_input(input);
 
         // Evaluate the query
-        let result = self
+        let results = self
             .engine
             .eval_query(query.to_string(), false)
             .map_err(|e| OPAError::EvaluationError(e.to_string()))?;
 
-        Ok(result)
+        // Extract the result from QueryResults
+        // QueryResults contains a Vec of QueryResult, each has expressions
+        if let Some(query_result) = results.result.first() {
+            // Get the first expression from the QueryResult
+            if let Some(expr) = query_result.expressions.first() {
+                Ok(expr.value.clone())
+            } else {
+                // No expressions means undefined result
+                Ok(Value::Bool(false))
+            }
+        } else {
+            // No results means the query didn't match - return false for boolean queries
+            Ok(Value::Bool(false))
+        }
     }
 
     /// Clear all loaded policies
@@ -197,7 +235,20 @@ impl Default for OPAEngine {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use serde_json::json;
+    use std::collections::BTreeMap;
+    use std::sync::Arc;
+
+    fn value_from_str(s: &str) -> Value {
+        Value::String(s.into())
+    }
+
+    fn value_object(pairs: Vec<(&str, Value)>) -> Value {
+        let mut map = BTreeMap::new();
+        for (k, v) in pairs {
+            map.insert(Value::String(k.into()), v);
+        }
+        Value::Object(Arc::new(map))
+    }
 
     #[test]
     fn test_new_engine() {
@@ -267,10 +318,10 @@ mod tests {
 
         engine.load_policy("example".to_string(), policy.to_string()).unwrap();
 
-        let input = json!({"user": "admin"});
+        let input = value_object(vec![("user", value_from_str("admin"))]);
         let result = engine.evaluate("data.example.allow", input).unwrap();
 
-        assert_eq!(result, json!(true));
+        assert_eq!(result, Value::Bool(true));
     }
 
     #[test]
@@ -286,11 +337,11 @@ mod tests {
 
         engine.load_policy("example".to_string(), policy.to_string()).unwrap();
 
-        let input = json!({});
+        let input = value_object(vec![]);
         let result = engine.evaluate("data.example.allow", input).unwrap();
 
         // When input.user is missing, the rule should not match
-        assert_eq!(result, json!(false));
+        assert_eq!(result, Value::Bool(false));
     }
 
     #[test]
@@ -314,11 +365,12 @@ mod tests {
         assert!(engine.has_policy("policy1"));
         assert!(engine.has_policy("policy2"));
 
-        let result1 = engine.evaluate("data.policy1.allow", json!({})).unwrap();
-        assert_eq!(result1, json!(true));
+        let empty_input = value_object(vec![]);
+        let result1 = engine.evaluate("data.policy1.allow", empty_input.clone()).unwrap();
+        assert_eq!(result1, Value::Bool(true));
 
-        let result2 = engine.evaluate("data.policy2.deny", json!({})).unwrap();
-        assert_eq!(result2, json!(true));
+        let result2 = engine.evaluate("data.policy2.deny", empty_input).unwrap();
+        assert_eq!(result2, Value::Bool(true));
     }
 
     #[test]
@@ -337,14 +389,15 @@ mod tests {
 
         engine.load_policy("example".to_string(), policy_v1.to_string()).unwrap();
 
-        let result1 = engine.evaluate("data.example.result", json!({})).unwrap();
-        assert_eq!(result1, json!("v1"));
+        let empty_input = value_object(vec![]);
+        let result1 = engine.evaluate("data.example.result", empty_input.clone()).unwrap();
+        assert_eq!(result1, Value::String("v1".into()));
 
         // Override with new policy
         engine.load_policy("example".to_string(), policy_v2.to_string()).unwrap();
 
-        let result2 = engine.evaluate("data.example.result", json!({})).unwrap();
-        assert_eq!(result2, json!("v2"));
+        let result2 = engine.evaluate("data.example.result", empty_input).unwrap();
+        assert_eq!(result2, Value::String("v2".into()));
     }
 
     #[test]
@@ -375,7 +428,8 @@ mod tests {
 
         engine.load_policy("example".to_string(), policy.to_string()).unwrap();
 
-        let result = engine.evaluate("", json!({}));
+        let empty_input = value_object(vec![]);
+        let result = engine.evaluate("", empty_input);
         assert!(result.is_err());
         assert!(matches!(result.unwrap_err(), OPAError::InvalidInput(_)));
     }

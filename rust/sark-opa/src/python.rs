@@ -5,7 +5,7 @@ use crate::error::OPAError;
 use pyo3::exceptions::{PyException, PyRuntimeError, PyValueError};
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
-use serde_json::Value;
+use regorus::Value;
 
 /// Python exception for OPA compilation errors
 pyo3::create_exception!(sark_opa, OPACompilationError, PyException);
@@ -108,16 +108,24 @@ impl RustOPAEngine {
     ///     >>> print(result)
     ///     True
     fn evaluate(&mut self, py: Python, query: String, input_data: &Bound<'_, PyDict>) -> PyResult<PyObject> {
-        // Convert Python dict to JSON Value
-        let input_json = pythonize::depythonize_bound(input_data.clone())?;
+        // Convert Python dict to serde_json::Value first
+        let input_json: serde_json::Value = pythonize::depythonize(input_data.as_any())?;
+
+        // Convert serde_json::Value to regorus::Value
+        let input_regorus = serde_json::from_str(&input_json.to_string())
+            .map_err(|e| PyValueError::new_err(format!("Failed to convert input: {}", e)))?;
 
         // Evaluate using Rust engine
-        let result_json = self.inner.evaluate(&query, input_json)?;
+        let result_regorus = self.inner.evaluate(&query, input_regorus)?;
 
-        // Convert JSON Value back to Python object
+        // Convert regorus::Value back to serde_json::Value
+        let result_json: serde_json::Value = serde_json::from_str(&result_regorus.to_string())
+            .map_err(|e| PyValueError::new_err(format!("Failed to convert result: {}", e)))?;
+
+        // Convert JSON Value to Python object
         let result_py = pythonize::pythonize(py, &result_json)?;
 
-        Ok(result_py)
+        Ok(result_py.into())
     }
 
     /// Clear all loaded policies
