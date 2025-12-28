@@ -95,9 +95,7 @@ impl LRUTTLCache {
     /// * `ttl` - Optional TTL override in seconds (uses default if None)
     pub fn set(&self, key: String, value: String, ttl: Option<u64>) -> Result<()> {
         // Calculate expiration time
-        let ttl_duration = ttl
-            .map(Duration::from_secs)
-            .unwrap_or(self.default_ttl);
+        let ttl_duration = ttl.map(Duration::from_secs).unwrap_or(self.default_ttl);
         let expires_at = Instant::now() + ttl_duration;
         let now = self.now();
 
@@ -195,7 +193,9 @@ mod tests {
     fn test_basic_get_set() {
         let cache = LRUTTLCache::new(100, 300);
 
-        cache.set("key1".to_string(), "value1".to_string(), None).unwrap();
+        cache
+            .set("key1".to_string(), "value1".to_string(), None)
+            .unwrap();
         assert_eq!(cache.get("key1"), Some("value1".to_string()));
         assert_eq!(cache.get("key2"), None);
     }
@@ -204,7 +204,9 @@ mod tests {
     fn test_ttl_expiration() {
         let cache = LRUTTLCache::new(100, 1); // 1 second default TTL
 
-        cache.set("key1".to_string(), "value1".to_string(), Some(1)).unwrap();
+        cache
+            .set("key1".to_string(), "value1".to_string(), Some(1))
+            .unwrap();
         assert_eq!(cache.get("key1"), Some("value1".to_string()));
 
         // Wait for expiration
@@ -216,15 +218,23 @@ mod tests {
     fn test_lru_eviction() {
         let cache = LRUTTLCache::new(3, 300);
 
-        cache.set("key1".to_string(), "value1".to_string(), None).unwrap();
+        cache
+            .set("key1".to_string(), "value1".to_string(), None)
+            .unwrap();
         thread::sleep(StdDuration::from_millis(10));
-        cache.set("key2".to_string(), "value2".to_string(), None).unwrap();
+        cache
+            .set("key2".to_string(), "value2".to_string(), None)
+            .unwrap();
         thread::sleep(StdDuration::from_millis(10));
-        cache.set("key3".to_string(), "value3".to_string(), None).unwrap();
+        cache
+            .set("key3".to_string(), "value3".to_string(), None)
+            .unwrap();
         thread::sleep(StdDuration::from_millis(10));
 
         // Cache is at capacity, adding one more should evict key1
-        cache.set("key4".to_string(), "value4".to_string(), None).unwrap();
+        cache
+            .set("key4".to_string(), "value4".to_string(), None)
+            .unwrap();
 
         assert_eq!(cache.get("key1"), None);
         assert_eq!(cache.get("key2"), Some("value2".to_string()));
