@@ -39,9 +39,9 @@ ENV/
 .DS_Store
 Thumbs.db
 
-# Documentation
+# Documentation (exclude docs directory but keep README.md for Maturin)
 docs/_build/
-*.md
+docs/
 
 # CI/CD
 .github/
