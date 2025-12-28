@@ -84,8 +84,7 @@ jobs:
       - name: Test Python imports
         run: |
           python -c "from sark._rust import RUST_AVAILABLE; print(f'RUST_AVAILABLE: {RUST_AVAILABLE}')"
-          python -c "from sark._rust import hello_opa; print(hello_opa())"
-          python -c "from sark._rust import hello_cache; print(hello_cache())"
+          python -c "from sark._rust import hello_opa, hello_cache; print(hello_opa()); print(hello_cache())"
 
   multi-python:
     name: Test Python ${{ matrix.python-version }}

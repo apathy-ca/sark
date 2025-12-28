@@ -69,6 +69,7 @@ build-backend = "maturin"
 
 [tool.maturin]
 python-source = "src"
+module-name = "sark.sark_rust"
 
 [tool.black]
 line-length = 100
