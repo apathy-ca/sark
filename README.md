@@ -30,6 +30,10 @@ SARK provides zero-trust governance for AI deployments at scale. Built for Model
 
 ## Quick Start
 
+**Prerequisites:**
+- Python 3.11+
+- Rust 1.70+ ([install Rust](https://rustup.rs/)) - Required for building native extensions
+
 ```bash
 # 1. Clone and setup
 git clone <repository-url>
@@ -37,16 +41,20 @@ cd sark
 python3.11 -m venv venv && source venv/bin/activate
 pip install -e ".[dev]"
 
-# 2. Start services
+# 2. Build Rust extensions
+maturin develop
+
+# 3. Start services
 docker compose --profile full up -d
 
-# 3. Access UI and API
+# 4. Access UI and API
 # UI: http://localhost:5173 (admin/password)
 # API: http://localhost:8000/docs
 ```
 
 **Next Steps:**
 - 📖 **[15-Minute Quick Start](docs/QUICK_START.md)** - Complete getting started guide
+- 🔨 **[Rust Development Setup](docs/v1.4.0/RUST_SETUP.md)** - Building and working with Rust extensions
 - 🎓 **[Tutorials](tutorials/)** - Step-by-step examples
 - 📚 **[API Reference](docs/API_REFERENCE.md)** - Complete API documentation
 

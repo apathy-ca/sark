@@ -1,0 +1,124 @@
+name: Rust CI
+
+on:
+  push:
+    branches: [main, develop, cz1/**]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  rust-tests:
+    name: Rust Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.70"
+          components: rustfmt, clippy
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
+
+      - name: Cache cargo index
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-git-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-git-
+
+      - name: Cache cargo build
+        uses: actions/cache@v4
+        with:
+          path: rust/target
+          key: ${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-build-
+
+      - name: Run cargo test
+        working-directory: rust
+        run: cargo test --all --verbose
+
+      - name: Run cargo clippy
+        working-directory: rust
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Run cargo fmt check
+        working-directory: rust
+        run: cargo fmt --all -- --check
+
+  maturin-build:
+    name: Maturin Build Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.70"
+
+      - name: Install maturin
+        run: pip install maturin
+
+      - name: Build with maturin
+        run: maturin build --release
+
+      - name: Install development build
+        run: maturin develop
+
+      - name: Test Python imports
+        run: |
+          python -c "from sark._rust import sark_opa; print('✓ sark_opa imported')"
+          python -c "from sark._rust import sark_cache; print('✓ sark_cache imported')"
+          python -c "from sark._rust.sark_opa import hello_opa; print(hello_opa())"
+          python -c "from sark._rust.sark_cache import hello_cache; print(hello_cache())"
+
+  multi-python:
+    name: Test Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.70"
+
+      - name: Install maturin
+        run: pip install maturin
+
+      - name: Build with maturin
+        run: maturin build --release --interpreter python${{ matrix.python-version }}
+
+      - name: Install and test
+        run: |
+          maturin develop
+          python -c "from sark._rust import sark_opa, sark_cache; print('Python ${{ matrix.python-version }}: OK')"

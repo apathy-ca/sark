@@ -153,6 +153,12 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 
+# Rust
+/target/
+rust/target/
+Cargo.lock
+**/*.rs.bk
+*.pdb
 
 # Czarina orchestration
 .czarina/status/
