@@ -1,15 +1,20 @@
 use pyo3::prelude::*;
 
+// Import types from subcrates
+use sark_opa::python::RustOPAEngine;
+use sark_cache::python::RustCache;
+
 /// SARK Rust Extensions
 ///
-/// This module provides high-performance Rust implementations for SARK.
+/// This module provides high-performance Rust implementations for SARK,
+/// including OPA policy evaluation and in-memory caching.
 #[pymodule]
 fn sark_rust(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    // Add OPA functions
-    sark_opa::register_module(m)?;
+    // Add OPA engine class
+    m.add_class::<RustOPAEngine>()?;
 
-    // Add Cache functions
-    sark_cache::register_module(m)?;
+    // Add Cache class
+    m.add_class::<RustCache>()?;
 
     Ok(())
 }
