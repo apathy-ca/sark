@@ -59,7 +59,7 @@ dev = [
     "bandit>=1.7.5",
     "maturin>=1.4,<2.0",
     # Type stubs for mypy
-    "types-valkey>=4.6.0",
+    "types-redis>=4.6.0",
     "types-passlib>=1.7.7",
 ]
 
