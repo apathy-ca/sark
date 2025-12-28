@@ -1,8 +1,8 @@
 use pyo3::prelude::*;
 
 // Import types from subcrates
-use sark_opa::python::RustOPAEngine;
 use sark_cache::python::RustCache;
+use sark_opa::python::RustOPAEngine;
 
 /// SARK Rust Extensions
 ///

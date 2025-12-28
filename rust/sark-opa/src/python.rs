@@ -118,7 +118,12 @@ impl RustOPAEngine {
     ///     >>> result = engine.evaluate("data.authz.allow", {"user": "admin"})
     ///     >>> print(result)
     ///     True
-    fn evaluate(&mut self, py: Python, query: String, input_data: &Bound<'_, PyDict>) -> PyResult<PyObject> {
+    fn evaluate(
+        &mut self,
+        py: Python,
+        query: String,
+        input_data: &Bound<'_, PyDict>,
+    ) -> PyResult<PyObject> {
         // Convert Python dict to serde_json::Value first
         let input_json: serde_json::Value = pythonize::depythonize(input_data.as_any())?;
 
@@ -188,7 +193,10 @@ impl RustOPAEngine {
 
     /// String representation
     fn __repr__(&self) -> String {
-        format!("RustOPAEngine(policies={})", self.inner.loaded_policies().len())
+        format!(
+            "RustOPAEngine(policies={})",
+            self.inner.loaded_policies().len()
+        )
     }
 }
 
