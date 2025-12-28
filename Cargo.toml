@@ -1,5 +1,5 @@
 [workspace]
-members = ["sark-opa", "sark-cache"]
+members = ["rust/sark-opa", "rust/sark-cache"]
 resolver = "2"
 
 [workspace.package]

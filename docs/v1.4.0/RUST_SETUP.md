@@ -133,8 +133,8 @@ Python changes are immediately visible - no rebuild needed.
 
 ```
 sark/
-├── rust/                      # Rust workspace root
-│   ├── Cargo.toml            # Workspace manifest
+├── Cargo.toml                # Rust workspace manifest
+├── rust/                      # Rust crates directory
 │   ├── sark-opa/             # OPA engine crate
 │   │   ├── Cargo.toml        # Crate manifest
 │   │   ├── src/
@@ -166,7 +166,6 @@ sark/
 
 ```bash
 # Test all crates
-cd rust
 cargo test --all
 
 # Test specific crate
@@ -190,8 +189,6 @@ pytest tests/
 ### Linting and Formatting
 
 ```bash
-cd rust
-
 # Check code formatting
 cargo fmt --all -- --check
 
@@ -214,11 +211,9 @@ The CI pipeline runs:
 Run these locally before pushing:
 
 ```bash
-cd rust
 cargo test --all
 cargo clippy --all-targets --all-features -- -D warnings
 cargo fmt --all -- --check
-cd ..
 maturin build --release
 ```
 
@@ -260,16 +255,13 @@ pip install -e ".[dev]"
 
 2. **Outdated dependencies:**
    ```bash
-   cd rust
    cargo clean
    cargo update
    ```
 
 3. **Corrupted build cache:**
    ```bash
-   cd rust
    cargo clean
-   cd ..
    rm -rf target/
    maturin develop
    ```
@@ -380,9 +372,9 @@ To add new Rust functionality:
    cargo new --lib my-feature
    ```
 
-2. **Add to workspace** in `rust/Cargo.toml`:
+2. **Add to workspace** in `Cargo.toml`:
    ```toml
-   members = ["sark-opa", "sark-cache", "my-feature"]
+   members = ["rust/sark-opa", "rust/sark-cache", "rust/my-feature"]
    ```
 
 3. **Add PyO3 bindings** in `lib.rs`:
