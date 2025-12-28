@@ -52,7 +52,7 @@ impl RustCache {
     fn set(&self, key: String, value: String, ttl: Option<u64>) -> PyResult<()> {
         self.inner
             .set(key, value, ttl)
-            .map_err(|e| map_cache_error(e))
+            .map_err(map_cache_error)
     }
 
     /// Delete a key from the cache
