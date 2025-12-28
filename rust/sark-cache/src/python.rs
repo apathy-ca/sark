@@ -49,6 +49,7 @@ impl RustCache {
     ///     value: Value to store
     ///     ttl: Optional TTL override in seconds (uses default if None)
     #[pyo3(signature = (key, value, ttl=None))]
+    #[allow(clippy::useless_conversion)]
     fn set(&self, key: String, value: String, ttl: Option<u64>) -> PyResult<()> {
         self.inner.set(key, value, ttl)?;
         Ok(())
