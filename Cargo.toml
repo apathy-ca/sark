@@ -1,13 +1,23 @@
-[workspace]
-members = ["rust/sark-opa", "rust/sark-cache"]
-resolver = "2"
-
-[workspace.package]
+[package]
+name = "sark-rust"
 version = "1.3.0"
 edition = "2021"
 rust-version = "1.70"
 license = "MIT"
 authors = ["James Henry"]
+
+[lib]
+name = "sark_rust"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.21", features = ["extension-module"] }
+sark-opa = { path = "rust/sark-opa" }
+sark-cache = { path = "rust/sark-cache" }
+
+[workspace]
+members = ["rust/sark-opa", "rust/sark-cache"]
+resolver = "2"
 
 [workspace.dependencies]
 pyo3 = { version = "0.21", features = ["extension-module"] }

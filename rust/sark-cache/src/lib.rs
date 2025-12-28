@@ -6,7 +6,7 @@ fn hello_cache() -> PyResult<String> {
     Ok("Hello from SARK Cache engine!".to_string())
 }
 
-/// SARK Cache Engine Module
+/// Register the Cache module functions
 ///
 /// Provides high-performance caching functionality implemented in Rust
 /// with Python bindings.
@@ -16,8 +16,7 @@ fn hello_cache() -> PyResult<String> {
 /// - TTL-based cache expiration
 /// - LRU eviction policies
 /// - Cache statistics and monitoring
-#[pymodule]
-fn sark_cache(m: &Bound<'_, PyModule>) -> PyResult<()> {
+pub fn register_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(hello_cache, m)?)?;
     Ok(())
 }
