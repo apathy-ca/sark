@@ -1,18 +1,13 @@
 [package]
 name = "sark-cache"
-version.workspace = true
-edition.workspace = true
-rust-version.workspace = true
-license.workspace = true
-authors.workspace = true
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.70"
 
 [lib]
 name = "sark_cache"
-crate-type = ["rlib"]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-pyo3.workspace = true
-serde.workspace = true
-serde_json.workspace = true
-dashmap.workspace = true
-parking_lot.workspace = true
+dashmap = { workspace = true }
+pyo3 = { workspace = true }
