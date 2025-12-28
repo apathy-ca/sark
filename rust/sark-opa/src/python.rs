@@ -1,6 +1,7 @@
 //! Python bindings for the SARK OPA engine using PyO3.
 
 #![allow(clippy::useless_conversion)]
+#![allow(unused_imports)]
 
 use crate::engine::OPAEngine;
 use crate::error::OPAError;
