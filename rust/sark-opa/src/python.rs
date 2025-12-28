@@ -25,9 +25,15 @@ impl From<OPAError> for PyErr {
             OPAError::CompilationError(msg) => OPACompilationError::new_err(msg),
             OPAError::EvaluationError(msg) => OPAEvaluationError::new_err(msg),
             OPAError::InvalidInput(msg) => PyValueError::new_err(msg),
-            OPAError::PolicyNotFound(msg) => PyValueError::new_err(format!("Policy not found: {}", msg)),
-            OPAError::SerializationError(msg) => PyValueError::new_err(format!("Serialization error: {}", msg)),
-            OPAError::InternalError(msg) => PyRuntimeError::new_err(format!("Internal error: {}", msg)),
+            OPAError::PolicyNotFound(msg) => {
+                PyValueError::new_err(format!("Policy not found: {}", msg))
+            }
+            OPAError::SerializationError(msg) => {
+                PyValueError::new_err(format!("Serialization error: {}", msg))
+            }
+            OPAError::InternalError(msg) => {
+                PyRuntimeError::new_err(format!("Internal error: {}", msg))
+            }
         }
     }
 }
@@ -190,7 +196,13 @@ impl RustOPAEngine {
 #[pymodule]
 fn sark_opa(py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<RustOPAEngine>()?;
-    m.add("OPACompilationError", py.get_type_bound::<OPACompilationError>())?;
-    m.add("OPAEvaluationError", py.get_type_bound::<OPAEvaluationError>())?;
+    m.add(
+        "OPACompilationError",
+        py.get_type_bound::<OPACompilationError>(),
+    )?;
+    m.add(
+        "OPAEvaluationError",
+        py.get_type_bound::<OPAEvaluationError>(),
+    )?;
     Ok(())
 }
