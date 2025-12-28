@@ -50,9 +50,8 @@ impl RustCache {
     ///     ttl: Optional TTL override in seconds (uses default if None)
     #[pyo3(signature = (key, value, ttl=None))]
     fn set(&self, key: String, value: String, ttl: Option<u64>) -> PyResult<()> {
-        self.inner
-            .set(key, value, ttl)
-            .map_err(map_cache_error)
+        self.inner.set(key, value, ttl)?;
+        Ok(())
     }
 
     /// Delete a key from the cache
@@ -92,17 +91,19 @@ impl RustCache {
     }
 }
 
-/// Map Rust cache errors to Python exceptions
-fn map_cache_error(err: CacheError) -> PyErr {
-    match err {
-        CacheError::CapacityExceeded => {
-            PyRuntimeError::new_err("Cache capacity exceeded")
-        }
-        CacheError::InvalidTTL(msg) => {
-            PyValueError::new_err(format!("Invalid TTL: {}", msg))
-        }
-        CacheError::Internal(msg) => {
-            PyRuntimeError::new_err(format!("Internal cache error: {}", msg))
+/// Convert Rust cache errors to Python exceptions
+impl From<CacheError> for PyErr {
+    fn from(err: CacheError) -> Self {
+        match err {
+            CacheError::CapacityExceeded => {
+                PyRuntimeError::new_err("Cache capacity exceeded")
+            }
+            CacheError::InvalidTTL(msg) => {
+                PyValueError::new_err(format!("Invalid TTL: {}", msg))
+            }
+            CacheError::Internal(msg) => {
+                PyRuntimeError::new_err(format!("Internal cache error: {}", msg))
+            }
         }
     }
 }
