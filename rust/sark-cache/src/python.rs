@@ -97,12 +97,8 @@ impl RustCache {
 impl From<CacheError> for PyErr {
     fn from(err: CacheError) -> Self {
         match err {
-            CacheError::CapacityExceeded => {
-                PyRuntimeError::new_err("Cache capacity exceeded")
-            }
-            CacheError::InvalidTTL(msg) => {
-                PyValueError::new_err(format!("Invalid TTL: {}", msg))
-            }
+            CacheError::CapacityExceeded => PyRuntimeError::new_err("Cache capacity exceeded"),
+            CacheError::InvalidTTL(msg) => PyValueError::new_err(format!("Invalid TTL: {}", msg)),
             CacheError::Internal(msg) => {
                 PyRuntimeError::new_err(format!("Internal cache error: {}", msg))
             }

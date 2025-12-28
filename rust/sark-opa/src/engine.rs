@@ -153,9 +153,7 @@ impl OPAEngine {
     /// ```
     pub fn evaluate(&mut self, query: &str, input: Value) -> Result<Value> {
         if query.is_empty() {
-            return Err(OPAError::InvalidInput(
-                "Query cannot be empty".to_string(),
-            ));
+            return Err(OPAError::InvalidInput("Query cannot be empty".to_string()));
         }
 
         // Set the input data
