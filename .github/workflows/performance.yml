@@ -1,0 +1,311 @@
+name: Performance Tests
+
+on:
+  # Run on PRs that modify performance-critical code
+  pull_request:
+    paths:
+      - 'rust/**'
+      - 'src/sark/services/policy/**'
+      - 'tests/performance/**'
+      - '.github/workflows/performance.yml'
+
+  # Run weekly to catch performance regressions
+  schedule:
+    - cron: '0 0 * * 0'  # Every Sunday at midnight
+
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      test_suite:
+        description: 'Test suite to run'
+        required: true
+        default: 'quick'
+        type: choice
+        options:
+          - quick
+          - full
+          - benchmarks
+          - load
+          - memory
+
+jobs:
+  # Quick performance check for PRs
+  quick-perf-check:
+    name: Quick Performance Check
+    runs-on: ubuntu-latest-16core
+    if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && github.event.inputs.test_suite == 'quick')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -e ".[dev]"
+
+      - name: Run quick benchmarks
+        run: |
+          pytest tests/performance/benchmarks/ \
+            --benchmark-only \
+            --benchmark-min-rounds=3 \
+            --benchmark-max-time=1.0 \
+            --benchmark-json=output.json \
+            -k "simple or get"
+
+      - name: Check for performance regression
+        run: |
+          python scripts/check_performance_regression.py \
+            --current output.json \
+            --threshold 0.10
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: quick-benchmark-results
+          path: output.json
+          retention-days: 30
+
+  # Full benchmark suite
+  benchmarks:
+    name: Full Benchmark Suite
+    runs-on: ubuntu-latest-16core
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.test_suite == 'benchmarks')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -e ".[dev]"
+
+      - name: Run all benchmarks
+        run: |
+          pytest tests/performance/benchmarks/ \
+            --benchmark-only \
+            --benchmark-json=benchmarks-full.json \
+            --benchmark-save=baseline
+
+      - name: Check for performance regression
+        run: |
+          python scripts/check_performance_regression.py \
+            --current benchmarks-full.json \
+            --threshold 0.10
+
+      - name: Generate benchmark report
+        if: always()
+        run: |
+          pytest tests/performance/benchmarks/ \
+            --benchmark-only \
+            --benchmark-compare=baseline \
+            --benchmark-compare-fail=mean:10% \
+            > benchmark-report.txt 2>&1 || true
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: benchmark-results
+          path: |
+            benchmarks-full.json
+            benchmark-report.txt
+          retention-days: 90
+
+  # Load testing
+  load-tests:
+    name: Load Testing
+    runs-on: ubuntu-latest-16core
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.test_suite == 'load')
+
+    services:
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: sark_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -e ".[dev]"
+          pip install locust
+
+      - name: Start SARK server
+        run: |
+          uvicorn sark.main:app --host 0.0.0.0 --port 8000 &
+          sleep 10
+
+      - name: Wait for server
+        run: |
+          timeout 30 bash -c 'until curl -f http://localhost:8000/health; do sleep 1; done'
+
+      - name: Run baseline load test
+        run: |
+          cd tests/performance/load
+          ./run_load_test.sh baseline
+
+      - name: Validate performance targets
+        run: |
+          python scripts/validate_load_test_results.py \
+            tests/performance/load/reports/baseline_*.csv \
+            --min-rps 80 \
+            --max-p95-latency 100
+
+      - name: Upload load test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: load-test-results
+          path: tests/performance/load/reports/
+          retention-days: 90
+
+  # Memory leak detection
+  memory-tests:
+    name: Memory Leak Detection
+    runs-on: ubuntu-latest-16core
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.test_suite == 'memory')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -e ".[dev]"
+
+      - name: Run memory leak tests
+        run: |
+          cd tests/performance/memory
+          ./profile_memory.sh short
+
+      - name: Upload memory test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: memory-test-results
+          path: tests/performance/memory/reports/
+          retention-days: 90
+
+  # Generate performance report
+  performance-report:
+    name: Generate Performance Report
+    runs-on: ubuntu-latest
+    needs: [benchmarks, load-tests, memory-tests]
+    if: github.event_name == 'schedule'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Generate report
+        run: |
+          python scripts/generate_performance_report.py \
+            --output performance-report-${{ github.run_number }}.md
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-report
+          path: performance-report-*.md
+          retention-days: 365
+
+      - name: Comment on PR (if applicable)
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('performance-report-${{ github.run_number }}.md', 'utf8');
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## Performance Test Results\n\n${report.substring(0, 65000)}`
+            });
+
+  # Stress tests (monthly)
+  stress-tests:
+    name: Stress Testing
+    runs-on: ubuntu-latest-16core
+    # Only run on first Sunday of the month
+    if: github.event_name == 'schedule' && github.event.schedule == '0 0 1-7 * 0'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -e ".[dev]"
+
+      - name: Run stress tests
+        run: |
+          pytest tests/performance/stress/ -v -m stress
+
+      - name: Upload stress test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stress-test-results
+          path: test-results/
+          retention-days: 90
