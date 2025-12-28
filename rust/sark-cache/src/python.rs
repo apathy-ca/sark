@@ -38,8 +38,8 @@ impl RustCache {
     ///
     /// Returns:
     ///     Cached value or None if not found/expired
-    fn get(&self, key: String) -> PyResult<Option<String>> {
-        Ok(self.inner.get(&key))
+    fn get(&self, key: String) -> Option<String> {
+        self.inner.get(&key)
     }
 
     /// Set a value in the cache
@@ -62,30 +62,29 @@ impl RustCache {
     ///
     /// Returns:
     ///     True if key existed and was deleted
-    fn delete(&self, key: String) -> PyResult<bool> {
-        Ok(self.inner.delete(&key))
+    fn delete(&self, key: String) -> bool {
+        self.inner.delete(&key)
     }
 
     /// Clear all entries from the cache
-    fn clear(&self) -> PyResult<()> {
+    fn clear(&self) {
         self.inner.clear();
-        Ok(())
     }
 
     /// Get current cache size
     ///
     /// Returns:
     ///     Number of entries in cache
-    fn size(&self) -> PyResult<usize> {
-        Ok(self.inner.size())
+    fn size(&self) -> usize {
+        self.inner.size()
     }
 
     /// Manually trigger cleanup of expired entries
     ///
     /// Returns:
     ///     Number of entries removed
-    fn cleanup_expired(&self) -> PyResult<usize> {
-        Ok(self.inner.cleanup_expired())
+    fn cleanup_expired(&self) -> usize {
+        self.inner.cleanup_expired()
     }
 
     fn __repr__(&self) -> String {
