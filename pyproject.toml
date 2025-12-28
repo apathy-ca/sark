@@ -57,20 +57,19 @@ dev = [
     "faker>=19.0.0",
     "factory-boy>=3.3.0",
     "bandit>=1.7.5",
+    "maturin>=1.4,<2.0",
     # Type stubs for mypy
-    "types-valkey>=4.6.0",
+    "types-redis>=4.6.0",
     "types-passlib>=1.7.7",
 ]
 
 [build-system]
-requires = ["setuptools>=68.0.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["maturin>=1.4,<2.0"]
+build-backend = "maturin"
 
-[tool.setuptools]
-package-dir = {"" = "src"}
-
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.maturin]
+python-source = "src"
+module-name = "sark.sark_rust"
 
 [tool.black]
 line-length = 100
