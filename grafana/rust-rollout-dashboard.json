@@ -1,0 +1,273 @@
+{
+  "dashboard": {
+    "title": "Rust Rollout Performance Comparison",
+    "tags": ["rust", "rollout", "performance", "ab-testing"],
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 0,
+    "refresh": "10s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Feature Flag Rollout Percentages",
+        "type": "stat",
+        "gridPos": {"h": 6, "w": 12, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "feature_flag_rollout_percentage{feature=\"rust_opa\"}",
+            "legendFormat": "OPA Rollout %",
+            "refId": "A"
+          },
+          {
+            "expr": "feature_flag_rollout_percentage{feature=\"rust_cache\"}",
+            "legendFormat": "Cache Rollout %",
+            "refId": "B"
+          }
+        ],
+        "options": {
+          "colorMode": "background",
+          "graphMode": "area",
+          "justifyMode": "center",
+          "orientation": "horizontal"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 50, "color": "yellow"},
+                {"value": 100, "color": "red"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Traffic Distribution",
+        "type": "piechart",
+        "gridPos": {"h": 6, "w": 12, "x": 12, "y": 0},
+        "targets": [
+          {
+            "expr": "sum(rate(feature_flag_assignments_total[5m])) by (implementation)",
+            "legendFormat": "{{implementation}}",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "OPA Evaluation Latency (p50, p95, p99)",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 6},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, sum(rate(opa_evaluation_duration_seconds_bucket[5m])) by (implementation, le))",
+            "legendFormat": "{{implementation}} p50",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(opa_evaluation_duration_seconds_bucket[5m])) by (implementation, le))",
+            "legendFormat": "{{implementation}} p95",
+            "refId": "B"
+          },
+          {
+            "expr": "histogram_quantile(0.99, sum(rate(opa_evaluation_duration_seconds_bucket[5m])) by (implementation, le))",
+            "legendFormat": "{{implementation}} p99",
+            "refId": "C"
+          }
+        ],
+        "yaxes": [
+          {
+            "format": "s",
+            "label": "Latency"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Cache Operation Latency (p50, p95, p99)",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 14},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, sum(rate(cache_operation_duration_seconds_bucket[5m])) by (implementation, le))",
+            "legendFormat": "{{implementation}} p50",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(cache_operation_duration_seconds_bucket[5m])) by (implementation, le))",
+            "legendFormat": "{{implementation}} p95",
+            "refId": "B"
+          },
+          {
+            "expr": "histogram_quantile(0.99, sum(rate(cache_operation_duration_seconds_bucket[5m])) by (implementation, le))",
+            "legendFormat": "{{implementation}} p99",
+            "refId": "C"
+          }
+        ],
+        "yaxes": [
+          {
+            "format": "s",
+            "label": "Latency"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "OPA Throughput (req/s)",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 22},
+        "targets": [
+          {
+            "expr": "sum(rate(opa_evaluation_total[5m])) by (implementation)",
+            "legendFormat": "{{implementation}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "format": "reqps",
+            "label": "Requests/sec"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Cache Hit Rate",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 22},
+        "targets": [
+          {
+            "expr": "sum(rate(cache_operations_total{result=\"hit\"}[5m])) by (implementation) / sum(rate(cache_operations_total[5m])) by (implementation) * 100",
+            "legendFormat": "{{implementation}} hit rate",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "format": "percent",
+            "label": "Hit Rate"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Error Rates",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 30},
+        "targets": [
+          {
+            "expr": "sum(rate(opa_evaluation_errors_total[5m])) by (implementation, error_type)",
+            "legendFormat": "{{implementation}} - {{error_type}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "format": "reqps",
+            "label": "Errors/sec"
+          }
+        ],
+        "alert": {
+          "conditions": [
+            {
+              "evaluator": {"params": [0.1], "type": "gt"},
+              "query": {"params": ["A", "5m", "now"]},
+              "reducer": {"params": [], "type": "avg"},
+              "type": "query"
+            }
+          ],
+          "executionErrorState": "alerting",
+          "frequency": "1m",
+          "handler": 1,
+          "name": "High Error Rate",
+          "noDataState": "no_data",
+          "notifications": []
+        }
+      },
+      {
+        "id": 8,
+        "title": "Fallback Events",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 30},
+        "targets": [
+          {
+            "expr": "sum(rate(implementation_fallback_total[5m])) by (feature, error_type)",
+            "legendFormat": "{{feature}} - {{error_type}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "format": "reqps",
+            "label": "Fallbacks/sec"
+          }
+        ],
+        "alert": {
+          "conditions": [
+            {
+              "evaluator": {"params": [0.01], "type": "gt"},
+              "query": {"params": ["A", "5m", "now"]},
+              "reducer": {"params": [], "type": "avg"},
+              "type": "query"
+            }
+          ],
+          "executionErrorState": "alerting",
+          "frequency": "1m",
+          "handler": 1,
+          "name": "Fallback Events Detected",
+          "noDataState": "no_data",
+          "notifications": []
+        }
+      },
+      {
+        "id": 9,
+        "title": "Performance Comparison Summary",
+        "type": "table",
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 38},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, sum(rate(opa_evaluation_duration_seconds_bucket[5m])) by (implementation, le))",
+            "legendFormat": "{{implementation}} OPA p50",
+            "refId": "A",
+            "format": "table"
+          },
+          {
+            "expr": "histogram_quantile(0.50, sum(rate(cache_operation_duration_seconds_bucket[5m])) by (implementation, le))",
+            "legendFormat": "{{implementation}} Cache p50",
+            "refId": "B",
+            "format": "table"
+          },
+          {
+            "expr": "sum(rate(opa_evaluation_errors_total[5m])) by (implementation)",
+            "legendFormat": "{{implementation}} Error Rate",
+            "refId": "C",
+            "format": "table"
+          }
+        ],
+        "transformations": [
+          {
+            "id": "merge",
+            "options": {}
+          },
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {},
+              "indexByName": {},
+              "renameByName": {
+                "implementation": "Implementation",
+                "Value #A": "OPA Latency (p50)",
+                "Value #B": "Cache Latency (p50)",
+                "Value #C": "Error Rate"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
