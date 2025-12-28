@@ -2,6 +2,8 @@
 
 #![allow(clippy::useless_conversion)]
 #![allow(unused_imports)]
+#![allow(unused_doc_comments)]
+#![allow(unexpected_cfgs)]
 
 use crate::engine::OPAEngine;
 use crate::error::OPAError;
