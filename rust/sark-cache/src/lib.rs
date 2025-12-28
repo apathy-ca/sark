@@ -2,7 +2,7 @@ use pyo3::prelude::*;
 
 pub mod error;
 pub mod lru_ttl;
-mod python;
+pub mod python;
 
 use python::RustCache;
 
