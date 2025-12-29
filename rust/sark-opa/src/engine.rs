@@ -400,13 +400,19 @@ mod tests {
             .unwrap();
 
         let empty_input = value_object(vec![]);
-        let result1 = engine.evaluate("data.example.result", empty_input.clone()).unwrap();
+        let result1 = engine
+            .evaluate("data.example.result", empty_input.clone())
+            .unwrap();
         assert_eq!(result1, Value::String("v1".into()));
 
         // Override with new policy
-        engine.load_policy("example".to_string(), policy_v2.to_string()).unwrap();
+        engine
+            .load_policy("example".to_string(), policy_v2.to_string())
+            .unwrap();
 
-        let result2 = engine.evaluate("data.example.result", empty_input).unwrap();
+        let result2 = engine
+            .evaluate("data.example.result", empty_input)
+            .unwrap();
         assert_eq!(result2, Value::String("v2".into()));
     }
 
@@ -419,7 +425,9 @@ mod tests {
             allow = true
         "#;
 
-        engine.load_policy("example".to_string(), policy.to_string()).unwrap();
+        engine
+            .load_policy("example".to_string(), policy.to_string())
+            .unwrap();
         assert_eq!(engine.loaded_policies().len(), 1);
 
         engine.clear_policies();
@@ -436,7 +444,9 @@ mod tests {
             allow = true
         "#;
 
-        engine.load_policy("example".to_string(), policy.to_string()).unwrap();
+        engine
+            .load_policy("example".to_string(), policy.to_string())
+            .unwrap();
 
         let empty_input = value_object(vec![]);
         let result = engine.evaluate("", empty_input);

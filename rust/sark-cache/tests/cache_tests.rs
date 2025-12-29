@@ -75,9 +75,21 @@ fn test_lru_eviction_removes_oldest() {
         .unwrap();
 
     assert_eq!(cache.get("key1"), None, "key1 should be evicted");
-    assert_eq!(cache.get("key2"), Some("value2".to_string()), "key2 should remain");
-    assert_eq!(cache.get("key3"), Some("value3".to_string()), "key3 should remain");
-    assert_eq!(cache.get("key4"), Some("value4".to_string()), "key4 should exist");
+    assert_eq!(
+        cache.get("key2"),
+        Some("value2".to_string()),
+        "key2 should remain"
+    );
+    assert_eq!(
+        cache.get("key3"),
+        Some("value3".to_string()),
+        "key3 should remain"
+    );
+    assert_eq!(
+        cache.get("key4"),
+        Some("value4".to_string()),
+        "key4 should exist"
+    );
 }
 
 #[test]
@@ -211,7 +223,11 @@ fn test_custom_ttl_override() {
     thread::sleep(Duration::from_millis(1100));
 
     assert_eq!(cache.get("short"), None, "Short TTL should expire");
-    assert_eq!(cache.get("long"), Some("value2".to_string()), "Default TTL should not expire");
+    assert_eq!(
+        cache.get("long"),
+        Some("value2".to_string()),
+        "Default TTL should not expire"
+    );
 }
 
 #[test]
