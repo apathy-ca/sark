@@ -410,9 +410,7 @@ mod tests {
             .load_policy("example".to_string(), policy_v2.to_string())
             .unwrap();
 
-        let result2 = engine
-            .evaluate("data.example.result", empty_input)
-            .unwrap();
+        let result2 = engine.evaluate("data.example.result", empty_input).unwrap();
         assert_eq!(result2, Value::String("v2".into()));
     }
 
