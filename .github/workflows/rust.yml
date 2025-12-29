@@ -78,11 +78,17 @@ jobs:
       - name: Build with maturin
         run: maturin build --release
 
+      - name: Create virtual environment
+        run: python -m venv .venv
+
       - name: Install development build
-        run: maturin develop
+        run: |
+          source .venv/bin/activate
+          maturin develop
 
       - name: Test Python imports
         run: |
+          source .venv/bin/activate
           python -c "from sark._rust import RUST_AVAILABLE; print(f'RUST_AVAILABLE: {RUST_AVAILABLE}')"
           python -c "from sark._rust import hello_opa, hello_cache; print(hello_opa()); print(hello_cache())"
 
@@ -113,7 +119,11 @@ jobs:
       - name: Build with maturin
         run: maturin build --release --interpreter python${{ matrix.python-version }}
 
+      - name: Create virtual environment
+        run: python -m venv .venv
+
       - name: Install and test
         run: |
+          source .venv/bin/activate
           maturin develop
           python -c "from sark._rust import RUST_AVAILABLE; print(f'Python ${{ matrix.python-version }}: {RUST_AVAILABLE}')"
