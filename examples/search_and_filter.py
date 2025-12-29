@@ -13,7 +13,7 @@ Usage:
 """
 
 import os
-from typing import Dict, List, Optional
+from typing import Optional
 
 import requests
 
@@ -44,7 +44,7 @@ class SARKSearchClient:
         match_all_tags: bool = False,
         search: Optional[str] = None,
         include_total: bool = False,
-    ) -> Dict:
+    ) -> dict:
         """List servers with filters and pagination.
 
         Args:
@@ -91,7 +91,7 @@ class SARKSearchClient:
         limit: int = 50,
         max_pages: Optional[int] = None,
         **filters,
-    ) -> List[Dict]:
+    ) -> list[dict]:
         """Search all pages and return all results.
 
         Args:
@@ -333,7 +333,7 @@ def example_fetch_all():
             level = server["sensitivity_level"]
             by_sensitivity[level] = by_sensitivity.get(level, 0) + 1
 
-        print(f"\n  By sensitivity:")
+        print("\n  By sensitivity:")
         for level, count in sorted(by_sensitivity.items()):
             print(f"    {level}: {count}")
 

@@ -15,7 +15,6 @@ from sark.gateway.client import (
 from sark.gateway.error_handler import GatewayErrorHandler
 from sark.gateway.transports.http_client import GatewayHTTPClient
 from sark.gateway.transports.sse_client import GatewaySSEClient, SSEEvent
-from sark.gateway.transports.stdio_client import StdioTransport
 from sark.models.gateway import GatewayServerInfo, GatewayToolInfo
 
 

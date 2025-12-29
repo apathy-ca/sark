@@ -9,7 +9,6 @@ from prometheus_client import Counter, Histogram
 
 from sark.metrics import registry
 
-
 # OPA evaluation metrics
 opa_evaluation_duration_seconds = Histogram(
     "opa_evaluation_duration_seconds",

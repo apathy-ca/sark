@@ -17,11 +17,11 @@ Engineer: ENGINEER-2
 """
 
 import asyncio
-import os
 from datetime import datetime
+import os
 
 from sark.adapters.http import HTTPAdapter
-from sark.models.base import ResourceSchema, InvocationRequest
+from sark.models.base import InvocationRequest, ResourceSchema
 
 
 async def main():
@@ -56,8 +56,8 @@ async def main():
     )
 
     print(f"   ✓ Adapter created: {adapter}")
-    print(f"   - Rate limit: 5 requests/second")
-    print(f"   - Authentication: Bearer token")
+    print("   - Rate limit: 5 requests/second")
+    print("   - Authentication: Bearer token")
 
     # Step 2: Create resource for GitHub API
     print("\n2. Creating GitHub API resource...")
@@ -104,7 +104,7 @@ async def main():
 
     if user_result.success:
         user_data = user_result.result
-        print(f"   ✓ Request successful!")
+        print("   ✓ Request successful!")
         print(f"   - Duration: {user_result.duration_ms:.2f}ms")
         print(f"   - Username: {user_data.get('login', 'N/A')}")
         print(f"   - Name: {user_data.get('name', 'N/A')}")
@@ -173,7 +173,7 @@ async def main():
 
     if repo_result.success:
         repo_data = repo_result.result
-        print(f"   ✓ Repository found!")
+        print("   ✓ Repository found!")
         print(f"   - Duration: {repo_result.duration_ms:.2f}ms")
         print(f"   - Full name: {repo_data.get('full_name', 'N/A')}")
         print(f"   - Description: {repo_data.get('description', 'N/A')}")
@@ -210,7 +210,7 @@ async def main():
     duration = end_time - start_time
 
     print(f"\n   ✓ Completed 10 requests in {duration:.2f}s")
-    print(f"   Expected: ~2s at 5 req/s")
+    print("   Expected: ~2s at 5 req/s")
     print(f"   Rate limiting working: {'✓' if duration >= 1.5 else '✗'}")
 
     # Step 8: Check rate limit status (GitHub provides this)
@@ -234,7 +234,7 @@ async def main():
         rate_data = rate_limit_result.result
         core = rate_data.get("resources", {}).get("core", {})
 
-        print(f"   ✓ Rate limit info retrieved")
+        print("   ✓ Rate limit info retrieved")
         print(f"   - Limit: {core.get('limit', 'N/A')} requests/hour")
         print(f"   - Remaining: {core.get('remaining', 'N/A')}")
         print(f"   - Resets at: {core.get('reset', 'N/A')}")

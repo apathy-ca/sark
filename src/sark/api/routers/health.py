@@ -4,10 +4,10 @@ import asyncio
 
 from fastapi import APIRouter
 from pydantic import BaseModel
-import valkey.asyncio as aioredis
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine
 import structlog
+import valkey.asyncio as aioredis
 
 from sark.config import get_settings
 from sark.services.policy import OPAClient

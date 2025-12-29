@@ -17,12 +17,12 @@ Author: Engineer 1 (Gateway Models Architect)
 import asyncio
 from contextlib import asynccontextmanager
 
-from sark.models.gateway import GatewayServerInfo, GatewayToolInfo, SensitivityLevel
+from sark.models.gateway import SensitivityLevel
 from sark.services.gateway import GatewayClient
 from sark.services.gateway.exceptions import (
+    GatewayAuthenticationError,
     GatewayConnectionError,
     GatewayTimeoutError,
-    GatewayAuthenticationError,
 )
 
 
@@ -193,7 +193,7 @@ async def example_list_tools_for_server():
 
                 # Show parameters
                 if tool.parameters:
-                    print(f"   Parameters:")
+                    print("   Parameters:")
                     for param in tool.parameters:
                         param_name = param.get("name", "unknown")
                         param_type = param.get("type", "any")

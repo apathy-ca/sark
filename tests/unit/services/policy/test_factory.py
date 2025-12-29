@@ -4,19 +4,19 @@ Unit tests for OPA and cache client factories.
 Tests feature flag routing, fallback behavior, and implementation selection.
 """
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 
+import pytest
+
+from sark.services.policy.cache import PolicyCache
 from sark.services.policy.factory import (
+    RustOPAClient,
+    RustPolicyCache,
     create_opa_client,
     create_policy_cache,
     create_policy_clients,
-    RustOPAClient,
-    RustPolicyCache,
-    RUST_AVAILABLE,
 )
 from sark.services.policy.opa_client import OPAClient
-from sark.services.policy.cache import PolicyCache
 
 
 class TestCreateOPAClient:
@@ -130,7 +130,7 @@ class TestCreateOPAClient:
         mock_rust_instance = Mock()
         mock_rust_client_class.return_value = mock_rust_instance
 
-        client = create_opa_client("user123", opa_url="http://custom-opa:8181")
+        create_opa_client("user123", opa_url="http://custom-opa:8181")
 
         mock_rust_client_class.assert_called_once_with("http://custom-opa:8181")
 
@@ -262,7 +262,7 @@ class TestCreatePolicyClients:
         mock_create_opa.return_value = mock_opa
         mock_create_cache.return_value = mock_cache
 
-        opa_client, policy_cache = create_policy_clients(
+        _opa_client, _policy_cache = create_policy_clients(
             "user123", opa_url="http://custom-opa:8181"
         )
 
@@ -387,10 +387,10 @@ class TestFeatureFlagRouting:
         mock_rust_cache_class.return_value = mock_rust_cache
 
         # Call multiple times with same user
-        opa1 = create_opa_client("user123")
-        opa2 = create_opa_client("user123")
-        cache1 = create_policy_cache("user123")
-        cache2 = create_policy_cache("user123")
+        create_opa_client("user123")
+        create_opa_client("user123")
+        create_policy_cache("user123")
+        create_policy_cache("user123")
 
         # Should call feature flag manager each time with same user
         assert mock_ff_manager.should_use_rust.call_count == 4

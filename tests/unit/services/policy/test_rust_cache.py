@@ -1,8 +1,9 @@
 """Unit tests for Rust-based Policy Cache."""
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
 import json
+from unittest.mock import MagicMock, patch
+
+import pytest
 
 from sark.services.policy import rust_cache
 

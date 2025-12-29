@@ -1,6 +1,5 @@
 """Unit tests for Federation Discovery Service."""
 
-import asyncio
 from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -9,8 +8,8 @@ import pytest
 from sark.models.federation import DiscoveryMethod, DiscoveryQuery, ServiceDiscoveryRecord
 from sark.services.federation.discovery import (
     ConsulDiscoveryClient,
-    DNSSDClient,
     DiscoveryService,
+    DNSSDClient,
     MDNSClient,
 )
 

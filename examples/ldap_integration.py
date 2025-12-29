@@ -14,7 +14,7 @@ Usage:
 """
 
 import os
-from typing import Dict, List, Optional
+from typing import Optional
 
 # Note: ldap3 must be installed: pip install ldap3
 try:
@@ -87,7 +87,7 @@ class LDAPIntegrationExample:
             print(f"✗ Connection failed: {e}")
             return False
 
-    def authenticate_user(self, username: str, password: str) -> Optional[Dict]:
+    def authenticate_user(self, username: str, password: str) -> Optional[dict]:
         """Authenticate user with LDAP.
 
         Args:
@@ -167,7 +167,7 @@ class LDAPIntegrationExample:
             print(f"✗ Authentication error: {e}")
             return None
 
-    def get_user_groups(self, user_dn: str) -> List[str]:
+    def get_user_groups(self, user_dn: str) -> list[str]:
         """Get groups for a user.
 
         Args:
@@ -206,7 +206,7 @@ class LDAPIntegrationExample:
             print(f"✗ Group lookup error: {e}")
             return []
 
-    def search_users(self, search_filter: str = "(objectClass=person)", limit: int = 10) -> List[Dict]:
+    def search_users(self, search_filter: str = "(objectClass=person)", limit: int = 10) -> list[dict]:
         """Search for users in LDAP.
 
         Args:
@@ -259,7 +259,7 @@ class LDAPIntegrationExample:
             return []
 
 
-def map_groups_to_roles(groups: List[str], role_mapping: Dict[str, str]) -> List[str]:
+def map_groups_to_roles(groups: list[str], role_mapping: dict[str, str]) -> list[str]:
     """Map LDAP groups to SARK roles.
 
     Args:
@@ -297,7 +297,7 @@ def example_openldap():
         "use_ssl": False,  # Use True for ldaps://
     }
 
-    print(f"\nConfiguration:")
+    print("\nConfiguration:")
     for key, value in config.items():
         if "password" in key.lower():
             print(f"  {key}: ********")
@@ -336,7 +336,7 @@ def example_active_directory():
         return
 
     # Active Directory configuration
-    config = {
+    {
         "server_uri": os.getenv("LDAP_SERVER", "ldaps://ad.corp.example.com:636"),
         "bind_dn": os.getenv("LDAP_BIND_DN", "CN=SARK Service,OU=Service Accounts,DC=corp,DC=example,DC=com"),
         "bind_password": os.getenv("LDAP_BIND_PASSWORD", "service_password"),
@@ -370,18 +370,18 @@ def example_role_mapping():
         "cn=readonly,ou=groups,dc=example,dc=com": "viewer",
     }
 
-    print(f"\nUser's LDAP groups:")
+    print("\nUser's LDAP groups:")
     for group in user_groups:
         print(f"  - {group}")
 
-    print(f"\nRole mapping configuration:")
+    print("\nRole mapping configuration:")
     for group, role in role_mapping.items():
         print(f"  {group} → {role}")
 
     # Map groups to roles
     roles = map_groups_to_roles(user_groups, role_mapping)
 
-    print(f"\nMapped SARK roles:")
+    print("\nMapped SARK roles:")
     for role in roles:
         print(f"  - {role}")
 

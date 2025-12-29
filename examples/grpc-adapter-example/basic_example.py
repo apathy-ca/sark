@@ -11,7 +11,6 @@ Engineer: ENGINEER-3
 """
 
 import asyncio
-from datetime import datetime
 
 from sark.adapters.grpc_adapter import GRPCAdapter
 from sark.models.base import InvocationRequest
@@ -112,7 +111,7 @@ async def main():
             print(f"   {key}: {value}")
 
     except Exception as e:
-        print(f"Error: {str(e)}")
+        print(f"Error: {e!s}")
         import traceback
 
         traceback.print_exc()

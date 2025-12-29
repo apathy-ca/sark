@@ -21,15 +21,16 @@ Exit Codes:
 """
 
 import argparse
-import sys
-import logging
-import json
-from datetime import datetime, UTC
-from typing import Dict, List, Tuple, Any, Optional
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
+from datetime import UTC, datetime
 from enum import Enum
-from sqlalchemy import create_engine, text, inspect
-from sqlalchemy.orm import sessionmaker, Session
+import json
+import logging
+import sys
+from typing import Any, Optional
+
+from sqlalchemy import create_engine, inspect, text
+from sqlalchemy.orm import Session, sessionmaker
 
 # Configure logging
 logging.basicConfig(
@@ -53,7 +54,7 @@ class ValidationIssue:
     severity: ValidationSeverity
     check_name: str
     message: str
-    details: Optional[Dict[str, Any]] = None
+    details: Optional[dict[str, Any]] = None
     timestamp: str = None
 
     def __post_init__(self):
@@ -69,7 +70,7 @@ class ValidationReport:
     total_checks: int = 0
     passed_checks: int = 0
     failed_checks: int = 0
-    issues: List[ValidationIssue] = None
+    issues: list[ValidationIssue] = None
 
     def __post_init__(self):
         if self.issues is None:
@@ -97,7 +98,7 @@ class ValidationReport:
             for issue in self.issues
         )
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         """Convert to dictionary."""
         return {
             "start_time": self.start_time.isoformat(),

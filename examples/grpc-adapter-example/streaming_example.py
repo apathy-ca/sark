@@ -37,7 +37,7 @@ async def server_streaming_example(adapter, resource, capability):
         print(f"Received {count} events total")
 
     except Exception as e:
-        print(f"Streaming failed: {str(e)}")
+        print(f"Streaming failed: {e!s}")
 
 
 async def client_streaming_example(adapter, resource, capability):
@@ -67,7 +67,7 @@ async def client_streaming_example(adapter, resource, capability):
             print(f"  Sum result: {response}")
 
     except Exception as e:
-        print(f"Streaming failed: {str(e)}")
+        print(f"Streaming failed: {e!s}")
 
 
 async def bidirectional_streaming_example(adapter, resource, capability):
@@ -97,7 +97,7 @@ async def bidirectional_streaming_example(adapter, resource, capability):
         print(f"Exchanged {count} messages")
 
     except Exception as e:
-        print(f"Streaming failed: {str(e)}")
+        print(f"Streaming failed: {e!s}")
 
 
 async def main():
@@ -133,7 +133,6 @@ async def main():
         bidi_streaming_cap = None
 
         for cap in capabilities:
-            metadata = cap.metadata
             is_server_streaming = cap.output_schema.get("streaming", False)
             is_client_streaming = cap.input_schema.get("streaming", False)
 
@@ -163,7 +162,7 @@ async def main():
             print("\nNo bidirectional streaming methods found")
 
     except Exception as e:
-        print(f"Error: {str(e)}")
+        print(f"Error: {e!s}")
         import traceback
 
         traceback.print_exc()

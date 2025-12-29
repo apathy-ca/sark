@@ -5,10 +5,11 @@ Tests the integrated evaluate_policy function with Rust/Python routing,
 caching, and metrics tracking.
 """
 
-import pytest
-from unittest.mock import Mock, patch, AsyncMock
+from unittest.mock import AsyncMock, patch
 
-from sark.services.policy.opa import evaluate_policy, _extract_resource_id
+import pytest
+
+from sark.services.policy.opa import _extract_resource_id, evaluate_policy
 from sark.services.policy.opa_client import AuthorizationDecision
 
 

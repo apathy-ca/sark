@@ -12,15 +12,15 @@ Usage:
 """
 
 import argparse
-import time
-import statistics
-from datetime import datetime, UTC, timedelta
-from typing import Dict, List, Tuple
-from sqlalchemy import create_engine, text, select, func
-from sqlalchemy.orm import sessionmaker, Session
+from datetime import UTC, datetime
 from decimal import Decimal
+import statistics
+import time
 
-from sark.models.base import Resource, Capability, FederationNode, CostTracking, PrincipalBudget
+from sqlalchemy import create_engine, func, text
+from sqlalchemy.orm import sessionmaker
+
+from sark.models.base import Capability, CostTracking, FederationNode, Resource
 
 
 class BenchmarkResult:
@@ -29,7 +29,7 @@ class BenchmarkResult:
     def __init__(self, name: str, target_ms: float):
         self.name = name
         self.target_ms = target_ms
-        self.measurements: List[float] = []
+        self.measurements: list[float] = []
         self.passed = False
 
     def add_measurement(self, duration_ms: float):
@@ -75,7 +75,7 @@ class DatabaseBenchmark:
         self.engine = create_engine(database_url, echo=False)
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
-        self.results: List[BenchmarkResult] = []
+        self.results: list[BenchmarkResult] = []
 
     def setup_test_data(self, num_resources: int = 1000, num_capabilities_per_resource: int = 10):
         """Create test data for benchmarking."""
@@ -150,7 +150,7 @@ class DatabaseBenchmark:
 
         for _ in range(iterations):
             start = time.time()
-            resource = self.session.query(Resource).get(sample_id)
+            self.session.query(Resource).get(sample_id)
             duration_ms = (time.time() - start) * 1000
             result.add_measurement(duration_ms)
 
@@ -166,7 +166,7 @@ class DatabaseBenchmark:
 
         for _ in range(iterations):
             start = time.time()
-            capabilities = (
+            (
                 self.session.query(Capability)
                 .filter(Capability.resource_id == sample_id)
                 .all()
@@ -184,7 +184,7 @@ class DatabaseBenchmark:
 
         for _ in range(iterations):
             start = time.time()
-            stats = (
+            (
                 self.session.query(
                     Resource.protocol,
                     func.count(Capability.id).label('capability_count')
@@ -207,7 +207,7 @@ class DatabaseBenchmark:
 
         for _ in range(iterations):
             start = time.time()
-            capabilities = (
+            (
                 self.session.query(Capability, Resource)
                 .join(Resource, Resource.id == Capability.resource_id)
                 .filter(Capability.sensitivity_level.in_(['high', 'critical']))
@@ -228,7 +228,7 @@ class DatabaseBenchmark:
 
         for _ in range(iterations):
             start = time.time()
-            resources = (
+            (
                 self.session.query(Resource)
                 .filter(Resource.metadata_.op('@>')({"benchmark": True}))
                 .limit(100)

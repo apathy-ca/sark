@@ -1,8 +1,7 @@
 """Comprehensive tests for policy audit service."""
 
 from datetime import UTC, datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
-from uuid import uuid4
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
@@ -83,7 +82,7 @@ class TestPolicyAuditService:
         self, service, mock_db_session, sample_auth_input, sample_decision_allow
     ):
         """Test logging an allow decision."""
-        log_entry = await service.log_decision(
+        await service.log_decision(
             auth_input=sample_auth_input,
             decision=sample_decision_allow,
             duration_ms=12.5,
@@ -207,7 +206,7 @@ class TestPolicyAuditService:
 
         policy_content = "package test\nallow = true"
 
-        change_log = await service.log_policy_change(
+        await service.log_policy_change(
             policy_name="test.policy",
             change_type=PolicyChangeType.CREATED,
             changed_by_user_id="user-admin",

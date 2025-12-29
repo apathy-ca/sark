@@ -1,12 +1,11 @@
 """Rust-based OPA client for high-performance policy evaluation."""
 
-import asyncio
-import time
 from pathlib import Path
+import time
 from typing import Any
 
-import structlog
 from pydantic import BaseModel
+import structlog
 
 # Import the Rust extension
 try:

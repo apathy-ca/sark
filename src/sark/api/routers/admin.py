@@ -5,15 +5,15 @@ Provides administrative endpoints for controlling Rust/Python rollout percentage
 monitoring metrics, and performing emergency rollbacks.
 """
 
-from typing import Dict, Any
+from typing import Any
 
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 import structlog
 
-from sark.services.feature_flags import get_feature_flag_manager
 from sark.api.dependencies import require_role
 from sark.api.metrics.rollout_metrics import record_rollout_percentage
+from sark.services.feature_flags import get_feature_flag_manager
 
 logger = structlog.get_logger()
 
@@ -56,10 +56,10 @@ class RollbackResponse(BaseModel):
 class MetricsComparisonResponse(BaseModel):
     """Response model for metrics comparison."""
 
-    rust_opa: Dict[str, Any]
-    python_opa: Dict[str, Any]
-    rust_cache: Dict[str, Any]
-    python_cache: Dict[str, Any]
+    rust_opa: dict[str, Any]
+    python_opa: dict[str, Any]
+    rust_cache: dict[str, Any]
+    python_cache: dict[str, Any]
     recommendation: str
 
 
@@ -289,7 +289,7 @@ async def get_metrics_comparison(
 @router.post("/rollout/rollback-all")
 async def rollback_all_features(
     _admin: Any = Depends(require_role("admin")),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Emergency rollback ALL features to 0% immediately.
 
@@ -311,7 +311,7 @@ async def rollback_all_features(
         feature_flags.rollback_all()
 
         # Record metrics
-        for feature in current_rollouts.keys():
+        for feature in current_rollouts:
             record_rollout_percentage(feature, 0)
 
         logger.critical(
@@ -322,7 +322,7 @@ async def rollback_all_features(
         return {
             "rolled_back": True,
             "previous_rollouts": current_rollouts,
-            "new_rollouts": {k: 0 for k in current_rollouts.keys()},
+            "new_rollouts": dict.fromkeys(current_rollouts.keys(), 0),
             "message": "Emergency rollback completed for ALL features. "
             "All traffic shifted to Python implementations.",
         }

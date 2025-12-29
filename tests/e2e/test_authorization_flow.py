@@ -19,19 +19,19 @@ Success Criteria:
 - No data leakage
 """
 
-import pytest
 import asyncio
-import time
 from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, Mock, patch
+import time
+from typing import Optional
 
-from sark.security.injection_detector import PromptInjectionDetector
-from sark.security.secret_scanner import SecretScanner
+import pytest
+
 from sark.security.behavioral_analyzer import (
     BehavioralAnalyzer,
     BehavioralAuditEvent,
 )
-from sark.security.anomaly_alerts import AnomalyAlertManager, AlertConfig
+from sark.security.injection_detector import PromptInjectionDetector
+from sark.security.secret_scanner import SecretScanner
 
 
 class MockJWTService:
@@ -110,7 +110,7 @@ class MockOPAClient:
         }
 
     async def check_authorization(
-        self, user_id: str, tool: str, params: dict = None
+        self, user_id: str, tool: str, params: Optional[dict] = None
     ) -> dict:
         """Check if user is authorized to use tool"""
         self.authorization_checks.append(
@@ -340,7 +340,7 @@ class TestCompleteAuthorizationFlow:
         request_params = {"user_id": 1, "role": "admin"}
 
         # 3. Injection check
-        injection_result = security_components["injection_detector"].detect(request_params)
+        security_components["injection_detector"].detect(request_params)
 
         # 4. Authorization check (should fail)
         auth_check = await mock_services["opa"].check_authorization(
@@ -430,7 +430,7 @@ class TestCompleteAuthorizationFlow:
         # 2. Authenticate
         auth_result = await mock_services["jwt"].authenticate(user_id, "password123")
         token = auth_result["access_token"]
-        user_info = await mock_services["jwt"].validate_token(token)
+        await mock_services["jwt"].validate_token(token)
 
         # 3. Unusual request (different tool, high sensitivity)
         tool = "query_orders"
@@ -502,7 +502,7 @@ class TestCompleteAuthorizationFlow:
                 )
 
                 # Scan for secrets
-                findings = security_components["secret_scanner"].scan(response)
+                security_components["secret_scanner"].scan(response)
 
                 # Log
                 await mock_services["audit"].log_event(
@@ -540,7 +540,7 @@ class TestCompleteAuthorizationFlow:
 
         # 2. Discovery
         token = auth_result["access_token"]
-        user_info = await mock_services["jwt"].validate_token(token)
+        await mock_services["jwt"].validate_token(token)
         servers = await mock_services["registry"].discover(user_id)
         await mock_services["audit"].log_event(
             event_type="server_discovery", user_id=user_id, servers_found=len(servers)

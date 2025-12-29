@@ -8,18 +8,17 @@ Author: SARK Team
 License: MIT
 """
 
+from datetime import UTC, datetime
 import re
 import time
-from datetime import datetime, UTC
-from typing import Any, Dict, List, Optional
+from typing import Any
+
 import structlog
 
 from sark.adapters.base import ProtocolAdapter
 from sark.adapters.exceptions import (
     AdapterConfigurationError,
-    ConnectionError as AdapterConnectionError,
     DiscoveryError,
-    InvocationError,
     ValidationError,
 )
 from sark.models.base import (
@@ -88,8 +87,8 @@ class DatabaseAdapter(ProtocolAdapter):
 
     def __init__(self):
         """Initialize the database adapter."""
-        self._connections: Dict[str, Any] = {}
-        self._schemas: Dict[str, List[Dict]] = {}
+        self._connections: dict[str, Any] = {}
+        self._schemas: dict[str, list[dict]] = {}
 
     @property
     def protocol_name(self) -> str:
@@ -103,8 +102,8 @@ class DatabaseAdapter(ProtocolAdapter):
 
     async def discover_resources(
         self,
-        discovery_config: Dict[str, Any]
-    ) -> List[ResourceSchema]:
+        discovery_config: dict[str, Any]
+    ) -> list[ResourceSchema]:
         """
         Discover database tables and views.
 
@@ -190,7 +189,7 @@ class DatabaseAdapter(ProtocolAdapter):
     async def get_capabilities(
         self,
         resource: ResourceSchema
-    ) -> List[CapabilitySchema]:
+    ) -> list[CapabilitySchema]:
         """Get all capabilities for a database resource."""
         return resource.capabilities
 
@@ -339,7 +338,7 @@ class DatabaseAdapter(ProtocolAdapter):
 
     # Helper methods
 
-    def _validate_discovery_config(self, config: Dict[str, Any]) -> None:
+    def _validate_discovery_config(self, config: dict[str, Any]) -> None:
         """Validate discovery configuration."""
         required_fields = ["type", "database"]
 
@@ -353,7 +352,7 @@ class DatabaseAdapter(ProtocolAdapter):
                 f"Supported: {', '.join(self.SUPPORTED_DATABASES)}"
             )
 
-    async def _connect(self, config: Dict[str, Any]) -> Any:
+    async def _connect(self, config: dict[str, Any]) -> Any:
         """Establish database connection (simulated for example)."""
         # Note: In a real implementation, you'd use asyncpg, aiomysql, etc.
         logger.info("database_connection", type=config["type"])
@@ -362,8 +361,8 @@ class DatabaseAdapter(ProtocolAdapter):
     async def _introspect_schema(
         self,
         conn: Any,
-        config: Dict[str, Any]
-    ) -> List[Dict[str, str]]:
+        config: dict[str, Any]
+    ) -> list[dict[str, str]]:
         """Introspect database schema (simulated for example)."""
         # Note: In a real implementation, you'd query information_schema
         # For this example, we'll return sample tables
@@ -377,7 +376,7 @@ class DatabaseAdapter(ProtocolAdapter):
 
         return sample_tables
 
-    def _get_operation_schema(self, operation: str) -> Dict[str, Any]:
+    def _get_operation_schema(self, operation: str) -> dict[str, Any]:
         """Get JSON schema for operation arguments."""
         if operation == "select":
             return {
@@ -410,7 +409,7 @@ class DatabaseAdapter(ProtocolAdapter):
         else:
             return "low"
 
-    def _simulate_query(self, query: str) -> List[Dict[str, Any]]:
+    def _simulate_query(self, query: str) -> list[dict[str, Any]]:
         """Simulate query execution (for example purposes)."""
         # Return sample data based on query
         if "SELECT" in query.upper():

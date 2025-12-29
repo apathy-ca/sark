@@ -13,7 +13,7 @@ Usage:
 """
 
 import os
-from typing import Dict, List, Optional
+from typing import Optional
 
 import requests
 
@@ -34,12 +34,12 @@ class SARKAPIKeyManager:
     def create_api_key(
         self,
         name: str,
-        scopes: List[str],
+        scopes: list[str],
         description: Optional[str] = None,
         rate_limit: int = 1000,
         expires_in_days: Optional[int] = 90,
         environment: str = "live",
-    ) -> Dict:
+    ) -> dict:
         """Create a new API key.
 
         Args:
@@ -72,15 +72,15 @@ class SARKAPIKeyManager:
         response.raise_for_status()
         data = response.json()
 
-        print(f"✓ API key created successfully")
+        print("✓ API key created successfully")
         print(f"  ID: {data['api_key']['id']}")
         print(f"  Prefix: {data['api_key']['key_prefix']}")
         print(f"  Full key: {data['key']}")
-        print(f"\n⚠️  Save this key securely - it won't be shown again!")
+        print("\n⚠️  Save this key securely - it won't be shown again!")
 
         return data
 
-    def list_api_keys(self, include_revoked: bool = False) -> List[Dict]:
+    def list_api_keys(self, include_revoked: bool = False) -> list[dict]:
         """List API keys.
 
         Args:
@@ -108,7 +108,7 @@ class SARKAPIKeyManager:
 
         return keys
 
-    def get_api_key(self, key_id: str) -> Dict:
+    def get_api_key(self, key_id: str) -> dict:
         """Get API key details.
 
         Args:
@@ -124,7 +124,7 @@ class SARKAPIKeyManager:
         response.raise_for_status()
         key = response.json()
 
-        print(f"✓ API key details:")
+        print("✓ API key details:")
         print(f"  Name: {key['name']}")
         print(f"  Prefix: {key['key_prefix']}")
         print(f"  Scopes: {', '.join(key['scopes'])}")
@@ -134,8 +134,8 @@ class SARKAPIKeyManager:
         return key
 
     def update_api_key(
-        self, key_id: str, name: Optional[str] = None, scopes: Optional[List[str]] = None, rate_limit: Optional[int] = None, is_active: Optional[bool] = None
-    ) -> Dict:
+        self, key_id: str, name: Optional[str] = None, scopes: Optional[list[str]] = None, rate_limit: Optional[int] = None, is_active: Optional[bool] = None
+    ) -> dict:
         """Update API key metadata.
 
         Args:
@@ -169,10 +169,10 @@ class SARKAPIKeyManager:
         response.raise_for_status()
         key = response.json()
 
-        print(f"✓ API key updated successfully")
+        print("✓ API key updated successfully")
         return key
 
-    def rotate_api_key(self, key_id: str, environment: str = "live") -> Dict:
+    def rotate_api_key(self, key_id: str, environment: str = "live") -> dict:
         """Rotate API key (generate new credentials).
 
         Args:
@@ -190,10 +190,10 @@ class SARKAPIKeyManager:
         response.raise_for_status()
         data = response.json()
 
-        print(f"✓ API key rotated successfully")
+        print("✓ API key rotated successfully")
         print(f"  New prefix: {data['api_key']['key_prefix']}")
         print(f"  New full key: {data['key']}")
-        print(f"\n⚠️  Update your applications with the new key!")
+        print("\n⚠️  Update your applications with the new key!")
 
         return data
 
@@ -208,7 +208,7 @@ class SARKAPIKeyManager:
         response = requests.delete(f"{self.base_url}/api/auth/api-keys/{key_id}", headers=self.headers)
 
         response.raise_for_status()
-        print(f"✓ API key revoked successfully")
+        print("✓ API key revoked successfully")
 
 
 def use_api_key_for_requests(base_url: str, api_key: str):
@@ -253,7 +253,7 @@ def use_api_key_for_requests(base_url: str, api_key: str):
         result = response.json()
         print(f"✓ Server registered: {result['server_id']}")
     elif response.status_code == 403:
-        print(f"✗ Permission denied - API key lacks 'server:write' scope")
+        print("✗ Permission denied - API key lacks 'server:write' scope")
     else:
         print(f"✗ Request failed: {response.status_code}")
 
@@ -289,7 +289,7 @@ def example_api_key_lifecycle():
         )
 
         key_id = key_data["api_key"]["id"]
-        full_key = key_data["key"]
+        key_data["key"]
 
         # Step 2: List all keys
         print("\n" + "-" * 60)

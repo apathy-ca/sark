@@ -16,7 +16,7 @@ Usage:
 
 import json
 import os
-from typing import Any, Dict
+from typing import Any
 
 import requests
 
@@ -29,7 +29,7 @@ class SARKClient:
         self.session = requests.Session()
         self.access_token: str | None = None
 
-    def login(self, username: str, password: str) -> Dict[str, Any]:
+    def login(self, username: str, password: str) -> dict[str, Any]:
         """Authenticate with SARK using LDAP credentials."""
         print(f"\n📡 Authenticating as {username}...")
 
@@ -42,7 +42,7 @@ class SARKClient:
             data = response.json()
             self.access_token = data["access_token"]
             self.session.headers.update({"Authorization": f"Bearer {self.access_token}"})
-            print(f"✅ Authenticated successfully!")
+            print("✅ Authenticated successfully!")
             print(f"   User: {data['user']['email']}")
             print(f"   Roles: {', '.join(data['user']['roles'])}")
             return data
@@ -51,9 +51,9 @@ class SARKClient:
             print(f"   Error: {response.json()}")
             raise Exception("Authentication failed")
 
-    def list_servers(self) -> list[Dict[str, Any]]:
+    def list_servers(self) -> list[dict[str, Any]]:
         """List all available MCP servers."""
-        print(f"\n📋 Fetching available MCP servers...")
+        print("\n📋 Fetching available MCP servers...")
 
         response = self.session.get(f"{self.base_url}/api/v1/servers")
 
@@ -67,9 +67,9 @@ class SARKClient:
             print(f"❌ Failed to fetch servers: {response.status_code}")
             return []
 
-    def list_tools(self, server_id: str | None = None) -> list[Dict[str, Any]]:
+    def list_tools(self, server_id: str | None = None) -> list[dict[str, Any]]:
         """List available MCP tools, optionally filtered by server."""
-        print(f"\n🔧 Fetching available MCP tools...")
+        print("\n🔧 Fetching available MCP tools...")
 
         url = f"{self.base_url}/api/v1/tools"
         if server_id:
@@ -93,11 +93,11 @@ class SARKClient:
     def invoke_tool(
         self,
         tool_id: str,
-        arguments: Dict[str, Any],
+        arguments: dict[str, Any],
         timeout: int = 30
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Invoke an MCP tool through SARK."""
-        print(f"\n🚀 Invoking tool...")
+        print("\n🚀 Invoking tool...")
         print(f"   Tool ID: {tool_id}")
         print(f"   Arguments: {json.dumps(arguments, indent=2)}")
 
@@ -114,7 +114,7 @@ class SARKClient:
 
         if response.status_code == 200:
             result = response.json()
-            print(f"✅ Tool invocation successful!")
+            print("✅ Tool invocation successful!")
             print(f"   Request ID: {result.get('request_id')}")
             print(f"   Audit ID: {result.get('audit_id')}")
 
@@ -129,15 +129,15 @@ class SARKClient:
             return result
         elif response.status_code == 403:
             error = response.json()
-            print(f"🚫 Access Denied!")
+            print("🚫 Access Denied!")
             print(f"   Reason: {error.get('reason', 'Unknown')}")
             print(f"   Required roles: {error.get('required_roles', [])}")
             raise Exception("Access denied")
         elif response.status_code == 404:
-            print(f"❌ Tool not found")
+            print("❌ Tool not found")
             raise Exception("Tool not found")
         else:
-            print(f"❌ Tool invocation failed")
+            print("❌ Tool invocation failed")
             print(f"   Error: {response.json()}")
             raise Exception(f"Tool invocation failed: {response.status_code}")
 
@@ -158,7 +158,7 @@ def main():
 
     try:
         # Step 1: Authenticate
-        auth_result = client.login(USERNAME, PASSWORD)
+        client.login(USERNAME, PASSWORD)
 
         # Step 2: List available MCP servers
         servers = client.list_servers()

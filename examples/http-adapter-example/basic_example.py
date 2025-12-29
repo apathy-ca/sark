@@ -14,7 +14,7 @@ import asyncio
 from datetime import datetime
 
 from sark.adapters.http import HTTPAdapter
-from sark.models.base import ResourceSchema, InvocationRequest
+from sark.models.base import InvocationRequest, ResourceSchema
 
 
 async def main():
@@ -112,7 +112,7 @@ async def main():
     result = await adapter.invoke(request)
 
     if result.success:
-        print(f"   ✓ Request successful!")
+        print("   ✓ Request successful!")
         print(f"   - Duration: {result.duration_ms:.2f}ms")
         print(f"   - Result: {result.result}")
     else:
@@ -142,7 +142,7 @@ async def main():
     create_result = await adapter.invoke(create_request)
 
     if create_result.success:
-        print(f"   ✓ Post created!")
+        print("   ✓ Post created!")
         print(f"   - Duration: {create_result.duration_ms:.2f}ms")
         print(f"   - Created post ID: {create_result.result.get('id')}")
     else:

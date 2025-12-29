@@ -5,8 +5,9 @@ Tests stable user assignment, rollout percentages, Redis integration,
 and rollback functionality.
 """
 
+from unittest.mock import Mock
+
 import pytest
-from unittest.mock import Mock, MagicMock
 
 from sark.services.feature_flags import FeatureFlagManager, get_feature_flag_manager
 

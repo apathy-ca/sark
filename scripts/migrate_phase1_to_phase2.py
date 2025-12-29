@@ -30,15 +30,14 @@ Examples:
 """
 
 import argparse
-import os
+from dataclasses import dataclass, field
+from datetime import datetime
+from pathlib import Path
 import re
 import secrets
 import shutil
 import sys
-from dataclasses import dataclass, field
-from datetime import datetime
-from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Optional
 
 
 # Color codes for terminal output
@@ -68,9 +67,9 @@ class MigrationIssue:
 class MigrationResult:
     """Results of a migration operation."""
     success: bool
-    config: Dict[str, str] = field(default_factory=dict)
-    issues: List[MigrationIssue] = field(default_factory=list)
-    changes_made: List[str] = field(default_factory=list)
+    config: dict[str, str] = field(default_factory=dict)
+    issues: list[MigrationIssue] = field(default_factory=list)
+    changes_made: list[str] = field(default_factory=list)
 
     def has_errors(self) -> bool:
         """Check if result has any errors."""
@@ -158,17 +157,17 @@ class ConfigMigrator:
         """Initialize migrator with input and output paths."""
         self.input_path = input_path
         self.output_path = output_path
-        self.phase1_config: Dict[str, str] = {}
-        self.phase2_config: Dict[str, str] = {}
+        self.phase1_config: dict[str, str] = {}
+        self.phase2_config: dict[str, str] = {}
 
-    def load_env_file(self, path: Path) -> Dict[str, str]:
+    def load_env_file(self, path: Path) -> dict[str, str]:
         """Load environment variables from .env file."""
         config = {}
 
         if not path.exists():
             return config
 
-        with open(path, 'r') as f:
+        with open(path) as f:
             for line_num, line in enumerate(f, 1):
                 line = line.strip()
 
@@ -192,7 +191,7 @@ class ConfigMigrator:
         """Generate a secure random secret key."""
         return secrets.token_urlsafe(length)
 
-    def validate_secret_key(self, key: str) -> Tuple[bool, Optional[str]]:
+    def validate_secret_key(self, key: str) -> tuple[bool, Optional[str]]:
         """Validate a secret key for security."""
         if not key:
             return False, "Secret key is empty"
@@ -274,7 +273,7 @@ class ConfigMigrator:
                     severity="error",
                     component="security",
                     message=f"{var_name}: {error_msg}",
-                    suggestion=f"Generate a new secure key using: python -c 'import secrets; print(secrets.token_urlsafe(64))'"
+                    suggestion="Generate a new secure key using: python -c 'import secrets; print(secrets.token_urlsafe(64))'"
                 ))
 
         # Check for required production variables
@@ -328,7 +327,7 @@ class ConfigMigrator:
         # This is a placeholder for future migrations
         pass
 
-    def write_config(self, config: Dict[str, str], output_path: Path):
+    def write_config(self, config: dict[str, str], output_path: Path):
         """Write configuration to output file."""
         # Group variables by category for better organization
         categories = {
@@ -365,7 +364,7 @@ class ConfigMigrator:
             f.write(f"# Migrated from: {self.input_path}\n\n")
 
             # Write categorized variables
-            written_vars: Set[str] = set()
+            written_vars: set[str] = set()
 
             for category, var_names in categories.items():
                 # Check if any variables in this category exist
@@ -390,7 +389,7 @@ class ConfigMigrator:
         print(f"\n{Colors.BOLD}{Colors.HEADER}=== Configuration Changes ==={Colors.ENDC}\n")
 
         # Show added variables
-        added_vars = [k for k in result.config.keys() if k not in self.phase1_config]
+        added_vars = [k for k in result.config if k not in self.phase1_config]
         if added_vars:
             print(f"{Colors.OKGREEN}Added variables ({len(added_vars)}):{Colors.ENDC}")
             for var in sorted(added_vars):
@@ -407,7 +406,7 @@ class ConfigMigrator:
             print()
 
         # Show modified variables
-        modified_vars = [k for k in result.config.keys()
+        modified_vars = [k for k in result.config
                         if k in self.phase1_config and result.config[k] != self.phase1_config[k]]
         if modified_vars:
             print(f"{Colors.WARNING}Modified variables ({len(modified_vars)}):{Colors.ENDC}")
@@ -425,7 +424,7 @@ class ConfigMigrator:
             print()
 
         # Show unchanged variables count
-        unchanged_count = len([k for k in self.phase1_config.keys()
+        unchanged_count = len([k for k in self.phase1_config
                              if k in result.config and result.config[k] == self.phase1_config[k]])
         print(f"{Colors.OKBLUE}Unchanged variables: {unchanged_count}{Colors.ENDC}\n")
 
@@ -579,10 +578,10 @@ def main():
 
     # Print next steps
     print(f"{Colors.BOLD}Next steps:{Colors.ENDC}")
-    print(f"  1. Review the generated configuration file")
-    print(f"  2. Fill in any missing values (SPLUNK_*, DATADOG_*, etc.)")
+    print("  1. Review the generated configuration file")
+    print("  2. Fill in any missing values (SPLUNK_*, DATADOG_*, etc.)")
     print(f"  3. Run: python scripts/validate_config.py --env {args.output if not args.apply else args.input}")
-    print(f"  4. Follow the deployment checklist in docs/DEPLOYMENT_CHECKLIST.md")
+    print("  4. Follow the deployment checklist in docs/DEPLOYMENT_CHECKLIST.md")
     print()
 
     if result.has_warnings():

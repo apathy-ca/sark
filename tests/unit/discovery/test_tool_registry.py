@@ -7,7 +7,6 @@ from uuid import uuid4
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from sark.models.audit import AuditEventType, SeverityLevel
 from sark.models.mcp_server import MCPTool, SensitivityLevel
 from sark.services.discovery.tool_registry import ToolRegistry
 

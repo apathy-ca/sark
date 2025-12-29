@@ -15,7 +15,7 @@ import asyncio
 from datetime import datetime
 
 from sark.adapters.http import HTTPAdapter
-from sark.models.base import ResourceSchema, InvocationRequest
+from sark.models.base import InvocationRequest, ResourceSchema
 
 
 async def example_rate_limiting():
@@ -68,7 +68,7 @@ async def example_rate_limiting():
     duration = end_time - start_time
 
     print(f"\n✓ All requests completed in {duration:.2f}s")
-    print(f"  Expected time: ~2s (10 requests at 5/s)")
+    print("  Expected time: ~2s (10 requests at 5/s)")
     print(f"  Rate limiting enforced: {'✓' if duration >= 1.5 else '✗'}")
 
 

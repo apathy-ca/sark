@@ -6,20 +6,19 @@ Provides fixtures for OPA clients (HTTP and Rust) and cache implementations
 """
 
 import asyncio
+from collections.abc import AsyncGenerator
 import json
 import os
-from typing import AsyncGenerator
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
 from sark.services.policy.cache import PolicyCache
 from sark.services.policy.opa_client import (
-    AuthorizationInput,
     AuthorizationDecision,
+    AuthorizationInput,
     OPAClient,
 )
-
 
 # ==============================================================================
 # Test Data Fixtures

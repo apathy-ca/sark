@@ -1,8 +1,9 @@
 """Unit tests for cache cleanup task."""
 
 import asyncio
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
 
 from sark.services.policy import cache_cleanup
 
@@ -154,7 +155,6 @@ class TestCleanupTaskLifecycle:
         await task.start()
 
         # Mock the task to not complete quickly
-        original_task = task._task
 
         # Stop should timeout and cancel
         with patch("asyncio.wait_for", side_effect=asyncio.TimeoutError):

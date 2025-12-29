@@ -12,7 +12,6 @@ import pytest
 
 from sark.services.policy.opa_client import AuthorizationInput
 
-
 # ==============================================================================
 # Simple Policy Benchmarks (RBAC)
 # ==============================================================================

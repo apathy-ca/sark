@@ -9,7 +9,6 @@ including Redis Sentinel for high availability.
 import logging
 from typing import Any
 
-import valkey
 from valkey import Redis
 from valkey.sentinel import Sentinel
 

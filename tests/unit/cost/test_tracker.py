@@ -1,12 +1,12 @@
 """Unit tests for Cost Tracker."""
 
 from decimal import Decimal
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock, Mock
 
 import pytest
 
 from sark.models.base import InvocationRequest, InvocationResult
-from sark.services.cost.estimator import CostEstimate, FixedCostEstimator, NoCostEstimator
+from sark.services.cost.estimator import CostEstimate, FixedCostEstimator
 from sark.services.cost.tracker import CostTracker
 
 
@@ -333,7 +333,7 @@ class TestCostTrackerIntegration:
         cost_tracker.attribution_service.record_cost = AsyncMock()
 
         # 1. Check budget
-        allowed, reason = await cost_tracker.check_budget_before_invocation(sample_request, metadata)
+        allowed, _reason = await cost_tracker.check_budget_before_invocation(sample_request, metadata)
         assert allowed is True
 
         # 2. Record cost after invocation

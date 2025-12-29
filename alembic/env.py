@@ -7,11 +7,10 @@ both synchronous (for migration generation) and asynchronous (for migration appl
 import asyncio
 from logging.config import fileConfig
 
+from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
-
-from alembic import context
 
 # Import the Base and all models to ensure they're registered
 from sark.config import get_settings

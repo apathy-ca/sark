@@ -7,9 +7,8 @@ Prevents abuse by limiting how many requests a user can make in a time period.
 
 from collections import defaultdict, deque
 from datetime import datetime, timedelta
-from typing import Dict, Deque
 
-from sark.services.policy.plugins import PolicyPlugin, PolicyContext, PolicyDecision
+from sark.services.policy.plugins import PolicyContext, PolicyDecision, PolicyPlugin
 
 
 class RateLimitPlugin(PolicyPlugin):
@@ -36,7 +35,7 @@ class RateLimitPlugin(PolicyPlugin):
 
         # In-memory request tracking (in production, use Redis or similar)
         # Structure: {principal_id: deque of timestamps}
-        self._request_history: Dict[str, Deque[datetime]] = defaultdict(deque)
+        self._request_history: dict[str, deque[datetime]] = defaultdict(deque)
 
     @property
     def name(self) -> str:

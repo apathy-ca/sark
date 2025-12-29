@@ -13,11 +13,11 @@ Engineer: ENGINEER-3
 
 import asyncio
 
-from sark.adapters.grpc_adapter import GRPCAdapter
 from sark.adapters.grpc.auth import (
     AuthenticationHelper,
     create_authenticated_channel,
 )
+from sark.adapters.grpc_adapter import GRPCAdapter
 
 
 async def bearer_token_example():
@@ -47,7 +47,7 @@ async def bearer_token_example():
         # as "Authorization: Bearer <token>"
 
     except Exception as e:
-        print(f"  Error: {str(e)}")
+        print(f"  Error: {e!s}")
 
 
 async def api_key_example():
@@ -78,7 +78,7 @@ async def api_key_example():
         # "x-api-key: sk-1234567890abcdef"
 
     except Exception as e:
-        print(f"  Error: {str(e)}")
+        print(f"  Error: {e!s}")
 
 
 async def custom_metadata_example():
@@ -115,14 +115,14 @@ async def custom_metadata_example():
             print(f"    {key}: {value}")
 
     except Exception as e:
-        print(f"  Error: {str(e)}")
+        print(f"  Error: {e!s}")
 
 
 async def mtls_example():
     """Demonstrate mTLS configuration."""
     print("\n=== mTLS Authentication ===")
 
-    adapter = GRPCAdapter()
+    GRPCAdapter()
 
     # Discovery with mTLS
     discovery_config = {

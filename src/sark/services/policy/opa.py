@@ -11,14 +11,14 @@ from typing import Any
 
 import structlog
 
+from sark.api.metrics.rollout_metrics import (
+    record_cache_operation,
+    record_feature_flag_assignment,
+    record_opa_error,
+    record_opa_evaluation,
+)
 from sark.services.policy.factory import create_opa_client, create_policy_cache
 from sark.services.policy.opa_client import AuthorizationInput
-from sark.api.metrics.rollout_metrics import (
-    record_opa_evaluation,
-    record_opa_error,
-    record_feature_flag_assignment,
-    record_cache_operation,
-)
 
 logger = structlog.get_logger()
 

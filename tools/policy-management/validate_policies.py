@@ -11,10 +11,10 @@ Usage:
 
 import argparse
 import json
+from pathlib import Path
 import subprocess
 import sys
-from pathlib import Path
-from typing import Dict, List, Tuple
+
 
 class PolicyValidator:
     """Validates OPA policies"""
@@ -40,7 +40,7 @@ class PolicyValidator:
         ]
 
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            subprocess.run(cmd, capture_output=True, text=True, check=True)
             print("  ✅ Syntax valid")
             return True
         except subprocess.CalledProcessError as e:
@@ -95,7 +95,7 @@ class PolicyValidator:
         """Check for policy best practices"""
         print(f"\nChecking best practices: {policy_file}")
 
-        with open(policy_file, 'r') as f:
+        with open(policy_file) as f:
             content = f.read()
 
         issues = []
@@ -133,14 +133,14 @@ class PolicyValidator:
 
         return len(issues) == 0
 
-    def check_conflicts(self, policy_files: List[Path]) -> bool:
+    def check_conflicts(self, policy_files: list[Path]) -> bool:
         """Check for policy conflicts"""
         print("\nChecking for policy conflicts...")
 
         # Group policies by package
         packages = {}
         for policy_file in policy_files:
-            with open(policy_file, 'r') as f:
+            with open(policy_file) as f:
                 content = f.read()
 
             # Extract package name
@@ -171,7 +171,7 @@ class PolicyValidator:
         """Check if policy is complete"""
         print(f"\nChecking completeness: {policy_file}")
 
-        with open(policy_file, 'r') as f:
+        with open(policy_file) as f:
             content = f.read()
 
         issues = []
@@ -196,7 +196,7 @@ class PolicyValidator:
 
         return len(issues) == 0
 
-    def generate_report(self) -> Dict:
+    def generate_report(self) -> dict:
         """Generate validation report"""
         return {
             "errors": self.errors,
@@ -235,7 +235,7 @@ class PolicyValidator:
         return len(self.errors) == 0
 
 
-def find_policy_files(path: Path) -> List[Path]:
+def find_policy_files(path: Path) -> list[Path]:
     """Find all .rego files (excluding tests)"""
     if path.is_file():
         return [path]
@@ -312,18 +312,16 @@ def main():
     validator = PolicyValidator()
 
     # Run validations
-    all_passed = True
 
     for policy_file in policy_files:
         # Syntax validation (always run)
         if not validator.validate_syntax(policy_file):
-            all_passed = False
             continue  # Skip other checks if syntax is invalid
 
         # Run tests
         if args.test or not args.lint:  # Run tests by default
             if not validator.run_tests(policy_file):
-                all_passed = False
+                pass
 
         # Best practices
         if args.lint or not args.test:  # Run linter by default

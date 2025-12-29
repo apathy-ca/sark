@@ -16,15 +16,14 @@ Acceptance Criteria:
 import asyncio
 import gc
 import os
+import time
+from unittest.mock import AsyncMock, patch
+
 import psutil
 import pytest
-import time
-from typing import List, Tuple
-from unittest.mock import AsyncMock, patch
 
 from sark.services.policy.cache import PolicyCache
 from sark.services.policy.opa_client import AuthorizationInput, OPAClient
-
 
 # ==============================================================================
 # Helper Functions
@@ -62,7 +61,7 @@ async def test_opa_client_no_memory_leak_short():
     This is a faster version suitable for CI that still catches obvious leaks.
     """
     print(f"\n{'=' * 80}")
-    print(f"OPA CLIENT MEMORY LEAK TEST (SHORT)")
+    print("OPA CLIENT MEMORY LEAK TEST (SHORT)")
     print(f"{'=' * 80}\n")
 
     # Force garbage collection before starting
@@ -87,7 +86,7 @@ async def test_opa_client_no_memory_leak_short():
         batch_size = 10_000
         num_batches = num_requests // batch_size
 
-        memory_samples: List[Tuple[int, float]] = []
+        memory_samples: list[tuple[int, float]] = []
 
         for batch_num in range(num_batches):
             # Run batch
@@ -120,7 +119,7 @@ async def test_opa_client_no_memory_leak_short():
         memory_growth = final_memory - initial_memory
 
         print(f"\n{'=' * 80}")
-        print(f"RESULTS")
+        print("RESULTS")
         print(f"{'=' * 80}")
         print(f"Initial memory: {initial_memory:.2f} MB")
         print(f"Final memory: {final_memory:.2f} MB")
@@ -161,7 +160,7 @@ async def test_cache_no_memory_leak_short():
     Tests cache set/get operations for memory leaks.
     """
     print(f"\n{'=' * 80}")
-    print(f"CACHE MEMORY LEAK TEST (SHORT)")
+    print("CACHE MEMORY LEAK TEST (SHORT)")
     print(f"{'=' * 80}\n")
 
     gc.collect()
@@ -182,7 +181,7 @@ async def test_cache_no_memory_leak_short():
     batch_size = 10_000
     num_batches = num_operations // batch_size
 
-    memory_samples: List[Tuple[int, float]] = []
+    memory_samples: list[tuple[int, float]] = []
 
     for batch_num in range(num_batches):
         # Mix of set and get operations
@@ -221,7 +220,7 @@ async def test_cache_no_memory_leak_short():
     memory_growth = final_memory - initial_memory
 
     print(f"\n{'=' * 80}")
-    print(f"RESULTS")
+    print("RESULTS")
     print(f"{'=' * 80}")
     print(f"Initial memory: {initial_memory:.2f} MB")
     print(f"Final memory: {final_memory:.2f} MB")
@@ -253,7 +252,7 @@ async def test_no_memory_leak_24h():
     pytest tests/performance/memory/test_memory_leaks.py::test_no_memory_leak_24h -v -s
     """
     print(f"\n{'=' * 80}")
-    print(f"24-HOUR MEMORY LEAK TEST")
+    print("24-HOUR MEMORY LEAK TEST")
     print(f"{'=' * 80}\n")
 
     # Test configuration
@@ -291,7 +290,7 @@ async def test_no_memory_leak_24h():
         cache = PolicyCache(redis_client=mock_redis, ttl_seconds=300, enabled=True)
 
         # Memory tracking
-        memory_samples: List[Tuple[float, float]] = []
+        memory_samples: list[tuple[float, float]] = []
         request_count = 0
         sample_count = 0
 
@@ -346,7 +345,7 @@ async def test_no_memory_leak_24h():
         elapsed_hours = (time.time() - start_time) / 3600
 
         print(f"\n{'=' * 80}")
-        print(f"24-HOUR TEST RESULTS")
+        print("24-HOUR TEST RESULTS")
         print(f"{'=' * 80}")
         print(f"Elapsed time: {elapsed_hours:.2f} hours")
         print(f"Total requests: {request_count:,}")
@@ -400,12 +399,11 @@ async def test_rust_vs_python_memory_usage():
     Expected: Rust ≤ Python memory usage
     """
     print(f"\n{'=' * 80}")
-    print(f"RUST VS PYTHON MEMORY COMPARISON")
+    print("RUST VS PYTHON MEMORY COMPARISON")
     print(f"{'=' * 80}\n")
 
     # Test configuration
     num_requests = 50_000
-    batch_size = 5_000
 
     # Test Python implementation
     print("Testing Python implementation...")
@@ -481,7 +479,7 @@ async def test_rust_vs_python_memory_usage():
 
         # Comparison
         print(f"{'=' * 80}")
-        print(f"COMPARISON")
+        print("COMPARISON")
         print(f"{'=' * 80}")
         print(f"Python memory growth: {python_growth:.2f} MB")
         print(f"Rust memory growth: {rust_growth:.2f} MB")
@@ -490,7 +488,7 @@ async def test_rust_vs_python_memory_usage():
             improvement = ((python_growth - rust_growth) / python_growth) * 100
             print(f"Rust uses {improvement:.1f}% less memory")
         else:
-            print(f"Rust uses similar memory to Python")
+            print("Rust uses similar memory to Python")
 
         print(f"{'=' * 80}\n")
 
@@ -518,7 +516,7 @@ async def test_resource_cleanup_on_client_close():
     are properly cleaned up when clients are closed.
     """
     print(f"\n{'=' * 80}")
-    print(f"RESOURCE CLEANUP TEST")
+    print("RESOURCE CLEANUP TEST")
     print(f"{'=' * 80}\n")
 
     gc.collect()

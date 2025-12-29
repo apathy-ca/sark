@@ -14,7 +14,7 @@ to pure-Python implementations where available.
 RUST_AVAILABLE = False
 
 try:
-    from sark.sark_rust import *  # noqa: F401, F403
+    from sark.sark_rust import *  # noqa: F403
     RUST_AVAILABLE = True
 except ImportError as e:
     # Rust extensions not built - this is OK during development

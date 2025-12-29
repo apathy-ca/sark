@@ -9,18 +9,18 @@ Tests cover:
 - Performance requirements
 """
 
-import pytest
 from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, Mock
-from collections import Counter
+from unittest.mock import AsyncMock
+
+import pytest
 
 from sark.security.behavioral_analyzer import (
-    BehavioralAnalyzer,
-    BehavioralBaseline,
-    BehavioralAuditEvent,
     Anomaly,
-    AnomalyType,
     AnomalySeverity,
+    AnomalyType,
+    BehavioralAnalyzer,
+    BehavioralAuditEvent,
+    BehavioralBaseline,
 )
 
 
@@ -236,7 +236,7 @@ class TestBehavioralAnalyzer:
             )
         ]
 
-        baseline = await analyzer_with_storage.build_baseline(
+        await analyzer_with_storage.build_baseline(
             "user123", events=events
         )
 
@@ -665,7 +665,7 @@ class TestBehavioralAnalyzer:
             sensitivity="low",
         )
 
-        anomalies = await analyzer_with_storage.detect_anomalies(event)
+        await analyzer_with_storage.detect_anomalies(event)
 
         # Verify storage.get was called
         analyzer_with_storage.baseline_storage.get.assert_called_once_with("user123")

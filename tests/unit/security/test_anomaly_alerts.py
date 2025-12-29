@@ -11,18 +11,19 @@ Tests cover:
 - Error handling
 """
 
-import pytest
 from datetime import datetime
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import AsyncMock
+
+import pytest
 
 from sark.security.anomaly_alerts import (
-    AnomalyAlertManager,
     AlertConfig,
+    AnomalyAlertManager,
 )
 from sark.security.behavioral_analyzer import (
     Anomaly,
-    AnomalyType,
     AnomalySeverity,
+    AnomalyType,
     BehavioralAuditEvent,
 )
 

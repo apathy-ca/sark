@@ -17,14 +17,14 @@ Acceptance Criteria:
 
 import asyncio
 import os
-import psutil
-import pytest
 import time
 from unittest.mock import AsyncMock, patch
 
+import psutil
+import pytest
+
 from sark.services.policy.cache import PolicyCache
 from sark.services.policy.opa_client import AuthorizationInput, OPAClient
-
 
 # ==============================================================================
 # Extreme Throughput Tests
@@ -69,7 +69,6 @@ async def test_extreme_throughput_10k_rps():
         # Metrics
         successful_requests = 0
         failed_requests = 0
-        latencies = []
         start_time = time.time()
 
         # Concurrent batches
@@ -77,7 +76,7 @@ async def test_extreme_throughput_10k_rps():
         num_batches = total_requests // batch_size
 
         print(f"\n{'=' * 80}")
-        print(f"EXTREME THROUGHPUT STRESS TEST")
+        print("EXTREME THROUGHPUT STRESS TEST")
         print(f"{'=' * 80}")
         print(f"Target RPS: {target_rps:,}")
         print(f"Duration: {test_duration_seconds}s")
@@ -142,7 +141,7 @@ async def test_extreme_throughput_10k_rps():
         )
 
         print(f"\n{'=' * 80}")
-        print(f"RESULTS")
+        print("RESULTS")
         print(f"{'=' * 80}")
         print(f"Successful requests: {successful_requests:,}")
         print(f"Failed requests: {failed_requests:,}")
@@ -185,7 +184,7 @@ async def test_large_policy_10mb():
     large_policy = _generate_large_policy(size_mb=10)
 
     print(f"\n{'=' * 80}")
-    print(f"LARGE POLICY STRESS TEST")
+    print("LARGE POLICY STRESS TEST")
     print(f"{'=' * 80}")
     print(f"Policy size: {len(large_policy) / 1024 / 1024:.2f} MB")
     print(f"{'=' * 80}\n")
@@ -287,9 +286,9 @@ async def test_large_cache_1m_entries():
     - Verify LRU eviction works correctly
     """
     print(f"\n{'=' * 80}")
-    print(f"LARGE CACHE STRESS TEST")
+    print("LARGE CACHE STRESS TEST")
     print(f"{'=' * 80}")
-    print(f"Target entries: 1,000,000")
+    print("Target entries: 1,000,000")
     print(f"{'=' * 80}\n")
 
     # Mock Redis client
@@ -352,7 +351,7 @@ async def test_large_cache_1m_entries():
     memory_per_entry = total_memory_delta / target_entries
 
     print(f"\n{'=' * 80}")
-    print(f"RESULTS")
+    print("RESULTS")
     print(f"{'=' * 80}")
     print(f"Entries added: {target_entries:,}")
     print(f"Duration: {total_duration:.2f}s")
@@ -410,9 +409,9 @@ async def test_memory_exhaustion():
     Run manually with: pytest -v -m stress --run-dangerous
     """
     print(f"\n{'=' * 80}")
-    print(f"MEMORY EXHAUSTION STRESS TEST")
+    print("MEMORY EXHAUSTION STRESS TEST")
     print(f"{'=' * 80}")
-    print(f"WARNING: This test intentionally exhausts memory!")
+    print("WARNING: This test intentionally exhausts memory!")
     print(f"{'=' * 80}\n")
 
     # Get available memory
@@ -470,7 +469,7 @@ async def test_connection_saturation():
     - No connection leaks
     """
     print(f"\n{'=' * 80}")
-    print(f"CONNECTION SATURATION STRESS TEST")
+    print("CONNECTION SATURATION STRESS TEST")
     print(f"{'=' * 80}\n")
 
     # Create client with small connection pool

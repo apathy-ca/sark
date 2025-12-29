@@ -6,16 +6,17 @@ implementations based on feature flags, with automatic fallback on errors.
 """
 
 import os
-from typing import Protocol, Any
+from typing import Any, Protocol
+
 import structlog
 
 from sark.services.feature_flags import get_feature_flag_manager
-from sark.services.policy.opa_client import (
-    OPAClient,
-    AuthorizationInput,
-    AuthorizationDecision,
-)
 from sark.services.policy.cache import PolicyCache
+from sark.services.policy.opa_client import (
+    AuthorizationDecision,
+    AuthorizationInput,
+    OPAClient,
+)
 
 logger = structlog.get_logger()
 

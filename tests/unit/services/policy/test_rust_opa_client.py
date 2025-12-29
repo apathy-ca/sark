@@ -1,16 +1,16 @@
 """Unit tests for RustOPAClient."""
 
-import pytest
 from pathlib import Path
 from unittest.mock import AsyncMock, Mock, patch
 
-from sark.services.policy.rust_opa_client import (
-    RustOPAClient,
-    AuthorizationInput,
-    AuthorizationDecision,
-    RUST_AVAILABLE,
-)
+import pytest
 
+from sark.services.policy.rust_opa_client import (
+    RUST_AVAILABLE,
+    AuthorizationDecision,
+    AuthorizationInput,
+    RustOPAClient,
+)
 
 # Mark all tests to skip if Rust extension is not available
 pytestmark = pytest.mark.skipif(

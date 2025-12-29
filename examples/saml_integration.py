@@ -44,17 +44,17 @@ async def azure_ad_example():
         state="/dashboard",  # RelayState - where to redirect after auth
         redirect_uri="",  # Not used in SAML
     )
-    print(f"\n2. SSO Login URL:")
+    print("\n2. SSO Login URL:")
     print(f"   {sso_url[:100]}...")
 
     # Step 3: After user authenticates, handle SAML response
     # (In real app, this would be done in your ACS endpoint)
-    print(f"\n3. After user authenticates at IdP:")
+    print("\n3. After user authenticates at IdP:")
     print(f"   - IdP POSTs SAML response to: {provider.sp_acs_url}")
-    print(f"   - Your app validates the assertion")
-    print(f"   - Extract user info (email, name, groups)")
-    print(f"   - Create user session")
-    print(f"   - Redirect to RelayState URL")
+    print("   - Your app validates the assertion")
+    print("   - Extract user info (email, name, groups)")
+    print("   - Create user session")
+    print("   - Redirect to RelayState URL")
 
     # Health check
     is_healthy = await provider.health_check()
@@ -116,7 +116,7 @@ async def attribute_mapping_example():
         "memberOf": "groups",
     }
 
-    provider = SAMLProvider(
+    SAMLProvider(
         sp_entity_id="https://sark.example.com",
         sp_acs_url="https://sark.example.com/api/auth/saml/acs",
         sp_sls_url="https://sark.example.com/api/auth/saml/slo",

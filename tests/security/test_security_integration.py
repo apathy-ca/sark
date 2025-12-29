@@ -9,27 +9,26 @@ Tests security modules working together with real dependencies:
 - Complete security flow
 """
 
-import pytest
 from datetime import datetime, timedelta
-import asyncio
 
+import pytest
+
+from sark.security.anomaly_alerts import (
+    AlertConfig,
+    AnomalyAlertManager,
+)
 from sark.security.behavioral_analyzer import (
+    AnomalyType,
     BehavioralAnalyzer,
     BehavioralAuditEvent,
-    AnomalyType,
-    AnomalySeverity,
 )
-from sark.security.anomaly_alerts import (
-    AnomalyAlertManager,
-    AlertConfig,
-)
+from sark.security.injection_detector import PromptInjectionDetector
 from sark.security.mfa import (
     MFAChallengeSystem,
     MFAConfig,
     MFAMethod,
     TOTPGenerator,
 )
-from sark.security.injection_detector import PromptInjectionDetector
 from sark.security.secret_scanner import SecretScanner
 
 
@@ -329,7 +328,7 @@ class TestInjectionDetectionIntegration:
 
         start = time.time()
         for _ in range(100):
-            result = detector.detect(complex_params)
+            detector.detect(complex_params)
         elapsed = time.time() - start
 
         # Should process 100 requests in under 500ms (5ms per request)
@@ -416,7 +415,7 @@ class TestCompleteSecurityFlow:
 
         analyzer = BehavioralAnalyzer()
         injection_detector = PromptInjectionDetector(mode="block", threshold=60)
-        secret_scanner = SecretScanner()
+        SecretScanner()
 
         alert_config = AlertConfig(
             auto_suspend_enabled=True,

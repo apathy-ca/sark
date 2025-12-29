@@ -7,7 +7,6 @@ Redis persistence, and real-time rollout control.
 
 import hashlib
 import logging
-from typing import Dict
 
 from valkey import Redis
 
@@ -26,7 +25,7 @@ class FeatureFlagManager:
                          If None, uses in-memory storage only.
         """
         self.redis = redis_client
-        self.rollout_pct: Dict[str, int] = {
+        self.rollout_pct: dict[str, int] = {
             "rust_opa": 0,  # Start at 0%
             "rust_cache": 0,
         }
@@ -127,7 +126,7 @@ class FeatureFlagManager:
                 f"Set rollout percentage in memory: {feature}={percentage}%"
             )
 
-    def get_all_rollouts(self) -> Dict[str, int]:
+    def get_all_rollouts(self) -> dict[str, int]:
         """
         Get all feature rollout percentages.
 
@@ -135,7 +134,7 @@ class FeatureFlagManager:
             Dictionary mapping feature names to rollout percentages
         """
         rollouts = {}
-        for feature in self.rollout_pct.keys():
+        for feature in self.rollout_pct:
             rollouts[feature] = self.get_rollout_pct(feature)
         return rollouts
 
@@ -152,7 +151,7 @@ class FeatureFlagManager:
     def rollback_all(self) -> None:
         """Emergency rollback: set all features to 0% immediately."""
         logger.warning("ROLLBACK ALL: Setting all features to 0%")
-        for feature in self.rollout_pct.keys():
+        for feature in self.rollout_pct:
             self.set_rollout_pct(feature, 0)
 
 

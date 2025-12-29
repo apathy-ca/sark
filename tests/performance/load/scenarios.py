@@ -5,7 +5,6 @@ Defines realistic request patterns for SARK authorization testing.
 """
 
 from dataclasses import dataclass
-from typing import ClassVar
 
 
 @dataclass

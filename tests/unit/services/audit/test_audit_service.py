@@ -2,7 +2,7 @@
 
 from datetime import UTC, datetime
 from unittest.mock import AsyncMock, Mock, patch
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -59,7 +59,7 @@ class TestAuditServiceBasic:
 
         # Act
         with patch.object(audit_service, '_forward_to_siem', new_callable=AsyncMock):
-            result = await audit_service.log_event(
+            await audit_service.log_event(
                 event_type=event_type,
                 severity=severity,
                 user_id=sample_user_id,

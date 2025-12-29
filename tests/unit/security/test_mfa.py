@@ -11,15 +11,16 @@ Tests cover:
 - Service integration (SMS, Email, Push)
 """
 
-import pytest
 from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, Mock, patch
-import time
 import secrets
+import time
+from unittest.mock import AsyncMock, patch
+
+import pytest
 
 from sark.security.mfa import (
-    MFAChallengeSystem,
     MFAChallenge,
+    MFAChallengeSystem,
     MFAConfig,
     MFAMethod,
     MFAStatus,

@@ -16,13 +16,13 @@ Acceptance Criteria:
 """
 
 import asyncio
-import pytest
 import time
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
+
+import pytest
 
 from sark.services.policy.cache import PolicyCache
 from sark.services.policy.opa_client import AuthorizationInput, OPAClient
-
 
 # ==============================================================================
 # OPA Server Failure Tests
@@ -48,7 +48,7 @@ async def test_opa_server_failure_and_recovery():
     - Recovery time < 5 seconds
     """
     print(f"\n{'=' * 80}")
-    print(f"OPA SERVER FAILURE RECOVERY TEST")
+    print("OPA SERVER FAILURE RECOVERY TEST")
     print(f"{'=' * 80}\n")
 
     # Mock httpx client to simulate OPA failure
@@ -88,9 +88,9 @@ async def test_opa_server_failure_and_recovery():
         # Request should fail but not crash
         failure_start = time.time()
         try:
-            result2 = await client.evaluate_policy(auth_input, use_cache=False)
+            await client.evaluate_policy(auth_input, use_cache=False)
             print("✗ Expected failure but got success")
-            assert False, "Should have raised exception"
+            raise AssertionError("Should have raised exception")
         except Exception as e:
             failure_time = (time.time() - failure_start) * 1000
             print(f"✓ Graceful failure: {type(e).__name__} after {failure_time:.0f}ms")
@@ -115,7 +115,7 @@ async def test_opa_server_failure_and_recovery():
         ), f"Recovery too slow: {recovery_time:.0f}ms"
 
         print(f"\n{'=' * 80}")
-        print(f"RECOVERY TEST PASSED")
+        print("RECOVERY TEST PASSED")
         print(f"{'=' * 80}\n")
 
         await client.close()
@@ -144,7 +144,7 @@ async def test_redis_cache_failure_and_recovery():
     - Cache recovers when Redis is restored
     """
     print(f"\n{'=' * 80}")
-    print(f"REDIS CACHE FAILURE RECOVERY TEST")
+    print("REDIS CACHE FAILURE RECOVERY TEST")
     print(f"{'=' * 80}\n")
 
     # Phase 1: Redis healthy
@@ -207,7 +207,7 @@ async def test_redis_cache_failure_and_recovery():
     print(f"✓ Cache recovered: {recovery_latency:.2f}ms")
 
     print(f"\n{'=' * 80}")
-    print(f"CACHE RECOVERY TEST PASSED")
+    print("CACHE RECOVERY TEST PASSED")
     print(f"{'=' * 80}\n")
 
 
@@ -234,7 +234,7 @@ async def test_network_interruption_recovery():
     - System recovers when network is restored
     """
     print(f"\n{'=' * 80}")
-    print(f"NETWORK INTERRUPTION RECOVERY TEST")
+    print("NETWORK INTERRUPTION RECOVERY TEST")
     print(f"{'=' * 80}\n")
 
     with patch("sark.services.policy.opa_client.httpx.AsyncClient") as mock_client_class:
@@ -307,7 +307,7 @@ async def test_network_interruption_recovery():
                 ),
                 use_cache=False,
             )
-            assert False, "Should have timed out"
+            raise AssertionError("Should have timed out")
         except Exception as e:
             print(f"✓ Timeout handled: {type(e).__name__}")
 
@@ -329,7 +329,7 @@ async def test_network_interruption_recovery():
         print(f"✓ Network recovered: {recovery_latency:.0f}ms")
 
         print(f"\n{'=' * 80}")
-        print(f"NETWORK RECOVERY TEST PASSED")
+        print("NETWORK RECOVERY TEST PASSED")
         print(f"{'=' * 80}\n")
 
         await client.close()
@@ -359,7 +359,7 @@ async def test_cascading_failure_prevention():
     - Graceful degradation
     """
     print(f"\n{'=' * 80}")
-    print(f"CASCADING FAILURE PREVENTION TEST")
+    print("CASCADING FAILURE PREVENTION TEST")
     print(f"{'=' * 80}\n")
 
     # Simulate multiple components
@@ -447,7 +447,7 @@ async def test_cascading_failure_prevention():
     print("✓ All components recovered")
 
     print(f"\n{'=' * 80}")
-    print(f"CASCADING FAILURE PREVENTION PASSED")
+    print("CASCADING FAILURE PREVENTION PASSED")
     print(f"{'=' * 80}\n")
 
 
@@ -475,7 +475,7 @@ async def test_partial_failure_handling():
     - No data corruption
     """
     print(f"\n{'=' * 80}")
-    print(f"PARTIAL FAILURE HANDLING TEST")
+    print("PARTIAL FAILURE HANDLING TEST")
     print(f"{'=' * 80}\n")
 
     # Mock Redis for batch operations
@@ -517,7 +517,7 @@ async def test_partial_failure_handling():
             failed += 1
             print(f"  Item {i + 1}: ✗ failed ({e})")
 
-    print(f"\nBatch Results:")
+    print("\nBatch Results:")
     print(f"  Successful: {successful}/{batch_size}")
     print(f"  Failed: {failed}/{batch_size}")
 
@@ -527,7 +527,7 @@ async def test_partial_failure_handling():
     assert successful + failed == batch_size, "Item count mismatch"
 
     print(f"\n{'=' * 80}")
-    print(f"PARTIAL FAILURE HANDLING PASSED")
+    print("PARTIAL FAILURE HANDLING PASSED")
     print(f"{'=' * 80}\n")
 
 
@@ -554,7 +554,7 @@ async def test_recovery_time_measurement():
     - Performance returns to baseline
     """
     print(f"\n{'=' * 80}")
-    print(f"RECOVERY TIME MEASUREMENT TEST")
+    print("RECOVERY TIME MEASUREMENT TEST")
     print(f"{'=' * 80}\n")
 
     with patch("sark.services.policy.opa_client.httpx.AsyncClient") as mock_client_class:
@@ -581,7 +581,7 @@ async def test_recovery_time_measurement():
                 ),
                 use_cache=False,
             )
-            assert False, "Should have failed"
+            raise AssertionError("Should have failed")
         except Exception:
             print("✓ System confirmed down")
 
@@ -618,7 +618,7 @@ async def test_recovery_time_measurement():
 
         recovery_time = (time.time() - recovery_start) * 1000
 
-        print(f"\nRecovery Metrics:")
+        print("\nRecovery Metrics:")
         print(f"  Recovery time: {recovery_time:.0f}ms")
         print(f"  Recovery attempts: {recovery_attempts}")
         print(f"  Time per attempt: {recovery_time / recovery_attempts:.0f}ms")
@@ -628,7 +628,7 @@ async def test_recovery_time_measurement():
         print(f"\n✓ Recovery time acceptable ({recovery_time:.0f}ms < 5000ms)")
 
         print(f"\n{'=' * 80}")
-        print(f"RECOVERY TIME TEST PASSED")
+        print("RECOVERY TIME TEST PASSED")
         print(f"{'=' * 80}\n")
 
         await client.close()

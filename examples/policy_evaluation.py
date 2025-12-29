@@ -13,8 +13,7 @@ Usage:
 """
 
 import os
-from typing import Dict, Optional
-from uuid import UUID, uuid4
+from typing import Optional
 
 import requests
 
@@ -37,9 +36,9 @@ class SARKPolicyClient:
         action: str,
         tool: Optional[str] = None,
         server_id: Optional[str] = None,
-        parameters: Optional[Dict] = None,
+        parameters: Optional[dict] = None,
         user_id: Optional[str] = None,
-    ) -> Dict:
+    ) -> dict:
         """Evaluate policy for an action.
 
         Args:

@@ -1,8 +1,7 @@
 """Comprehensive tests for Gateway error handler (circuit breaker, retry, timeout)."""
 
 import asyncio
-from datetime import UTC, datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
+from datetime import UTC, datetime
 
 import pytest
 

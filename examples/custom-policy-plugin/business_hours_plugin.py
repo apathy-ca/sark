@@ -5,10 +5,10 @@ Restricts resource access to business hours only (9 AM - 5 PM, Monday-Friday).
 Useful for controlling costs by preventing expensive operations outside work hours.
 """
 
-from datetime import datetime, time
-from typing import Dict, Any
+from datetime import datetime
+from typing import Optional
 
-from sark.services.policy.plugins import PolicyPlugin, PolicyContext, PolicyDecision
+from sark.services.policy.plugins import PolicyContext, PolicyDecision, PolicyPlugin
 
 
 class BusinessHoursPlugin(PolicyPlugin):
@@ -26,7 +26,7 @@ class BusinessHoursPlugin(PolicyPlugin):
         self,
         start_hour: int = 9,
         end_hour: int = 17,
-        allowed_days: list = None,
+        allowed_days: Optional[list] = None,
     ):
         """
         Initialize business hours plugin.
@@ -99,7 +99,7 @@ class BusinessHoursPlugin(PolicyPlugin):
         # Within business hours - allow
         return PolicyDecision(
             allowed=True,
-            reason=f"Access granted: Within business hours",
+            reason="Access granted: Within business hours",
             metadata={
                 "evaluated_at": now.isoformat(),
             },

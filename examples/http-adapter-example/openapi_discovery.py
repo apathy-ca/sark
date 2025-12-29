@@ -10,10 +10,8 @@ Engineer: ENGINEER-2
 """
 
 import asyncio
-from datetime import datetime
 
 from sark.adapters.http import HTTPAdapter
-from sark.models.base import ResourceSchema
 
 
 async def main():
@@ -137,7 +135,7 @@ async def main():
 
     servers = resource.metadata.get("servers", [])
     if servers:
-        print(f"\n   Available servers:")
+        print("\n   Available servers:")
         for server in servers:
             url = server.get("url", "unknown")
             desc = server.get("description", "")

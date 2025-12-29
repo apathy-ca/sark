@@ -15,10 +15,8 @@ Usage:
 """
 
 import argparse
-import json
-import os
-import sys
 from datetime import datetime, timedelta
+import sys
 from typing import Optional
 
 import requests
@@ -78,7 +76,7 @@ class SARKAuthClient:
 
             # Save the API key
             self.api_key = data["key"]
-            print(f"✅ API Key created successfully!")
+            print("✅ API Key created successfully!")
             print(f"   Name: {data['api_key']['name']}")
             print(f"   Prefix: {data['api_key']['key_prefix']}")
             print(f"   Scopes: {', '.join(data['api_key']['scopes'])}")
@@ -134,7 +132,7 @@ class SARKAuthClient:
                     seconds=session["expires_in"]
                 )
 
-                print(f"✅ LDAP login successful!")
+                print("✅ LDAP login successful!")
                 print(f"   User ID: {data['user_id']}")
                 print(f"   Token expires in: {session['expires_in']} seconds")
                 return data
@@ -193,7 +191,7 @@ class SARKAuthClient:
                 seconds=data["expires_in"]
             )
 
-            print(f"✅ OIDC authentication successful!")
+            print("✅ OIDC authentication successful!")
             print(f"   User: {data['user']['name']} ({data['user']['email']})")
             return data
 
@@ -233,7 +231,7 @@ class SARKAuthClient:
                 self.refresh_token = data["refresh_token"]
                 print("🔄 Refresh token rotated")
 
-            print(f"✅ Access token refreshed")
+            print("✅ Access token refreshed")
             print(f"   Expires in: {data['expires_in']} seconds")
             return data
 
@@ -293,7 +291,7 @@ class SARKAuthClient:
             response.raise_for_status()
             data = response.json()
 
-            print(f"👤 Current User:")
+            print("👤 Current User:")
             print(f"   User ID: {data['user_id']}")
             print(f"   Username: {data.get('username', 'N/A')}")
             print(f"   Email: {data.get('email', 'N/A')}")

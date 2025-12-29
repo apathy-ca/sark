@@ -12,9 +12,8 @@ This script creates charts and graphs for:
 Requirements: matplotlib, pandas (optional)
 """
 
+
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-from datetime import datetime
 import numpy as np
 
 # Set style
@@ -23,7 +22,7 @@ COLORS = ['#2E86AB', '#A23B72', '#F18F01', '#C73E1D', '#6A994E']
 
 def create_commit_timeline():
     """Create commit timeline visualization."""
-    fig, ax = plt.subplots(figsize=(12, 6))
+    _fig, ax = plt.subplots(figsize=(12, 6))
 
     dates = ['Nov 20', 'Nov 22', 'Nov 23']
     commits = [20, 54, 27]
@@ -49,14 +48,14 @@ def create_commit_timeline():
 
 def create_code_distribution():
     """Create code distribution pie chart."""
-    fig, ax = plt.subplots(figsize=(10, 8))
+    _fig, ax = plt.subplots(figsize=(10, 8))
 
     categories = ['Source Code\n(19,568 lines)', 'Test Code\n(33,170 lines)', 'Documentation\n(~5,000 lines)']
     sizes = [19568, 33170, 5000]
     colors_pie = [COLORS[0], COLORS[1], COLORS[2]]
     explode = (0.05, 0.05, 0.05)
 
-    wedges, texts, autotexts = ax.pie(sizes, explode=explode, labels=categories,
+    _wedges, _texts, autotexts = ax.pie(sizes, explode=explode, labels=categories,
                                        colors=colors_pie, autopct='%1.1f%%',
                                        shadow=True, startangle=90,
                                        textprops={'fontsize': 11, 'fontweight': 'bold'})
@@ -76,7 +75,7 @@ def create_code_distribution():
 
 def create_authorship_chart():
     """Create authorship breakdown chart."""
-    fig, ax = plt.subplots(figsize=(10, 6))
+    _fig, ax = plt.subplots(figsize=(10, 6))
 
     authors = ['Claude\n(AI)', 'James Henry\n(Human)']
     commits = [100, 1]
@@ -104,13 +103,13 @@ def create_authorship_chart():
 
 def create_cost_comparison():
     """Create cost comparison chart."""
-    fig, ax = plt.subplots(figsize=(12, 7))
+    _fig, ax = plt.subplots(figsize=(12, 7))
 
     approaches = ['Traditional\nDevelopment', 'AI-Driven\nDevelopment']
     costs = [105000, 193]  # Midpoint of 80K-130K vs actual $193 spent
     colors_bar = [COLORS[3], COLORS[4]]
 
-    bars = ax.bar(approaches, costs, color=colors_bar, alpha=0.8, edgecolor='black', width=0.6)
+    ax.bar(approaches, costs, color=colors_bar, alpha=0.8, edgecolor='black', width=0.6)
 
     # Add value labels
     ax.text(0, 105000 + 3000, '$105,000', ha='center', va='bottom',
@@ -121,8 +120,8 @@ def create_cost_comparison():
     # Add savings annotation
     ax.annotate('99.8% Cost Savings\n($104,807 saved)', xy=(0.5, 52500), xytext=(0.5, 70000),
                 fontsize=16, fontweight='bold', ha='center',
-                arrowprops=dict(arrowstyle='->', lw=2, color='red'),
-                bbox=dict(boxstyle='round,pad=0.5', facecolor='yellow', alpha=0.7))
+                arrowprops={'arrowstyle': '->', 'lw': 2, 'color': 'red'},
+                bbox={'boxstyle': 'round,pad=0.5', 'facecolor': 'yellow', 'alpha': 0.7})
 
     ax.set_ylabel('Development Cost (USD)', fontsize=12, fontweight='bold')
     ax.set_title('SARK Development: Cost Comparison', fontsize=14, fontweight='bold')
@@ -139,7 +138,7 @@ def create_cost_comparison():
 
 def create_velocity_chart():
     """Create development velocity chart."""
-    fig, ax = plt.subplots(figsize=(12, 6))
+    _fig, ax = plt.subplots(figsize=(12, 6))
 
     dates = ['Nov 20', 'Nov 22', 'Nov 23']
     lines_per_day = [8000, 35000, 9738]
@@ -168,7 +167,7 @@ def create_velocity_chart():
 
 def create_quality_metrics():
     """Create quality metrics radar chart."""
-    fig, ax = plt.subplots(figsize=(10, 10), subplot_kw=dict(projection='polar'))
+    _fig, ax = plt.subplots(figsize=(10, 10), subplot_kw={'projection': 'polar'})
 
     categories = ['Test Coverage\n(90%+)', 'Documentation\n(100%)', 'Security\n(95%)',
                   'Performance\n(100%)', 'Code Quality\n(85%)']
@@ -210,7 +209,7 @@ def create_quality_metrics():
 
 def create_feature_completion():
     """Create feature completion stacked bar chart."""
-    fig, ax = plt.subplots(figsize=(12, 6))
+    _fig, ax = plt.subplots(figsize=(12, 6))
 
     categories = ['Core\nFeatures', 'Auth &\nAuthorization', 'Enterprise\nFeatures',
                   'DevOps', 'Testing', 'Docs']
@@ -218,11 +217,11 @@ def create_feature_completion():
     total = [6, 7, 8, 8, 5, 87]
 
     # Create stacked bars
-    p1 = ax.bar(categories, completed, color=COLORS[4], alpha=0.9, label='Completed')
+    ax.bar(categories, completed, color=COLORS[4], alpha=0.9, label='Completed')
 
     # Add percentage labels
-    for i, (cat, comp, tot) in enumerate(zip(categories, completed, total)):
-        percentage = (comp / tot) * 100
+    for i, (_cat, comp, tot) in enumerate(zip(categories, completed, total)):
+        (comp / tot) * 100
         ax.text(i, comp + 2, f'100%\n({comp}/{tot})',
                 ha='center', va='bottom', fontsize=10, fontweight='bold')
 
@@ -238,13 +237,13 @@ def create_feature_completion():
 
 def create_time_comparison():
     """Create time comparison chart."""
-    fig, ax = plt.subplots(figsize=(12, 7))
+    _fig, ax = plt.subplots(figsize=(12, 7))
 
     approaches = ['Traditional\n(8-13 weeks)', 'AI-Driven\n(4 days)']
     days = [56, 4]  # Using midpoint of 8 weeks = 56 days
     colors_bar = [COLORS[3], COLORS[4]]
 
-    bars = ax.barh(approaches, days, color=colors_bar, alpha=0.8, edgecolor='black')
+    ax.barh(approaches, days, color=colors_bar, alpha=0.8, edgecolor='black')
 
     # Add value labels
     ax.text(56 + 2, 0, '56 days\n(8 weeks)', ha='left', va='center',
@@ -255,8 +254,8 @@ def create_time_comparison():
     # Add speedup annotation
     ax.annotate('14x Faster', xy=(30, 0.5), xytext=(40, 0.5),
                 fontsize=16, fontweight='bold', ha='center',
-                arrowprops=dict(arrowstyle='->', lw=2, color='red'),
-                bbox=dict(boxstyle='round,pad=0.5', facecolor='yellow', alpha=0.7))
+                arrowprops={'arrowstyle': '->', 'lw': 2, 'color': 'red'},
+                bbox={'boxstyle': 'round,pad=0.5', 'facecolor': 'yellow', 'alpha': 0.7})
 
     ax.set_xlabel('Development Time (Days)', fontsize=12, fontweight='bold')
     ax.set_title('SARK Development: Time Comparison', fontsize=14, fontweight='bold')

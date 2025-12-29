@@ -11,9 +11,9 @@ Usage:
 
 import argparse
 import json
-import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
+import sys
+from typing import Optional
 
 
 class PerformanceRegressionError(Exception):
@@ -26,17 +26,17 @@ class RegressionDetector:
 
     def __init__(self, threshold: float = 0.10):
         self.threshold = threshold
-        self.regressions: List[Dict] = []
-        self.improvements: List[Dict] = []
+        self.regressions: list[dict] = []
+        self.improvements: list[dict] = []
 
-    def load_results(self, file_path: Path) -> Dict:
+    def load_results(self, file_path: Path) -> dict:
         """Load benchmark results from JSON file."""
         if not file_path.exists():
             raise FileNotFoundError(f"Results file not found: {file_path}")
         with open(file_path) as f:
             return json.load(f)
 
-    def compare_benchmarks(self, current: Dict, baseline: Dict) -> Tuple[List[Dict], List[Dict]]:
+    def compare_benchmarks(self, current: dict, baseline: dict) -> tuple[list[dict], list[dict]]:
         """Compare current benchmarks against baseline."""
         regressions = []
         improvements = []
@@ -88,7 +88,7 @@ class RegressionDetector:
             for reg in self.regressions:
                 print(f"\n✗ {reg['name']}: {reg['regression_percent']:.1f}% slower")
 
-    def run(self, current_file: Path, baseline_file: Path = None):
+    def run(self, current_file: Path, baseline_file: Optional[Path] = None):
         """Run regression detection."""
         current = self.load_results(current_file)
 

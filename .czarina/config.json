@@ -1,42 +1,107 @@
 {
   "project": {
-    "name": "sark",
-    "slug": "sark",
+    "name": "SARK v1.4.0 - Rust Foundation",
+    "slug": "sark-v1_4_0-rust",
+    "version": "1.4.0",
+    "phase": "1",
     "repository": "/home/jhenry/Source/sark",
-    "orchestration_dir": ".czarina"
+    "orchestration_dir": ".czarina",
+    "description": "High-performance Rust core components for OPA engine and in-memory cache"
+  },
+  "orchestration": {
+    "mode": "parallel-then-sequential",
+    "omnibus_branch": "cz1/release/v1_4_0",
+    "base_branch": "main",
+    "auto_pr": true,
+    "hopper": {
+      "enabled": true,
+      "checkpoint_interval": "daily"
+    }
   },
   "workers": [
     {
-      "id": "auth-policy",
-      "agent": "aider",
-      "branch": "feat/tests-auth-policy",
-      "description": "Workstream 1: Auth & Policy tests (20 modules)"
+      "id": "build-setup",
+      "name": "Stream 1: Rust Build System",
+      "agent": "cursor",
+      "branch": "cz1/feat/build-setup",
+      "dependencies": [],
+      "priority": 1,
+      "estimated_duration": "1 week",
+      "description": "Set up Rust tooling, PyO3 integration, and Maturin build system",
+      "tags": ["devops", "infrastructure", "rust", "maturin"]
     },
     {
-      "id": "discovery-federation",
+      "id": "opa-engine",
+      "name": "Stream 2: Rust OPA Engine",
       "agent": "aider",
-      "branch": "feat/tests-discovery-federation",
-      "description": "Workstream 2: Discovery & Federation tests (15 modules)"
+      "branch": "cz1/feat/opa-engine",
+      "dependencies": ["build-setup"],
+      "priority": 2,
+      "estimated_duration": "2 weeks",
+      "parallel_with": ["cache-engine"],
+      "description": "Embedded Rego policy evaluation engine using Regorus",
+      "tags": ["rust", "opa", "policy", "regorus", "pyo3"]
     },
     {
-      "id": "gateway-adapters",
+      "id": "cache-engine",
+      "name": "Stream 3: Rust Cache Engine",
       "agent": "aider",
-      "branch": "feat/tests-gateway-adapters",
-      "description": "Workstream 3: Gateway & Adapters tests (12 modules)"
+      "branch": "cz1/feat/cache-engine",
+      "dependencies": ["build-setup"],
+      "priority": 2,
+      "estimated_duration": "2 weeks",
+      "parallel_with": ["opa-engine"],
+      "description": "High-performance in-memory LRU+TTL cache using DashMap",
+      "tags": ["rust", "cache", "lru", "ttl", "pyo3"]
     },
     {
-      "id": "services-api",
-      "agent": "aider",
-      "branch": "feat/tests-services-api",
-      "description": "Workstream 4: Services & API tests (18 modules)"
+      "id": "integration-ab-testing",
+      "name": "Stream 4: Integration & A/B Testing",
+      "agent": "cursor",
+      "branch": "cz1/feat/integration-ab-testing",
+      "dependencies": ["opa-engine", "cache-engine"],
+      "priority": 3,
+      "estimated_duration": "2 weeks",
+      "description": "Production integration with feature flags and gradual rollout",
+      "tags": ["integration", "feature-flags", "ab-testing", "metrics"]
     },
     {
-      "id": "e2e-integration",
+      "id": "performance-testing",
+      "name": "Stream 5: Performance Testing",
       "agent": "aider",
-      "branch": "feat/tests-e2e-integration",
-      "description": "Workstream 5: E2E & Integration tests (10 modules)"
+      "branch": "cz1/feat/performance-testing",
+      "dependencies": ["integration-ab-testing"],
+      "priority": 4,
+      "estimated_duration": "2 weeks",
+      "parallel_with": ["documentation"],
+      "description": "Benchmarking, load testing, and performance validation",
+      "tags": ["testing", "benchmarks", "load-testing", "qa"]
+    },
+    {
+      "id": "documentation",
+      "name": "Stream 6: Documentation",
+      "agent": "any",
+      "branch": "cz1/feat/documentation",
+      "dependencies": ["integration-ab-testing"],
+      "priority": 4,
+      "estimated_duration": "1 week",
+      "parallel_with": ["performance-testing"],
+      "description": "Migration guide, release notes, and developer documentation",
+      "tags": ["docs", "migration-guide", "release-notes"]
     }
   ],
+  "performance_targets": {
+    "opa_latency_p95": "5ms",
+    "cache_latency_p95": "0.5ms",
+    "total_request_p95": "50ms",
+    "throughput": "2000 req/s"
+  },
+  "release": {
+    "target_date": "2026-02-28",
+    "rollout_strategy": "gradual",
+    "rollout_percentages": [5, 25, 50, 100],
+    "prerequisites": ["v1.3.0"]
+  },
   "daemon": {
     "enabled": true,
     "auto_approve": [

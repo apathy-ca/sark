@@ -10,12 +10,12 @@ Usage:
 """
 
 import argparse
+from datetime import datetime
 import json
 import os
-import sys
-from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Any
+import sys
+from typing import Any
 
 
 class PerformanceReportGenerator:
@@ -40,7 +40,7 @@ class PerformanceReportGenerator:
         # Look for .json files from pytest-benchmark
         json_files = list(benchmark_dir.glob("*.json"))
         if not json_files:
-            print(f"⚠️  No benchmark JSON files found")
+            print("⚠️  No benchmark JSON files found")
             return
 
         print(f"Found {len(json_files)} benchmark result files")
@@ -63,7 +63,7 @@ class PerformanceReportGenerator:
         # Look for CSV files from Locust
         csv_files = list(load_dir.glob("*_stats.csv"))
         if not csv_files:
-            print(f"⚠️  No load test CSV files found")
+            print("⚠️  No load test CSV files found")
             return
 
         print(f"Found {len(csv_files)} load test result files")
@@ -83,7 +83,7 @@ class PerformanceReportGenerator:
 
         txt_files = list(memory_dir.glob("*.txt"))
         if not txt_files:
-            print(f"⚠️  No memory test result files found")
+            print("⚠️  No memory test result files found")
             return
 
         print(f"Found {len(txt_files)} memory test result files")
@@ -99,7 +99,7 @@ class PerformanceReportGenerator:
 
         print(f"✓ Found {len(self.results['memory_tests'])} memory test categories")
 
-    def analyze_benchmarks(self) -> Dict[str, Any]:
+    def analyze_benchmarks(self) -> dict[str, Any]:
         """Analyze benchmark data and extract key metrics."""
         if not self.results["benchmarks"]:
             return {}
@@ -144,7 +144,7 @@ class PerformanceReportGenerator:
 
         return analysis
 
-    def calculate_improvements(self, analysis: Dict[str, Any]) -> Dict[str, Any]:
+    def calculate_improvements(self, analysis: dict[str, Any]) -> dict[str, Any]:
         """Calculate performance improvements."""
         improvements = {}
 

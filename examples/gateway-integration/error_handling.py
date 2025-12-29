@@ -18,12 +18,11 @@ Author: Engineer 1 (Gateway Models Architect)
 import asyncio
 from typing import Any
 
-from pydantic import HttpUrl, ValidationError
+from pydantic import ValidationError
 
 from sark.models.gateway import (
     GatewayAuthorizationRequest,
     GatewayServerInfo,
-    GatewayToolInfo,
     SensitivityLevel,
 )
 from sark.services.gateway import GatewayClient
@@ -175,8 +174,8 @@ async def example_network_error_handling():
     except GatewayConnectionError as e:
         print(f"   ❌ Connection failed: {e}")
         print("   💡 Solution: Verify Gateway URL and network connectivity")
-        print(f"      - Check if Gateway is running")
-        print(f"      - Verify firewall rules allow access")
+        print("      - Check if Gateway is running")
+        print("      - Verify firewall rules allow access")
         print(f"      - Confirm URL is correct: {client.gateway_url}")
     except Exception as e:
         print(f"   ❌ Unexpected error: {e}")
@@ -191,7 +190,7 @@ async def example_network_error_handling():
         print(f"   ❌ Request timed out: {e}")
         print("   💡 Solution: Increase timeout or check Gateway performance")
         print(f"      - Current timeout: {client.timeout}s")
-        print(f"      - Consider increasing to 10-30s for slow networks")
+        print("      - Consider increasing to 10-30s for slow networks")
     except GatewayConnectionError:
         print("   ❌ Connection error (expected for this example)")
     except Exception as e:
@@ -359,7 +358,7 @@ def example_graceful_degradation():
 
         except GatewayError as e:
             print(f"   ⚠️  Gateway unavailable: {e}")
-            print(f"   💡 Falling back to cached data...")
+            print("   💡 Falling back to cached data...")
             return cached_servers, True  # Using cache
 
     client = GatewayClient(

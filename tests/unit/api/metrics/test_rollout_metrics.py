@@ -5,24 +5,22 @@ Tests metric recording functions for OPA evaluations, cache operations,
 and feature flag assignments.
 """
 
-import pytest
-from prometheus_client import REGISTRY
 
 from sark.api.metrics.rollout_metrics import (
-    record_opa_evaluation,
-    record_opa_error,
-    record_cache_operation,
-    record_feature_flag_assignment,
-    record_rollout_percentage,
-    record_fallback,
-    opa_evaluation_duration_seconds,
-    opa_evaluation_total,
-    opa_evaluation_errors_total,
     cache_operation_duration_seconds,
     cache_operations_total,
     feature_flag_assignments_total,
     feature_flag_rollout_percentage,
     implementation_fallback_total,
+    opa_evaluation_duration_seconds,
+    opa_evaluation_errors_total,
+    opa_evaluation_total,
+    record_cache_operation,
+    record_fallback,
+    record_feature_flag_assignment,
+    record_opa_error,
+    record_opa_evaluation,
+    record_rollout_percentage,
 )
 
 

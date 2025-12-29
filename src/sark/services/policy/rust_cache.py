@@ -12,9 +12,9 @@ Features:
 """
 
 import asyncio
+from dataclasses import dataclass
 import hashlib
 import json
-from dataclasses import dataclass
 from typing import Any
 
 import structlog

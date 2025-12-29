@@ -6,9 +6,9 @@ Demonstrates orchestrating HTTP, MCP, and gRPC protocols under unified governanc
 """
 
 import asyncio
-import sys
 from datetime import datetime
-from typing import Any, Dict
+import sys
+from typing import Any
 
 import httpx
 import structlog
@@ -32,7 +32,7 @@ class SmartHomeAutomation:
         self.principal_id = "automation-service"
         self.http_client = httpx.AsyncClient(timeout=30.0)
 
-    async def run_automation(self) -> Dict[str, Any]:
+    async def run_automation(self) -> dict[str, Any]:
         """
         Execute the complete automation workflow.
 
@@ -84,7 +84,7 @@ class SmartHomeAutomation:
 
         return results
 
-    async def _fetch_weather(self) -> Dict[str, Any]:
+    async def _fetch_weather(self) -> dict[str, Any]:
         """
         Fetch current weather from OpenWeatherMap API.
 
@@ -121,7 +121,7 @@ class SmartHomeAutomation:
             "clouds": data["clouds"]["all"]
         }
 
-    async def _analyze_weather(self, weather: Dict[str, Any]) -> Dict[str, Any]:
+    async def _analyze_weather(self, weather: dict[str, Any]) -> dict[str, Any]:
         """
         Analyze weather data using MCP analytics tool.
 
@@ -153,7 +153,7 @@ class SmartHomeAutomation:
 
         return result["result"]
 
-    async def _control_devices(self, analysis: Dict[str, Any]) -> Dict[str, Any]:
+    async def _control_devices(self, analysis: dict[str, Any]) -> dict[str, Any]:
         """
         Control smart home devices via gRPC.
 
@@ -209,10 +209,10 @@ class SmartHomeAutomation:
 
     async def _send_notification(
         self,
-        weather: Dict[str, Any],
-        analysis: Dict[str, Any],
-        device_states: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        weather: dict[str, Any],
+        analysis: dict[str, Any],
+        device_states: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Send notification to Slack.
 

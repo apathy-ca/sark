@@ -13,10 +13,10 @@ Engineer: ENGINEER-3 (BONUS TASK)
 """
 
 import asyncio
-from typing import AsyncIterator
+from collections.abc import AsyncIterator
 
 from sark.adapters.grpc_adapter import GRPCAdapter
-from sark.models.base import InvocationRequest, ResourceSchema
+from sark.models.base import InvocationRequest
 
 
 async def message_stream_generator(messages: list[dict]) -> AsyncIterator[dict]:
@@ -137,7 +137,6 @@ async def bidirectional_chat_example():
         )
 
         # Process bidirectional stream
-        message_count = 0
         response_count = 0
 
         try:
@@ -159,12 +158,12 @@ async def bidirectional_chat_example():
                 await asyncio.sleep(0.5)
 
             print("\n" + "-" * 70)
-            print(f"\n✓ Chat completed successfully!")
+            print("\n✓ Chat completed successfully!")
             print(f"  Messages sent: {len(chat_messages)}")
             print(f"  Responses received: {response_count}")
 
         except Exception as e:
-            print(f"\n❌ Stream error: {str(e)}")
+            print(f"\n❌ Stream error: {e!s}")
             import traceback
             traceback.print_exc()
 
@@ -173,7 +172,7 @@ async def bidirectional_chat_example():
         print("✓ Resources cleaned up")
 
     except Exception as e:
-        print(f"\n❌ Error: {str(e)}")
+        print(f"\n❌ Error: {e!s}")
         import traceback
         traceback.print_exc()
 
