@@ -90,7 +90,7 @@ jobs:
         run: |
           source .venv/bin/activate
           python -c "from sark._rust import RUST_AVAILABLE; print(f'RUST_AVAILABLE: {RUST_AVAILABLE}')"
-          python -c "from sark._rust import hello_opa, hello_cache; print(hello_opa()); print(hello_cache())"
+          python -c "from sark.sark_rust import RustOPAEngine, RustCache; print('RustOPAEngine:', RustOPAEngine); print('RustCache:', RustCache)"
 
   multi-python:
     name: Test Python ${{ matrix.python-version }}
@@ -127,3 +127,4 @@ jobs:
           source .venv/bin/activate
           maturin develop
           python -c "from sark._rust import RUST_AVAILABLE; print(f'Python ${{ matrix.python-version }}: {RUST_AVAILABLE}')"
+          python -c "from sark.sark_rust import RustOPAEngine, RustCache; print('Rust classes imported successfully')"
