@@ -246,7 +246,9 @@ mod tests {
     fn test_delete() {
         let cache = LRUTTLCache::new(100, 300);
 
-        cache.set("key1".to_string(), "value1".to_string(), None).unwrap();
+        cache
+            .set("key1".to_string(), "value1".to_string(), None)
+            .unwrap();
         assert!(cache.delete("key1"));
         assert_eq!(cache.get("key1"), None);
         assert!(!cache.delete("key1")); // Second delete returns false
@@ -256,8 +258,12 @@ mod tests {
     fn test_clear() {
         let cache = LRUTTLCache::new(100, 300);
 
-        cache.set("key1".to_string(), "value1".to_string(), None).unwrap();
-        cache.set("key2".to_string(), "value2".to_string(), None).unwrap();
+        cache
+            .set("key1".to_string(), "value1".to_string(), None)
+            .unwrap();
+        cache
+            .set("key2".to_string(), "value2".to_string(), None)
+            .unwrap();
 
         cache.clear();
         assert_eq!(cache.size(), 0);
@@ -269,8 +275,12 @@ mod tests {
     fn test_cleanup_expired() {
         let cache = LRUTTLCache::new(100, 1);
 
-        cache.set("key1".to_string(), "value1".to_string(), Some(1)).unwrap();
-        cache.set("key2".to_string(), "value2".to_string(), Some(10)).unwrap();
+        cache
+            .set("key1".to_string(), "value1".to_string(), Some(1))
+            .unwrap();
+        cache
+            .set("key2".to_string(), "value2".to_string(), Some(10))
+            .unwrap();
 
         thread::sleep(StdDuration::from_millis(1100));
         let removed = cache.cleanup_expired();

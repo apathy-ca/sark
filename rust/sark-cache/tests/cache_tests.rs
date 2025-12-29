@@ -13,7 +13,9 @@ fn test_cache_miss_returns_none() {
 fn test_cache_hit_updates_access_time() {
     let cache = LRUTTLCache::new(100, 300);
 
-    cache.set("key1".to_string(), "value1".to_string(), None).unwrap();
+    cache
+        .set("key1".to_string(), "value1".to_string(), None)
+        .unwrap();
     thread::sleep(Duration::from_millis(50));
 
     // Access the key
@@ -31,7 +33,9 @@ fn test_cache_hit_updates_access_time() {
 fn test_ttl_expiration_accuracy() {
     let cache = LRUTTLCache::new(100, 1);
 
-    cache.set("key1".to_string(), "value1".to_string(), Some(1)).unwrap();
+    cache
+        .set("key1".to_string(), "value1".to_string(), Some(1))
+        .unwrap();
 
     // Should be available immediately
     assert_eq!(cache.get("key1"), Some("value1".to_string()));
@@ -46,13 +50,19 @@ fn test_lru_eviction_removes_oldest() {
     let cache = LRUTTLCache::new(3, 300);
 
     // Insert 3 entries with delays to ensure ordering
-    cache.set("key1".to_string(), "value1".to_string(), None).unwrap();
+    cache
+        .set("key1".to_string(), "value1".to_string(), None)
+        .unwrap();
     thread::sleep(Duration::from_millis(10));
 
-    cache.set("key2".to_string(), "value2".to_string(), None).unwrap();
+    cache
+        .set("key2".to_string(), "value2".to_string(), None)
+        .unwrap();
     thread::sleep(Duration::from_millis(10));
 
-    cache.set("key3".to_string(), "value3".to_string(), None).unwrap();
+    cache
+        .set("key3".to_string(), "value3".to_string(), None)
+        .unwrap();
     thread::sleep(Duration::from_millis(10));
 
     // Access key2 to update its access time
@@ -60,7 +70,9 @@ fn test_lru_eviction_removes_oldest() {
     thread::sleep(Duration::from_millis(10));
 
     // Insert 4th entry - should evict key1 (oldest accessed)
-    cache.set("key4".to_string(), "value4".to_string(), None).unwrap();
+    cache
+        .set("key4".to_string(), "value4".to_string(), None)
+        .unwrap();
 
     assert_eq!(cache.get("key1"), None, "key1 should be evicted");
     assert_eq!(cache.get("key2"), Some("value2".to_string()), "key2 should remain");
@@ -72,10 +84,14 @@ fn test_lru_eviction_removes_oldest() {
 fn test_lru_retains_recently_accessed() {
     let cache = LRUTTLCache::new(2, 300);
 
-    cache.set("key1".to_string(), "value1".to_string(), None).unwrap();
+    cache
+        .set("key1".to_string(), "value1".to_string(), None)
+        .unwrap();
     thread::sleep(Duration::from_millis(10));
 
-    cache.set("key2".to_string(), "value2".to_string(), None).unwrap();
+    cache
+        .set("key2".to_string(), "value2".to_string(), None)
+        .unwrap();
     thread::sleep(Duration::from_millis(10));
 
     // Access key1 to make it more recently used
@@ -83,7 +99,9 @@ fn test_lru_retains_recently_accessed() {
     thread::sleep(Duration::from_millis(10));
 
     // Insert key3 - should evict key2
-    cache.set("key3".to_string(), "value3".to_string(), None).unwrap();
+    cache
+        .set("key3".to_string(), "value3".to_string(), None)
+        .unwrap();
 
     assert_eq!(cache.get("key1"), Some("value1".to_string()));
     assert_eq!(cache.get("key2"), None, "key2 should be evicted");
@@ -155,9 +173,15 @@ fn test_cleanup_removes_expired() {
     let cache = LRUTTLCache::new(100, 1);
 
     // Insert multiple entries with short TTL
-    cache.set("expired1".to_string(), "value1".to_string(), Some(1)).unwrap();
-    cache.set("expired2".to_string(), "value2".to_string(), Some(1)).unwrap();
-    cache.set("valid".to_string(), "value3".to_string(), Some(10)).unwrap();
+    cache
+        .set("expired1".to_string(), "value1".to_string(), Some(1))
+        .unwrap();
+    cache
+        .set("expired2".to_string(), "value2".to_string(), Some(1))
+        .unwrap();
+    cache
+        .set("valid".to_string(), "value3".to_string(), Some(10))
+        .unwrap();
 
     assert_eq!(cache.size(), 3);
 
@@ -176,9 +200,13 @@ fn test_custom_ttl_override() {
     let cache = LRUTTLCache::new(100, 10); // 10 second default
 
     // Set with custom 1 second TTL
-    cache.set("short".to_string(), "value1".to_string(), Some(1)).unwrap();
+    cache
+        .set("short".to_string(), "value1".to_string(), Some(1))
+        .unwrap();
     // Use default TTL
-    cache.set("long".to_string(), "value2".to_string(), None).unwrap();
+    cache
+        .set("long".to_string(), "value2".to_string(), None)
+        .unwrap();
 
     thread::sleep(Duration::from_millis(1100));
 
@@ -190,11 +218,15 @@ fn test_custom_ttl_override() {
 fn test_update_existing_key() {
     let cache = LRUTTLCache::new(100, 300);
 
-    cache.set("key1".to_string(), "value1".to_string(), None).unwrap();
+    cache
+        .set("key1".to_string(), "value1".to_string(), None)
+        .unwrap();
     assert_eq!(cache.get("key1"), Some("value1".to_string()));
 
     // Update with new value
-    cache.set("key1".to_string(), "value2".to_string(), None).unwrap();
+    cache
+        .set("key1".to_string(), "value2".to_string(), None)
+        .unwrap();
     assert_eq!(cache.get("key1"), Some("value2".to_string()));
 
     // Size should still be 1
@@ -237,11 +269,15 @@ fn test_empty_cache_operations() {
 fn test_single_entry_cache() {
     let cache = LRUTTLCache::new(1, 300);
 
-    cache.set("key1".to_string(), "value1".to_string(), None).unwrap();
+    cache
+        .set("key1".to_string(), "value1".to_string(), None)
+        .unwrap();
     assert_eq!(cache.get("key1"), Some("value1".to_string()));
 
     // Adding another should evict the first
-    cache.set("key2".to_string(), "value2".to_string(), None).unwrap();
+    cache
+        .set("key2".to_string(), "value2".to_string(), None)
+        .unwrap();
     assert_eq!(cache.get("key1"), None);
     assert_eq!(cache.get("key2"), Some("value2".to_string()));
 }

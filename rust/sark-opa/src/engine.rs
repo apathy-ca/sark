@@ -314,7 +314,9 @@ mod tests {
             }
         "#;
 
-        engine.load_policy("example".to_string(), policy.to_string()).unwrap();
+        engine
+            .load_policy("example".to_string(), policy.to_string())
+            .unwrap();
 
         let input = value_object(vec![("user", value_from_str("admin"))]);
         let result = engine.evaluate("data.example.allow", input).unwrap();
@@ -333,7 +335,9 @@ mod tests {
             }
         "#;
 
-        engine.load_policy("example".to_string(), policy.to_string()).unwrap();
+        engine
+            .load_policy("example".to_string(), policy.to_string())
+            .unwrap();
 
         let input = value_object(vec![]);
         let result = engine.evaluate("data.example.allow", input).unwrap();
@@ -356,15 +360,21 @@ mod tests {
             deny = true
         "#;
 
-        engine.load_policy("policy1".to_string(), policy1.to_string()).unwrap();
-        engine.load_policy("policy2".to_string(), policy2.to_string()).unwrap();
+        engine
+            .load_policy("policy1".to_string(), policy1.to_string())
+            .unwrap();
+        engine
+            .load_policy("policy2".to_string(), policy2.to_string())
+            .unwrap();
 
         assert_eq!(engine.loaded_policies().len(), 2);
         assert!(engine.has_policy("policy1"));
         assert!(engine.has_policy("policy2"));
 
         let empty_input = value_object(vec![]);
-        let result1 = engine.evaluate("data.policy1.allow", empty_input.clone()).unwrap();
+        let result1 = engine
+            .evaluate("data.policy1.allow", empty_input.clone())
+            .unwrap();
         assert_eq!(result1, Value::Bool(true));
 
         let result2 = engine.evaluate("data.policy2.deny", empty_input).unwrap();
@@ -385,7 +395,9 @@ mod tests {
             result = "v2"
         "#;
 
-        engine.load_policy("example".to_string(), policy_v1.to_string()).unwrap();
+        engine
+            .load_policy("example".to_string(), policy_v1.to_string())
+            .unwrap();
 
         let empty_input = value_object(vec![]);
         let result1 = engine.evaluate("data.example.result", empty_input.clone()).unwrap();

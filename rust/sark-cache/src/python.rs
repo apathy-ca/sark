@@ -1,10 +1,10 @@
 #![allow(clippy::useless_conversion)]
 
-use pyo3::prelude::*;
 use pyo3::exceptions::{PyRuntimeError, PyValueError};
+use pyo3::prelude::*;
 
-use crate::lru_ttl::LRUTTLCache;
 use crate::error::CacheError;
+use crate::lru_ttl::LRUTTLCache;
 
 /// Python wrapper for the Rust LRU+TTL cache
 #[pyclass]
