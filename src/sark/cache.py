@@ -67,7 +67,7 @@ class CacheManager:
         Returns:
             Redis client instance
         """
-        return redis.Redis(
+        return Redis(
             host=self.config.host,
             port=self.config.port,
             db=self.config.database,
