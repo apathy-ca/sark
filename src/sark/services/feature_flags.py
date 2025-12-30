@@ -29,9 +29,7 @@ class FeatureFlagManager:
             "rust_opa": 0,  # Start at 0%
             "rust_cache": 0,
         }
-        logger.info(
-            f"Initialized FeatureFlagManager with Redis: {redis_client is not None}"
-        )
+        logger.info(f"Initialized FeatureFlagManager with Redis: {redis_client is not None}")
 
     def should_use_rust(self, feature: str, user_id: str) -> bool:
         """
@@ -48,9 +46,7 @@ class FeatureFlagManager:
             True if user should use Rust implementation, False otherwise
         """
         # Stable hash-based assignment (0-99)
-        hash_val = (
-            int(hashlib.md5(f"{feature}:{user_id}".encode()).hexdigest(), 16) % 100
-        )
+        hash_val = int(hashlib.md5(f"{feature}:{user_id}".encode()).hexdigest(), 16) % 100
         rollout = self.get_rollout_pct(feature)
 
         # User is in rollout if their hash is below the percentage
@@ -78,9 +74,7 @@ class FeatureFlagManager:
                 val = self.redis.get(f"feature_flag:{feature}")
                 if val is not None:
                     pct = int(val)
-                    logger.debug(
-                        f"Retrieved rollout from Redis: {feature}={pct}%"
-                    )
+                    logger.debug(f"Retrieved rollout from Redis: {feature}={pct}%")
                     return pct
             except Exception as e:
                 logger.warning(
@@ -114,17 +108,11 @@ class FeatureFlagManager:
         if self.redis:
             try:
                 self.redis.set(f"feature_flag:{feature}", percentage)
-                logger.info(
-                    f"Set rollout percentage in Redis: {feature}={percentage}%"
-                )
+                logger.info(f"Set rollout percentage in Redis: {feature}={percentage}%")
             except Exception as e:
-                logger.error(
-                    f"Failed to persist rollout to Redis for {feature}: {e}"
-                )
+                logger.error(f"Failed to persist rollout to Redis for {feature}: {e}")
         else:
-            logger.info(
-                f"Set rollout percentage in memory: {feature}={percentage}%"
-            )
+            logger.info(f"Set rollout percentage in memory: {feature}={percentage}%")
 
     def get_all_rollouts(self) -> dict[str, int]:
         """

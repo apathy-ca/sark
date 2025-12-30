@@ -129,9 +129,7 @@ async def test_opa_client_no_memory_leak_short():
 
         # Allow up to 50MB growth for 100K requests (0.5KB per request)
         # This accounts for caching, connection pools, etc.
-        assert (
-            memory_growth < 50
-        ), f"Possible memory leak: grew {memory_growth:.2f} MB"
+        assert memory_growth < 50, f"Possible memory leak: grew {memory_growth:.2f} MB"
 
         # Check that memory didn't grow linearly (sign of leak)
         # Compare first half vs second half growth rate
@@ -144,9 +142,7 @@ async def test_opa_client_no_memory_leak_short():
 
         # Second half growth should not be significantly larger than first half
         # Allow 50% increase to account for variance
-        assert (
-            second_half_growth < first_half_growth * 1.5
-        ), "Memory appears to be leaking linearly"
+        assert second_half_growth < first_half_growth * 1.5, "Memory appears to be leaking linearly"
 
         print("✓ No memory leak detected\n")
 
@@ -373,9 +369,7 @@ async def test_no_memory_leak_24h():
             assert growth_rate < 1.0, f"Memory still growing: {growth_rate:.4f} MB/hr"
 
         # Allow up to 100MB growth over 24 hours (accounts for caching, buffers, etc.)
-        assert (
-            total_memory_growth < 100
-        ), f"Memory grew too much: {total_memory_growth:.2f} MB"
+        assert total_memory_growth < 100, f"Memory grew too much: {total_memory_growth:.2f} MB"
 
         print("✓ No memory leak detected over 24 hours\n")
 
@@ -564,8 +558,6 @@ async def test_resource_cleanup_on_client_close():
 
         # Memory should return close to baseline (within 10MB)
         memory_delta = memory_after_close - baseline_memory
-        assert (
-            memory_delta < 10
-        ), f"Memory not properly released: {memory_delta:.2f} MB retained"
+        assert memory_delta < 10, f"Memory not properly released: {memory_delta:.2f} MB retained"
 
         print("✓ Resources properly cleaned up\n")

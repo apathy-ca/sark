@@ -5,7 +5,6 @@ Tests metric recording functions for OPA evaluations, cache operations,
 and feature flag assignments.
 """
 
-
 from sark.api.metrics.rollout_metrics import (
     cache_operation_duration_seconds,
     cache_operations_total,
@@ -40,15 +39,11 @@ class TestOPAMetrics:
         # Note: We can't easily assert exact values because metrics are cumulative,
         # but we can verify the metric exists and has samples
         samples = opa_evaluation_duration_seconds.collect()[0].samples
-        assert any(
-            s.labels.get("implementation") == "rust"
-            for s in samples
-        )
+        assert any(s.labels.get("implementation") == "rust" for s in samples)
 
         samples = opa_evaluation_total.collect()[0].samples
         assert any(
-            s.labels.get("implementation") == "rust"
-            and s.labels.get("result") == "allow"
+            s.labels.get("implementation") == "rust" and s.labels.get("result") == "allow"
             for s in samples
         )
 
@@ -62,8 +57,7 @@ class TestOPAMetrics:
         # Verify error metric was recorded
         samples = opa_evaluation_errors_total.collect()[0].samples
         assert any(
-            s.labels.get("implementation") == "python"
-            and s.labels.get("error_type") == "timeout"
+            s.labels.get("implementation") == "python" and s.labels.get("error_type") == "timeout"
             for s in samples
         )
 
@@ -83,8 +77,7 @@ class TestCacheMetrics:
         # Verify metrics were recorded
         samples = cache_operation_duration_seconds.collect()[0].samples
         assert any(
-            s.labels.get("implementation") == "rust"
-            and s.labels.get("operation") == "get"
+            s.labels.get("implementation") == "rust" and s.labels.get("operation") == "get"
             for s in samples
         )
 
@@ -126,8 +119,7 @@ class TestCacheMetrics:
         # Verify set was recorded
         samples = cache_operations_total.collect()[0].samples
         assert any(
-            s.labels.get("implementation") == "rust"
-            and s.labels.get("operation") == "set"
+            s.labels.get("implementation") == "rust" and s.labels.get("operation") == "set"
             for s in samples
         )
 
@@ -145,8 +137,7 @@ class TestFeatureFlagMetrics:
         # Verify assignment was recorded
         samples = feature_flag_assignments_total.collect()[0].samples
         assert any(
-            s.labels.get("feature") == "rust_opa"
-            and s.labels.get("implementation") == "rust"
+            s.labels.get("feature") == "rust_opa" and s.labels.get("implementation") == "rust"
             for s in samples
         )
 
@@ -160,8 +151,7 @@ class TestFeatureFlagMetrics:
         # Verify assignment was recorded
         samples = feature_flag_assignments_total.collect()[0].samples
         assert any(
-            s.labels.get("feature") == "rust_cache"
-            and s.labels.get("implementation") == "python"
+            s.labels.get("feature") == "rust_cache" and s.labels.get("implementation") == "python"
             for s in samples
         )
 
@@ -174,10 +164,7 @@ class TestFeatureFlagMetrics:
 
         # Verify percentage was recorded
         samples = feature_flag_rollout_percentage.collect()[0].samples
-        assert any(
-            s.labels.get("feature") == "rust_opa"
-            for s in samples
-        )
+        assert any(s.labels.get("feature") == "rust_opa" for s in samples)
 
 
 class TestFallbackMetrics:
@@ -261,6 +248,7 @@ class TestMetricTypes:
         # Counters should have _total suffix in their metric name (not internal _name)
         # Verify they are Counter type
         from prometheus_client import Counter
+
         assert isinstance(opa_evaluation_total, Counter)
         assert isinstance(cache_operations_total, Counter)
         assert isinstance(feature_flag_assignments_total, Counter)
@@ -300,8 +288,7 @@ class TestMetricIntegration:
         )
         samples = cache_operations_total.collect()[0].samples
         assert any(
-            s.labels.get("implementation") == "rust"
-            and s.labels.get("operation") == "get"
+            s.labels.get("implementation") == "rust" and s.labels.get("operation") == "get"
             for s in samples
         )
 

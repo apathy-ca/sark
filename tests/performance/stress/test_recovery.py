@@ -110,9 +110,7 @@ async def test_opa_server_failure_and_recovery():
 
         assert result3 is not None
         print(f"✓ Recovered in {recovery_time:.0f}ms")
-        assert (
-            recovery_time < 5000
-        ), f"Recovery too slow: {recovery_time:.0f}ms"
+        assert recovery_time < 5000, f"Recovery too slow: {recovery_time:.0f}ms"
 
         print(f"\n{'=' * 80}")
         print("RECOVERY TEST PASSED")
@@ -160,9 +158,7 @@ async def test_redis_cache_failure_and_recovery():
 
     # Cache hit (fast)
     start = time.time()
-    result1 = await cache.get(
-        user_id="test-user", action="read", resource="doc-123"
-    )
+    result1 = await cache.get(user_id="test-user", action="read", resource="doc-123")
     cache_hit_latency = (time.time() - start) * 1000
 
     assert result1 is not None
@@ -179,9 +175,7 @@ async def test_redis_cache_failure_and_recovery():
 
     # Cache should fail gracefully and return None
     start = time.time()
-    result2 = await cache.get(
-        user_id="test-user", action="read", resource="doc-123"
-    )
+    result2 = await cache.get(user_id="test-user", action="read", resource="doc-123")
     failure_latency = (time.time() - start) * 1000
 
     # Should return None without crashing
@@ -198,9 +192,7 @@ async def test_redis_cache_failure_and_recovery():
 
     # Cache should work again
     start = time.time()
-    result3 = await cache.get(
-        user_id="test-user", action="read", resource="doc-123"
-    )
+    result3 = await cache.get(user_id="test-user", action="read", resource="doc-123")
     recovery_latency = (time.time() - start) * 1000
 
     assert result3 is not None
@@ -258,9 +250,7 @@ async def test_network_interruption_recovery():
 
         start = time.time()
         result1 = await client.evaluate_policy(
-            AuthorizationInput(
-                user_id="user-1", action="read", resource="doc-1", context={}
-            ),
+            AuthorizationInput(user_id="user-1", action="read", resource="doc-1", context={}),
             use_cache=False,
         )
         healthy_latency = (time.time() - start) * 1000
@@ -279,9 +269,7 @@ async def test_network_interruption_recovery():
 
         start = time.time()
         result2 = await client.evaluate_policy(
-            AuthorizationInput(
-                user_id="user-2", action="read", resource="doc-2", context={}
-            ),
+            AuthorizationInput(user_id="user-2", action="read", resource="doc-2", context={}),
             use_cache=False,
         )
         degraded_latency = (time.time() - start) * 1000
@@ -302,9 +290,7 @@ async def test_network_interruption_recovery():
         # Should timeout and raise exception
         try:
             await client.evaluate_policy(
-                AuthorizationInput(
-                    user_id="user-3", action="read", resource="doc-3", context={}
-                ),
+                AuthorizationInput(user_id="user-3", action="read", resource="doc-3", context={}),
                 use_cache=False,
             )
             raise AssertionError("Should have timed out")
@@ -318,9 +304,7 @@ async def test_network_interruption_recovery():
 
         start = time.time()
         result4 = await client.evaluate_policy(
-            AuthorizationInput(
-                user_id="user-4", action="read", resource="doc-4", context={}
-            ),
+            AuthorizationInput(user_id="user-4", action="read", resource="doc-4", context={}),
             use_cache=False,
         )
         recovery_latency = (time.time() - start) * 1000
@@ -576,9 +560,7 @@ async def test_recovery_time_measurement():
         # Verify system is down
         try:
             await client.evaluate_policy(
-                AuthorizationInput(
-                    user_id="user", action="read", resource="doc", context={}
-                ),
+                AuthorizationInput(user_id="user", action="read", resource="doc", context={}),
                 use_cache=False,
             )
             raise AssertionError("Should have failed")

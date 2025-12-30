@@ -281,9 +281,7 @@ async def get_metrics_comparison(
 
     except Exception as e:
         logger.error("Failed to get metrics comparison", error=str(e), exc_info=True)
-        raise HTTPException(
-            status_code=500, detail=f"Failed to get metrics comparison: {e}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to get metrics comparison: {e}")
 
 
 @router.post("/rollout/rollback-all")
@@ -329,6 +327,4 @@ async def rollback_all_features(
 
     except Exception as e:
         logger.error("Failed to rollback all features", error=str(e), exc_info=True)
-        raise HTTPException(
-            status_code=500, detail=f"Failed to rollback all features: {e}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to rollback all features: {e}")

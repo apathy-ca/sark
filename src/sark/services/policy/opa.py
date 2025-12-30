@@ -208,9 +208,11 @@ def _extract_resource_id(input_data: dict[str, Any]) -> str:
 
     # Try different resource types (check type before server for precedence)
     if "tool" in resource:
-        tool_name = resource.get("tool", {}).get("name") if isinstance(
-            resource.get("tool"), dict
-        ) else resource.get("tool")
+        tool_name = (
+            resource.get("tool", {}).get("name")
+            if isinstance(resource.get("tool"), dict)
+            else resource.get("tool")
+        )
         server = resource.get("server", "unknown")
         return f"tool:{server}/{tool_name}"
     elif "type" in resource:

@@ -82,6 +82,7 @@ SCENARIOS = {
 # Request Distribution Patterns
 # ==============================================================================
 
+
 @dataclass
 class RequestPattern:
     """Defines distribution of request types."""
@@ -119,6 +120,7 @@ WRITE_HEAVY_PATTERN = RequestPattern(
 # ==============================================================================
 # User Profiles
 # ==============================================================================
+
 
 @dataclass
 class UserProfile:
@@ -192,6 +194,7 @@ ACTIONS = {
 # ==============================================================================
 # Performance Targets
 # ==============================================================================
+
 
 @dataclass
 class PerformanceTarget:

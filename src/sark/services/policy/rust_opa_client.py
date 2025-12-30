@@ -173,9 +173,7 @@ class RustOPAClient:
             policy_files = list(self.policy_dir.rglob(f"{policy_name}.rego"))
 
             if not policy_files:
-                raise FileNotFoundError(
-                    f"Policy '{policy_name}' not found in {self.policy_dir}"
-                )
+                raise FileNotFoundError(f"Policy '{policy_name}' not found in {self.policy_dir}")
 
             policy_file = policy_files[0]
 

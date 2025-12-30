@@ -236,9 +236,7 @@ class TestCompleteAuthorizationFlow:
         }
 
     @pytest.mark.asyncio
-    async def test_complete_authorization_flow_success(
-        self, mock_services, security_components
-    ):
+    async def test_complete_authorization_flow_success(self, mock_services, security_components):
         """Test complete successful authorization flow"""
         start_time = time.time()
 
@@ -275,15 +273,11 @@ class TestCompleteAuthorizationFlow:
         sensitivity = auth_check["sensitivity"]
 
         # 7. Request filtering (policy)
-        filtered_params = await mock_services["opa"].filter_request(
-            request_params, auth_check
-        )
+        filtered_params = await mock_services["opa"].filter_request(request_params, auth_check)
         assert filtered_params is not None
 
         # 8. Tool invoked (Gateway)
-        response = await mock_services["gateway"].invoke_tool(
-            server["id"], tool, filtered_params
-        )
+        response = await mock_services["gateway"].invoke_tool(server["id"], tool, filtered_params)
         assert response["status"] == "success"
 
         # 9. Response scanned for secrets
@@ -326,9 +320,7 @@ class TestCompleteAuthorizationFlow:
         assert latency < 100, f"Latency {latency:.2f}ms exceeds 100ms threshold"
 
     @pytest.mark.asyncio
-    async def test_authorization_flow_blocked_by_policy(
-        self, mock_services, security_components
-    ):
+    async def test_authorization_flow_blocked_by_policy(self, mock_services, security_components):
         """Test authorization flow blocked by OPA policy"""
         # 1. Authenticate
         auth_result = await mock_services["jwt"].authenticate("john_doe", "password123")
@@ -382,9 +374,7 @@ class TestCompleteAuthorizationFlow:
         }
 
         # 3. Injection detection (should catch it)
-        injection_result = security_components["injection_detector"].detect(
-            malicious_params
-        )
+        injection_result = security_components["injection_detector"].detect(malicious_params)
 
         assert injection_result.detected, "Should detect injection attempt"
         assert injection_result.risk_score > 40
@@ -437,15 +427,11 @@ class TestCompleteAuthorizationFlow:
         request_params = {"limit": 1000}
 
         # 4. Authorization check
-        auth_check = await mock_services["opa"].check_authorization(
-            user_id, tool, request_params
-        )
+        auth_check = await mock_services["opa"].check_authorization(user_id, tool, request_params)
         assert auth_check["allowed"]
 
         # 5. Invoke tool
-        response = await mock_services["gateway"].invoke_tool(
-            "server1", tool, request_params
-        )
+        response = await mock_services["gateway"].invoke_tool("server1", tool, request_params)
 
         # 6. Detect behavioral anomaly
         event = BehavioralAuditEvent(
@@ -497,9 +483,7 @@ class TestCompleteAuthorizationFlow:
 
             if auth_check["allowed"]:
                 # Invoke tool
-                response = await mock_services["gateway"].invoke_tool(
-                    "server1", "query_users", {}
-                )
+                response = await mock_services["gateway"].invoke_tool("server1", "query_users", {})
 
                 # Scan for secrets
                 security_components["secret_scanner"].scan(response)
@@ -534,9 +518,7 @@ class TestCompleteAuthorizationFlow:
 
         # 1. Authentication
         auth_result = await mock_services["jwt"].authenticate(user_id, "password123")
-        await mock_services["audit"].log_event(
-            event_type="authentication_success", user_id=user_id
-        )
+        await mock_services["audit"].log_event(event_type="authentication_success", user_id=user_id)
 
         # 2. Discovery
         token = auth_result["access_token"]
@@ -547,9 +529,7 @@ class TestCompleteAuthorizationFlow:
         )
 
         # 3. Authorization
-        auth_check = await mock_services["opa"].check_authorization(
-            user_id, "query_users", {}
-        )
+        auth_check = await mock_services["opa"].check_authorization(user_id, "query_users", {})
         await mock_services["audit"].log_event(
             event_type="authorization_check",
             user_id=user_id,
@@ -598,18 +578,14 @@ class TestCompleteAuthorizationFlow:
         assert len(mock_services["siem"].forwarded_events) == 5
 
     @pytest.mark.asyncio
-    async def test_no_data_leakage_in_responses(
-        self, mock_services, security_components
-    ):
+    async def test_no_data_leakage_in_responses(self, mock_services, security_components):
         """Test that sensitive data is properly redacted"""
         # Setup
         auth_result = await mock_services["jwt"].authenticate("user", "password123")
         user_info = await mock_services["jwt"].validate_token(auth_result["access_token"])
 
         # Invoke tool that returns sensitive data
-        response = await mock_services["gateway"].invoke_tool(
-            "server1", "query_users", {}
-        )
+        response = await mock_services["gateway"].invoke_tool("server1", "query_users", {})
 
         # Verify raw response contains secrets
         raw_str = str(response)

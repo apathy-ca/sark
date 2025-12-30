@@ -144,7 +144,7 @@ class TestCheckRateLimit:
         mock_redis.pipeline.return_value = pipe_mock
 
         # Act
-        with patch('time.time', return_value=1000.0):
+        with patch("time.time", return_value=1000.0):
             await rate_limiter.check_rate_limit(identifier)
 
         # Assert
@@ -185,7 +185,7 @@ class TestCheckRateLimit:
         mock_redis.pipeline.return_value = pipe_mock
 
         # Act
-        with patch('time.time', return_value=current_time):
+        with patch("time.time", return_value=current_time):
             result = await rate_limiter.check_rate_limit(identifier)
 
         # Assert
@@ -206,7 +206,7 @@ class TestCheckRateLimit:
         mock_redis.zrange.return_value = [("entry", oldest_timestamp)]
 
         # Act
-        with patch('time.time', return_value=current_time):
+        with patch("time.time", return_value=current_time):
             result = await rate_limiter.check_rate_limit(identifier)
 
         # Assert
@@ -229,7 +229,7 @@ class TestCheckRateLimit:
         mock_redis.zrange.return_value = [("entry", oldest_timestamp)]
 
         # Act
-        with patch('time.time', return_value=current_time):
+        with patch("time.time", return_value=current_time):
             result = await rate_limiter.check_rate_limit(identifier)
 
         # Assert
@@ -355,7 +355,7 @@ class TestGetCurrentUsage:
         mock_redis.zcard.return_value = 5
 
         # Act
-        with patch('time.time', return_value=current_time):
+        with patch("time.time", return_value=current_time):
             await rate_limiter.get_current_usage(identifier)
 
         # Assert

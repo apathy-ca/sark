@@ -15,17 +15,19 @@ RUST_AVAILABLE = False
 
 try:
     from sark.sark_rust import *  # noqa: F403
+
     RUST_AVAILABLE = True
 except ImportError as e:
     # Rust extensions not built - this is OK during development
     # or when running from source without building Rust
     import warnings
+
     warnings.warn(
         f"Rust extensions not available: {e}. "
         "Run 'maturin develop' to build them. "
         "SARK will use pure-Python fallbacks where available.",
         ImportWarning,
-        stacklevel=2
+        stacklevel=2,
     )
 
 __all__ = ["RUST_AVAILABLE"]

@@ -90,12 +90,8 @@ def record_opa_evaluation(
         duration_seconds: Evaluation duration in seconds
         result: 'allow' or 'deny'
     """
-    opa_evaluation_duration_seconds.labels(implementation=implementation).observe(
-        duration_seconds
-    )
-    opa_evaluation_total.labels(
-        implementation=implementation, result=result
-    ).inc()
+    opa_evaluation_duration_seconds.labels(implementation=implementation).observe(duration_seconds)
+    opa_evaluation_total.labels(implementation=implementation, result=result).inc()
 
 
 def record_opa_error(
@@ -109,9 +105,7 @@ def record_opa_error(
         implementation: 'rust' or 'python'
         error_type: Error type (e.g., 'timeout', 'connection', 'validation')
     """
-    opa_evaluation_errors_total.labels(
-        implementation=implementation, error_type=error_type
-    ).inc()
+    opa_evaluation_errors_total.labels(implementation=implementation, error_type=error_type).inc()
 
 
 def record_cache_operation(
@@ -148,9 +142,7 @@ def record_feature_flag_assignment(
         feature: Feature name (e.g., 'rust_opa', 'rust_cache')
         implementation: Assigned implementation ('rust' or 'python')
     """
-    feature_flag_assignments_total.labels(
-        feature=feature, implementation=implementation
-    ).inc()
+    feature_flag_assignments_total.labels(feature=feature, implementation=implementation).inc()
 
 
 def record_rollout_percentage(
@@ -178,6 +170,4 @@ def record_fallback(
         feature: Feature name (e.g., 'rust_opa', 'rust_cache')
         error_type: Error that triggered fallback
     """
-    implementation_fallback_total.labels(
-        feature=feature, error_type=error_type
-    ).inc()
+    implementation_fallback_total.labels(feature=feature, error_type=error_type).inc()

@@ -13,10 +13,7 @@ from sark.services.policy.rust_opa_client import (
 )
 
 # Mark all tests to skip if Rust extension is not available
-pytestmark = pytest.mark.skipif(
-    not RUST_AVAILABLE,
-    reason="Rust extensions not available"
-)
+pytestmark = pytest.mark.skipif(not RUST_AVAILABLE, reason="Rust extensions not available")
 
 
 @pytest.fixture
@@ -44,19 +41,17 @@ def rust_client(mock_cache, tmp_path):
 
     # Create a simple test policy
     policy_file = policy_dir / "test_policy.rego"
-    policy_file.write_text("""
+    policy_file.write_text(
+        """
         package test
         default allow = false
         allow {
             input.user.role == "admin"
         }
-    """)
-
-    client = RustOPAClient(
-        policy_dir=policy_dir,
-        cache=mock_cache,
-        cache_enabled=True
+    """
     )
+
+    client = RustOPAClient(policy_dir=policy_dir, cache=mock_cache, cache_enabled=True)
 
     yield client
 
@@ -72,11 +67,7 @@ class TestRustOPAClientInit:
 
     def test_init_with_rust_extension(self, mock_cache, tmp_path):
         """Test successful initialization with Rust extension."""
-        client = RustOPAClient(
-            policy_dir=tmp_path,
-            cache=mock_cache,
-            cache_enabled=True
-        )
+        client = RustOPAClient(policy_dir=tmp_path, cache=mock_cache, cache_enabled=True)
 
         assert client.engine is not None
         assert client.policy_dir == tmp_path
@@ -164,7 +155,7 @@ class TestPolicyEvaluation:
             user={"id": "user1", "role": "admin"},
             action="gateway:tool:invoke",
             tool={"name": "test-tool", "sensitivity_level": "low"},
-            context={}
+            context={},
         )
 
         cached_decision = {
@@ -199,7 +190,7 @@ class TestPolicyEvaluation:
             user={"id": "user1", "role": "admin"},
             action="gateway:tool:invoke",
             tool={"name": "test-tool", "sensitivity_level": "low"},
-            context={}
+            context={},
         )
 
         mock_cache.get = AsyncMock(return_value=None)
@@ -224,7 +215,7 @@ class TestPolicyEvaluation:
             user={"id": "user1", "role": "user"},
             action="gateway:tool:invoke",
             tool={"name": "test-tool"},
-            context={}
+            context={},
         )
 
         mock_cache.get = AsyncMock(return_value=None)
@@ -240,7 +231,7 @@ class TestPolicyEvaluation:
             user={"id": "user1", "role": "user"},
             action="gateway:tool:invoke",
             tool={"name": "test-tool"},
-            context={}
+            context={},
         )
 
         mock_cache.get = AsyncMock(return_value=None)
@@ -263,16 +254,12 @@ class TestCacheOperations:
         mock_cache.invalidate = AsyncMock(return_value=5)
 
         count = await rust_client.invalidate_cache(
-            user_id="user1",
-            action="gateway:tool:invoke",
-            resource="tool:test"
+            user_id="user1", action="gateway:tool:invoke", resource="tool:test"
         )
 
         assert count == 5
         mock_cache.invalidate.assert_called_once_with(
-            user_id="user1",
-            action="gateway:tool:invoke",
-            resource="tool:test"
+            user_id="user1", action="gateway:tool:invoke", resource="tool:test"
         )
 
     @pytest.mark.asyncio
@@ -341,14 +328,14 @@ class TestHelperMethods:
             user={"id": "user1"},
             action="test",
             tool={"name": "test", "sensitivity_level": "critical"},
-            context={}
+            context={},
         )
 
         auth_input_public = AuthorizationInput(
             user={"id": "user1"},
             action="test",
             tool={"name": "test", "sensitivity_level": "public"},
-            context={}
+            context={},
         )
 
         ttl_critical = rust_client._get_cache_ttl(auth_input_critical)
@@ -363,7 +350,7 @@ class TestHelperMethods:
             user={"id": "user1"},
             action="test",
             tool={"name": "test", "sensitivity_level": "high"},
-            context={}
+            context={},
         )
 
         sensitivity = rust_client._get_sensitivity(auth_input)
@@ -376,7 +363,7 @@ class TestHelperMethods:
             user={"id": "user1"},
             action="test",
             server={"name": "test", "sensitivity_level": "low"},
-            context={}
+            context={},
         )
 
         sensitivity = rust_client._get_sensitivity(auth_input)
@@ -385,11 +372,7 @@ class TestHelperMethods:
 
     def test_get_sensitivity_default(self, rust_client):
         """Test default sensitivity when neither tool nor server is provided."""
-        auth_input = AuthorizationInput(
-            user={"id": "user1"},
-            action="test",
-            context={}
-        )
+        auth_input = AuthorizationInput(user={"id": "user1"}, action="test", context={})
 
         sensitivity = rust_client._get_sensitivity(auth_input)
 

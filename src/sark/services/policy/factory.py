@@ -65,9 +65,7 @@ class PolicyCacheProtocol(Protocol):
         """Set cached policy decision."""
         ...
 
-    async def delete(
-        self, user_id: str, action: str, resource: str
-    ) -> None:
+    async def delete(self, user_id: str, action: str, resource: str) -> None:
         """Delete cached policy decision."""
         ...
 
@@ -180,9 +178,7 @@ class RustPolicyCache:
             "Rust cache stub - waiting for cache-engine worker implementation"
         )
 
-    async def delete(
-        self, user_id: str, action: str, resource: str
-    ) -> None:
+    async def delete(self, user_id: str, action: str, resource: str) -> None:
         """
         Delete cached decision using Rust cache.
 

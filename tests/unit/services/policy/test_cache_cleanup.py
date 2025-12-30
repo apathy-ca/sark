@@ -38,9 +38,7 @@ class TestCleanupMetrics:
 
     def test_avg_entries_per_cleanup(self):
         """Test average calculation."""
-        metrics = cache_cleanup.CleanupMetrics(
-            cleanups_run=10, total_entries_removed=50
-        )
+        metrics = cache_cleanup.CleanupMetrics(cleanups_run=10, total_entries_removed=50)
 
         assert metrics.avg_entries_per_cleanup == 5.0
 
@@ -85,9 +83,7 @@ class TestCacheCleanupTaskInitialization:
 
     def test_custom_initialization(self, mock_cache):
         """Test initialization with custom parameters."""
-        task = cache_cleanup.CacheCleanupTask(
-            mock_cache, interval=30, enabled=False
-        )
+        task = cache_cleanup.CacheCleanupTask(mock_cache, interval=30, enabled=False)
 
         assert task.interval == 30
         assert task.enabled is False
@@ -338,9 +334,7 @@ class TestGlobalInstance:
         # Reset global state
         cache_cleanup._cleanup_task = None
 
-        task = await cache_cleanup.start_cache_cleanup(
-            mock_cache, interval=60, enabled=True
-        )
+        task = await cache_cleanup.start_cache_cleanup(mock_cache, interval=60, enabled=True)
 
         assert task is not None
         assert task.running is True

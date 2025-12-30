@@ -24,9 +24,7 @@ class TestCreateOPAClient:
 
     @patch("sark.services.policy.factory.get_feature_flag_manager")
     @patch("sark.services.policy.factory.RUST_AVAILABLE", False)
-    def test_create_python_client_when_rust_not_available(
-        self, mock_get_ff_manager
-    ):
+    def test_create_python_client_when_rust_not_available(self, mock_get_ff_manager):
         """Test that Python client is created when Rust is not available."""
         mock_ff_manager = Mock()
         mock_ff_manager.should_use_rust.return_value = True
@@ -36,15 +34,11 @@ class TestCreateOPAClient:
 
         assert isinstance(client, OPAClient)
         # Feature flag should still be checked
-        mock_ff_manager.should_use_rust.assert_called_once_with(
-            "rust_opa", "user123"
-        )
+        mock_ff_manager.should_use_rust.assert_called_once_with("rust_opa", "user123")
 
     @patch("sark.services.policy.factory.get_feature_flag_manager")
     @patch("sark.services.policy.factory.RUST_AVAILABLE", False)
-    def test_create_python_client_when_feature_flag_disabled(
-        self, mock_get_ff_manager
-    ):
+    def test_create_python_client_when_feature_flag_disabled(self, mock_get_ff_manager):
         """Test that Python client is created when feature flag is off."""
         mock_ff_manager = Mock()
         mock_ff_manager.should_use_rust.return_value = False
@@ -53,16 +47,12 @@ class TestCreateOPAClient:
         client = create_opa_client("user123")
 
         assert isinstance(client, OPAClient)
-        mock_ff_manager.should_use_rust.assert_called_once_with(
-            "rust_opa", "user123"
-        )
+        mock_ff_manager.should_use_rust.assert_called_once_with("rust_opa", "user123")
 
     @patch("sark.services.policy.factory.get_feature_flag_manager")
     @patch("sark.services.policy.factory.RUST_AVAILABLE", True)
     @patch("sark.services.policy.factory.RustOPAClient")
-    def test_create_rust_client_when_enabled(
-        self, mock_rust_client_class, mock_get_ff_manager
-    ):
+    def test_create_rust_client_when_enabled(self, mock_rust_client_class, mock_get_ff_manager):
         """Test that Rust client is created when feature flag is on."""
         mock_ff_manager = Mock()
         mock_ff_manager.should_use_rust.return_value = True
@@ -74,17 +64,13 @@ class TestCreateOPAClient:
         client = create_opa_client("user123")
 
         assert client == mock_rust_instance
-        mock_ff_manager.should_use_rust.assert_called_once_with(
-            "rust_opa", "user123"
-        )
+        mock_ff_manager.should_use_rust.assert_called_once_with("rust_opa", "user123")
         mock_rust_client_class.assert_called_once_with(None)
 
     @patch("sark.services.policy.factory.get_feature_flag_manager")
     @patch("sark.services.policy.factory.RUST_AVAILABLE", True)
     @patch("sark.services.policy.factory.RustOPAClient")
-    def test_fallback_to_python_on_rust_error(
-        self, mock_rust_client_class, mock_get_ff_manager
-    ):
+    def test_fallback_to_python_on_rust_error(self, mock_rust_client_class, mock_get_ff_manager):
         """Test fallback to Python when Rust client fails to initialize."""
         mock_ff_manager = Mock()
         mock_ff_manager.should_use_rust.return_value = True
@@ -102,9 +88,7 @@ class TestCreateOPAClient:
     @patch("sark.services.policy.factory.get_feature_flag_manager")
     @patch("sark.services.policy.factory.RUST_AVAILABLE", True)
     @patch("sark.services.policy.factory.RustOPAClient")
-    def test_no_fallback_when_disabled(
-        self, mock_rust_client_class, mock_get_ff_manager
-    ):
+    def test_no_fallback_when_disabled(self, mock_rust_client_class, mock_get_ff_manager):
         """Test that error is raised when fallback is disabled."""
         mock_ff_manager = Mock()
         mock_ff_manager.should_use_rust.return_value = True
@@ -119,9 +103,7 @@ class TestCreateOPAClient:
     @patch("sark.services.policy.factory.get_feature_flag_manager")
     @patch("sark.services.policy.factory.RUST_AVAILABLE", True)
     @patch("sark.services.policy.factory.RustOPAClient")
-    def test_opa_url_passed_to_clients(
-        self, mock_rust_client_class, mock_get_ff_manager
-    ):
+    def test_opa_url_passed_to_clients(self, mock_rust_client_class, mock_get_ff_manager):
         """Test that OPA URL is passed to clients."""
         mock_ff_manager = Mock()
         mock_ff_manager.should_use_rust.return_value = True
@@ -140,9 +122,7 @@ class TestCreatePolicyCache:
 
     @patch("sark.services.policy.factory.get_feature_flag_manager")
     @patch("sark.services.policy.factory.RUST_AVAILABLE", False)
-    def test_create_redis_cache_when_rust_not_available(
-        self, mock_get_ff_manager
-    ):
+    def test_create_redis_cache_when_rust_not_available(self, mock_get_ff_manager):
         """Test that Redis cache is created when Rust is not available."""
         mock_ff_manager = Mock()
         mock_ff_manager.should_use_rust.return_value = True
@@ -151,15 +131,11 @@ class TestCreatePolicyCache:
         cache = create_policy_cache("user123")
 
         assert isinstance(cache, PolicyCache)
-        mock_ff_manager.should_use_rust.assert_called_once_with(
-            "rust_cache", "user123"
-        )
+        mock_ff_manager.should_use_rust.assert_called_once_with("rust_cache", "user123")
 
     @patch("sark.services.policy.factory.get_feature_flag_manager")
     @patch("sark.services.policy.factory.RUST_AVAILABLE", False)
-    def test_create_redis_cache_when_feature_flag_disabled(
-        self, mock_get_ff_manager
-    ):
+    def test_create_redis_cache_when_feature_flag_disabled(self, mock_get_ff_manager):
         """Test that Redis cache is created when feature flag is off."""
         mock_ff_manager = Mock()
         mock_ff_manager.should_use_rust.return_value = False
@@ -168,16 +144,12 @@ class TestCreatePolicyCache:
         cache = create_policy_cache("user123")
 
         assert isinstance(cache, PolicyCache)
-        mock_ff_manager.should_use_rust.assert_called_once_with(
-            "rust_cache", "user123"
-        )
+        mock_ff_manager.should_use_rust.assert_called_once_with("rust_cache", "user123")
 
     @patch("sark.services.policy.factory.get_feature_flag_manager")
     @patch("sark.services.policy.factory.RUST_AVAILABLE", True)
     @patch("sark.services.policy.factory.RustPolicyCache")
-    def test_create_rust_cache_when_enabled(
-        self, mock_rust_cache_class, mock_get_ff_manager
-    ):
+    def test_create_rust_cache_when_enabled(self, mock_rust_cache_class, mock_get_ff_manager):
         """Test that Rust cache is created when feature flag is on."""
         mock_ff_manager = Mock()
         mock_ff_manager.should_use_rust.return_value = True
@@ -189,17 +161,13 @@ class TestCreatePolicyCache:
         cache = create_policy_cache("user123")
 
         assert cache == mock_rust_instance
-        mock_ff_manager.should_use_rust.assert_called_once_with(
-            "rust_cache", "user123"
-        )
+        mock_ff_manager.should_use_rust.assert_called_once_with("rust_cache", "user123")
         mock_rust_cache_class.assert_called_once_with()
 
     @patch("sark.services.policy.factory.get_feature_flag_manager")
     @patch("sark.services.policy.factory.RUST_AVAILABLE", True)
     @patch("sark.services.policy.factory.RustPolicyCache")
-    def test_fallback_to_redis_on_rust_error(
-        self, mock_rust_cache_class, mock_get_ff_manager
-    ):
+    def test_fallback_to_redis_on_rust_error(self, mock_rust_cache_class, mock_get_ff_manager):
         """Test fallback to Redis when Rust cache fails to initialize."""
         mock_ff_manager = Mock()
         mock_ff_manager.should_use_rust.return_value = True
@@ -217,9 +185,7 @@ class TestCreatePolicyCache:
     @patch("sark.services.policy.factory.get_feature_flag_manager")
     @patch("sark.services.policy.factory.RUST_AVAILABLE", True)
     @patch("sark.services.policy.factory.RustPolicyCache")
-    def test_no_fallback_when_disabled(
-        self, mock_rust_cache_class, mock_get_ff_manager
-    ):
+    def test_no_fallback_when_disabled(self, mock_rust_cache_class, mock_get_ff_manager):
         """Test that error is raised when fallback is disabled."""
         mock_ff_manager = Mock()
         mock_ff_manager.should_use_rust.return_value = True
@@ -237,9 +203,7 @@ class TestCreatePolicyClients:
 
     @patch("sark.services.policy.factory.create_opa_client")
     @patch("sark.services.policy.factory.create_policy_cache")
-    def test_creates_both_clients(
-        self, mock_create_cache, mock_create_opa
-    ):
+    def test_creates_both_clients(self, mock_create_cache, mock_create_opa):
         """Test that both clients are created."""
         mock_opa = Mock()
         mock_cache = Mock()
@@ -266,9 +230,7 @@ class TestCreatePolicyClients:
             "user123", opa_url="http://custom-opa:8181"
         )
 
-        mock_create_opa.assert_called_once_with(
-            "user123", "http://custom-opa:8181"
-        )
+        mock_create_opa.assert_called_once_with("user123", "http://custom-opa:8181")
 
 
 class TestRustOPAClient:
@@ -300,9 +262,7 @@ class TestRustOPAClient:
             context={},
         )
 
-        with pytest.raises(
-            NotImplementedError, match="Rust OPA client stub"
-        ):
+        with pytest.raises(NotImplementedError, match="Rust OPA client stub"):
             await client.evaluate_policy(auth_input)
 
     @patch("sark.services.policy.factory.RUST_AVAILABLE", True)
@@ -319,9 +279,7 @@ class TestRustPolicyCache:
     @patch("sark.services.policy.factory.RUST_AVAILABLE", False)
     def test_raises_error_when_rust_not_available(self):
         """Test that RustPolicyCache raises error when Rust is not available."""
-        with pytest.raises(
-            RuntimeError, match="Rust policy cache not available"
-        ):
+        with pytest.raises(RuntimeError, match="Rust policy cache not available"):
             RustPolicyCache()
 
     @patch("sark.services.policy.factory.RUST_AVAILABLE", True)
@@ -347,9 +305,7 @@ class TestRustPolicyCache:
         cache = RustPolicyCache()
 
         with pytest.raises(NotImplementedError, match="Rust cache stub"):
-            await cache.set(
-                "user123", "read", "tool:slack", {"allow": True}
-            )
+            await cache.set("user123", "read", "tool:slack", {"allow": True})
 
     @patch("sark.services.policy.factory.RUST_AVAILABLE", True)
     @pytest.mark.asyncio
@@ -410,9 +366,7 @@ class TestFeatureFlagRouting:
         def should_use_rust_side_effect(feature, user_id):
             return user_id == "user1"
 
-        mock_ff_manager.should_use_rust.side_effect = (
-            should_use_rust_side_effect
-        )
+        mock_ff_manager.should_use_rust.side_effect = should_use_rust_side_effect
         mock_get_ff_manager.return_value = mock_ff_manager
 
         mock_rust_opa = Mock()

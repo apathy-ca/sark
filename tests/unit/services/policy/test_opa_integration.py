@@ -223,9 +223,7 @@ class TestEvaluatePolicy:
         mock_create_cache.return_value = mock_cache
 
         mock_opa = AsyncMock()
-        mock_opa.evaluate_policy.return_value = AuthorizationDecision(
-            allow=True, reason="Test"
-        )
+        mock_opa.evaluate_policy.return_value = AuthorizationDecision(allow=True, reason="Test")
         mock_create_opa.return_value = mock_opa
 
         # Test input
@@ -264,9 +262,7 @@ class TestEvaluatePolicy:
         mock_create_cache.return_value = mock_cache
 
         mock_opa = AsyncMock()
-        mock_opa.evaluate_policy.return_value = AuthorizationDecision(
-            allow=True, reason="Test"
-        )
+        mock_opa.evaluate_policy.return_value = AuthorizationDecision(allow=True, reason="Test")
         mock_create_opa.return_value = mock_opa
 
         # Test input without explicit user_id
@@ -302,9 +298,7 @@ class TestEvaluatePolicy:
         mock_create_cache.return_value = mock_cache
 
         mock_opa = AsyncMock()
-        mock_opa.evaluate_policy.return_value = AuthorizationDecision(
-            allow=True, reason="Test"
-        )
+        mock_opa.evaluate_policy.return_value = AuthorizationDecision(allow=True, reason="Test")
         mock_create_opa.return_value = mock_opa
 
         # Test input
@@ -379,9 +373,7 @@ class TestExtractResourceId:
 
     def test_extract_unknown_resource(self):
         """Test handling unknown resource format."""
-        input_data = {
-            "resource": {}
-        }
+        input_data = {"resource": {}}
 
         resource_id = _extract_resource_id(input_data)
         assert resource_id == "unknown"
@@ -415,9 +407,7 @@ class TestImplementationDetection:
 
         mock_opa = AsyncMock()
         mock_opa.__class__.__name__ = "RustOPAClient"  # Simulate Rust client
-        mock_opa.evaluate_policy.return_value = AuthorizationDecision(
-            allow=True, reason="Test"
-        )
+        mock_opa.evaluate_policy.return_value = AuthorizationDecision(allow=True, reason="Test")
         mock_create_opa.return_value = mock_opa
 
         # Test input
@@ -457,9 +447,7 @@ class TestImplementationDetection:
 
         mock_opa = AsyncMock()
         mock_opa.__class__.__name__ = "OPAClient"  # Simulate Python client
-        mock_opa.evaluate_policy.return_value = AuthorizationDecision(
-            allow=True, reason="Test"
-        )
+        mock_opa.evaluate_policy.return_value = AuthorizationDecision(allow=True, reason="Test")
         mock_create_opa.return_value = mock_opa
 
         # Test input

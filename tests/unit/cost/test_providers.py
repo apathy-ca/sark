@@ -192,7 +192,9 @@ class TestAnthropicCostEstimator:
             resource_id="res_001",
             arguments={"messages": [{"role": "user", "content": "Hello"}]},
         )
-        result = InvocationResult(invocation_id="inv_123", success=True, duration_ms=50, metadata={})
+        result = InvocationResult(
+            invocation_id="inv_123", success=True, duration_ms=50, metadata={}
+        )
         metadata = {"model": "claude-3-haiku-20240307"}
 
         actual = await anthropic_estimator.record_actual_cost(request, result, metadata)

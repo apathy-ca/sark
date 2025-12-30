@@ -92,9 +92,7 @@ class TestCacheKeyGeneration:
 
     def test_generate_cache_key_without_context(self, cache_with_mock):
         """Test key generation without context."""
-        key = cache_with_mock._generate_cache_key(
-            "user-123", "execute", "tool:calculator", None
-        )
+        key = cache_with_mock._generate_cache_key("user-123", "execute", "tool:calculator", None)
 
         assert key.startswith("policy:decision:user-123:execute:tool_calculator:")
         assert key.endswith(":none")
@@ -102,9 +100,7 @@ class TestCacheKeyGeneration:
     def test_generate_cache_key_with_context(self, cache_with_mock):
         """Test key generation with context."""
         context = {"param1": "value1", "param2": "value2"}
-        key = cache_with_mock._generate_cache_key(
-            "user-123", "execute", "tool:calculator", context
-        )
+        key = cache_with_mock._generate_cache_key("user-123", "execute", "tool:calculator", context)
 
         assert key.startswith("policy:decision:user-123:execute:tool_calculator:")
         assert not key.endswith(":none")
@@ -141,9 +137,7 @@ class TestCacheKeyGeneration:
 
     def test_generate_cache_key_handles_special_characters(self, cache_with_mock):
         """Test that special characters in resource are cleaned."""
-        key = cache_with_mock._generate_cache_key(
-            "user-123", "execute", "tool:calculator/v2", None
-        )
+        key = cache_with_mock._generate_cache_key("user-123", "execute", "tool:calculator/v2", None)
 
         # Colons and slashes should be replaced with underscores
         assert "tool_calculator_v2" in key
@@ -228,9 +222,7 @@ class TestCacheOperations:
         """Test successful cache set."""
         decision = {"allow": True, "reason": "test"}
 
-        result = await cache_with_mock.set(
-            "user-123", "execute", "tool:calculator", decision
-        )
+        result = await cache_with_mock.set("user-123", "execute", "tool:calculator", decision)
 
         assert result is True
         cache_with_mock.cache.set.assert_called_once()
@@ -268,9 +260,7 @@ class TestCacheOperations:
         cache_with_mock.enabled = False
         decision = {"allow": True}
 
-        result = await cache_with_mock.set(
-            "user-123", "execute", "tool:calculator", decision
-        )
+        result = await cache_with_mock.set("user-123", "execute", "tool:calculator", decision)
 
         assert result is False
         cache_with_mock.cache.set.assert_not_called()

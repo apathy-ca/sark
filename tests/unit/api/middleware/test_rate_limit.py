@@ -54,10 +54,7 @@ def mock_request():
     request.client = Mock()
     request.client.host = "127.0.0.1"
     # Use a proper object for state to support attribute access
-    request.state = type('obj', (object,), {
-        'user_id': None,
-        'user_roles': []
-    })()
+    request.state = type("obj", (object,), {"user_id": None, "user_roles": []})()
     return request
 
 

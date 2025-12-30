@@ -71,13 +71,15 @@ class SARKUser(HttpUser):
         self.request_count += 1
 
         # Use common resources for cache hit simulation
-        resource = random.choice([
-            "document-123",
-            "document-456",
-            "document-789",
-            "project-alpha:document-001",
-            "project-beta:document-002",
-        ])
+        resource = random.choice(
+            [
+                "document-123",
+                "document-456",
+                "document-789",
+                "project-alpha:document-001",
+                "project-beta:document-002",
+            ]
+        )
 
         with self.client.post(
             "/authorize",
@@ -115,12 +117,14 @@ class SARKUser(HttpUser):
         """
         self.request_count += 1
 
-        resource = random.choice([
-            "document-123",
-            "document-456",
-            "project-alpha:document-001",
-            f"document-{self.request_count}",  # Unique resource for cache miss
-        ])
+        resource = random.choice(
+            [
+                "document-123",
+                "document-456",
+                "project-alpha:document-001",
+                f"document-{self.request_count}",  # Unique resource for cache miss
+            ]
+        )
 
         with self.client.post(
             "/authorize",

@@ -237,9 +237,7 @@ class TestAnomalyAlertManager:
         assert result["reason"] == "no anomalies detected"
 
     @pytest.mark.asyncio
-    async def test_process_low_severity_only(
-        self, alert_manager, sample_event, mock_services
-    ):
+    async def test_process_low_severity_only(self, alert_manager, sample_event, mock_services):
         """Test processing low severity anomalies only logs"""
         anomalies = [
             Anomaly(
@@ -259,9 +257,7 @@ class TestAnomalyAlertManager:
         mock_services["alert_service"].send_alert.assert_not_called()
 
     @pytest.mark.asyncio
-    async def test_process_warning_level(
-        self, alert_manager, sample_event, mock_services
-    ):
+    async def test_process_warning_level(self, alert_manager, sample_event, mock_services):
         """Test processing warning level anomalies"""
         anomalies = [
             Anomaly(
@@ -283,9 +279,7 @@ class TestAnomalyAlertManager:
         mock_services["alert_service"].send_alert.assert_called()
 
     @pytest.mark.asyncio
-    async def test_process_critical_level(
-        self, alert_manager, sample_event, mock_services
-    ):
+    async def test_process_critical_level(self, alert_manager, sample_event, mock_services):
         """Test processing critical level anomalies"""
         anomalies = [
             Anomaly(
@@ -312,9 +306,7 @@ class TestAnomalyAlertManager:
         mock_services["alert_service"].send_alert.assert_called()
 
     @pytest.mark.asyncio
-    async def test_process_with_metadata(
-        self, alert_manager, sample_event, mock_services
-    ):
+    async def test_process_with_metadata(self, alert_manager, sample_event, mock_services):
         """Test that metadata is included in logging"""
         anomalies = [
             Anomaly(
@@ -356,9 +348,7 @@ class TestAnomalyAlertManager:
     @pytest.mark.asyncio
     async def test_auto_suspend_on_critical(self, sample_event, mock_services):
         """Test auto-suspend when enabled"""
-        config = AlertConfig(
-            auto_suspend_enabled=True, auto_suspend_on_critical=True
-        )
+        config = AlertConfig(auto_suspend_enabled=True, auto_suspend_on_critical=True)
         manager = AnomalyAlertManager(
             audit_logger=mock_services["audit_logger"],
             alert_service=mock_services["alert_service"],
@@ -389,9 +379,7 @@ class TestAnomalyAlertManager:
     @pytest.mark.asyncio
     async def test_auto_suspend_logs_event(self, sample_event, mock_services):
         """Test that auto-suspend logs to audit"""
-        config = AlertConfig(
-            auto_suspend_enabled=True, auto_suspend_on_critical=True
-        )
+        config = AlertConfig(auto_suspend_enabled=True, auto_suspend_on_critical=True)
         manager = AnomalyAlertManager(
             audit_logger=mock_services["audit_logger"],
             alert_service=mock_services["alert_service"],
@@ -422,9 +410,7 @@ class TestAnomalyAlertManager:
         assert suspension_call[0][1]["user_id"] == "user123"
 
     @pytest.mark.asyncio
-    async def test_suspend_user_without_user_management(
-        self, alert_manager, sample_event, caplog
-    ):
+    async def test_suspend_user_without_user_management(self, alert_manager, sample_event, caplog):
         """Test that suspend logs warning without user management service"""
         anomalies = [
             Anomaly(
@@ -442,17 +428,11 @@ class TestAnomalyAlertManager:
         assert "No user management service" in caplog.text
 
     @pytest.mark.asyncio
-    async def test_suspend_user_handles_error(
-        self, sample_event, mock_services, caplog
-    ):
+    async def test_suspend_user_handles_error(self, sample_event, mock_services, caplog):
         """Test that suspend errors are caught and logged"""
-        mock_services["user_management"].suspend_user.side_effect = Exception(
-            "Suspend failed"
-        )
+        mock_services["user_management"].suspend_user.side_effect = Exception("Suspend failed")
 
-        config = AlertConfig(
-            auto_suspend_enabled=True, auto_suspend_on_critical=True
-        )
+        config = AlertConfig(auto_suspend_enabled=True, auto_suspend_on_critical=True)
         manager = AnomalyAlertManager(
             audit_logger=mock_services["audit_logger"],
             alert_service=mock_services["alert_service"],
@@ -476,9 +456,7 @@ class TestAnomalyAlertManager:
     # Audit Logging Tests
 
     @pytest.mark.asyncio
-    async def test_log_anomalies_called(
-        self, alert_manager, sample_event, mock_services
-    ):
+    async def test_log_anomalies_called(self, alert_manager, sample_event, mock_services):
         """Test that anomalies are logged to audit system"""
         anomalies = [
             Anomaly(
@@ -575,9 +553,7 @@ class TestAnomalyAlertManager:
     # Critical Alert Tests
 
     @pytest.mark.asyncio
-    async def test_critical_alert_sends_to_pagerduty(
-        self, sample_event, mock_services
-    ):
+    async def test_critical_alert_sends_to_pagerduty(self, sample_event, mock_services):
         """Test critical alert sent to PagerDuty when enabled"""
         config = AlertConfig(pagerduty_enabled=True, slack_enabled=False)
         manager = AnomalyAlertManager(
@@ -608,9 +584,7 @@ class TestAnomalyAlertManager:
         assert call_args["details"]["anomaly_count"] == 1
 
     @pytest.mark.asyncio
-    async def test_critical_alert_sends_to_slack(
-        self, sample_event, mock_services
-    ):
+    async def test_critical_alert_sends_to_slack(self, sample_event, mock_services):
         """Test critical alert sent to Slack when enabled"""
         config = AlertConfig(slack_enabled=True, pagerduty_enabled=False)
         manager = AnomalyAlertManager(
@@ -639,9 +613,7 @@ class TestAnomalyAlertManager:
         assert "🚨" in call_args["title"]
 
     @pytest.mark.asyncio
-    async def test_critical_alert_without_alert_service(
-        self, sample_event, caplog
-    ):
+    async def test_critical_alert_without_alert_service(self, sample_event, caplog):
         """Test critical alert logs warning without alert service"""
         manager = AnomalyAlertManager(alert_service=None)
 
@@ -658,18 +630,12 @@ class TestAnomalyAlertManager:
         assert "No alert service configured" in caplog.text
 
     @pytest.mark.asyncio
-    async def test_critical_alert_handles_error(
-        self, sample_event, mock_services, caplog
-    ):
+    async def test_critical_alert_handles_error(self, sample_event, mock_services, caplog):
         """Test that critical alert errors are caught"""
-        mock_services["alert_service"].send_alert.side_effect = Exception(
-            "Alert failed"
-        )
+        mock_services["alert_service"].send_alert.side_effect = Exception("Alert failed")
 
         config = AlertConfig(slack_enabled=True)
-        manager = AnomalyAlertManager(
-            alert_service=mock_services["alert_service"], config=config
-        )
+        manager = AnomalyAlertManager(alert_service=mock_services["alert_service"], config=config)
 
         anomalies = [
             Anomaly(
@@ -687,9 +653,7 @@ class TestAnomalyAlertManager:
     # Warning Alert Tests
 
     @pytest.mark.asyncio
-    async def test_warning_alert_sends_to_slack(
-        self, alert_manager, sample_event, mock_services
-    ):
+    async def test_warning_alert_sends_to_slack(self, alert_manager, sample_event, mock_services):
         """Test warning alert sent to Slack"""
         anomalies = [
             Anomaly(
@@ -711,9 +675,7 @@ class TestAnomalyAlertManager:
         assert "⚠️" in call_args["title"]
 
     @pytest.mark.asyncio
-    async def test_warning_alert_sends_to_email(
-        self, alert_manager, sample_event, mock_services
-    ):
+    async def test_warning_alert_sends_to_email(self, alert_manager, sample_event, mock_services):
         """Test warning alert sent to Email"""
         anomalies = [
             Anomaly(
@@ -745,9 +707,7 @@ class TestAnomalyAlertManager:
         assert "user123" in call_args["title"]
 
     @pytest.mark.asyncio
-    async def test_warning_alert_without_alert_service(
-        self, sample_event, caplog
-    ):
+    async def test_warning_alert_without_alert_service(self, sample_event, caplog):
         """Test warning alert logs warning without alert service"""
         manager = AnomalyAlertManager(alert_service=None)
 
@@ -764,17 +724,11 @@ class TestAnomalyAlertManager:
         assert "No alert service configured" in caplog.text
 
     @pytest.mark.asyncio
-    async def test_warning_alert_handles_error(
-        self, sample_event, mock_services, caplog
-    ):
+    async def test_warning_alert_handles_error(self, sample_event, mock_services, caplog):
         """Test that warning alert errors are caught"""
-        mock_services["alert_service"].send_alert.side_effect = Exception(
-            "Alert failed"
-        )
+        mock_services["alert_service"].send_alert.side_effect = Exception("Alert failed")
 
-        manager = AnomalyAlertManager(
-            alert_service=mock_services["alert_service"]
-        )
+        manager = AnomalyAlertManager(alert_service=mock_services["alert_service"])
 
         anomalies = [
             Anomaly(
@@ -849,9 +803,7 @@ class TestAnomalyAlertManager:
     # Integration Tests
 
     @pytest.mark.asyncio
-    async def test_complete_flow_low_severity(
-        self, alert_manager, sample_event, mock_services
-    ):
+    async def test_complete_flow_low_severity(self, alert_manager, sample_event, mock_services):
         """Test complete flow for low severity anomalies"""
         anomalies = [
             Anomaly(
@@ -876,9 +828,7 @@ class TestAnomalyAlertManager:
         mock_services["user_management"].suspend_user.assert_not_called()
 
     @pytest.mark.asyncio
-    async def test_complete_flow_warning_severity(
-        self, alert_manager, sample_event, mock_services
-    ):
+    async def test_complete_flow_warning_severity(self, alert_manager, sample_event, mock_services):
         """Test complete flow for warning severity anomalies"""
         anomalies = [
             Anomaly(
@@ -898,9 +848,7 @@ class TestAnomalyAlertManager:
         mock_services["user_management"].suspend_user.assert_not_called()
 
     @pytest.mark.asyncio
-    async def test_complete_flow_critical_with_auto_suspend(
-        self, sample_event, mock_services
-    ):
+    async def test_complete_flow_critical_with_auto_suspend(self, sample_event, mock_services):
         """Test complete flow for critical anomalies with auto-suspend"""
         config = AlertConfig(
             auto_suspend_enabled=True,

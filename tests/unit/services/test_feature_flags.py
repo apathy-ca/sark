@@ -66,16 +66,12 @@ class TestFeatureFlagManager:
 
             # Test with 1000 users
             rust_count = sum(
-                1
-                for i in range(1000)
-                if manager.should_use_rust("rust_opa", f"user{i}")
+                1 for i in range(1000) if manager.should_use_rust("rust_opa", f"user{i}")
             )
             actual_pct = (rust_count / 1000) * 100
 
             # Should be within ±5% of target
-            assert abs(actual_pct - target_pct) <= 5, (
-                f"Expected ~{target_pct}%, got {actual_pct}%"
-            )
+            assert abs(actual_pct - target_pct) <= 5, f"Expected ~{target_pct}%, got {actual_pct}%"
 
     def test_set_rollout_pct_in_memory(self):
         """Test setting rollout percentage in memory."""
@@ -253,6 +249,7 @@ class TestGetFeatureFlagManager:
         """Test that get_feature_flag_manager creates instance."""
         # Reset global
         import sark.services.feature_flags as ff_module
+
         ff_module._feature_flag_manager = None
 
         manager = get_feature_flag_manager()
@@ -263,6 +260,7 @@ class TestGetFeatureFlagManager:
         """Test that get_feature_flag_manager returns same instance."""
         # Reset global
         import sark.services.feature_flags as ff_module
+
         ff_module._feature_flag_manager = None
 
         manager1 = get_feature_flag_manager()
@@ -274,6 +272,7 @@ class TestGetFeatureFlagManager:
         """Test creating manager with Redis client."""
         # Reset global
         import sark.services.feature_flags as ff_module
+
         ff_module._feature_flag_manager = None
 
         mock_redis = Mock()

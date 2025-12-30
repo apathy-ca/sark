@@ -250,7 +250,9 @@ class TestPolicyAuditService:
         added_entry = mock_db_session.add.call_args[0][0]
         assert added_entry.policy_version == 4  # Incremented from 3
         assert added_entry.policy_diff is not None
-        assert "allow = false" in added_entry.policy_diff or "allow = true" in added_entry.policy_diff
+        assert (
+            "allow = false" in added_entry.policy_diff or "allow = true" in added_entry.policy_diff
+        )
 
     @pytest.mark.asyncio
     async def test_log_policy_change_with_metadata(self, service, mock_db_session):

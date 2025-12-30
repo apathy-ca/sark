@@ -299,9 +299,7 @@ class TestFilterServersByPermission:
             ),
         ]
 
-        mock_evaluate.return_value = {
-            "result": {"allow": True}
-        }
+        mock_evaluate.return_value = {"result": {"allow": True}}
 
         # Execute
         authorized = await filter_servers_by_permission(user, servers)
@@ -373,9 +371,7 @@ class TestFilterServersByPermission:
             ),
         ]
 
-        mock_evaluate.return_value = {
-            "result": {"allow": False}
-        }
+        mock_evaluate.return_value = {"result": {"allow": False}}
 
         # Execute
         authorized = await filter_servers_by_permission(user, servers)
@@ -440,9 +436,7 @@ class TestFilterToolsByPermission:
             ),
         ]
 
-        mock_evaluate.return_value = {
-            "result": {"allow": True}
-        }
+        mock_evaluate.return_value = {"result": {"allow": True}}
 
         # Execute
         authorized = await filter_tools_by_permission(user, tools)

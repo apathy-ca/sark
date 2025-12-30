@@ -233,9 +233,7 @@ async def test_large_policy_10mb():
         print(f"{'=' * 80}\n")
 
         # Verify reasonable performance even with large policy
-        assert (
-            evaluation_time < 1000
-        ), f"Evaluation too slow: {evaluation_time:.2f}ms"
+        assert evaluation_time < 1000, f"Evaluation too slow: {evaluation_time:.2f}ms"
         assert result is not None
 
         await client.close()
@@ -332,9 +330,7 @@ async def test_large_cache_1m_entries():
             current_memory_mb = process.memory_info().rss / 1024 / 1024
             memory_delta = current_memory_mb - initial_memory_mb
             entries_added = (batch_num + 1) * batch_size
-            memory_per_entry = (
-                memory_delta / entries_added if entries_added > 0 else 0
-            )
+            memory_per_entry = memory_delta / entries_added if entries_added > 0 else 0
 
             print(
                 f"Batch {batch_num + 1}/{num_batches}: "
