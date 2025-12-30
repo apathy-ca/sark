@@ -89,15 +89,9 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-      opa:
-        image: openpolicyagent/opa:latest
-        ports:
-          - 8181:8181
-        options: >-
-          --health-cmd "wget --spider --quiet http://localhost:8181/health || exit 1"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+      # OPA service removed - now using Rust OPA engine (regorus) via sark-opa
+      # Integration tests that require external OPA are skipped in CI
+      # and run via docker-compose locally
 
     steps:
       - name: Checkout code
