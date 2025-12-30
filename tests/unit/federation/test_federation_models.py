@@ -1,10 +1,9 @@
 """Unit tests for Federation models and Pydantic schemas."""
 
 from datetime import datetime, timedelta
-from uuid import uuid4
 
-import pytest
 from pydantic import ValidationError
+import pytest
 
 from sark.models.federation import (
     AuditCorrelationQuery,
@@ -19,7 +18,6 @@ from sark.models.federation import (
     FederationHealthResponse,
     FederationNodeBase,
     FederationNodeCreate,
-    FederationNodeResponse,
     FederationNodeUpdate,
     NodeHealthCheck,
     NodeStatus,
@@ -34,7 +32,6 @@ from sark.models.federation import (
     TrustVerificationRequest,
     TrustVerificationResponse,
 )
-
 
 # Sample PEM certificate for testing
 SAMPLE_CERT = """-----BEGIN CERTIFICATE-----

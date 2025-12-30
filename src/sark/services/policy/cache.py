@@ -19,8 +19,8 @@ import json
 import time
 from typing import Any, ClassVar
 
-import valkey.asyncio as redis
 import structlog
+import valkey.asyncio as redis
 
 from sark.config import get_settings
 

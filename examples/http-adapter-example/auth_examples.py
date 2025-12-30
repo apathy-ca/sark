@@ -11,13 +11,6 @@ Engineer: ENGINEER-2
 import asyncio
 
 from sark.adapters.http import HTTPAdapter
-from sark.adapters.http.authentication import (
-    NoAuthStrategy,
-    BasicAuthStrategy,
-    BearerAuthStrategy,
-    OAuth2Strategy,
-    APIKeyStrategy,
-)
 
 
 async def example_no_auth():
@@ -52,7 +45,7 @@ async def example_basic_auth():
 
     print("✓ Adapter created with Basic Auth")
     print(f"  Auth strategy: {type(adapter.auth_strategy).__name__}")
-    print(f"  Username: testuser")
+    print("  Username: testuser")
 
 
 async def example_bearer_token():
@@ -71,7 +64,7 @@ async def example_bearer_token():
 
     print("✓ Adapter created with Bearer Token")
     print(f"  Auth strategy: {type(adapter.auth_strategy).__name__}")
-    print(f"  Token: ghp_example... (truncated)")
+    print("  Token: ghp_example... (truncated)")
 
 
 async def example_oauth2():
@@ -94,8 +87,8 @@ async def example_oauth2():
 
     print("✓ Adapter created with OAuth2")
     print(f"  Auth strategy: {type(adapter.auth_strategy).__name__}")
-    print(f"  Grant type: client_credentials")
-    print(f"  Token URL: https://auth.example.com/oauth/token")
+    print("  Grant type: client_credentials")
+    print("  Token URL: https://auth.example.com/oauth/token")
 
     # Note: In production, you would call:
     # await adapter.auth_strategy.refresh()
@@ -120,8 +113,8 @@ async def example_api_key_header():
 
     print("✓ Adapter created with API Key")
     print(f"  Auth strategy: {type(adapter.auth_strategy).__name__}")
-    print(f"  Location: header")
-    print(f"  Key name: X-API-Key")
+    print("  Location: header")
+    print("  Key name: X-API-Key")
 
 
 async def example_api_key_query():
@@ -142,8 +135,8 @@ async def example_api_key_query():
 
     print("✓ Adapter created with API Key (query)")
     print(f"  Auth strategy: {type(adapter.auth_strategy).__name__}")
-    print(f"  Location: query parameter")
-    print(f"  Key name: api_key")
+    print("  Location: query parameter")
+    print("  Key name: api_key")
 
 
 async def example_custom_headers():
@@ -155,7 +148,7 @@ async def example_custom_headers():
     # For APIs that need custom headers beyond authentication
     # You can combine auth with custom headers in invocation requests
 
-    adapter = HTTPAdapter(
+    HTTPAdapter(
         base_url="https://api.example.com",
         auth_config={
             "type": "bearer",

@@ -21,8 +21,11 @@ RUN apt-get update && apt-get install -y \
 # Development stage
 FROM base as development
 
-# Copy pyproject.toml first for better layer caching
-COPY pyproject.toml ./
+# Copy build configuration files
+COPY pyproject.toml Cargo.toml README.md ./
+
+# Copy Rust source code
+COPY rust ./rust
 
 # Copy application code
 COPY . .
@@ -41,8 +44,11 @@ FROM base as production
 RUN useradd -m -u 1000 appuser && \
     chown -R appuser:appuser /app
 
-# Copy pyproject.toml first for better layer caching
-COPY --chown=appuser:appuser pyproject.toml ./
+# Copy build configuration files
+COPY --chown=appuser:appuser pyproject.toml Cargo.toml README.md ./
+
+# Copy Rust source code
+COPY --chown=appuser:appuser rust ./rust
 
 # Copy application code
 COPY --chown=appuser:appuser src ./src

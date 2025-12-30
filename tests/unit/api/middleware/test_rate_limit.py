@@ -2,9 +2,9 @@
 
 from unittest.mock import AsyncMock, Mock
 
-import pytest
 from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse
+import pytest
 
 from sark.api.middleware.rate_limit import RateLimitMiddleware
 from sark.services.rate_limiter import RateLimitInfo
@@ -54,10 +54,7 @@ def mock_request():
     request.client = Mock()
     request.client.host = "127.0.0.1"
     # Use a proper object for state to support attribute access
-    request.state = type('obj', (object,), {
-        'user_id': None,
-        'user_roles': []
-    })()
+    request.state = type("obj", (object,), {"user_id": None, "user_roles": []})()
     return request
 
 
@@ -86,7 +83,7 @@ class TestRateLimitBypass:
 
         call_next = AsyncMock(return_value=Response())
 
-        response = await middleware.dispatch(mock_request, call_next)
+        await middleware.dispatch(mock_request, call_next)
 
         # Should call next without checking rate limit
         call_next.assert_called_once()
@@ -193,7 +190,7 @@ class TestIdentifierDetection:
         """Test IP detection from X-Forwarded-For header."""
         mock_request.headers = {"X-Forwarded-For": "203.0.113.45, 198.51.100.1"}
 
-        identifier, limit = await middleware._get_identifier_and_limit(mock_request)
+        identifier, _limit = await middleware._get_identifier_and_limit(mock_request)
 
         # Should use first IP in X-Forwarded-For
         assert identifier == "ip:203.0.113.45"
@@ -203,7 +200,7 @@ class TestIdentifierDetection:
         """Test IP detection from X-Real-IP header."""
         mock_request.headers = {"X-Real-IP": "198.51.100.99"}
 
-        identifier, limit = await middleware._get_identifier_and_limit(mock_request)
+        identifier, _limit = await middleware._get_identifier_and_limit(mock_request)
 
         assert identifier == "ip:198.51.100.99"
 
@@ -391,7 +388,7 @@ class TestRateLimitIntegration:
 
         call_next = AsyncMock(return_value=Response())
 
-        response = await middleware.dispatch(mock_request, call_next)
+        await middleware.dispatch(mock_request, call_next)
 
         # Verify rate limiter was called with API key identifier
         middleware.rate_limiter.check_rate_limit.assert_called_once()

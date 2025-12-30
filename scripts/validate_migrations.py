@@ -14,13 +14,11 @@ import argparse
 import asyncio
 import logging
 import sys
-from pathlib import Path
 
 from alembic import command
 from alembic.config import Config
 from sqlalchemy import text
 
-from sark.config import get_settings
 from sark.db.session import get_postgres_engine
 
 logging.basicConfig(level=logging.INFO)

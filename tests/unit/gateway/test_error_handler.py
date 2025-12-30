@@ -1,8 +1,7 @@
 """Comprehensive tests for Gateway error handler (circuit breaker, retry, timeout)."""
 
 import asyncio
-from datetime import UTC, datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
+from datetime import UTC, datetime
 
 import pytest
 
@@ -229,9 +228,7 @@ class TestCircuitBreaker:
     @pytest.mark.asyncio
     async def test_half_open_concurrent_call_limit(self):
         """Test HALF_OPEN state limits concurrent calls."""
-        breaker = CircuitBreaker(
-            failure_threshold=2, timeout_seconds=1, half_open_max_calls=2
-        )
+        breaker = CircuitBreaker(failure_threshold=2, timeout_seconds=1, half_open_max_calls=2)
 
         async def slow_func():
             await asyncio.sleep(0.5)
@@ -328,9 +325,7 @@ class TestRetryConfig:
 
     def test_exponential_backoff_calculation(self):
         """Test exponential backoff delay calculation."""
-        config = RetryConfig(
-            initial_delay=1.0, max_delay=30.0, exponential_base=2.0, jitter=False
-        )
+        config = RetryConfig(initial_delay=1.0, max_delay=30.0, exponential_base=2.0, jitter=False)
 
         # Attempt 0: 1.0 * 2^0 = 1.0
         assert config.get_delay(0) == 1.0
@@ -346,9 +341,7 @@ class TestRetryConfig:
 
     def test_max_delay_cap(self):
         """Test that delay is capped at max_delay."""
-        config = RetryConfig(
-            initial_delay=1.0, max_delay=10.0, exponential_base=2.0, jitter=False
-        )
+        config = RetryConfig(initial_delay=1.0, max_delay=10.0, exponential_base=2.0, jitter=False)
 
         # Attempt 10: would be 1024, but capped at 10
         assert config.get_delay(10) == 10.0
@@ -379,6 +372,7 @@ class TestWithRetry:
     @pytest.mark.asyncio
     async def test_success_on_first_attempt(self):
         """Test successful execution on first attempt."""
+
         async def success_func():
             return "success"
 
@@ -494,6 +488,7 @@ class TestWithTimeout:
     @pytest.mark.asyncio
     async def test_successful_execution_within_timeout(self):
         """Test successful execution within timeout."""
+
         async def fast_func():
             await asyncio.sleep(0.1)
             return "success"
@@ -505,6 +500,7 @@ class TestWithTimeout:
     @pytest.mark.asyncio
     async def test_timeout_exceeded(self):
         """Test timeout error when execution exceeds timeout."""
+
         async def slow_func():
             await asyncio.sleep(2.0)
             return "success"
@@ -515,6 +511,7 @@ class TestWithTimeout:
     @pytest.mark.asyncio
     async def test_timeout_with_function_args(self):
         """Test timeout with function arguments."""
+
         async def func_with_args(a, b, c=None):
             await asyncio.sleep(0.1)
             return a + b + (c or 0)
@@ -526,6 +523,7 @@ class TestWithTimeout:
     @pytest.mark.asyncio
     async def test_timeout_propagates_function_errors(self):
         """Test that function errors are propagated, not timeout errors."""
+
         async def failing_func():
             await asyncio.sleep(0.1)
             raise ValueError("Function error")
@@ -574,9 +572,7 @@ class TestGatewayErrorHandler:
     async def test_execute_with_custom_timeout(self):
         """Test execute with custom timeout."""
         # Use max_attempts=1 to minimize retry attempts
-        handler = GatewayErrorHandler(
-            default_timeout=1.0, retry_config={"max_attempts": 1}
-        )
+        handler = GatewayErrorHandler(default_timeout=1.0, retry_config={"max_attempts": 1})
 
         async def slow_func():
             await asyncio.sleep(2.0)
@@ -589,9 +585,7 @@ class TestGatewayErrorHandler:
     @pytest.mark.asyncio
     async def test_execute_with_retry_on_failure(self):
         """Test execute retries on failure."""
-        handler = GatewayErrorHandler(
-            retry_config={"max_attempts": 3, "initial_delay": 0.01}
-        )
+        handler = GatewayErrorHandler(retry_config={"max_attempts": 3, "initial_delay": 0.01})
 
         call_count = 0
 
@@ -674,9 +668,7 @@ class TestGatewayErrorHandler:
 
     def test_get_metrics(self):
         """Test metrics aggregation."""
-        handler = GatewayErrorHandler(
-            retry_config={"max_attempts": 5}, default_timeout=60.0
-        )
+        handler = GatewayErrorHandler(retry_config={"max_attempts": 5}, default_timeout=60.0)
 
         metrics = handler.get_metrics()
 

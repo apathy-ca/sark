@@ -9,18 +9,18 @@ Tests cover:
 - Performance requirements
 """
 
-import pytest
 from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, Mock
-from collections import Counter
+from unittest.mock import AsyncMock
+
+import pytest
 
 from sark.security.behavioral_analyzer import (
-    BehavioralAnalyzer,
-    BehavioralBaseline,
-    BehavioralAuditEvent,
     Anomaly,
-    AnomalyType,
     AnomalySeverity,
+    AnomalyType,
+    BehavioralAnalyzer,
+    BehavioralAuditEvent,
+    BehavioralBaseline,
 )
 
 
@@ -134,9 +134,7 @@ class TestBehavioralAnalyzer:
         """Create analyzer with mock storage"""
         baseline_storage = AsyncMock()
         audit_storage = AsyncMock()
-        return BehavioralAnalyzer(
-            baseline_storage=baseline_storage, audit_storage=audit_storage
-        )
+        return BehavioralAnalyzer(baseline_storage=baseline_storage, audit_storage=audit_storage)
 
     @pytest.fixture
     def sample_events(self):
@@ -190,9 +188,7 @@ class TestBehavioralAnalyzer:
     @pytest.mark.asyncio
     async def test_build_baseline_from_events(self, analyzer, sample_events):
         """Test building baseline from historical events"""
-        baseline = await analyzer.build_baseline(
-            "user123", lookback_days=30, events=sample_events
-        )
+        baseline = await analyzer.build_baseline("user123", lookback_days=30, events=sample_events)
 
         assert baseline.user_id == "user123"
         assert baseline.lookback_days == 30
@@ -236,9 +232,7 @@ class TestBehavioralAnalyzer:
             )
         ]
 
-        baseline = await analyzer_with_storage.build_baseline(
-            "user123", events=events
-        )
+        await analyzer_with_storage.build_baseline("user123", events=events)
 
         # Verify save was called
         analyzer_with_storage.baseline_storage.save.assert_called_once()
@@ -247,13 +241,9 @@ class TestBehavioralAnalyzer:
         assert call_args[0][1].user_id == "user123"
 
     @pytest.mark.asyncio
-    async def test_build_baseline_handles_storage_error(
-        self, analyzer_with_storage, caplog
-    ):
+    async def test_build_baseline_handles_storage_error(self, analyzer_with_storage, caplog):
         """Test that baseline building continues even if storage fails"""
-        analyzer_with_storage.baseline_storage.save.side_effect = Exception(
-            "Storage error"
-        )
+        analyzer_with_storage.baseline_storage.save.side_effect = Exception("Storage error")
 
         events = [
             BehavioralAuditEvent(
@@ -265,17 +255,13 @@ class TestBehavioralAnalyzer:
         ]
 
         # Should not raise exception
-        baseline = await analyzer_with_storage.build_baseline(
-            "user123", events=events
-        )
+        baseline = await analyzer_with_storage.build_baseline("user123", events=events)
 
         assert baseline is not None
         assert "Failed to save baseline" in caplog.text
 
     @pytest.mark.asyncio
-    async def test_build_baseline_fetches_from_audit_storage(
-        self, analyzer_with_storage
-    ):
+    async def test_build_baseline_fetches_from_audit_storage(self, analyzer_with_storage):
         """Test that baseline fetches events from audit storage if not provided"""
         # Mock audit storage to return events
         mock_events = [
@@ -338,9 +324,7 @@ class TestBehavioralAnalyzer:
 
         anomalies = await analyzer.detect_anomalies(event, baseline=baseline)
 
-        unusual_tool_anomalies = [
-            a for a in anomalies if a.type == AnomalyType.UNUSUAL_TOOL
-        ]
+        unusual_tool_anomalies = [a for a in anomalies if a.type == AnomalyType.UNUSUAL_TOOL]
         assert len(unusual_tool_anomalies) == 1
         anomaly = unusual_tool_anomalies[0]
         assert anomaly.severity == AnomalySeverity.LOW
@@ -376,9 +360,7 @@ class TestBehavioralAnalyzer:
 
         anomalies = await analyzer.detect_anomalies(event, baseline=baseline)
 
-        unusual_time_anomalies = [
-            a for a in anomalies if a.type == AnomalyType.UNUSUAL_TIME
-        ]
+        unusual_time_anomalies = [a for a in anomalies if a.type == AnomalyType.UNUSUAL_TIME]
         assert len(unusual_time_anomalies) == 1
         anomaly = unusual_time_anomalies[0]
         assert anomaly.severity == AnomalySeverity.MEDIUM
@@ -415,9 +397,7 @@ class TestBehavioralAnalyzer:
 
         anomalies = await analyzer.detect_anomalies(event, baseline=baseline)
 
-        unusual_day_anomalies = [
-            a for a in anomalies if a.type == AnomalyType.UNUSUAL_DAY
-        ]
+        unusual_day_anomalies = [a for a in anomalies if a.type == AnomalyType.UNUSUAL_DAY]
         assert len(unusual_day_anomalies) == 1
         anomaly = unusual_day_anomalies[0]
         assert anomaly.severity == AnomalySeverity.LOW
@@ -454,9 +434,7 @@ class TestBehavioralAnalyzer:
 
         anomalies = await analyzer.detect_anomalies(event, baseline=baseline)
 
-        excessive_data_anomalies = [
-            a for a in anomalies if a.type == AnomalyType.EXCESSIVE_DATA
-        ]
+        excessive_data_anomalies = [a for a in anomalies if a.type == AnomalyType.EXCESSIVE_DATA]
         assert len(excessive_data_anomalies) == 1
         anomaly = excessive_data_anomalies[0]
         assert anomaly.severity == AnomalySeverity.HIGH
@@ -547,9 +525,7 @@ class TestBehavioralAnalyzer:
             event, baseline=baseline, recent_events=recent_events
         )
 
-        rapid_request_anomalies = [
-            a for a in anomalies if a.type == AnomalyType.RAPID_REQUESTS
-        ]
+        rapid_request_anomalies = [a for a in anomalies if a.type == AnomalyType.RAPID_REQUESTS]
         assert len(rapid_request_anomalies) == 1
         anomaly = rapid_request_anomalies[0]
         assert anomaly.severity == AnomalySeverity.MEDIUM
@@ -586,9 +562,7 @@ class TestBehavioralAnalyzer:
 
         anomalies = await analyzer.detect_anomalies(event, baseline=baseline)
 
-        geo_anomalies = [
-            a for a in anomalies if a.type == AnomalyType.GEOGRAPHIC_ANOMALY
-        ]
+        geo_anomalies = [a for a in anomalies if a.type == AnomalyType.GEOGRAPHIC_ANOMALY]
         assert len(geo_anomalies) == 1
         anomaly = geo_anomalies[0]
         assert anomaly.severity == AnomalySeverity.MEDIUM
@@ -665,7 +639,7 @@ class TestBehavioralAnalyzer:
             sensitivity="low",
         )
 
-        anomalies = await analyzer_with_storage.detect_anomalies(event)
+        await analyzer_with_storage.detect_anomalies(event)
 
         # Verify storage.get was called
         analyzer_with_storage.baseline_storage.get.assert_called_once_with("user123")
@@ -1024,9 +998,7 @@ class TestBehavioralAnalyzer:
 
         anomalies = await analyzer.detect_anomalies(event, baseline=baseline)
 
-        excessive_data_anomalies = [
-            a for a in anomalies if a.type == AnomalyType.EXCESSIVE_DATA
-        ]
+        excessive_data_anomalies = [a for a in anomalies if a.type == AnomalyType.EXCESSIVE_DATA]
         assert len(excessive_data_anomalies) == 0
 
     @pytest.mark.asyncio

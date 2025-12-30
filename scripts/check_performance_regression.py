@@ -1,152 +1,126 @@
 #!/usr/bin/env python3
 """
-Performance Regression Checker
+Performance Regression Detection
 
-Checks if the latest benchmark results show any performance regressions
-compared to historical data.
-
-Exit codes:
-    0: No regressions detected
-    1: Regressions detected
-    2: Error reading data
+Compares current benchmark results against baseline to detect regressions.
 
 Usage:
-    python scripts/check_performance_regression.py [--threshold 10.0]
+    python scripts/check_performance_regression.py --current output.json
+    python scripts/check_performance_regression.py --current output.json --baseline baseline.json --threshold 0.10
 """
 
-import sys
-import json
 import argparse
+import json
 from pathlib import Path
-from typing import List, Dict, Any
+import sys
+from typing import Optional
 
 
-def load_history(history_file: Path, limit: int = 5) -> List[Dict[str, Any]]:
-    """Load benchmark history from JSONL file"""
-    if not history_file.exists():
-        return []
-
-    history = []
-    with open(history_file, 'r') as f:
-        for line in f:
-            history.append(json.loads(line))
-
-    return history[-limit:] if limit else history
+class PerformanceRegressionError(Exception):
+    """Raised when a performance regression is detected."""
+    pass
 
 
-def check_regressions(
-    current: Dict[str, Any],
-    history: List[Dict[str, Any]],
-    threshold_percent: float = 10.0
-) -> List[Dict[str, Any]]:
-    """
-    Check for performance regressions
+class RegressionDetector:
+    """Detects performance regressions in benchmark results."""
 
-    Args:
-        current: Current benchmark results
-        history: Historical benchmark results
-        threshold_percent: Regression threshold (e.g., 10.0 = 10% slower)
+    def __init__(self, threshold: float = 0.10):
+        self.threshold = threshold
+        self.regressions: list[dict] = []
+        self.improvements: list[dict] = []
 
-    Returns:
-        List of regressions found
-    """
-    if len(history) < 2:
-        print("⚠️  Not enough historical data for regression detection")
-        return []
+    def load_results(self, file_path: Path) -> dict:
+        """Load benchmark results from JSON file."""
+        if not file_path.exists():
+            raise FileNotFoundError(f"Results file not found: {file_path}")
+        with open(file_path) as f:
+            return json.load(f)
 
-    # Get previous run
-    previous = history[-2]
+    def compare_benchmarks(self, current: dict, baseline: dict) -> tuple[list[dict], list[dict]]:
+        """Compare current benchmarks against baseline."""
+        regressions = []
+        improvements = []
 
-    regressions = []
+        current_benchmarks = {b["name"]: b for b in current.get("benchmarks", [])}
+        baseline_benchmarks = {b["name"]: b for b in baseline.get("benchmarks", [])}
 
-    # Build lookup for previous results
-    prev_results = {r['name']: r for r in previous.get('results', [])}
+        for name, current_bench in current_benchmarks.items():
+            if name not in baseline_benchmarks:
+                continue
 
-    for current_result in current.get('results', []):
-        name = current_result['name']
-        if name not in prev_results:
-            continue
+            baseline_bench = baseline_benchmarks[name]
+            current_mean = current_bench["stats"]["mean"]
+            baseline_mean = baseline_bench["stats"]["mean"]
 
-        prev_p95 = prev_results[name]['p95_ms']
-        curr_p95 = current_result['p95_ms']
+            if baseline_mean > 0:
+                regression = (current_mean - baseline_mean) / baseline_mean
+                result = {
+                    "name": name,
+                    "regression_percent": regression * 100,
+                    "current_mean_ms": current_mean * 1000,
+                    "baseline_mean_ms": baseline_mean * 1000,
+                }
 
-        # Calculate percent change
-        if prev_p95 > 0:
-            percent_change = ((curr_p95 - prev_p95) / prev_p95) * 100
+                if regression > self.threshold:
+                    regressions.append(result)
+                elif regression < -self.threshold:
+                    improvements.append(result)
 
-            if percent_change > threshold_percent:
-                regressions.append({
-                    'name': name,
-                    'previous_p95_ms': prev_p95,
-                    'current_p95_ms': curr_p95,
-                    'percent_change': percent_change,
-                    'threshold_percent': threshold_percent
-                })
+        return regressions, improvements
 
-    return regressions
+    def print_results(self):
+        """Print regression detection results."""
+        print(f"\n{'=' * 80}")
+        print("PERFORMANCE REGRESSION ANALYSIS")
+        print(f"{'=' * 80}\n")
+
+        if not self.regressions and not self.improvements:
+            print("✅ No significant performance changes detected")
+            return
+
+        if self.improvements:
+            print(f"📈 IMPROVEMENTS ({len(self.improvements)} found):")
+            for imp in self.improvements:
+                print(f"\n✓ {imp['name']}: {abs(imp['regression_percent']):.1f}% faster")
+
+        if self.regressions:
+            print(f"\n⚠️  REGRESSIONS ({len(self.regressions)} found):")
+            for reg in self.regressions:
+                print(f"\n✗ {reg['name']}: {reg['regression_percent']:.1f}% slower")
+
+    def run(self, current_file: Path, baseline_file: Optional[Path] = None):
+        """Run regression detection."""
+        current = self.load_results(current_file)
+
+        if baseline_file and baseline_file.exists():
+            baseline = self.load_results(baseline_file)
+            self.regressions, self.improvements = self.compare_benchmarks(current, baseline)
+            self.print_results()
+
+            if self.regressions:
+                raise PerformanceRegressionError(f"Detected {len(self.regressions)} regression(s)")
+
+        print("✅ All performance checks passed")
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Check for performance regressions')
-    parser.add_argument(
-        '--threshold',
-        type=float,
-        default=10.0,
-        help='Regression threshold in percent (default: 10.0)'
-    )
-    parser.add_argument(
-        '--report-dir',
-        type=str,
-        default='reports/performance',
-        help='Performance reports directory'
-    )
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--current", type=Path, required=True)
+    parser.add_argument("--baseline", type=Path)
+    parser.add_argument("--threshold", type=float, default=0.10)
     args = parser.parse_args()
 
-    # Paths
-    report_dir = Path(args.report_dir)
-    latest_file = report_dir / 'latest_benchmark.json'
-    history_file = report_dir / 'benchmark_history.jsonl'
-
-    # Load current results
-    if not latest_file.exists():
-        print(f"❌ Latest benchmark file not found: {latest_file}")
-        return 2
-
-    with open(latest_file, 'r') as f:
-        current = json.load(f)
-
-    # Load history
-    history = load_history(history_file, limit=5)
-
-    # Check for regressions
-    regressions = check_regressions(current, history, args.threshold)
-
-    # Report
-    print("=" * 80)
-    print("Performance Regression Check")
-    print("=" * 80)
-    print(f"Suite: {current.get('suite_name', 'Unknown')}")
-    print(f"Timestamp: {current.get('timestamp', 'Unknown')}")
-    print(f"Commit: {current.get('git_commit', 'Unknown')}")
-    print(f"Threshold: {args.threshold}%")
-    print("=" * 80)
-
-    if not regressions:
-        print("\n✅ No performance regressions detected\n")
-        return 0
-
-    print(f"\n❌ {len(regressions)} REGRESSION(S) DETECTED:\n")
-
-    for reg in regressions:
-        print(f"  {reg['name']}:")
-        print(f"    Previous: {reg['previous_p95_ms']:.2f}ms")
-        print(f"    Current:  {reg['current_p95_ms']:.2f}ms")
-        print(f"    Change:   +{reg['percent_change']:.1f}% (threshold: {reg['threshold_percent']}%)")
-        print()
-
-    print("=" * 80)
-    return 1
+    try:
+        detector = RegressionDetector(threshold=args.threshold)
+        detector.run(args.current, args.baseline)
+        sys.exit(0)
+    except PerformanceRegressionError as e:
+        print(f"\n❌ {e}\n")
+        sys.exit(1)
+    except Exception as e:
+        print(f"\n❌ Error: {e}\n")
+        sys.exit(1)
 
 
-if __name__ == '__main__':
-    sys.exit(main())
+if __name__ == "__main__":
+    main()

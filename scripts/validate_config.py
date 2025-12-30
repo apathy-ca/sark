@@ -16,14 +16,12 @@ Usage:
 """
 
 import argparse
-import json
-import os
-import re
-import sys
 from dataclasses import dataclass, field
 from enum import Enum
+import json
 from pathlib import Path
-from typing import Any
+import re
+import sys
 from urllib.parse import urlparse
 
 
@@ -147,9 +145,7 @@ class ConfigValidator:
                     value = value.strip()
 
                     # Remove quotes if present
-                    if value.startswith('"') and value.endswith('"'):
-                        value = value[1:-1]
-                    elif value.startswith("'") and value.endswith("'"):
+                    if (value.startswith('"') and value.endswith('"')) or (value.startswith("'") and value.endswith("'")):
                         value = value[1:-1]
 
                     self.config[key] = value
@@ -263,7 +259,7 @@ class ConfigValidator:
                     Severity.ERROR,
                     category,
                     variable,
-                    f"Required variable not set",
+                    "Required variable not set",
                     f"Set {variable} to one of: {', '.join(valid_values)}",
                 )
             return
@@ -341,8 +337,8 @@ class ConfigValidator:
                 Severity.ERROR,
                 category,
                 variable,
-                f"Weak/default password detected",
-                f"Generate a strong password: python3 -c \"import secrets; print(secrets.token_urlsafe(32))\"",
+                "Weak/default password detected",
+                "Generate a strong password: python3 -c \"import secrets; print(secrets.token_urlsafe(32))\"",
             )
             return
 

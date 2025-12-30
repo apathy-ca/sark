@@ -1,0 +1,31 @@
+[package]
+name = "sark-opa"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[lib]
+name = "sark_opa"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# OPA engine
+regorus.workspace = true
+
+# Python bindings
+pyo3.workspace = true
+pythonize.workspace = true
+
+# Serialization
+serde.workspace = true
+serde_json.workspace = true
+
+# Error handling
+thiserror.workspace = true
+anyhow.workspace = true
+
+[dev-dependencies]
+# Testing
+pyo3 = { version = "0.22", features = ["auto-initialize"] }

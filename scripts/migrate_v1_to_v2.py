@@ -18,12 +18,12 @@ Requirements:
 """
 
 import argparse
-import sys
+from datetime import UTC, datetime
 import logging
-from datetime import datetime, UTC
-from typing import Dict, List, Tuple
-from sqlalchemy import create_engine, text, select, func
-from sqlalchemy.orm import sessionmaker, Session
+import sys
+
+from sqlalchemy import create_engine, text
+from sqlalchemy.orm import Session, sessionmaker
 
 # Configure logging
 logging.basicConfig(
@@ -41,8 +41,8 @@ class MigrationStats:
         self.tools_migrated = 0
         self.resources_created = 0
         self.capabilities_created = 0
-        self.errors: List[str] = []
-        self.warnings: List[str] = []
+        self.errors: list[str] = []
+        self.warnings: list[str] = []
         self.start_time: datetime = None
         self.end_time: datetime = None
 
@@ -90,7 +90,7 @@ def create_session() -> Session:
     return Session()
 
 
-def check_prerequisites(session: Session) -> Tuple[bool, List[str]]:
+def check_prerequisites(session: Session) -> tuple[bool, list[str]]:
     """
     Check migration prerequisites.
 
@@ -136,14 +136,14 @@ def check_prerequisites(session: Session) -> Tuple[bool, List[str]]:
     return len(errors) == 0, errors
 
 
-def count_v1_data(session: Session) -> Tuple[int, int]:
+def count_v1_data(session: Session) -> tuple[int, int]:
     """Count existing v1.x data."""
     server_count = session.execute(text("SELECT COUNT(*) FROM mcp_servers")).scalar()
     tool_count = session.execute(text("SELECT COUNT(*) FROM mcp_tools")).scalar()
     return server_count, tool_count
 
 
-def count_v2_data(session: Session) -> Tuple[int, int]:
+def count_v2_data(session: Session) -> tuple[int, int]:
     """Count existing v2.0 data."""
     resource_count = session.execute(text("SELECT COUNT(*) FROM resources")).scalar()
     capability_count = session.execute(text("SELECT COUNT(*) FROM capabilities")).scalar()
@@ -271,7 +271,7 @@ def migrate_tools_to_capabilities(session: Session, stats: MigrationStats, dry_r
         stats.capabilities_created = migrated_count
 
 
-def validate_migration(session: Session) -> Tuple[bool, List[str]]:
+def validate_migration(session: Session) -> tuple[bool, list[str]]:
     """
     Validate migration results.
 
@@ -285,8 +285,8 @@ def validate_migration(session: Session) -> Tuple[bool, List[str]]:
     errors = []
 
     # Check server count match
-    v1_servers, v1_tools = count_v1_data(session)
-    v2_resources, v2_capabilities = count_v2_data(session)
+    v1_servers, _v1_tools = count_v1_data(session)
+    _v2_resources, _v2_capabilities = count_v2_data(session)
 
     # Count MCP-protocol resources (should match v1 servers)
     mcp_resources = session.execute(
@@ -443,7 +443,7 @@ def main():
         # Display current state
         v1_servers, v1_tools = count_v1_data(session)
         v2_resources, v2_capabilities = count_v2_data(session)
-        logger.info(f"Current state:")
+        logger.info("Current state:")
         logger.info(f"  v1.x: {v1_servers} servers, {v1_tools} tools")
         logger.info(f"  v2.0: {v2_resources} resources, {v2_capabilities} capabilities")
 

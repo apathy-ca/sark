@@ -21,10 +21,10 @@ Usage:
 
 import argparse
 import json
+from pathlib import Path
 import subprocess
 import sys
-from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Optional
 
 # Policy file mappings
 POLICY_MAPPINGS = {
@@ -72,7 +72,7 @@ class PolicySimulator:
 
         return policy_file
 
-    def evaluate(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
+    def evaluate(self, input_data: dict[str, Any]) -> dict[str, Any]:
         """Evaluate policy with given input"""
         # Build OPA eval command
         cmd = [
@@ -121,7 +121,7 @@ class PolicySimulator:
             print(f"Error parsing OPA output: {e}", file=sys.stderr)
             sys.exit(1)
 
-    def evaluate_batch(self, scenarios: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def evaluate_batch(self, scenarios: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Evaluate multiple scenarios"""
         results = []
         for i, scenario in enumerate(scenarios):
@@ -144,7 +144,7 @@ class PolicySimulator:
 
         return results
 
-    def _print_result(self, result: Dict[str, Any], expected: Dict[str, Any] = None):
+    def _print_result(self, result: dict[str, Any], expected: Optional[dict[str, Any]] = None):
         """Pretty print policy result"""
         if isinstance(result, dict):
             allow = result.get("allow", False)
@@ -168,10 +168,10 @@ class PolicySimulator:
             print(f"\nResult: {json.dumps(result, indent=2)}")
 
 
-def load_json_file(filepath: str) -> Dict[str, Any]:
+def load_json_file(filepath: str) -> dict[str, Any]:
     """Load JSON from file"""
     try:
-        with open(filepath, 'r') as f:
+        with open(filepath) as f:
             return json.load(f)
     except FileNotFoundError:
         print(f"Error: File not found: {filepath}", file=sys.stderr)

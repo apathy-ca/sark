@@ -13,8 +13,7 @@ Usage:
 """
 
 import os
-from typing import Dict, Optional
-from uuid import UUID, uuid4
+from typing import Optional
 
 import requests
 
@@ -37,9 +36,9 @@ class SARKPolicyClient:
         action: str,
         tool: Optional[str] = None,
         server_id: Optional[str] = None,
-        parameters: Optional[Dict] = None,
+        parameters: Optional[dict] = None,
         user_id: Optional[str] = None,
-    ) -> Dict:
+    ) -> dict:
         """Evaluate policy for an action.
 
         Args:
@@ -61,7 +60,7 @@ class SARKPolicyClient:
         if server_id:
             payload["server_id"] = server_id
 
-        response = requests.post(f"{self.base_url}/api/v1/policy/evaluate", headers=self.headers, json=payload)
+        response = requests.post(f"{self.base_url}/api/v1/policy/evaluate", headers=self.headers, json=payload, timeout=30)
 
         response.raise_for_status()
         return response.json()

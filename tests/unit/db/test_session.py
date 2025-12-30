@@ -221,7 +221,7 @@ class TestGetDB:
                     mock_factory_getter.return_value = mock_factory
 
                     # Use the generator normally (no exception)
-                    async for db in session.get_db():
+                    async for _db in session.get_db():
                         pass
 
                     mock_session.commit.assert_called()
@@ -253,7 +253,7 @@ class TestGetDB:
 
                     # Use the generator and raise exception
                     try:
-                        async for db in session.get_db():
+                        async for _db in session.get_db():
                             raise ValueError("Test exception")
                     except ValueError:
                         pass
@@ -301,7 +301,7 @@ class TestGetTimescaleDB:
                     mock_factory_getter.return_value = mock_factory
 
                     # Use the generator normally
-                    async for db in session.get_timescale_db():
+                    async for _db in session.get_timescale_db():
                         pass
 
                     mock_session.commit.assert_called()

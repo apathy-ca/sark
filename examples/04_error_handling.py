@@ -23,12 +23,11 @@ Usage:
     python examples/04_error_handling.py
 """
 
-import json
-import os
-import time
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Dict, Optional
+import os
+import time
+from typing import Any, Optional
 
 import requests
 
@@ -57,7 +56,7 @@ class ErrorDetails:
     status_code: Optional[int] = None
     retry_after: Optional[int] = None
     retry_able: bool = False
-    details: Optional[Dict[str, Any]] = None
+    details: Optional[dict[str, Any]] = None
 
 
 class ResilientSARKClient:
@@ -211,7 +210,7 @@ class ResilientSARKClient:
             except requests.exceptions.ConnectionError as e:
                 last_error = ErrorDetails(
                     error_type=ErrorType.NETWORK_ERROR,
-                    message=f"Connection error: {str(e)}",
+                    message=f"Connection error: {e!s}",
                     retry_able=True
                 )
 
@@ -260,7 +259,7 @@ class ResilientSARKClient:
         circuit["opened_at"] = None
         self.circuit_breaker_state[url] = circuit
 
-    def login(self, username: str, password: str) -> Dict[str, Any]:
+    def login(self, username: str, password: str) -> dict[str, Any]:
         """Authenticate with SARK with error handling."""
         print(f"\n📡 Authenticating as {username}...")
 
@@ -289,11 +288,11 @@ class ResilientSARKClient:
     def invoke_tool_safe(
         self,
         tool_id: str,
-        arguments: Dict[str, Any],
+        arguments: dict[str, Any],
         handle_errors: bool = True
-    ) -> Optional[Dict[str, Any]]:
+    ) -> Optional[dict[str, Any]]:
         """Invoke tool with comprehensive error handling."""
-        print(f"\n🚀 Invoking tool (with error handling)...")
+        print("\n🚀 Invoking tool (with error handling)...")
 
         try:
             response = self._handle_request_with_retry(
@@ -304,7 +303,7 @@ class ResilientSARKClient:
 
             if response.status_code == 200:
                 result = response.json()
-                print(f"✅ Tool invoked successfully")
+                print("✅ Tool invoked successfully")
                 return result
 
             else:
@@ -323,61 +322,61 @@ class ResilientSARKClient:
         """Handle different error types with appropriate actions."""
 
         if error.error_type == ErrorType.AUTH_FAILED:
-            print(f"❌ Authentication Failed")
+            print("❌ Authentication Failed")
             print(f"   Reason: {error.message}")
-            print(f"   Action: Verify credentials and try again")
+            print("   Action: Verify credentials and try again")
 
         elif error.error_type == ErrorType.AUTH_EXPIRED:
-            print(f"⏰ Token Expired")
-            print(f"   Action: Refreshing token automatically...")
+            print("⏰ Token Expired")
+            print("   Action: Refreshing token automatically...")
             # In real implementation, refresh token here
 
         elif error.error_type == ErrorType.AUTHZ_DENIED:
-            print(f"🚫 Access Denied")
+            print("🚫 Access Denied")
             print(f"   Reason: {error.message}")
-            print(f"   Action: Check permissions or request approval")
+            print("   Action: Check permissions or request approval")
             if error.details:
                 print(f"   Required roles: {error.details.get('required_roles', [])}")
 
         elif error.error_type == ErrorType.TOOL_NOT_FOUND:
-            print(f"❓ Tool Not Found")
+            print("❓ Tool Not Found")
             print(f"   Tool ID: {error.message}")
-            print(f"   Action: Verify tool ID or check if tool was deleted")
+            print("   Action: Verify tool ID or check if tool was deleted")
 
         elif error.error_type == ErrorType.SERVER_OFFLINE:
-            print(f"📴 MCP Server Offline")
+            print("📴 MCP Server Offline")
             print(f"   Reason: {error.message}")
-            print(f"   Action: Check MCP server health or contact ops team")
+            print("   Action: Check MCP server health or contact ops team")
 
         elif error.error_type == ErrorType.SERVER_TIMEOUT:
-            print(f"⏱️  MCP Server Timeout")
+            print("⏱️  MCP Server Timeout")
             print(f"   Reason: {error.message}")
-            print(f"   Action: Retry or check if tool operation is too slow")
+            print("   Action: Retry or check if tool operation is too slow")
 
         elif error.error_type == ErrorType.SERVER_ERROR:
-            print(f"💥 MCP Server Error")
+            print("💥 MCP Server Error")
             print(f"   Reason: {error.message}")
-            print(f"   Action: Check MCP server logs and notify ops team")
+            print("   Action: Check MCP server logs and notify ops team")
 
         elif error.error_type == ErrorType.INVALID_PARAMS:
-            print(f"📝 Invalid Parameters")
+            print("📝 Invalid Parameters")
             print(f"   Reason: {error.message}")
-            print(f"   Action: Check parameter schema and fix input")
+            print("   Action: Check parameter schema and fix input")
             if error.details and 'validation_errors' in error.details:
                 print(f"   Validation errors: {error.details['validation_errors']}")
 
         elif error.error_type == ErrorType.RATE_LIMITED:
-            print(f"⏳ Rate Limit Exceeded")
+            print("⏳ Rate Limit Exceeded")
             print(f"   Retry after: {error.retry_after}s")
-            print(f"   Action: Wait or reduce request rate")
+            print("   Action: Wait or reduce request rate")
 
         elif error.error_type == ErrorType.CIRCUIT_OPEN:
-            print(f"🔌 Circuit Breaker Open")
-            print(f"   Reason: Too many failures to MCP server")
-            print(f"   Action: Wait 30s for circuit to reset")
+            print("🔌 Circuit Breaker Open")
+            print("   Reason: Too many failures to MCP server")
+            print("   Action: Wait 30s for circuit to reset")
 
         else:
-            print(f"❌ Unknown Error")
+            print("❌ Unknown Error")
             print(f"   Error: {error.message}")
             print(f"   Status: {error.status_code}")
 
@@ -423,9 +422,9 @@ def demonstrate_error_scenarios(client: ResilientSARKClient):
         )
 
         if result is None:
-            print(f"✅ Error handled gracefully (as expected)")
+            print("✅ Error handled gracefully (as expected)")
         else:
-            print(f"⚠️  Unexpected success - tool should have failed")
+            print("⚠️  Unexpected success - tool should have failed")
 
 
 def main():

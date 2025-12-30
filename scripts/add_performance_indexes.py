@@ -37,7 +37,7 @@ async def apply_indexes(dry_run: bool = False) -> None:
     sql_file = Path(__file__).parent.parent / "alembic" / "versions" / "001_add_performance_indexes.sql"
     logger.info(f"Reading SQL from {sql_file}")
 
-    with open(sql_file, "r") as f:
+    with open(sql_file) as f:
         sql_content = f.read()
 
     if dry_run:

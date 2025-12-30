@@ -19,15 +19,16 @@ Key Optimizations:
 """
 
 import argparse
-import sys
-import logging
-import json
-from datetime import datetime, UTC
-from typing import Dict, List, Tuple, Optional
 from dataclasses import dataclass
-from sqlalchemy import create_engine, text, inspect
-from sqlalchemy.orm import sessionmaker, Session
+from datetime import UTC, datetime
+import json
+import logging
+import sys
 import time
+from typing import Optional
+
+from sqlalchemy import create_engine, inspect, text
+from sqlalchemy.orm import Session, sessionmaker
 
 # Configure logging
 logging.basicConfig(
@@ -163,7 +164,7 @@ QUERY_PATTERNS = {
 }
 
 
-def benchmark_query(session: Session, query_name: str, query: str, params: Dict) -> QueryBenchmark:
+def benchmark_query(session: Session, query_name: str, query: str, params: dict) -> QueryBenchmark:
     """
     Benchmark a single query.
 
@@ -223,7 +224,7 @@ def benchmark_query(session: Session, query_name: str, query: str, params: Dict)
         )
 
 
-def run_benchmarks(session: Session) -> List[QueryBenchmark]:
+def run_benchmarks(session: Session) -> list[QueryBenchmark]:
     """Run all query benchmarks."""
     logger.info("Running query benchmarks...")
     benchmarks = []
@@ -249,7 +250,7 @@ def run_benchmarks(session: Session) -> List[QueryBenchmark]:
     return benchmarks
 
 
-def analyze_indexes(session: Session) -> Dict[str, List[str]]:
+def analyze_indexes(session: Session) -> dict[str, list[str]]:
     """Analyze existing indexes."""
     logger.info("Analyzing existing indexes...")
 
@@ -265,7 +266,7 @@ def analyze_indexes(session: Session) -> Dict[str, List[str]]:
     return index_info
 
 
-def generate_recommendations(benchmarks: List[QueryBenchmark]) -> List[OptimizationRecommendation]:
+def generate_recommendations(benchmarks: list[QueryBenchmark]) -> list[OptimizationRecommendation]:
     """Generate optimization recommendations based on benchmarks."""
     logger.info("Generating optimization recommendations...")
     recommendations = []
@@ -394,9 +395,9 @@ def apply_optimizations(session: Session, dry_run: bool = True):
 
 
 def generate_report(
-    benchmarks: List[QueryBenchmark],
-    recommendations: List[OptimizationRecommendation],
-    index_info: Dict[str, List[str]],
+    benchmarks: list[QueryBenchmark],
+    recommendations: list[OptimizationRecommendation],
+    index_info: dict[str, list[str]],
 ) -> str:
     """Generate performance report."""
     report = []

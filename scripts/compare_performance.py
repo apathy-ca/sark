@@ -9,13 +9,13 @@ Usage:
     python scripts/compare_performance.py ./baseline ./current
 """
 
-import sys
 import json
 from pathlib import Path
-from typing import Dict, Any, List
+import sys
+from typing import Any
 
 
-def load_benchmark(path: Path) -> Dict[str, Any]:
+def load_benchmark(path: Path) -> dict[str, Any]:
     """Load benchmark from file or directory"""
     if path.is_dir():
         # Look for latest_benchmark.json in directory
@@ -24,18 +24,18 @@ def load_benchmark(path: Path) -> Dict[str, Any]:
             raise FileNotFoundError(f"No latest_benchmark.json found in {path}")
         path = benchmark_file
 
-    with open(path, 'r') as f:
+    with open(path) as f:
         return json.load(f)
 
 
-def compare_benchmarks(baseline: Dict[str, Any], current: Dict[str, Any]) -> Dict[str, Any]:
+def compare_benchmarks(baseline: dict[str, Any], current: dict[str, Any]) -> dict[str, Any]:
     """Compare two benchmark results"""
     baseline_results = {r['name']: r for r in baseline.get('results', [])}
     current_results = {r['name']: r for r in current.get('results', [])}
 
     comparisons = []
 
-    for name in current_results.keys():
+    for name in current_results:
         curr = current_results[name]
 
         if name not in baseline_results:
@@ -78,7 +78,7 @@ def compare_benchmarks(baseline: Dict[str, Any], current: Dict[str, Any]) -> Dic
     }
 
 
-def generate_markdown_report(comparison: Dict[str, Any]) -> str:
+def generate_markdown_report(comparison: dict[str, Any]) -> str:
     """Generate markdown comparison report"""
     baseline = comparison['baseline']
     current = comparison['current']

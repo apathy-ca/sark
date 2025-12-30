@@ -12,7 +12,6 @@ Usage:
     python jwt_auth.py
 """
 
-import os
 from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
@@ -117,7 +116,7 @@ class JWTAuthExample:
             if payload.get("type") != "access":
                 raise ValueError("Invalid token type")
 
-            print(f"✓ Token validated successfully")
+            print("✓ Token validated successfully")
             print(f"  - User: {payload.get('email')}")
             print(f"  - Role: {payload.get('role')}")
             print(f"  - Expires: {datetime.fromtimestamp(payload['exp'], tz=UTC).isoformat()}")
@@ -262,13 +261,13 @@ def example_token_refresh_flow():
             raise ValueError("Invalid token type")
 
         # Issue new access token
-        new_access_token = jwt_handler.create_access_token(
+        jwt_handler.create_access_token(
             user_id=refresh_payload["sub"],
             email=refresh_payload["email"],
             role=role,  # Would fetch from database in real app
         )
 
-        print(f"  ✓ New access token issued")
+        print("  ✓ New access token issued")
 
     except JWTError as e:
         print(f"  ✗ Token refresh failed: {e}")

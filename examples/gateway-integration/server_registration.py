@@ -16,12 +16,10 @@ Author: Engineer 1 (Gateway Models Architect)
 """
 
 import asyncio
-from datetime import datetime, UTC
 
 from pydantic import HttpUrl, ValidationError
 
 from sark.models.gateway import GatewayServerInfo, SensitivityLevel
-from sark.services.gateway import GatewayClient
 
 
 def create_server_info_example() -> GatewayServerInfo:
@@ -167,7 +165,7 @@ async def example_register_low_sensitivity_server():
     print("\n📦 Low-Sensitivity Server Config:")
     print(f"   Name: {server_info.server_name}")
     print(f"   Sensitivity: {server_info.sensitivity_level.value}")
-    print(f"   MFA Required: No (development environment)")
+    print("   MFA Required: No (development environment)")
     print(f"   Authorized Teams: {', '.join(server_info.authorized_teams)}")
     print()
 
@@ -213,11 +211,11 @@ async def example_register_critical_server():
     print("\n🔒 Critical-Sensitivity Server Config:")
     print(f"   Name: {server_info.server_name}")
     print(f"   Sensitivity: {server_info.sensitivity_level.value}")
-    print(f"   MFA Required: Yes")
-    print(f"   Hardware Key Required: Yes")
+    print("   MFA Required: Yes")
+    print("   Hardware Key Required: Yes")
     print(f"   IP Allowlist: {server_info.access_restrictions['ip_allowlist']}")
-    print(f"   Audit All Requests: Yes")
-    print(f"   Max Connections: 10")
+    print("   Audit All Requests: Yes")
+    print("   Max Connections: 10")
     print(f"   Teams: {', '.join(server_info.authorized_teams)}")
     print()
 
@@ -344,7 +342,7 @@ def example_health_status_values():
 
     print("Valid Health Status Values:\n")
     for status, description in health_statuses.items():
-        example_server = GatewayServerInfo(
+        GatewayServerInfo(
             server_id=f"srv_{status}_001",
             server_name=f"example-{status}",
             server_url=HttpUrl("http://localhost:8080"),

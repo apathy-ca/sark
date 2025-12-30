@@ -9,7 +9,7 @@ when users are close to budget limits.
 from decimal import Decimal
 from typing import Optional
 
-from sark.services.policy.plugins import PolicyPlugin, PolicyContext, PolicyDecision
+from sark.services.policy.plugins import PolicyContext, PolicyDecision, PolicyPlugin
 
 
 class CostAwarePlugin(PolicyPlugin):

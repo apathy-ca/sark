@@ -15,7 +15,6 @@ from sark.gateway.client import (
 from sark.gateway.error_handler import GatewayErrorHandler
 from sark.gateway.transports.http_client import GatewayHTTPClient
 from sark.gateway.transports.sse_client import GatewaySSEClient, SSEEvent
-from sark.gateway.transports.stdio_client import StdioTransport
 from sark.models.gateway import GatewayServerInfo, GatewayToolInfo
 
 
@@ -149,7 +148,9 @@ class TestTransportManagement:
 
     def test_check_transport_available_http_only_mode(self):
         """Test transport availability in HTTP_ONLY mode."""
-        client = GatewayClient(gateway_url="http://test:8080", transport_mode=TransportMode.HTTP_ONLY)
+        client = GatewayClient(
+            gateway_url="http://test:8080", transport_mode=TransportMode.HTTP_ONLY
+        )
 
         # Only HTTP should be available
         client._check_transport_available(TransportType.HTTP)
@@ -162,7 +163,9 @@ class TestTransportManagement:
 
     def test_check_transport_available_sse_only_mode(self):
         """Test transport availability in SSE_ONLY mode."""
-        client = GatewayClient(gateway_url="http://test:8080", transport_mode=TransportMode.SSE_ONLY)
+        client = GatewayClient(
+            gateway_url="http://test:8080", transport_mode=TransportMode.SSE_ONLY
+        )
 
         # Only SSE should be available
         client._check_transport_available(TransportType.SSE)
@@ -254,7 +257,9 @@ class TestServerDiscoveryOperations:
     @pytest.mark.asyncio
     async def test_list_servers_transport_not_available(self):
         """Test listing servers when HTTP transport not available."""
-        client = GatewayClient(gateway_url="http://test:8080", transport_mode=TransportMode.SSE_ONLY)
+        client = GatewayClient(
+            gateway_url="http://test:8080", transport_mode=TransportMode.SSE_ONLY
+        )
 
         with pytest.raises(TransportNotAvailableError):
             await client.list_servers()
@@ -328,9 +333,7 @@ class TestToolDiscoveryOperations:
         result = await client.list_tools(server_name="server1", page=1, page_size=100)
 
         assert result == expected_tools
-        mock_http.list_tools.assert_called_once_with(
-            server_name="server1", page=1, page_size=100
-        )
+        mock_http.list_tools.assert_called_once_with(server_name="server1", page=1, page_size=100)
 
     @pytest.mark.asyncio
     async def test_list_tools_all_servers(self):
@@ -429,7 +432,9 @@ class TestToolInvocation:
     @pytest.mark.asyncio
     async def test_invoke_tool_transport_not_available(self):
         """Test invoking tool when HTTP transport not available."""
-        client = GatewayClient(gateway_url="http://test:8080", transport_mode=TransportMode.STDIO_ONLY)
+        client = GatewayClient(
+            gateway_url="http://test:8080", transport_mode=TransportMode.STDIO_ONLY
+        )
 
         with pytest.raises(TransportNotAvailableError):
             await client.invoke_tool(
@@ -491,8 +496,7 @@ class TestEventStreaming:
         # Collect events with filter
         events = []
         async for event in client.stream_events(
-            event_types=["tool_invoked"],
-            user_token="jwt-token"
+            event_types=["tool_invoked"], user_token="jwt-token"
         ):
             events.append(event)
 
@@ -501,7 +505,9 @@ class TestEventStreaming:
     @pytest.mark.asyncio
     async def test_stream_events_transport_not_available(self):
         """Test streaming events when SSE transport not available."""
-        client = GatewayClient(gateway_url="http://test:8080", transport_mode=TransportMode.HTTP_ONLY)
+        client = GatewayClient(
+            gateway_url="http://test:8080", transport_mode=TransportMode.HTTP_ONLY
+        )
 
         with pytest.raises(TransportNotAvailableError):
             async for _ in client.stream_events():
@@ -554,7 +560,9 @@ class TestLocalServerOperations:
     @pytest.mark.asyncio
     async def test_connect_local_server_transport_not_available(self):
         """Test connecting to local server when stdio transport not available."""
-        client = GatewayClient(gateway_url="http://test:8080", transport_mode=TransportMode.HTTP_ONLY)
+        client = GatewayClient(
+            gateway_url="http://test:8080", transport_mode=TransportMode.HTTP_ONLY
+        )
 
         with pytest.raises(TransportNotAvailableError):
             await client.connect_local_server(command=["python", "server.py"])

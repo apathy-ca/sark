@@ -1,7 +1,6 @@
 """Comprehensive tests for Gateway authorization service."""
 
-from typing import Any
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import patch
 from uuid import uuid4
 
 import pytest
@@ -300,9 +299,7 @@ class TestFilterServersByPermission:
             ),
         ]
 
-        mock_evaluate.return_value = {
-            "result": {"allow": True}
-        }
+        mock_evaluate.return_value = {"result": {"allow": True}}
 
         # Execute
         authorized = await filter_servers_by_permission(user, servers)
@@ -374,9 +371,7 @@ class TestFilterServersByPermission:
             ),
         ]
 
-        mock_evaluate.return_value = {
-            "result": {"allow": False}
-        }
+        mock_evaluate.return_value = {"result": {"allow": False}}
 
         # Execute
         authorized = await filter_servers_by_permission(user, servers)
@@ -441,9 +436,7 @@ class TestFilterToolsByPermission:
             ),
         ]
 
-        mock_evaluate.return_value = {
-            "result": {"allow": True}
-        }
+        mock_evaluate.return_value = {"result": {"allow": True}}
 
         # Execute
         authorized = await filter_tools_by_permission(user, tools)
@@ -579,7 +572,7 @@ class TestEnforceA2ARestrictions:
     @pytest.mark.asyncio
     async def test_a2a_untrusted_cross_environment_blocked(self):
         """Test that untrusted agents cannot cross environments."""
-        agent_context = AgentContext(
+        AgentContext(
             agent_id="agent-1",
             agent_type=AgentType.SERVICE,
             trust_level=TrustLevel.UNTRUSTED,
@@ -587,7 +580,7 @@ class TestEnforceA2ARestrictions:
             environment="development",
         )
 
-        request = A2AAuthorizationRequest(
+        A2AAuthorizationRequest(
             source_agent_id="agent-1",
             target_agent_id="agent-2",
             capability="execute",
@@ -627,7 +620,7 @@ class TestEnforceA2ARestrictions:
     @pytest.mark.asyncio
     async def test_a2a_delegation_depth_limit(self):
         """Test that excessive delegation depth is blocked."""
-        agent_context = AgentContext(
+        AgentContext(
             agent_id="agent-1",
             agent_type=AgentType.SERVICE,
             trust_level=TrustLevel.TRUSTED,
@@ -635,7 +628,7 @@ class TestEnforceA2ARestrictions:
             environment="production",
         )
 
-        request = A2AAuthorizationRequest(
+        A2AAuthorizationRequest(
             source_agent_id="agent-1",
             target_agent_id="agent-2",
             capability="delegate",

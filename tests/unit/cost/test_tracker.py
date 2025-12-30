@@ -1,12 +1,12 @@
 """Unit tests for Cost Tracker."""
 
 from decimal import Decimal
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock, Mock
 
 import pytest
 
 from sark.models.base import InvocationRequest, InvocationResult
-from sark.services.cost.estimator import CostEstimate, FixedCostEstimator, NoCostEstimator
+from sark.services.cost.estimator import CostEstimate, FixedCostEstimator
 from sark.services.cost.tracker import CostTracker
 
 
@@ -182,7 +182,9 @@ class TestCheckBudgetBeforeInvocation:
         # Mock attribution service to allow
         cost_tracker.attribution_service.check_budget = AsyncMock(return_value=(True, None))
 
-        allowed, reason = await cost_tracker.check_budget_before_invocation(sample_request, metadata)
+        allowed, reason = await cost_tracker.check_budget_before_invocation(
+            sample_request, metadata
+        )
 
         assert allowed is True
         assert reason is None
@@ -197,7 +199,9 @@ class TestCheckBudgetBeforeInvocation:
             return_value=(False, "Budget exceeded")
         )
 
-        allowed, reason = await cost_tracker.check_budget_before_invocation(sample_request, metadata)
+        allowed, reason = await cost_tracker.check_budget_before_invocation(
+            sample_request, metadata
+        )
 
         assert allowed is False
         assert reason == "Budget exceeded"
@@ -268,7 +272,9 @@ class TestRecordInvocationCost:
         )
 
     @pytest.mark.asyncio
-    async def test_record_cost_with_unknown_provider(self, cost_tracker, sample_request, sample_result):
+    async def test_record_cost_with_unknown_provider(
+        self, cost_tracker, sample_request, sample_result
+    ):
         """Test recording cost with unknown provider."""
         metadata = {"provider": "unknown"}
         resource_id = "res_001"
@@ -301,7 +307,9 @@ class TestRecordInvocationCost:
         assert recorded_metadata["provider"] == "anthropic"
 
     @pytest.mark.asyncio
-    async def test_record_actual_cost_when_available(self, cost_tracker, sample_request, sample_result):
+    async def test_record_actual_cost_when_available(
+        self, cost_tracker, sample_request, sample_result
+    ):
         """Test that actual cost is used when available from result."""
         metadata = {"provider": "anthropic", "model": "claude-3-haiku-20240307"}
         resource_id = "res_001"
@@ -333,11 +341,15 @@ class TestCostTrackerIntegration:
         cost_tracker.attribution_service.record_cost = AsyncMock()
 
         # 1. Check budget
-        allowed, reason = await cost_tracker.check_budget_before_invocation(sample_request, metadata)
+        allowed, _reason = await cost_tracker.check_budget_before_invocation(
+            sample_request, metadata
+        )
         assert allowed is True
 
         # 2. Record cost after invocation
-        result = InvocationResult(invocation_id="inv_123", success=True, duration_ms=50, metadata={})
+        result = InvocationResult(
+            invocation_id="inv_123", success=True, duration_ms=50, metadata={}
+        )
         await cost_tracker.record_invocation_cost(sample_request, result, resource_id, metadata)
 
         # Verify both calls happened

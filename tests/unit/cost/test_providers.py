@@ -1,7 +1,6 @@
 """Unit tests for Cost Provider Estimators (Anthropic and OpenAI)."""
 
 from decimal import Decimal
-from unittest.mock import Mock
 
 import pytest
 
@@ -193,7 +192,9 @@ class TestAnthropicCostEstimator:
             resource_id="res_001",
             arguments={"messages": [{"role": "user", "content": "Hello"}]},
         )
-        result = InvocationResult(invocation_id="inv_123", success=True, duration_ms=50, metadata={})
+        result = InvocationResult(
+            invocation_id="inv_123", success=True, duration_ms=50, metadata={}
+        )
         metadata = {"model": "claude-3-haiku-20240307"}
 
         actual = await anthropic_estimator.record_actual_cost(request, result, metadata)
@@ -338,7 +339,7 @@ class TestPricingData:
 
     def test_anthropic_pricing_structure(self):
         """Test that all Anthropic pricing entries have correct structure."""
-        for model, pricing in ANTHROPIC_PRICING.items():
+        for _model, pricing in ANTHROPIC_PRICING.items():
             assert isinstance(pricing, tuple)
             assert len(pricing) == 2
             assert isinstance(pricing[0], Decimal)
@@ -346,7 +347,7 @@ class TestPricingData:
 
     def test_openai_pricing_structure(self):
         """Test that all OpenAI pricing entries have correct structure."""
-        for model, pricing in OPENAI_PRICING.items():
+        for _model, pricing in OPENAI_PRICING.items():
             assert isinstance(pricing, tuple)
             assert len(pricing) == 2
             assert isinstance(pricing[0], Decimal)

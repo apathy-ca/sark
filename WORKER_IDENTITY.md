@@ -1,26 +1,26 @@
-# Worker Identity: discovery-federation
+# Worker Identity: build-setup
 
-You are the **discovery-federation** worker in this czarina orchestration.
+You are the **build-setup** worker in this czarina orchestration.
 
 ## Your Role
-Workstream 2: Discovery & Federation tests (15 modules)
+Set up Rust tooling, PyO3 integration, and Maturin build system
 
 ## Your Instructions
-Full task list: $(pwd)/../workers/discovery-federation.md
+Full task list: ../../workers/build-setup.md
 
 Read it now:
 ```bash
-cat ../workers/discovery-federation.md | less
+cat ../../workers/build-setup.md | less
 ```
 
 Or use this one-liner to start:
 ```bash
-cat ../workers/discovery-federation.md
+cat ../../workers/build-setup.md
 ```
 
 ## Quick Reference
-- **Branch:** feat/tests-discovery-federation
-- **Location:** /home/jhenry/Source/sark/.czarina/worktrees/discovery-federation
+- **Branch:** cz1/feat/build-setup
+- **Location:** /home/jhenry/Source/sark/.czarina/worktrees/build-setup
 - **Dependencies:** None
 
 ## Logging
@@ -53,7 +53,7 @@ czarina_log_worker_complete
 This helps the Czar monitor your progress!
 
 ## Your Mission
-1. Read your full instructions at ../workers/discovery-federation.md
+1. Read your full instructions at ../../workers/build-setup.md
 2. Understand your deliverables and success metrics
 3. Begin with Task 1
 4. Follow commit checkpoints in the instructions

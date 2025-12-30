@@ -11,15 +11,16 @@ Tests cover:
 - Service integration (SMS, Email, Push)
 """
 
-import pytest
 from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, Mock, patch
-import time
 import secrets
+import time
+from unittest.mock import AsyncMock, patch
+
+import pytest
 
 from sark.security.mfa import (
-    MFAChallengeSystem,
     MFAChallenge,
+    MFAChallengeSystem,
     MFAConfig,
     MFAMethod,
     MFAStatus,
@@ -283,9 +284,7 @@ class TestMFAChallengeSystem:
     @pytest.mark.asyncio
     async def test_create_totp_challenge(self, mfa_system):
         """Test creating TOTP challenge"""
-        challenge = await mfa_system._create_challenge(
-            "user123", "delete_resource", MFAMethod.TOTP
-        )
+        challenge = await mfa_system._create_challenge("user123", "delete_resource", MFAMethod.TOTP)
 
         assert challenge.user_id == "user123"
         assert challenge.action == "delete_resource"
@@ -298,9 +297,7 @@ class TestMFAChallengeSystem:
     @pytest.mark.asyncio
     async def test_create_sms_challenge(self, mfa_system):
         """Test creating SMS challenge with code"""
-        challenge = await mfa_system._create_challenge(
-            "user123", "delete_resource", MFAMethod.SMS
-        )
+        challenge = await mfa_system._create_challenge("user123", "delete_resource", MFAMethod.SMS)
 
         assert challenge.method == MFAMethod.SMS
         assert challenge.code is not None
@@ -321,9 +318,7 @@ class TestMFAChallengeSystem:
     @pytest.mark.asyncio
     async def test_create_push_challenge(self, mfa_system):
         """Test creating Push challenge"""
-        challenge = await mfa_system._create_challenge(
-            "user123", "delete_resource", MFAMethod.PUSH
-        )
+        challenge = await mfa_system._create_challenge("user123", "delete_resource", MFAMethod.PUSH)
 
         assert challenge.method == MFAMethod.PUSH
         assert challenge.code is None  # Push doesn't use codes
@@ -331,9 +326,7 @@ class TestMFAChallengeSystem:
     @pytest.mark.asyncio
     async def test_challenge_saved_to_storage(self, mfa_system, mock_storage):
         """Test that challenge is saved to storage"""
-        challenge = await mfa_system._create_challenge(
-            "user123", "delete_resource", MFAMethod.TOTP
-        )
+        challenge = await mfa_system._create_challenge("user123", "delete_resource", MFAMethod.TOTP)
 
         # Verify storage.set was called
         mock_storage.set.assert_called_once()
@@ -348,9 +341,7 @@ class TestMFAChallengeSystem:
         config = MFAConfig(timeout_seconds=300)
         system = MFAChallengeSystem(config=config)
 
-        challenge = await system._create_challenge(
-            "user123", "action", MFAMethod.TOTP
-        )
+        challenge = await system._create_challenge("user123", "action", MFAMethod.TOTP)
 
         time_diff = (challenge.expires_at - challenge.created_at).total_seconds()
         assert time_diff == 300
@@ -371,9 +362,7 @@ class TestMFAChallengeSystem:
             code="123456",
         )
 
-        await mfa_system._send_challenge(
-            challenge, user_contact={"phone": "+1234567890"}
-        )
+        await mfa_system._send_challenge(challenge, user_contact={"phone": "+1234567890"})
 
         # Verify SMS was sent
         mock_services["sms_service"].send_sms.assert_called_once()
@@ -395,9 +384,7 @@ class TestMFAChallengeSystem:
             code="123456",
         )
 
-        await mfa_system._send_challenge(
-            challenge, user_contact={"email": "user@example.com"}
-        )
+        await mfa_system._send_challenge(challenge, user_contact={"email": "user@example.com"})
 
         # Verify email was sent
         mock_services["email_service"].send_email.assert_called_once()
@@ -450,9 +437,7 @@ class TestMFAChallengeSystem:
         # TOTP doesn't send anything, just logs internally
 
     @pytest.mark.asyncio
-    async def test_send_challenge_missing_contact_info(
-        self, mfa_system, mock_services, caplog
-    ):
+    async def test_send_challenge_missing_contact_info(self, mfa_system, mock_services, caplog):
         """Test sending challenge without contact info logs warning"""
         challenge = MFAChallenge(
             challenge_id="chal-123",
@@ -472,9 +457,7 @@ class TestMFAChallengeSystem:
         assert "Cannot send SMS" in caplog.text
 
     @pytest.mark.asyncio
-    async def test_send_challenge_handles_service_error(
-        self, mfa_system, mock_services, caplog
-    ):
+    async def test_send_challenge_handles_service_error(self, mfa_system, mock_services, caplog):
         """Test that send errors are caught and logged"""
         mock_services["sms_service"].send_sms.side_effect = Exception("SMS service down")
 
@@ -490,9 +473,7 @@ class TestMFAChallengeSystem:
         )
 
         # Should not raise exception
-        await mfa_system._send_challenge(
-            challenge, user_contact={"phone": "+1234567890"}
-        )
+        await mfa_system._send_challenge(challenge, user_contact={"phone": "+1234567890"})
 
         assert "Failed to send MFA challenge" in caplog.text
 
@@ -871,6 +852,7 @@ class TestMFAChallengeSystem:
     @pytest.mark.asyncio
     async def test_require_mfa_complete_flow_totp(self, mfa_system, mock_storage, mock_services):
         """Test complete MFA flow with TOTP"""
+
         # Mock the wait_for_response to return immediately
         async def mock_wait(challenge, poll_interval=2.0):
             # Simulate user entering correct code
@@ -880,9 +862,7 @@ class TestMFAChallengeSystem:
 
         mfa_system._wait_for_response = mock_wait
 
-        result = await mfa_system.require_mfa(
-            "user123", "delete_resource", method=MFAMethod.TOTP
-        )
+        result = await mfa_system.require_mfa("user123", "delete_resource", method=MFAMethod.TOTP)
 
         assert result is True
         # Verify audit log was called
@@ -891,6 +871,7 @@ class TestMFAChallengeSystem:
     @pytest.mark.asyncio
     async def test_require_mfa_uses_default_method(self, mfa_system, mock_storage):
         """Test that require_mfa uses default method when not specified"""
+
         async def mock_wait(challenge, poll_interval=2.0):
             return True
 

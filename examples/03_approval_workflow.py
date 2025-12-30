@@ -33,11 +33,8 @@ Usage:
 """
 
 import argparse
-import json
 import os
-import time
-from datetime import datetime, timedelta
-from typing import Any, Dict, List
+from typing import Any
 
 import requests
 
@@ -49,7 +46,7 @@ class SARKClient:
         self.base_url = base_url
         self.session = requests.Session()
         self.access_token: str | None = None
-        self.user_info: Dict[str, Any] | None = None
+        self.user_info: dict[str, Any] | None = None
 
     def login(self, username: str, password: str):
         """Authenticate with SARK."""
@@ -73,9 +70,9 @@ class SARKClient:
         else:
             raise Exception("Authentication failed")
 
-    def check_tool_access(self, tool_id: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
+    def check_tool_access(self, tool_id: str, arguments: dict[str, Any]) -> dict[str, Any]:
         """Check if user can access a tool (dry-run policy evaluation)."""
-        print(f"\n🔍 Checking access to tool...")
+        print("\n🔍 Checking access to tool...")
 
         response = self.session.post(
             f"{self.base_url}/api/v1/policy/evaluate",
@@ -97,11 +94,11 @@ class SARKClient:
         self,
         tool_id: str,
         justification: str,
-        arguments: Dict[str, Any],
+        arguments: dict[str, Any],
         duration_hours: int = 4
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Request approval to invoke a high-sensitivity tool."""
-        print(f"\n📝 Requesting approval...")
+        print("\n📝 Requesting approval...")
         print(f"   Tool: {tool_id}")
         print(f"   Justification: {justification}")
         print(f"   Duration: {duration_hours} hours")
@@ -118,7 +115,7 @@ class SARKClient:
 
         if response.status_code == 201:
             approval_request = response.json()
-            print(f"\n✅ Approval request created!")
+            print("\n✅ Approval request created!")
             print(f"   Request ID: {approval_request['id']}")
             print(f"   Status: {approval_request['status']}")
             print(f"   Expires: {approval_request['expires_at']}")
@@ -128,9 +125,9 @@ class SARKClient:
             error = response.json()
             raise Exception(f"Failed to request approval: {error.get('detail')}")
 
-    def list_pending_approvals(self) -> List[Dict[str, Any]]:
+    def list_pending_approvals(self) -> list[dict[str, Any]]:
         """List pending approval requests (admin view)."""
-        print(f"\n📋 Fetching pending approval requests...")
+        print("\n📋 Fetching pending approval requests...")
 
         response = self.session.get(
             f"{self.base_url}/api/v1/approvals?status=pending"
@@ -147,7 +144,7 @@ class SARKClient:
         self,
         approval_id: str,
         admin_notes: str = ""
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Approve an approval request (admin only)."""
         print(f"\n✅ Approving request {approval_id}...")
 
@@ -158,7 +155,7 @@ class SARKClient:
 
         if response.status_code == 200:
             approval = response.json()
-            print(f"✅ Request approved!")
+            print("✅ Request approved!")
             print(f"   Valid until: {approval['expires_at']}")
             return approval
         else:
@@ -169,7 +166,7 @@ class SARKClient:
         self,
         approval_id: str,
         admin_notes: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Deny an approval request (admin only)."""
         print(f"\n🚫 Denying request {approval_id}...")
 
@@ -180,7 +177,7 @@ class SARKClient:
 
         if response.status_code == 200:
             approval = response.json()
-            print(f"🚫 Request denied")
+            print("🚫 Request denied")
             print(f"   Reason: {admin_notes}")
             return approval
         else:
@@ -190,11 +187,11 @@ class SARKClient:
     def invoke_tool_with_approval(
         self,
         tool_id: str,
-        arguments: Dict[str, Any],
+        arguments: dict[str, Any],
         approval_id: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Invoke a tool with an approval token."""
-        print(f"\n🚀 Invoking tool with approval...")
+        print("\n🚀 Invoking tool with approval...")
 
         response = self.session.post(
             f"{self.base_url}/api/v1/tools/invoke",
@@ -207,7 +204,7 @@ class SARKClient:
 
         if response.status_code == 200:
             result = response.json()
-            print(f"✅ Tool invoked successfully!")
+            print("✅ Tool invoked successfully!")
             return result
         elif response.status_code == 403:
             error = response.json()
@@ -252,7 +249,7 @@ def run_user_workflow(client: SARKClient):
         )
 
         if not decision.get('allow'):
-            print(f"❌ Access denied (as expected)")
+            print("❌ Access denied (as expected)")
             print(f"   Reason: {decision.get('reason')}")
             print(f"   Approval required: {decision.get('requires_approval', False)}")
     except Exception as e:
@@ -274,7 +271,7 @@ def run_user_workflow(client: SARKClient):
     )
 
     print("\n✉️  Approval request submitted!")
-    print(f"\n📋 Request Details:")
+    print("\n📋 Request Details:")
     print(f"   ID: {approval_request['id']}")
     print(f"   Requester: {client.user_info['email']}")
     print(f"   Tool: {tool['name']}")
@@ -309,7 +306,7 @@ def run_admin_workflow(client: SARKClient):
         return
 
     # Step 2: Review each request
-    print(f"\n📝 Step 2: Review pending requests")
+    print("\n📝 Step 2: Review pending requests")
 
     for i, approval in enumerate(approvals, 1):
         print(f"\n{'='*80}")
@@ -330,7 +327,7 @@ def run_admin_workflow(client: SARKClient):
         # - Is the user authorized for this emergency access?
 
     # Step 3: Approve or deny
-    print(f"\n🤔 Step 3: Make decision (approve/deny)")
+    print("\n🤔 Step 3: Make decision (approve/deny)")
 
     # For this example, auto-approve if justification mentions incident ticket
     approval = approvals[0]
@@ -348,12 +345,12 @@ def run_admin_workflow(client: SARKClient):
         print("=" * 80)
         print(f"Approval ID: {approved['id']}")
         print(f"Valid until: {approved['expires_at']}")
-        print(f"User can now invoke the tool using this approval")
+        print("User can now invoke the tool using this approval")
 
     else:
         print("\n🚫 Insufficient justification - DENYING")
 
-        denied = client.deny_request(
+        client.deny_request(
             approval_id=approval['id'],
             admin_notes="Denied: No valid incident ticket provided. Please include incident number."
         )

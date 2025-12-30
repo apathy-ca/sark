@@ -13,7 +13,6 @@ Usage:
 """
 
 import os
-from typing import Dict, List
 
 import requests
 
@@ -31,7 +30,7 @@ class SARKBulkOperations:
         self.base_url = base_url.rstrip("/")
         self.headers = {"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"}
 
-    def bulk_register_servers(self, servers: List[Dict], fail_on_first_error: bool = False) -> Dict:
+    def bulk_register_servers(self, servers: list[dict], fail_on_first_error: bool = False) -> dict:
         """Bulk register multiple servers.
 
         Args:
@@ -47,30 +46,30 @@ class SARKBulkOperations:
 
         payload = {"servers": servers, "fail_on_first_error": fail_on_first_error}
 
-        response = requests.post(f"{self.base_url}/api/v1/bulk/servers/register", headers=self.headers, json=payload)
+        response = requests.post(f"{self.base_url}/api/v1/bulk/servers/register", headers=self.headers, json=payload, timeout=30)
 
         response.raise_for_status()
         result = response.json()
 
         # Display results
-        print(f"\n✓ Bulk operation completed")
+        print("\n✓ Bulk operation completed")
         print(f"  Total: {result['total']}")
         print(f"  Succeeded: {result['succeeded']}")
         print(f"  Failed: {result['failed']}")
 
         if result["succeeded_items"]:
-            print(f"\n  Successful registrations:")
+            print("\n  Successful registrations:")
             for item in result["succeeded_items"]:
                 print(f"    ✓ {item['name']} → {item['server_id']}")
 
         if result["failed_items"]:
-            print(f"\n  Failed registrations:")
+            print("\n  Failed registrations:")
             for item in result["failed_items"]:
                 print(f"    ✗ {item['name']}: {item.get('error', 'Unknown error')}")
 
         return result
 
-    def bulk_update_server_status(self, updates: List[Dict], fail_on_first_error: bool = False) -> Dict:
+    def bulk_update_server_status(self, updates: list[dict], fail_on_first_error: bool = False) -> dict:
         """Bulk update server statuses.
 
         Args:
@@ -85,24 +84,24 @@ class SARKBulkOperations:
 
         payload = {"updates": updates, "fail_on_first_error": fail_on_first_error}
 
-        response = requests.patch(f"{self.base_url}/api/v1/bulk/servers/status", headers=self.headers, json=payload)
+        response = requests.patch(f"{self.base_url}/api/v1/bulk/servers/status", headers=self.headers, json=payload, timeout=30)
 
         response.raise_for_status()
         result = response.json()
 
         # Display results
-        print(f"\n✓ Bulk operation completed")
+        print("\n✓ Bulk operation completed")
         print(f"  Total: {result['total']}")
         print(f"  Succeeded: {result['succeeded']}")
         print(f"  Failed: {result['failed']}")
 
         if result["succeeded_items"]:
-            print(f"\n  Successful updates:")
+            print("\n  Successful updates:")
             for item in result["succeeded_items"]:
                 print(f"    ✓ {item['server_id']} → {item['status']}")
 
         if result["failed_items"]:
-            print(f"\n  Failed updates:")
+            print("\n  Failed updates:")
             for item in result["failed_items"]:
                 print(f"    ✗ {item['server_id']}: {item.get('error', 'Unknown error')}")
 
@@ -161,7 +160,7 @@ def example_bulk_register_best_effort():
         # Best-effort mode: continues even if some servers fail
         result = bulk_ops.bulk_register_servers(servers, fail_on_first_error=False)
 
-        print(f"\n📊 Summary:")
+        print("\n📊 Summary:")
         print(f"  Success rate: {result['succeeded']}/{result['total']} " f"({result['succeeded']/result['total']*100:.1f}%)")
 
     except requests.exceptions.RequestException as e:
@@ -220,7 +219,7 @@ def example_bulk_status_update():
     try:
         result = bulk_ops.bulk_update_server_status(updates, fail_on_first_error=False)
 
-        print(f"\n📊 Summary:")
+        print("\n📊 Summary:")
         print(f"  Success rate: {result['succeeded']}/{result['total']}")
 
     except requests.exceptions.RequestException as e:

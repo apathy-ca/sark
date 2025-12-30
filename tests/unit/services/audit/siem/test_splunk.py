@@ -154,7 +154,9 @@ class TestSendEvent:
             await splunk_siem.send_event(sample_audit_event)
 
     @pytest.mark.asyncio
-    async def test_send_event_connection_error(self, splunk_siem, sample_audit_event, mock_http_client):
+    async def test_send_event_connection_error(
+        self, splunk_siem, sample_audit_event, mock_http_client
+    ):
         """Test event send connection error handling."""
         mock_http_client.post = AsyncMock(side_effect=httpx.ConnectError("Connection failed"))
 
@@ -162,7 +164,9 @@ class TestSendEvent:
             await splunk_siem.send_event(sample_audit_event)
 
     @pytest.mark.asyncio
-    async def test_send_event_generic_exception(self, splunk_siem, sample_audit_event, mock_http_client):
+    async def test_send_event_generic_exception(
+        self, splunk_siem, sample_audit_event, mock_http_client
+    ):
         """Test event send with generic exception."""
         mock_http_client.post = AsyncMock(side_effect=Exception("Unknown error"))
 
@@ -170,7 +174,9 @@ class TestSendEvent:
             await splunk_siem.send_event(sample_audit_event)
 
     @pytest.mark.asyncio
-    async def test_send_event_formats_correctly(self, splunk_siem, sample_audit_event, mock_http_client):
+    async def test_send_event_formats_correctly(
+        self, splunk_siem, sample_audit_event, mock_http_client
+    ):
         """Test that event is formatted correctly for HEC."""
         mock_response = Mock()
         mock_response.status_code = 200
@@ -278,7 +284,14 @@ class TestSendBatch:
     @pytest.mark.asyncio
     async def test_send_batch_timeout(self, splunk_siem, mock_http_client):
         """Test batch send timeout handling."""
-        events = [AuditEvent(id=uuid4(), timestamp=datetime.now(UTC), event_type=AuditEventType.USER_LOGIN, severity=SeverityLevel.LOW)]
+        events = [
+            AuditEvent(
+                id=uuid4(),
+                timestamp=datetime.now(UTC),
+                event_type=AuditEventType.USER_LOGIN,
+                severity=SeverityLevel.LOW,
+            )
+        ]
 
         mock_http_client.post = AsyncMock(side_effect=httpx.TimeoutException("Timeout"))
 
@@ -410,7 +423,9 @@ class TestMetricsTracking:
     """Test metrics tracking during operations."""
 
     @pytest.mark.asyncio
-    async def test_metrics_updated_on_success(self, splunk_siem, sample_audit_event, mock_http_client):
+    async def test_metrics_updated_on_success(
+        self, splunk_siem, sample_audit_event, mock_http_client
+    ):
         """Test that metrics are updated on successful send."""
         mock_response = Mock()
         mock_response.status_code = 200
@@ -426,7 +441,9 @@ class TestMetricsTracking:
         assert splunk_siem.metrics.last_success is not None
 
     @pytest.mark.asyncio
-    async def test_metrics_updated_on_failure(self, splunk_siem, sample_audit_event, mock_http_client):
+    async def test_metrics_updated_on_failure(
+        self, splunk_siem, sample_audit_event, mock_http_client
+    ):
         """Test that metrics are updated on failed send."""
         mock_response = Mock()
         mock_response.status_code = 500

@@ -21,21 +21,21 @@ from sark.gateway.error_handler import (
 )
 
 __all__ = [
-    # Client classes
-    "GatewayClient",
-    "LocalServerClient",
-    "GatewayClientError",
-    "TransportNotAvailableError",
-    "TransportType",
-    "TransportMode",
     # Error handling classes
     "CircuitBreaker",
     "CircuitBreakerError",
     "CircuitState",
+    # Client classes
+    "GatewayClient",
+    "GatewayClientError",
     "GatewayErrorHandler",
+    "LocalServerClient",
     "RetryConfig",
     "RetryExhaustedError",
     "TimeoutError",
+    "TransportMode",
+    "TransportNotAvailableError",
+    "TransportType",
     "with_retry",
     "with_timeout",
 ]

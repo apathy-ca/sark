@@ -2,7 +2,7 @@
 
 from datetime import UTC, datetime
 from unittest.mock import AsyncMock, Mock, patch
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -49,7 +49,9 @@ class TestAuditServiceBasic:
     """Test basic audit service functionality."""
 
     @pytest.mark.asyncio
-    async def test_log_event_creates_audit_event(self, audit_service, mock_db_session, sample_user_id):
+    async def test_log_event_creates_audit_event(
+        self, audit_service, mock_db_session, sample_user_id
+    ):
         """Test that log_event creates an audit event."""
         # Arrange
         event_type = AuditEventType.TOOL_INVOKED
@@ -58,8 +60,8 @@ class TestAuditServiceBasic:
         tool_name = "execute_query"
 
         # Act
-        with patch.object(audit_service, '_forward_to_siem', new_callable=AsyncMock):
-            result = await audit_service.log_event(
+        with patch.object(audit_service, "_forward_to_siem", new_callable=AsyncMock):
+            await audit_service.log_event(
                 event_type=event_type,
                 severity=severity,
                 user_id=sample_user_id,
@@ -108,7 +110,7 @@ class TestAuditServiceBasic:
         }
 
         # Act
-        with patch.object(audit_service, '_forward_to_siem', new_callable=AsyncMock):
+        with patch.object(audit_service, "_forward_to_siem", new_callable=AsyncMock):
             await audit_service.log_event(**event_data)
 
         # Assert
@@ -125,7 +127,7 @@ class TestAuditServiceBasic:
     async def test_log_event_defaults_empty_details(self, audit_service, mock_db_session):
         """Test that log_event defaults to empty dict for details."""
         # Act
-        with patch.object(audit_service, '_forward_to_siem', new_callable=AsyncMock):
+        with patch.object(audit_service, "_forward_to_siem", new_callable=AsyncMock):
             await audit_service.log_event(event_type=AuditEventType.USER_LOGIN)
 
         # Assert
@@ -147,7 +149,7 @@ class TestAuthorizationDecisionLogging:
     ):
         """Test logging an authorization allow decision."""
         # Act
-        with patch.object(audit_service, '_forward_to_siem', new_callable=AsyncMock):
+        with patch.object(audit_service, "_forward_to_siem", new_callable=AsyncMock):
             await audit_service.log_authorization_decision(
                 user_id=sample_user_id,
                 user_email="user@example.com",
@@ -177,7 +179,7 @@ class TestAuthorizationDecisionLogging:
     ):
         """Test logging an authorization deny decision."""
         # Act
-        with patch.object(audit_service, '_forward_to_siem', new_callable=AsyncMock):
+        with patch.object(audit_service, "_forward_to_siem", new_callable=AsyncMock):
             await audit_service.log_authorization_decision(
                 user_id=sample_user_id,
                 user_email="user@example.com",
@@ -209,7 +211,7 @@ class TestToolInvocationLogging:
         parameters = {"query": "SELECT * FROM users", "limit": 100}
 
         # Act
-        with patch.object(audit_service, '_forward_to_siem', new_callable=AsyncMock):
+        with patch.object(audit_service, "_forward_to_siem", new_callable=AsyncMock):
             await audit_service.log_tool_invocation(
                 user_id=sample_user_id,
                 user_email="analyst@example.com",
@@ -239,7 +241,7 @@ class TestToolInvocationLogging:
     ):
         """Test logging a tool invocation without parameters."""
         # Act
-        with patch.object(audit_service, '_forward_to_siem', new_callable=AsyncMock):
+        with patch.object(audit_service, "_forward_to_siem", new_callable=AsyncMock):
             await audit_service.log_tool_invocation(
                 user_id=sample_user_id,
                 user_email="user@example.com",
@@ -269,7 +271,7 @@ class TestServerRegistrationLogging:
         details = {"endpoint": "http://localhost:8080", "transport": "http"}
 
         # Act
-        with patch.object(audit_service, '_forward_to_siem', new_callable=AsyncMock):
+        with patch.object(audit_service, "_forward_to_siem", new_callable=AsyncMock):
             await audit_service.log_server_registration(
                 user_id=sample_user_id,
                 user_email="admin@example.com",
@@ -305,7 +307,7 @@ class TestSecurityViolationLogging:
 
         # Act
         mock_forward_siem = AsyncMock()
-        with patch.object(audit_service, '_forward_to_siem', mock_forward_siem):
+        with patch.object(audit_service, "_forward_to_siem", mock_forward_siem):
             await audit_service.log_security_violation(
                 user_id=sample_user_id,
                 user_email="attacker@example.com",
@@ -335,7 +337,7 @@ class TestSecurityViolationLogging:
         """Test logging a security violation without user information."""
         # Act
         mock_forward_siem = AsyncMock()
-        with patch.object(audit_service, '_forward_to_siem', mock_forward_siem):
+        with patch.object(audit_service, "_forward_to_siem", mock_forward_siem):
             await audit_service.log_security_violation(
                 user_id=None,
                 user_email=None,
@@ -363,7 +365,7 @@ class TestSIEMForwarding:
         """Test that HIGH severity events trigger SIEM forwarding."""
         # Act
         mock_forward_siem = AsyncMock()
-        with patch.object(audit_service, '_forward_to_siem', mock_forward_siem):
+        with patch.object(audit_service, "_forward_to_siem", mock_forward_siem):
             await audit_service.log_event(
                 event_type=AuditEventType.POLICY_UPDATED,
                 severity=SeverityLevel.HIGH,
@@ -381,7 +383,7 @@ class TestSIEMForwarding:
         """Test that CRITICAL severity events trigger SIEM forwarding."""
         # Act
         mock_forward_siem = AsyncMock()
-        with patch.object(audit_service, '_forward_to_siem', mock_forward_siem):
+        with patch.object(audit_service, "_forward_to_siem", mock_forward_siem):
             await audit_service.log_event(
                 event_type=AuditEventType.SECURITY_VIOLATION,
                 severity=SeverityLevel.CRITICAL,
@@ -399,7 +401,7 @@ class TestSIEMForwarding:
         """Test that LOW severity events do NOT trigger SIEM forwarding."""
         # Act
         mock_forward_siem = AsyncMock()
-        with patch.object(audit_service, '_forward_to_siem', mock_forward_siem):
+        with patch.object(audit_service, "_forward_to_siem", mock_forward_siem):
             await audit_service.log_event(
                 event_type=AuditEventType.USER_LOGIN,
                 severity=SeverityLevel.LOW,
@@ -417,7 +419,7 @@ class TestSIEMForwarding:
         """Test that MEDIUM severity events do NOT trigger SIEM forwarding."""
         # Act
         mock_forward_siem = AsyncMock()
-        with patch.object(audit_service, '_forward_to_siem', mock_forward_siem):
+        with patch.object(audit_service, "_forward_to_siem", mock_forward_siem):
             await audit_service.log_event(
                 event_type=AuditEventType.SERVER_UPDATED,
                 severity=SeverityLevel.MEDIUM,
@@ -457,7 +459,7 @@ class TestEventTimestamps:
     async def test_event_has_timestamp(self, audit_service, mock_db_session):
         """Test that events are created with a timestamp."""
         # Act
-        with patch.object(audit_service, '_forward_to_siem', new_callable=AsyncMock):
+        with patch.object(audit_service, "_forward_to_siem", new_callable=AsyncMock):
             await audit_service.log_event(event_type=AuditEventType.USER_LOGIN)
 
         # Assert
@@ -469,7 +471,7 @@ class TestEventTimestamps:
     async def test_timestamp_is_utc(self, audit_service, mock_db_session):
         """Test that event timestamps are in UTC."""
         # Act
-        with patch.object(audit_service, '_forward_to_siem', new_callable=AsyncMock):
+        with patch.object(audit_service, "_forward_to_siem", new_callable=AsyncMock):
             await audit_service.log_event(event_type=AuditEventType.USER_LOGOUT)
 
         # Assert

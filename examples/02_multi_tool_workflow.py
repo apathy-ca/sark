@@ -23,11 +23,11 @@ Usage:
     python examples/02_multi_tool_workflow.py
 """
 
+from dataclasses import dataclass
 import json
 import os
 import time
-from dataclasses import dataclass
-from typing import Any, Dict, List
+from typing import Any, Optional
 
 import requests
 
@@ -38,7 +38,7 @@ class WorkflowStep:
     name: str
     tool_name: str
     description: str
-    depends_on: List[str] = None  # Names of steps that must complete first
+    depends_on: list[str] = None  # Names of steps that must complete first
     status: str = "pending"  # pending, running, completed, failed
     result: Any = None
     error: str = None
@@ -54,15 +54,15 @@ class WorkflowEngine:
 
     def __init__(self, client):
         self.client = client
-        self.steps: List[WorkflowStep] = []
-        self.results: Dict[str, Any] = {}
+        self.steps: list[WorkflowStep] = []
+        self.results: dict[str, Any] = {}
 
     def add_step(
         self,
         name: str,
         tool_name: str,
         description: str,
-        depends_on: List[str] = None
+        depends_on: Optional[list[str]] = None
     ) -> WorkflowStep:
         """Add a step to the workflow."""
         step = WorkflowStep(
@@ -245,7 +245,7 @@ class SARKClient:
             raise Exception(f"Tool invocation failed: {response.status_code}")
 
 
-def build_workflow_arguments(step_name: str, previous_results: Dict[str, Any]) -> Dict[str, Any]:
+def build_workflow_arguments(step_name: str, previous_results: dict[str, Any]) -> dict[str, Any]:
     """Build arguments for each workflow step based on previous results."""
 
     if step_name == "query_data":
