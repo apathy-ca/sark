@@ -22,7 +22,7 @@ RUN apt-get update && apt-get install -y \
 FROM base as development
 
 # Copy build configuration files
-COPY pyproject.toml Cargo.toml ./
+COPY pyproject.toml Cargo.toml README.md ./
 
 # Copy Rust source code
 COPY rust ./rust
@@ -45,7 +45,7 @@ RUN useradd -m -u 1000 appuser && \
     chown -R appuser:appuser /app
 
 # Copy build configuration files
-COPY --chown=appuser:appuser pyproject.toml Cargo.toml ./
+COPY --chown=appuser:appuser pyproject.toml Cargo.toml README.md ./
 
 # Copy Rust source code
 COPY --chown=appuser:appuser rust ./rust
