@@ -81,7 +81,7 @@ class SARKSearchClient:
         if search:
             params["search"] = search
 
-        response = requests.get(f"{self.base_url}/api/v1/servers", headers=self.headers, params=params)
+        response = requests.get(f"{self.base_url}/api/v1/servers", headers=self.headers, params=params, timeout=30)
 
         response.raise_for_status()
         return response.json()

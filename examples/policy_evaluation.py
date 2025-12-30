@@ -60,7 +60,7 @@ class SARKPolicyClient:
         if server_id:
             payload["server_id"] = server_id
 
-        response = requests.post(f"{self.base_url}/api/v1/policy/evaluate", headers=self.headers, json=payload)
+        response = requests.post(f"{self.base_url}/api/v1/policy/evaluate", headers=self.headers, json=payload, timeout=30)
 
         response.raise_for_status()
         return response.json()

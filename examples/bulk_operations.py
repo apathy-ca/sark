@@ -46,7 +46,7 @@ class SARKBulkOperations:
 
         payload = {"servers": servers, "fail_on_first_error": fail_on_first_error}
 
-        response = requests.post(f"{self.base_url}/api/v1/bulk/servers/register", headers=self.headers, json=payload)
+        response = requests.post(f"{self.base_url}/api/v1/bulk/servers/register", headers=self.headers, json=payload, timeout=30)
 
         response.raise_for_status()
         result = response.json()
@@ -84,7 +84,7 @@ class SARKBulkOperations:
 
         payload = {"updates": updates, "fail_on_first_error": fail_on_first_error}
 
-        response = requests.patch(f"{self.base_url}/api/v1/bulk/servers/status", headers=self.headers, json=payload)
+        response = requests.patch(f"{self.base_url}/api/v1/bulk/servers/status", headers=self.headers, json=payload, timeout=30)
 
         response.raise_for_status()
         result = response.json()

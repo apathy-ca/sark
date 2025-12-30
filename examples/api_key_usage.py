@@ -67,7 +67,7 @@ class SARKAPIKeyManager:
             "environment": environment,
         }
 
-        response = requests.post(f"{self.base_url}/api/auth/api-keys", headers=self.headers, json=payload)
+        response = requests.post(f"{self.base_url}/api/auth/api-keys", headers=self.headers, json=payload, timeout=30)
 
         response.raise_for_status()
         data = response.json()
@@ -92,7 +92,7 @@ class SARKAPIKeyManager:
         print(f"\nListing API keys (include_revoked={include_revoked})")
 
         params = {"include_revoked": include_revoked}
-        response = requests.get(f"{self.base_url}/api/auth/api-keys", headers=self.headers, params=params)
+        response = requests.get(f"{self.base_url}/api/auth/api-keys", headers=self.headers, params=params, timeout=30)
 
         response.raise_for_status()
         keys = response.json()
@@ -119,7 +119,7 @@ class SARKAPIKeyManager:
         """
         print(f"\nFetching API key: {key_id}")
 
-        response = requests.get(f"{self.base_url}/api/auth/api-keys/{key_id}", headers=self.headers)
+        response = requests.get(f"{self.base_url}/api/auth/api-keys/{key_id}", headers=self.headers, timeout=30)
 
         response.raise_for_status()
         key = response.json()
@@ -164,7 +164,7 @@ class SARKAPIKeyManager:
             payload["is_active"] = is_active
             print(f"  Setting active: {is_active}")
 
-        response = requests.patch(f"{self.base_url}/api/auth/api-keys/{key_id}", headers=self.headers, json=payload)
+        response = requests.patch(f"{self.base_url}/api/auth/api-keys/{key_id}", headers=self.headers, json=payload, timeout=30)
 
         response.raise_for_status()
         key = response.json()
@@ -185,7 +185,7 @@ class SARKAPIKeyManager:
         print(f"\nRotating API key: {key_id}")
 
         params = {"environment": environment}
-        response = requests.post(f"{self.base_url}/api/auth/api-keys/{key_id}/rotate", headers=self.headers, params=params)
+        response = requests.post(f"{self.base_url}/api/auth/api-keys/{key_id}/rotate", headers=self.headers, params=params, timeout=30)
 
         response.raise_for_status()
         data = response.json()
@@ -205,7 +205,7 @@ class SARKAPIKeyManager:
         """
         print(f"\nRevoking API key: {key_id}")
 
-        response = requests.delete(f"{self.base_url}/api/auth/api-keys/{key_id}", headers=self.headers)
+        response = requests.delete(f"{self.base_url}/api/auth/api-keys/{key_id}", headers=self.headers, timeout=30)
 
         response.raise_for_status()
         print("✓ API key revoked successfully")
@@ -226,7 +226,7 @@ def use_api_key_for_requests(base_url: str, api_key: str):
 
     # Example 1: List servers
     print("\n1. Listing servers with API key...")
-    response = requests.get(f"{base_url}/api/v1/servers", headers=headers, params={"limit": 5})
+    response = requests.get(f"{base_url}/api/v1/servers", headers=headers, params={"limit": 5}, timeout=30)
 
     if response.status_code == 200:
         servers = response.json()
@@ -247,7 +247,7 @@ def use_api_key_for_requests(base_url: str, api_key: str):
         "sensitivity_level": "medium",
     }
 
-    response = requests.post(f"{base_url}/api/v1/servers", headers=headers, json=server_data)
+    response = requests.post(f"{base_url}/api/v1/servers", headers=headers, json=server_data, timeout=30)
 
     if response.status_code == 201:
         result = response.json()

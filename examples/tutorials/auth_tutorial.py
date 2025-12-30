@@ -70,7 +70,7 @@ class SARKAuthClient:
         }
 
         try:
-            response = requests.post(url, headers=headers, json=payload)
+            response = requests.post(url, headers=headers, json=payload, timeout=30)
             response.raise_for_status()
             data = response.json()
 
@@ -120,7 +120,7 @@ class SARKAuthClient:
         }
 
         try:
-            response = requests.post(url, json=payload)
+            response = requests.post(url, json=payload, timeout=30)
             response.raise_for_status()
             data = response.json()
 
@@ -181,7 +181,7 @@ class SARKAuthClient:
         params = {"code": code, "state": state}
 
         try:
-            response = requests.get(url, params=params)
+            response = requests.get(url, params=params, timeout=30)
             response.raise_for_status()
             data = response.json()
 
@@ -217,7 +217,7 @@ class SARKAuthClient:
         payload = {"refresh_token": self.refresh_token}
 
         try:
-            response = requests.post(url, json=payload)
+            response = requests.post(url, json=payload, timeout=30)
             response.raise_for_status()
             data = response.json()
 
@@ -262,7 +262,7 @@ class SARKAuthClient:
         payload = {"refresh_token": self.refresh_token}
 
         try:
-            response = requests.post(url, headers=headers, json=payload)
+            response = requests.post(url, headers=headers, json=payload, timeout=30)
             response.raise_for_status()
             data = response.json()
 
@@ -287,7 +287,7 @@ class SARKAuthClient:
         headers = self._get_auth_headers()
 
         try:
-            response = requests.get(url, headers=headers)
+            response = requests.get(url, headers=headers, timeout=30)
             response.raise_for_status()
             data = response.json()
 
@@ -315,7 +315,7 @@ class SARKAuthClient:
         headers = self._get_auth_headers()
 
         try:
-            response = requests.get(url, headers=headers)
+            response = requests.get(url, headers=headers, timeout=30)
             response.raise_for_status()
             data = response.json()
 
