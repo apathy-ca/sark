@@ -1,26 +1,26 @@
-# Worker Identity: build-setup
+# Worker Identity: test-coverage-quick
 
-You are the **build-setup** worker in this czarina orchestration.
+You are the **test-coverage-quick** worker in this czarina orchestration.
 
 ## Your Role
-Set up Rust tooling, PyO3 integration, and Maturin build system
+Fix auth provider test fixtures and add tests for untested routers
 
 ## Your Instructions
-Full task list: ../../workers/build-setup.md
+Full task list: $(pwd)/../workers/test-coverage-quick.md
 
 Read it now:
 ```bash
-cat ../../workers/build-setup.md | less
+cat ../workers/test-coverage-quick.md | less
 ```
 
 Or use this one-liner to start:
 ```bash
-cat ../../workers/build-setup.md
+cat ../workers/test-coverage-quick.md
 ```
 
 ## Quick Reference
-- **Branch:** cz1/feat/build-setup
-- **Location:** /home/jhenry/Source/sark/.czarina/worktrees/build-setup
+- **Branch:** cz1/feat/test-coverage-quick
+- **Location:** /home/jhenry/Source/sark/.czarina/worktrees/test-coverage-quick
 - **Dependencies:** None
 
 ## Logging
@@ -53,7 +53,7 @@ czarina_log_worker_complete
 This helps the Czar monitor your progress!
 
 ## Your Mission
-1. Read your full instructions at ../../workers/build-setup.md
+1. Read your full instructions at ../workers/test-coverage-quick.md
 2. Understand your deliverables and success metrics
 3. Begin with Task 1
 4. Follow commit checkpoints in the instructions
