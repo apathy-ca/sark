@@ -1,10 +1,8 @@
 """Comprehensive tests for admin router endpoints."""
 
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
-from fastapi import HTTPException
-from fastapi.testclient import TestClient
 
 # Import the router and models
 from sark.api.routers.admin import (
@@ -15,33 +13,13 @@ from sark.api.routers.admin import (
     SetRolloutResponse,
     router,
 )
-from sark.api.dependencies import require_role
-from sark.main import app
-
-
-# Create a test client
-client = TestClient(app)
-
-
-# Mock dependency to bypass authentication
-async def mock_admin_user():
-    """Mock admin user for testing."""
-    return {"user_id": "test-admin", "role": "admin"}
-
-
-@pytest.fixture(autouse=True)
-def override_dependencies():
-    """Override dependencies for all admin tests."""
-    app.dependency_overrides[require_role("admin")] = mock_admin_user
-    yield
-    app.dependency_overrides = {}
 
 
 class TestRolloutStatusEndpoint:
     """Tests for GET /admin/rollout/status endpoint."""
 
     @patch("sark.api.routers.admin.get_feature_flag_manager")
-    def test_get_rollout_status_success(self, mock_feature_flags):
+    def test_get_rollout_status_success(self, mock_feature_flags, client):
         """Test successful retrieval of rollout status."""
         # Mock feature flag manager
         mock_manager = MagicMock()
@@ -60,7 +38,7 @@ class TestRolloutStatusEndpoint:
         assert data["rust_cache"] == 75
 
     @patch("sark.api.routers.admin.get_feature_flag_manager")
-    def test_get_rollout_status_default_values(self, mock_feature_flags):
+    def test_get_rollout_status_default_values(self, mock_feature_flags, client):
         """Test rollout status returns 0 for missing features."""
 # Mock feature flag manager returning empty dict
         mock_manager = MagicMock()
@@ -75,7 +53,7 @@ class TestRolloutStatusEndpoint:
         assert data["rust_cache"] == 0
 
     @patch("sark.api.routers.admin.get_feature_flag_manager")
-    def test_get_rollout_status_error_handling(self, mock_feature_flags):
+    def test_get_rollout_status_error_handling(self, mock_feature_flags, client):
         """Test error handling when feature flag manager fails."""
 # Mock feature flag manager to raise exception
         mock_feature_flags.side_effect = Exception("Database connection failed")
@@ -91,7 +69,7 @@ class TestSetRolloutEndpoint:
 
     @patch("sark.api.routers.admin.get_feature_flag_manager")
     @patch("sark.api.routers.admin.record_rollout_percentage")
-    def test_set_rollout_success(self, mock_record, mock_feature_flags):
+    def test_set_rollout_success(self, mock_record, mock_feature_flags, client):
         """Test successfully setting rollout percentage."""
         mock_manager = MagicMock()
         mock_manager.get_rollout_pct.return_value = 25
@@ -112,7 +90,7 @@ class TestSetRolloutEndpoint:
         mock_manager.set_rollout_pct.assert_called_once_with("rust_opa", 50)
         mock_record.assert_called_once_with("rust_opa", 50)
 
-    def test_set_rollout_invalid_feature(self, mock_require_role):
+    def test_set_rollout_invalid_feature(self, client):
         """Test setting rollout for invalid feature name."""
         response = client.post(
             "/admin/rollout/set",
@@ -122,7 +100,7 @@ class TestSetRolloutEndpoint:
         assert response.status_code == 400
         assert "Invalid feature" in response.json()["detail"]
 
-    def test_set_rollout_invalid_percentage_too_high(self, mock_require_role):
+    def test_set_rollout_invalid_percentage_too_high(self, client):
         """Test setting rollout percentage above 100."""
         response = client.post(
             "/admin/rollout/set",
@@ -131,7 +109,7 @@ class TestSetRolloutEndpoint:
 
         assert response.status_code == 422  # Validation error
 
-    def test_set_rollout_invalid_percentage_negative(self, mock_require_role):
+    def test_set_rollout_invalid_percentage_negative(self, client):
         """Test setting negative rollout percentage."""
         response = client.post(
             "/admin/rollout/set",
@@ -141,7 +119,7 @@ class TestSetRolloutEndpoint:
         assert response.status_code == 422  # Validation error
 
     @patch("sark.api.routers.admin.get_feature_flag_manager")
-    def test_set_rollout_value_error(self, mock_feature_flags):
+    def test_set_rollout_value_error(self, mock_feature_flags, client):
         """Test handling of ValueError from feature flag manager."""
         mock_manager = MagicMock()
         mock_manager.get_rollout_pct.return_value = 0
@@ -162,7 +140,7 @@ class TestRollbackFeatureEndpoint:
 
     @patch("sark.api.routers.admin.get_feature_flag_manager")
     @patch("sark.api.routers.admin.record_rollout_percentage")
-    def test_rollback_feature_success(self, mock_record, mock_feature_flags):
+    def test_rollback_feature_success(self, mock_record, mock_feature_flags, client):
         """Test successful feature rollback."""
         mock_manager = MagicMock()
         mock_manager.get_rollout_pct.return_value = 75
@@ -182,7 +160,7 @@ class TestRollbackFeatureEndpoint:
         mock_manager.rollback.assert_called_once_with("rust_opa")
         mock_record.assert_called_once_with("rust_opa", 0)
 
-    def test_rollback_invalid_feature(self, mock_require_role):
+    def test_rollback_invalid_feature(self, client):
         """Test rollback with invalid feature name."""
         response = client.post("/admin/rollout/rollback?feature=invalid_feature")
 
@@ -190,7 +168,7 @@ class TestRollbackFeatureEndpoint:
         assert "Invalid feature" in response.json()["detail"]
 
     @patch("sark.api.routers.admin.get_feature_flag_manager")
-    def test_rollback_from_zero(self, mock_feature_flags):
+    def test_rollback_from_zero(self, mock_feature_flags, client):
         """Test rolling back a feature that's already at 0%."""
         mock_manager = MagicMock()
         mock_manager.get_rollout_pct.return_value = 0
@@ -207,7 +185,7 @@ class TestRollbackFeatureEndpoint:
 class TestMetricsComparisonEndpoint:
     """Tests for GET /admin/metrics/comparison endpoint."""
 
-    def test_get_metrics_comparison_success(self, mock_require_role):
+    def test_get_metrics_comparison_success(self, client):
         """Test successful metrics comparison retrieval."""
         response = client.get("/admin/metrics/comparison")
 
@@ -228,7 +206,7 @@ class TestMetricsComparisonEndpoint:
         assert "p99_latency_ms" in data["rust_opa"]
         assert "error_rate" in data["rust_opa"]
 
-    def test_metrics_comparison_returns_placeholder_data(self, mock_require_role):
+    def test_metrics_comparison_returns_placeholder_data(self, client):
         """Test that metrics comparison returns placeholder data for now."""
         response = client.get("/admin/metrics/comparison")
 
@@ -246,7 +224,7 @@ class TestRollbackAllFeaturesEndpoint:
     @patch("sark.api.routers.admin.get_feature_flag_manager")
     @patch("sark.api.routers.admin.record_rollout_percentage")
     def test_rollback_all_features_success(
-        self, mock_require_role, mock_record, mock_feature_flags
+        self, mock_record, mock_feature_flags, client
     ):
         """Test successfully rolling back all features."""
         mock_manager = MagicMock()
@@ -274,7 +252,7 @@ class TestRollbackAllFeaturesEndpoint:
         assert mock_record.call_count == 2
 
     @patch("sark.api.routers.admin.get_feature_flag_manager")
-    def test_rollback_all_features_error_handling(self, mock_feature_flags):
+    def test_rollback_all_features_error_handling(self, mock_feature_flags, client):
         """Test error handling when rollback_all fails."""
         mock_manager = MagicMock()
         mock_manager.get_all_rollouts.return_value = {"rust_opa": 50}
