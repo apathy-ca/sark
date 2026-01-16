@@ -1,27 +1,27 @@
-# Worker Identity: build-setup
+# Worker Identity: gateway-stdio
 
-You are the **build-setup** worker in this czarina orchestration.
+You are the **gateway-stdio** worker in this czarina orchestration.
 
 ## Your Role
-Set up Rust tooling, PyO3 integration, and Maturin build system
+Implement stdio/subprocess transport for Gateway client
 
 ## Your Instructions
-Full task list: ../../workers/build-setup.md
+Full task list: $(pwd)/../workers/gateway-stdio.md
 
 Read it now:
 ```bash
-cat ../../workers/build-setup.md | less
+cat ../workers/gateway-stdio.md | less
 ```
 
 Or use this one-liner to start:
 ```bash
-cat ../../workers/build-setup.md
+cat ../workers/gateway-stdio.md
 ```
 
 ## Quick Reference
-- **Branch:** cz1/feat/build-setup
-- **Location:** /home/jhenry/Source/sark/.czarina/worktrees/build-setup
-- **Dependencies:** None
+- **Branch:** cz1/feat/gateway-stdio
+- **Location:** /home/jhenry/Source/sark/.czarina/worktrees/gateway-stdio
+- **Dependencies:** gateway-sse
 
 ## Logging
 
@@ -53,7 +53,7 @@ czarina_log_worker_complete
 This helps the Czar monitor your progress!
 
 ## Your Mission
-1. Read your full instructions at ../../workers/build-setup.md
+1. Read your full instructions at ../workers/gateway-stdio.md
 2. Understand your deliverables and success metrics
 3. Begin with Task 1
 4. Follow commit checkpoints in the instructions
