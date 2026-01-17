@@ -4,7 +4,6 @@ from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
 from fastapi import status
-from httpx import AsyncClient
 import pytest
 
 from sark.models.mcp_server import MCPServer, MCPTool, SensitivityLevel, ServerStatus, TransportType
@@ -58,10 +57,10 @@ def mock_tool(db_session, mock_server):
 # ============================================================================
 
 
-@pytest.mark.asyncio
-async def test_get_tool_sensitivity_success(client: AsyncClient, mock_tool):
+
+def test_get_tool_sensitivity_success(client, mock_tool):
     """Test getting tool sensitivity level."""
-    response = await client.get(f"/api/v1/tools/{mock_tool.id}/sensitivity")
+    response = client.get(f"/api/v1/tools/{mock_tool.id}/sensitivity")
 
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
@@ -71,17 +70,17 @@ async def test_get_tool_sensitivity_success(client: AsyncClient, mock_tool):
     assert data["is_overridden"] is False
 
 
-@pytest.mark.asyncio
-async def test_get_tool_sensitivity_not_found(client: AsyncClient):
+
+def test_get_tool_sensitivity_not_found(client):
     """Test getting sensitivity for non-existent tool."""
     fake_id = uuid4()
-    response = await client.get(f"/api/v1/tools/{fake_id}/sensitivity")
+    response = client.get(f"/api/v1/tools/{fake_id}/sensitivity")
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.asyncio
-async def test_get_tool_sensitivity_with_override(client: AsyncClient, db_session, mock_tool):
+
+def test_get_tool_sensitivity_with_override(client, db_session, mock_tool):
     """Test getting tool sensitivity that has been manually overridden."""
     # Add override metadata
     mock_tool.extra_metadata = {
@@ -95,7 +94,7 @@ async def test_get_tool_sensitivity_with_override(client: AsyncClient, db_sessio
     }
     db_session.commit()
 
-    response = await client.get(f"/api/v1/tools/{mock_tool.id}/sensitivity")
+    response = client.get(f"/api/v1/tools/{mock_tool.id}/sensitivity")
 
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
@@ -107,14 +106,14 @@ async def test_get_tool_sensitivity_with_override(client: AsyncClient, db_sessio
 # ============================================================================
 
 
-@pytest.mark.asyncio
+
 @patch("sark.services.policy.OPAClient.authorize", return_value=True)
-async def test_update_tool_sensitivity_success(
-    mock_authorize, client: AsyncClient, mock_tool, mock_user
+def test_update_tool_sensitivity_success(
+    mock_authorize, client, mock_tool, mock_user
 ):
     """Test manually updating tool sensitivity level."""
     with patch("sark.services.auth.get_current_user", return_value=mock_user):
-        response = await client.post(
+        response = client.post(
             f"/api/v1/tools/{mock_tool.id}/sensitivity",
             json={
                 "sensitivity_level": "critical",
@@ -128,14 +127,14 @@ async def test_update_tool_sensitivity_success(
     assert data["is_overridden"] is True
 
 
-@pytest.mark.asyncio
+
 @patch("sark.services.policy.OPAClient.authorize", return_value=False)
-async def test_update_tool_sensitivity_forbidden(
-    mock_authorize, client: AsyncClient, mock_tool, mock_user
+def test_update_tool_sensitivity_forbidden(
+    mock_authorize, client, mock_tool, mock_user
 ):
     """Test updating tool sensitivity without authorization."""
     with patch("sark.services.auth.get_current_user", return_value=mock_user):
-        response = await client.post(
+        response = client.post(
             f"/api/v1/tools/{mock_tool.id}/sensitivity",
             json={
                 "sensitivity_level": "critical",
@@ -146,14 +145,14 @@ async def test_update_tool_sensitivity_forbidden(
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
-@pytest.mark.asyncio
+
 @patch("sark.services.policy.OPAClient.authorize", return_value=True)
-async def test_update_tool_sensitivity_invalid_level(
-    mock_authorize, client: AsyncClient, mock_tool, mock_user
+def test_update_tool_sensitivity_invalid_level(
+    mock_authorize, client, mock_tool, mock_user
 ):
     """Test updating tool with invalid sensitivity level."""
     with patch("sark.services.auth.get_current_user", return_value=mock_user):
-        response = await client.post(
+        response = client.post(
             f"/api/v1/tools/{mock_tool.id}/sensitivity",
             json={
                 "sensitivity_level": "super-critical",  # Invalid
@@ -165,14 +164,14 @@ async def test_update_tool_sensitivity_invalid_level(
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-@pytest.mark.asyncio
+
 @patch("sark.services.policy.OPAClient.authorize", return_value=True)
-async def test_update_tool_sensitivity_not_found(mock_authorize, client: AsyncClient, mock_user):
+def test_update_tool_sensitivity_not_found(mock_authorize, client, mock_user):
     """Test updating sensitivity for non-existent tool."""
     fake_id = uuid4()
 
     with patch("sark.services.auth.get_current_user", return_value=mock_user):
-        response = await client.post(
+        response = client.post(
             f"/api/v1/tools/{fake_id}/sensitivity",
             json={
                 "sensitivity_level": "high",
@@ -188,10 +187,10 @@ async def test_update_tool_sensitivity_not_found(mock_authorize, client: AsyncCl
 # ============================================================================
 
 
-@pytest.mark.asyncio
-async def test_detect_sensitivity_low(client: AsyncClient):
+
+def test_detect_sensitivity_low(client):
     """Test detecting LOW sensitivity."""
-    response = await client.post(
+    response = client.post(
         "/api/v1/tools/detect-sensitivity",
         json={
             "tool_name": "read_user_data",
@@ -206,10 +205,10 @@ async def test_detect_sensitivity_low(client: AsyncClient):
     assert "read" in data.get("keywords_matched", [])
 
 
-@pytest.mark.asyncio
-async def test_detect_sensitivity_medium(client: AsyncClient):
+
+def test_detect_sensitivity_medium(client):
     """Test detecting MEDIUM sensitivity."""
-    response = await client.post(
+    response = client.post(
         "/api/v1/tools/detect-sensitivity",
         json={
             "tool_name": "update_settings",
@@ -223,10 +222,10 @@ async def test_detect_sensitivity_medium(client: AsyncClient):
     assert data["detection_method"] == "medium_keywords"
 
 
-@pytest.mark.asyncio
-async def test_detect_sensitivity_high(client: AsyncClient):
+
+def test_detect_sensitivity_high(client):
     """Test detecting HIGH sensitivity."""
-    response = await client.post(
+    response = client.post(
         "/api/v1/tools/detect-sensitivity",
         json={
             "tool_name": "delete_resource",
@@ -241,10 +240,10 @@ async def test_detect_sensitivity_high(client: AsyncClient):
     assert "delete" in data.get("keywords_matched", [])
 
 
-@pytest.mark.asyncio
-async def test_detect_sensitivity_critical(client: AsyncClient):
+
+def test_detect_sensitivity_critical(client):
     """Test detecting CRITICAL sensitivity."""
-    response = await client.post(
+    response = client.post(
         "/api/v1/tools/detect-sensitivity",
         json={
             "tool_name": "process_payment",
@@ -258,10 +257,10 @@ async def test_detect_sensitivity_critical(client: AsyncClient):
     assert data["detection_method"] == "critical_keywords"
 
 
-@pytest.mark.asyncio
-async def test_detect_sensitivity_default(client: AsyncClient):
+
+def test_detect_sensitivity_default(client):
     """Test default sensitivity detection."""
-    response = await client.post(
+    response = client.post(
         "/api/v1/tools/detect-sensitivity",
         json={
             "tool_name": "process_data",
@@ -275,10 +274,10 @@ async def test_detect_sensitivity_default(client: AsyncClient):
     assert data["detection_method"] == "default"
 
 
-@pytest.mark.asyncio
-async def test_detect_sensitivity_with_parameters(client: AsyncClient):
+
+def test_detect_sensitivity_with_parameters(client):
     """Test sensitivity detection with parameters."""
-    response = await client.post(
+    response = client.post(
         "/api/v1/tools/detect-sensitivity",
         json={
             "tool_name": "manage_account",
@@ -301,10 +300,10 @@ async def test_detect_sensitivity_with_parameters(client: AsyncClient):
 # ============================================================================
 
 
-@pytest.mark.asyncio
-async def test_get_sensitivity_history(client: AsyncClient, mock_tool):
+
+def test_get_sensitivity_history(client, mock_tool):
     """Test getting sensitivity change history."""
-    response = await client.get(f"/api/v1/tools/{mock_tool.id}/sensitivity/history")
+    response = client.get(f"/api/v1/tools/{mock_tool.id}/sensitivity/history")
 
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
@@ -313,11 +312,11 @@ async def test_get_sensitivity_history(client: AsyncClient, mock_tool):
     assert len(data) >= 1
 
 
-@pytest.mark.asyncio
-async def test_get_sensitivity_history_not_found(client: AsyncClient):
+
+def test_get_sensitivity_history_not_found(client):
     """Test getting history for non-existent tool."""
     fake_id = uuid4()
-    response = await client.get(f"/api/v1/tools/{fake_id}/sensitivity/history")
+    response = client.get(f"/api/v1/tools/{fake_id}/sensitivity/history")
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -327,10 +326,10 @@ async def test_get_sensitivity_history_not_found(client: AsyncClient):
 # ============================================================================
 
 
-@pytest.mark.asyncio
-async def test_get_sensitivity_statistics(client: AsyncClient, mock_tool):
+
+def test_get_sensitivity_statistics(client, mock_tool):
     """Test getting sensitivity statistics."""
-    response = await client.get("/api/v1/tools/statistics/sensitivity")
+    response = client.get("/api/v1/tools/statistics/sensitivity")
 
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
@@ -349,10 +348,10 @@ async def test_get_sensitivity_statistics(client: AsyncClient, mock_tool):
 # ============================================================================
 
 
-@pytest.mark.asyncio
-async def test_list_tools_by_sensitivity_high(client: AsyncClient, mock_tool):
+
+def test_list_tools_by_sensitivity_high(client, mock_tool):
     """Test listing tools by sensitivity level."""
-    response = await client.get("/api/v1/tools/sensitivity/high")
+    response = client.get("/api/v1/tools/sensitivity/high")
 
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
@@ -362,10 +361,10 @@ async def test_list_tools_by_sensitivity_high(client: AsyncClient, mock_tool):
     assert str(mock_tool.id) in tool_ids
 
 
-@pytest.mark.asyncio
-async def test_list_tools_by_sensitivity_invalid_level(client: AsyncClient):
+
+def test_list_tools_by_sensitivity_invalid_level(client):
     """Test listing tools with invalid sensitivity level."""
-    response = await client.get("/api/v1/tools/sensitivity/invalid")
+    response = client.get("/api/v1/tools/sensitivity/invalid")
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
@@ -375,11 +374,11 @@ async def test_list_tools_by_sensitivity_invalid_level(client: AsyncClient):
 # ============================================================================
 
 
-@pytest.mark.asyncio
-async def test_bulk_detect_sensitivity(client: AsyncClient, mock_server, mock_user):
+
+def test_bulk_detect_sensitivity(client, mock_server, mock_user):
     """Test bulk sensitivity detection for a server."""
     with patch("sark.services.auth.get_current_user", return_value=mock_user):
-        response = await client.post(f"/api/v1/tools/servers/{mock_server.id}/tools/detect-all")
+        response = client.post(f"/api/v1/tools/servers/{mock_server.id}/tools/detect-all")
 
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
@@ -394,11 +393,11 @@ async def test_bulk_detect_sensitivity(client: AsyncClient, mock_server, mock_us
 # ============================================================================
 
 
-@pytest.mark.asyncio
-async def test_update_sensitivity_missing_level(client: AsyncClient, mock_tool, mock_user):
+
+def test_update_sensitivity_missing_level(client, mock_tool, mock_user):
     """Test update with missing sensitivity level."""
     with patch("sark.services.auth.get_current_user", return_value=mock_user):
-        response = await client.post(
+        response = client.post(
             f"/api/v1/tools/{mock_tool.id}/sensitivity",
             json={
                 "reason": "Test",
@@ -409,10 +408,10 @@ async def test_update_sensitivity_missing_level(client: AsyncClient, mock_tool, 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-@pytest.mark.asyncio
-async def test_detect_sensitivity_missing_name(client: AsyncClient):
+
+def test_detect_sensitivity_missing_name(client):
     """Test detect with missing tool name."""
-    response = await client.post(
+    response = client.post(
         "/api/v1/tools/detect-sensitivity",
         json={
             "tool_description": "Test description",
@@ -423,12 +422,12 @@ async def test_detect_sensitivity_missing_name(client: AsyncClient):
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-@pytest.mark.asyncio
-async def test_update_sensitivity_with_optional_reason(client: AsyncClient, mock_tool, mock_user):
+
+def test_update_sensitivity_with_optional_reason(client, mock_tool, mock_user):
     """Test update with optional reason field."""
     with patch("sark.services.policy.OPAClient.authorize", return_value=True):
         with patch("sark.services.auth.get_current_user", return_value=mock_user):
-            response = await client.post(
+            response = client.post(
                 f"/api/v1/tools/{mock_tool.id}/sensitivity",
                 json={
                     "sensitivity_level": "critical",
