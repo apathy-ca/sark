@@ -11,6 +11,7 @@ Tests cover:
 """
 
 import asyncio
+import json
 from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
@@ -146,6 +147,15 @@ class TestStdioTransportLifecycle:
                 await transport.start()
 
             assert transport.is_running is False
+
+    @pytest.mark.asyncio
+    async def test_stop_not_started(self):
+        """Test stopping when transport not started."""
+        transport = StdioTransport(command=["python", "server.py"])
+
+        # Should not raise error, just return
+        await transport.stop()
+        assert transport._process is None
 
     @pytest.mark.asyncio
     async def test_stop_graceful(self, mock_process, mock_psutil_process):
@@ -298,6 +308,14 @@ class TestStdioTransportMessaging:
             mock_process.stdin.write.assert_called()
             # Notification should not have pending request
             assert len(transport._pending_requests) == 0
+
+    @pytest.mark.asyncio
+    async def test_send_notification_not_started(self):
+        """Test sending notification when transport not started."""
+        transport = StdioTransport(command=["python", "server.py"])
+
+        with pytest.raises(StdioTransportError, match="Transport not started"):
+            await transport.send_notification("test/notify", {})
 
     @pytest.mark.asyncio
     async def test_handle_error_response(self, mock_process, mock_psutil_process):
@@ -547,6 +565,75 @@ class TestStdioTransportErrorHandling:
 
             # Transport should still be running
             assert transport.is_running is True
+
+    @pytest.mark.asyncio
+    async def test_read_stdout_with_valid_response(self, mock_process, mock_psutil_process):
+        """Test _read_stdout with valid JSON-RPC response."""
+        transport = StdioTransport(command=["python", "server.py"])
+
+        # Mock readline to return a valid JSON-RPC response, then EOF
+        response = {"jsonrpc": "2.0", "id": 0, "result": {"status": "ok"}}
+        mock_process.stdout.readline.side_effect = [
+            (json.dumps(response) + "\n").encode("utf-8"),
+            b"",  # EOF
+        ]
+
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=mock_process),
+            patch("psutil.Process", return_value=mock_psutil_process),
+            patch("asyncio.create_task") as mock_create_task,
+        ):
+            await transport.start()
+
+            # Create a pending request
+            future = asyncio.Future()
+            transport._pending_requests[0] = future
+
+            # Manually call _read_stdout
+            await transport._read_stdout()
+
+            # The future should be resolved with the result
+            assert future.done()
+            assert future.result() == {"status": "ok"}
+
+            await transport.stop()
+
+    @pytest.mark.asyncio
+    async def test_read_stdout_with_error_response(self, mock_process, mock_psutil_process):
+        """Test _read_stdout with JSON-RPC error response."""
+        transport = StdioTransport(command=["python", "server.py"])
+
+        # Mock readline to return a JSON-RPC error response, then EOF
+        error_response = {
+            "jsonrpc": "2.0",
+            "id": 0,
+            "error": {"code": -32601, "message": "Method not found"},
+        }
+        mock_process.stdout.readline.side_effect = [
+            (json.dumps(error_response) + "\n").encode("utf-8"),
+            b"",  # EOF
+        ]
+
+        with (
+            patch("asyncio.create_subprocess_exec", return_value=mock_process),
+            patch("psutil.Process", return_value=mock_psutil_process),
+            patch("asyncio.create_task") as mock_create_task,
+        ):
+            await transport.start()
+
+            # Create a pending request
+            future = asyncio.Future()
+            transport._pending_requests[0] = future
+
+            # Manually call _read_stdout
+            await transport._read_stdout()
+
+            # The future should be resolved with an exception
+            assert future.done()
+            with pytest.raises(StdioTransportError, match="Method not found"):
+                future.result()
+
+            await transport.stop()
 
     @pytest.mark.asyncio
     async def test_process_disappeared(self, mock_process, mock_psutil_process):
