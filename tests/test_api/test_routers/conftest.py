@@ -88,15 +88,17 @@ def db_session():
 @pytest.fixture
 def client():
     """Create a test client with dependency overrides."""
-    # Remove auth middleware for testing by rebuilding the middleware stack
+    # Remove auth and CSRF middleware for testing by rebuilding the middleware stack
     # Save original middleware
     original_middleware = app.user_middleware.copy()
 
-    # Remove AuthMiddleware from the stack
+    # Remove AuthMiddleware and CSRFProtectionMiddleware from the stack
+    # CSRF requires SessionMiddleware which we don't configure in tests
     app.user_middleware = [
         m for m in app.user_middleware
-        if not (hasattr(m, 'cls') and m.cls.__name__ == 'AuthMiddleware')
+        if not (hasattr(m, 'cls') and m.cls.__name__ in ('AuthMiddleware', 'CSRFProtectionMiddleware'))
     ]
+
     # Rebuild middleware stack
     app.middleware_stack = app.build_middleware_stack()
 
@@ -118,12 +120,13 @@ def client():
 @pytest.fixture
 def client_user():
     """Create a test client with regular user auth."""
-    # Remove auth middleware for testing
+    # Remove auth and CSRF middleware for testing
     original_middleware = app.user_middleware.copy()
     app.user_middleware = [
         m for m in app.user_middleware
-        if not (hasattr(m, 'cls') and m.cls.__name__ == 'AuthMiddleware')
+        if not (hasattr(m, 'cls') and m.cls.__name__ in ('AuthMiddleware', 'CSRFProtectionMiddleware'))
     ]
+
     app.middleware_stack = app.build_middleware_stack()
 
     # Override BOTH versions of get_current_user (from different modules)

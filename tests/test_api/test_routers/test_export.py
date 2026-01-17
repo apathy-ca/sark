@@ -98,7 +98,7 @@ class TestCreateExportEndpoint:
         mock_get_db.return_value = mock_db_session
 
         response = client.post(
-            "/export",
+            "/api/v1/export",
             json={
                 "format": "json",
                 "resource_type": "servers",
@@ -127,7 +127,7 @@ class TestCreateExportEndpoint:
         mock_get_db.return_value = mock_db_session
 
         response = client.post(
-            "/export",
+            "/api/v1/export",
             json={
                 "format": "csv",
                 "resource_type": "tools",
@@ -148,7 +148,7 @@ class TestCreateExportEndpoint:
         mock_get_db.return_value = AsyncMock(spec=AsyncSession)
 
         response = client.post(
-            "/export",
+            "/api/v1/export",
             json={
                 "format": "json",
                 "resource_type": "audit",
@@ -178,7 +178,7 @@ class TestExportServersCsvEndpoint:
         mock_db_session.execute = AsyncMock(return_value=mock_result)
         mock_get_db.return_value = mock_db_session
 
-        response = client.get("/servers.csv")
+        response = client.get("/api/v1/export/servers.csv")
 
         assert response.status_code == 200
         assert response.headers["content-type"] == "text/csv; charset=utf-8"
@@ -206,7 +206,7 @@ class TestExportServersCsvEndpoint:
         mock_db_session.execute = AsyncMock(return_value=mock_result)
         mock_get_db.return_value = mock_db_session
 
-        response = client.get("/servers.csv?status_filter=active")
+        response = client.get("/api/v1/export/servers.csv?status_filter=active")
 
         assert response.status_code == 200
         assert response.headers["content-type"] == "text/csv; charset=utf-8"
@@ -223,7 +223,7 @@ class TestExportServersCsvEndpoint:
         mock_db_session.execute = AsyncMock(return_value=mock_result)
         mock_get_db.return_value = mock_db_session
 
-        response = client.get("/servers.csv")
+        response = client.get("/api/v1/export/servers.csv")
 
         assert response.status_code == 200
         csv_content = response.text
@@ -246,7 +246,7 @@ class TestExportServersJsonEndpoint:
         mock_db_session.execute = AsyncMock(return_value=mock_result)
         mock_get_db.return_value = mock_db_session
 
-        response = client.get("/servers.json")
+        response = client.get("/api/v1/export/servers.json")
 
         assert response.status_code == 200
         assert response.headers["content-type"] == "application/json"
@@ -282,7 +282,7 @@ class TestExportServersJsonEndpoint:
         mock_db_session.execute = AsyncMock(return_value=mock_result)
         mock_get_db.return_value = mock_db_session
 
-        response = client.get("/servers.json?pretty=true")
+        response = client.get("/api/v1/export/servers.json?pretty=true")
 
         assert response.status_code == 200
         json_content = response.text
@@ -306,7 +306,7 @@ class TestExportToolsCsvEndpoint:
         mock_db_session.execute = AsyncMock(return_value=mock_result)
         mock_get_db.return_value = mock_db_session
 
-        response = client.get("/tools.csv")
+        response = client.get("/api/v1/export/tools.csv")
 
         assert response.status_code == 200
         assert response.headers["content-type"] == "text/csv; charset=utf-8"
@@ -343,7 +343,7 @@ class TestExportToolsCsvEndpoint:
         mock_db_session.execute = AsyncMock(return_value=mock_result)
         mock_get_db.return_value = mock_db_session
 
-        response = client.get("/tools.csv")
+        response = client.get("/api/v1/export/tools.csv")
 
         assert response.status_code == 200
         csv_content = response.text
@@ -365,7 +365,7 @@ class TestExportToolsJsonEndpoint:
         mock_db_session.execute = AsyncMock(return_value=mock_result)
         mock_get_db.return_value = mock_db_session
 
-        response = client.get("/tools.json")
+        response = client.get("/api/v1/export/tools.json")
 
         assert response.status_code == 200
         assert response.headers["content-type"] == "application/json"
@@ -396,7 +396,7 @@ class TestExportToolsJsonEndpoint:
         mock_db_session.execute = AsyncMock(return_value=mock_result)
         mock_get_db.return_value = mock_db_session
 
-        response = client.get("/tools.json?pretty=true")
+        response = client.get("/api/v1/export/tools.json?pretty=true")
 
         assert response.status_code == 200
         json_content = response.text
@@ -417,7 +417,7 @@ class TestExportErrorHandling:
         mock_db_session.execute = AsyncMock(side_effect=Exception("Database error"))
         mock_get_db.return_value = mock_db_session
 
-        response = client.get("/servers.csv")
+        response = client.get("/api/v1/export/servers.csv")
 
         assert response.status_code == 500
         assert "Failed to export" in response.json()["detail"]
