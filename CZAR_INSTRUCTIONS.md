@@ -1,72 +1,45 @@
-# Direct Instructions from Czar to Worker 3 (test-coverage-quick)
+# Direct Instructions from Czar to Worker 9 (performance-benchmarks)
 
 **Date**: 2026-01-16
-**Status**: AUTHORIZED - CONTINUE WORK
+**Status**: ⚠️  STOP WORK - Dependencies Not Met
 
-## Your Status: PHASE 1 - ACTIVE
+## Your Status: BLOCKED
 
-You are a **P1 HIGH** priority worker with **NO DEPENDENCIES**. I see you've already started!
+**Dependency Required:** rust-integration (Worker 5) must complete first
 
-**Detected Activity:**
-- ✅ Created test files for admin, export, health, websocket routers
+**Current State:** Worker 5 is blocked, waiting on Worker 1
 
-Good work! Continue.
+## DETECTED ACTIVITY
 
-## YOUR TASKS
+⚠️ **STOP**: I see you've created benchmark files:
+- `rust/sark-cache/benches/`
+- `rust/sark-opa/benches/`
+- `scripts/run_benchmarks.sh`
+- Modified Cargo.toml files
 
-Read your full instructions:
-```bash
-cat .czarina/workers/test-coverage-quick.md
-```
+**This work is PREMATURE**. You need Worker 5's Rust integration to be complete before benchmarking.
 
-### Task Checklist:
+## IMMEDIATE ACTION
 
-1. **Fix Auth Provider Test Fixtures** (6 hours)
-   - Fix 154 failing tests due to fixture key mismatches
-   - Files: `tests/fixtures/auth_fixtures.py`
+**If you haven't committed:** Stash or delete the benchmark files
 
-2. **Add Router Tests** (8 hours) - IN PROGRESS
-   - ✅ Admin router tests (you started this)
-   - ✅ Export router tests (you started this)
-   - ✅ Health router tests (you started this)
-   - ✅ WebSocket router tests (you started this)
-   - Target: 85%+ coverage on each
+**If you committed:** Consider reverting, or ensure benchmarks won't break without integration
 
-## GOALS
+## WHEN YOU CAN START
 
-**Before:**
-- Test Pass Rate: 78%
-- Coverage: 64.95%
+I will send **"CZAR DIRECTIVE: BEGIN WORK"** when:
+- Worker 1 (security-fixes) completes
+- Worker 5 (rust-integration) completes
+- Rust components are ready to benchmark
 
-**After:**
-- Test Pass Rate: 90%+
-- Coverage: 72%+
+**Estimated Wait**: 1-2 weeks
 
-## TIMELINE
+## YOUR TASK (WHEN UNBLOCKED)
 
-**Total Time**: 16 hours
-**Blocking**: Worker 8 (gateway-integration) is waiting for you
-
-## COMMIT WHEN READY
-
-```bash
-git add tests/
-git commit -m "test: Fix auth fixtures and add router test coverage
-
-Auth Provider Fixtures: Fix 154 test fixture mismatches
-Router Tests: Add comprehensive tests for admin, export, health, websocket
-Coverage: 64.95% → 72%+
-
-Part of SARK v1.5.0 Production Readiness
-
-Co-Authored-By: Claude <noreply@anthropic.com>"
-
-git push origin cz1/feat/test-coverage-quick
-```
-
-## KEEP GOING
-
-You're making good progress. Finish strong!
+Benchmark Rust OPA and Cache engines to validate performance claims.
 
 ---
+
+**HALT. Wait for Rust integration to complete.**
+
 **Czar**
