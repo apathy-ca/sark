@@ -12,9 +12,11 @@ to pure-Python implementations where available.
 
 # Try to import Rust extensions
 RUST_AVAILABLE = False
+RustOPAEngine = None
+RustCache = None
 
 try:
-    from sark.sark_rust import *  # noqa: F403
+    from sark.sark_rust import RustCache, RustOPAEngine
 
     RUST_AVAILABLE = True
 except ImportError as e:
@@ -30,4 +32,4 @@ except ImportError as e:
         stacklevel=2,
     )
 
-__all__ = ["RUST_AVAILABLE"]
+__all__ = ["RUST_AVAILABLE", "RustOPAEngine", "RustCache"]

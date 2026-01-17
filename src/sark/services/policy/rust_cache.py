@@ -23,7 +23,7 @@ logger = structlog.get_logger()
 
 # Try to import Rust cache extension
 try:
-    from sark_cache import RustCache
+    from sark._rust import RustCache
 
     RUST_AVAILABLE = True
 except ImportError:
@@ -31,8 +31,8 @@ except ImportError:
     RustCache = None
     logger.warning(
         "rust_cache_unavailable",
-        reason="sark_cache extension not built",
-        suggestion="Run 'maturin develop --release' in rust/sark-cache/",
+        reason="sark_rust extension not built",
+        suggestion="Run 'maturin develop --release' to build Rust extensions",
     )
 
 
