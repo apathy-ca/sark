@@ -3,9 +3,11 @@
 Adds security headers to HTTP responses to protect against common web vulnerabilities.
 """
 
+import secrets
+
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
-from starlette.responses import Response
+from starlette.responses import JSONResponse, Response
 from starlette.types import ASGIApp
 
 
@@ -154,56 +156,51 @@ class CSRFProtectionMiddleware(BaseHTTPMiddleware):
         if any(request.url.path.startswith(path) for path in self.exempt_paths):
             return await call_next(request)
 
-        # Get CSRF token from header
-        csrf_token = request.headers.get(self.csrf_header_name)
-
-        # Get expected token from session/cookie
-        # NOTE: Current implementation requires token presence but doesn't validate against session
-        # This provides basic CSRF protection. Full session-based validation is a future enhancement.
-        # See: https://github.com/apathy-ca/sark/issues/TBD (CSRF token session validation)
-        if not csrf_token:
-            from starlette.responses import JSONResponse
-
+        # Validate CSRF token
+        if not self._validate_csrf_token(request):
             return JSONResponse(
                 status_code=403,
                 content={
-                    "error": "CSRF token missing",
-                    "message": f"State-changing request requires {self.csrf_header_name} header",
+                    "error": "CSRF token invalid",
+                    "message": "CSRF token missing or invalid",
                 },
             )
 
-        # In production, validate token against session
-        # if not self._validate_token(request, csrf_token):
-        #     return JSONResponse(status_code=403, content={"error": "Invalid CSRF token"})
-
         return await call_next(request)
 
-    def _validate_token(self, request: Request, token: str) -> bool:
+    def _validate_csrf_token(self, request: Request) -> bool:
         """Validate CSRF token against session.
 
         Args:
             request: HTTP request
-            token: CSRF token to validate
 
         Returns:
             True if token is valid, False otherwise
-
-        Note:
-            Current implementation: Basic validation (token presence required).
-            Future enhancement: Session-based token validation.
-            See: https://github.com/apathy-ca/sark/issues/TBD (CSRF token session validation)
-
-            For full session-based validation, implement:
-            1. Generate random token on session creation
-            2. Store in secure, httponly cookie or session storage
-            3. Validate using constant-time comparison: secrets.compare_digest(token, session_token)
-            4. Rotate token periodically (e.g., every hour)
         """
-        # Placeholder - accepts any token (basic protection via presence check)
-        # Future: Implement session-based validation
-        # session_token = request.session.get("csrf_token")
-        # return secrets.compare_digest(token, session_token)
-        return True
+        # Get token from header
+        token_from_header = request.headers.get(self.csrf_header_name)
+
+        # Get token from session/cookie
+        if not hasattr(request, "session"):
+            # If session is not available, require token in header only
+            # This provides basic CSRF protection
+            return token_from_header is not None
+
+        token_from_session = request.session.get("csrf_token")
+
+        if not token_from_header or not token_from_session:
+            return False
+
+        # Use constant-time comparison to prevent timing attacks
+        return secrets.compare_digest(token_from_header, token_from_session)
+
+    def generate_csrf_token(self) -> str:
+        """Generate cryptographically secure CSRF token.
+
+        Returns:
+            A URL-safe random token string
+        """
+        return secrets.token_urlsafe(32)
 
 
 # Convenience function to add security middleware to FastAPI app

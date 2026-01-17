@@ -9,12 +9,12 @@ import structlog
 
 # Import the Rust extension
 try:
-    from sark._rust import sark_opa
+    from sark._rust import RustOPAEngine
 
     RUST_AVAILABLE = True
 except ImportError:
     RUST_AVAILABLE = False
-    sark_opa = None
+    RustOPAEngine = None
 
 from sark.config import get_settings
 from sark.services.policy.cache import PolicyCache, get_policy_cache
@@ -92,7 +92,7 @@ class RustOPAClient:
             )
 
         # Initialize the Rust engine
-        self.engine = sark_opa.RustOPAEngine()
+        self.engine = RustOPAEngine()
 
         # Set policy directory
         self.policy_dir = policy_dir or Path("opa/policies")

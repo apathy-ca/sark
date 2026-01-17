@@ -1,10 +1,15 @@
 """SARK configuration settings."""
 
+import logging
+import os
+import sys
 from functools import lru_cache
 from typing import Any
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+logger = logging.getLogger(__name__)
 
 
 class Settings(BaseSettings):
@@ -23,6 +28,7 @@ class Settings(BaseSettings):
     environment: str = Field(default="development", pattern="^(development|staging|production)$")
     debug: bool = False
     log_level: str = Field(default="INFO", pattern="^(DEBUG|INFO|WARNING|ERROR|CRITICAL)$")
+    json_logs: bool = False
 
     # API Server
     api_host: str = "0.0.0.0"
@@ -296,6 +302,63 @@ class Settings(BaseSettings):
             return [server.strip() for server in v.split(",")]
         return v
 
+    @field_validator("postgres_password", mode="after")
+    @classmethod
+    def validate_postgres_password(cls, v: str) -> str:
+        """Validate PostgreSQL password - must be set in production."""
+        environment = os.getenv("ENVIRONMENT", "development")
+
+        if v == "sark":
+            if environment == "production":
+                logger.critical("POSTGRES_PASSWORD not set in production environment!")
+                sys.exit(1)
+            else:
+                logger.warning(
+                    "POSTGRES_PASSWORD using default value. "
+                    "DO NOT USE IN PRODUCTION! "
+                    "Set POSTGRES_PASSWORD environment variable."
+                )
+
+        return v
+
+    @field_validator("timescale_password", mode="after")
+    @classmethod
+    def validate_timescale_password(cls, v: str) -> str:
+        """Validate TimescaleDB password - must be set in production."""
+        environment = os.getenv("ENVIRONMENT", "development")
+
+        if v == "sark":
+            if environment == "production":
+                logger.critical("TIMESCALE_PASSWORD not set in production environment!")
+                sys.exit(1)
+            else:
+                logger.warning(
+                    "TIMESCALE_PASSWORD using default value. "
+                    "DO NOT USE IN PRODUCTION! "
+                    "Set TIMESCALE_PASSWORD environment variable."
+                )
+
+        return v
+
+    @field_validator("redis_password", mode="after")
+    @classmethod
+    def validate_redis_password(cls, v: str | None) -> str | None:
+        """Validate Redis password - should be set in production."""
+        environment = os.getenv("ENVIRONMENT", "development")
+
+        if not v:
+            if environment == "production":
+                logger.critical("REDIS_PASSWORD not set in production environment!")
+                sys.exit(1)
+            else:
+                logger.warning(
+                    "REDIS_PASSWORD not set - Redis will be unprotected. "
+                    "DO NOT USE IN PRODUCTION! "
+                    "Set REDIS_PASSWORD environment variable."
+                )
+
+        return v
+
     @property
     def postgres_dsn(self) -> str:
         """Construct PostgreSQL connection string."""
@@ -317,6 +380,31 @@ class Settings(BaseSettings):
         """Construct Redis connection string."""
         password_part = f":{self.redis_password}@" if self.redis_password else ""
         return f"redis://{password_part}{self.redis_host}:{self.redis_port}/{self.redis_db}"
+
+    @property
+    def host(self) -> str:
+        """Alias for api_host for backward compatibility."""
+        return self.api_host
+
+    @property
+    def port(self) -> int:
+        """Alias for api_port for backward compatibility."""
+        return self.api_port
+
+    @property
+    def reload(self) -> bool:
+        """Alias for api_reload for backward compatibility."""
+        return self.api_reload
+
+    @property
+    def workers(self) -> int:
+        """Alias for api_workers for backward compatibility."""
+        return self.api_workers
+
+    @property
+    def enable_metrics(self) -> bool:
+        """Alias for metrics_enabled for backward compatibility."""
+        return self.metrics_enabled
 
 
 @lru_cache

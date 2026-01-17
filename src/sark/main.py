@@ -11,6 +11,7 @@ from sark.config import get_settings
 from sark.health import router as health_router
 from sark.logging_config import setup_logging
 from sark.metrics import PrometheusMiddleware, get_metrics, initialize_metrics
+from sark.api.routers import admin, export, health as health_v2, websocket
 
 settings = get_settings()
 
@@ -74,6 +75,10 @@ if settings.enable_metrics:
 
 # Include routers
 app.include_router(health_router, tags=["health"])
+app.include_router(admin.router, tags=["admin"])
+app.include_router(export.router, tags=["export"])
+app.include_router(health_v2.router, prefix="/health", tags=["health-v2"])
+app.include_router(websocket.router, prefix="/ws", tags=["websocket"])
 
 
 @app.get("/")

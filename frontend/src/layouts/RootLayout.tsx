@@ -4,9 +4,11 @@ import { getAccessToken } from "../services/api";
 import { ThemeToggleIcon } from "@/components/ThemeToggle";
 import { KeyboardShortcutsHelp } from "@/components/KeyboardShortcutsHelp";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function RootLayout() {
   const navigate = useNavigate();
+  const { user, logout, isAuthenticated } = useAuth();
 
   // Enable global keyboard shortcuts
   useKeyboardShortcuts();
@@ -64,12 +66,22 @@ export default function RootLayout() {
             </div>
             <div className="flex items-center space-x-4">
               <ThemeToggleIcon />
-              <Link
-                to="/profile"
-                className="text-foreground/80 hover:text-foreground transition-colors"
-              >
-                Profile
-              </Link>
+              {isAuthenticated && user && (
+                <>
+                  <div className="hidden md:flex items-center space-x-2 text-sm">
+                    <span className="text-foreground font-medium">{user.username}</span>
+                    {user.roles && user.roles.length > 0 && (
+                      <span className="text-muted-foreground">({user.roles[0]})</span>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => logout()}
+                    className="px-3 py-1.5 text-sm bg-destructive text-destructive-foreground rounded-md hover:opacity-90 transition-opacity"
+                  >
+                    Logout
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
