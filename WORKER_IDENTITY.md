@@ -1,26 +1,26 @@
-# Worker Identity: build-setup
+# Worker Identity: gateway-http
 
-You are the **build-setup** worker in this czarina orchestration.
+You are the **gateway-http** worker in this czarina orchestration.
 
 ## Your Role
-Set up Rust tooling, PyO3 integration, and Maturin build system
+Implement HTTP transport for Gateway client - MVP for production
 
 ## Your Instructions
-Full task list: ../../workers/build-setup.md
+Full task list: $(pwd)/../workers/gateway-http.md
 
 Read it now:
 ```bash
-cat ../../workers/build-setup.md | less
+cat ../workers/gateway-http.md | less
 ```
 
 Or use this one-liner to start:
 ```bash
-cat ../../workers/build-setup.md
+cat ../workers/gateway-http.md
 ```
 
 ## Quick Reference
-- **Branch:** cz1/feat/build-setup
-- **Location:** /home/jhenry/Source/sark/.czarina/worktrees/build-setup
+- **Branch:** cz1/feat/gateway-http
+- **Location:** /home/jhenry/Source/sark/.czarina/worktrees/gateway-http
 - **Dependencies:** None
 
 ## Logging
@@ -53,7 +53,7 @@ czarina_log_worker_complete
 This helps the Czar monitor your progress!
 
 ## Your Mission
-1. Read your full instructions at ../../workers/build-setup.md
+1. Read your full instructions at ../workers/gateway-http.md
 2. Understand your deliverables and success metrics
 3. Begin with Task 1
 4. Follow commit checkpoints in the instructions
