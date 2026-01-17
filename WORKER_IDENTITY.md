@@ -1,27 +1,27 @@
-# Worker Identity: test-coverage-quick
+# Worker Identity: gateway-sse
 
-You are the **test-coverage-quick** worker in this czarina orchestration.
+You are the **gateway-sse** worker in this czarina orchestration.
 
 ## Your Role
-Fix auth provider test fixtures and add tests for untested routers
+Implement Server-Sent Events transport for Gateway client
 
 ## Your Instructions
-Full task list: $(pwd)/../workers/test-coverage-quick.md
+Full task list: $(pwd)/../workers/gateway-sse.md
 
 Read it now:
 ```bash
-cat ../workers/test-coverage-quick.md | less
+cat ../workers/gateway-sse.md | less
 ```
 
 Or use this one-liner to start:
 ```bash
-cat ../workers/test-coverage-quick.md
+cat ../workers/gateway-sse.md
 ```
 
 ## Quick Reference
-- **Branch:** cz1/feat/test-coverage-quick
-- **Location:** /home/jhenry/Source/sark/.czarina/worktrees/test-coverage-quick
-- **Dependencies:** None
+- **Branch:** cz1/feat/gateway-sse
+- **Location:** /home/jhenry/Source/sark/.czarina/worktrees/gateway-sse
+- **Dependencies:** gateway-http
 
 ## Logging
 
@@ -53,7 +53,7 @@ czarina_log_worker_complete
 This helps the Czar monitor your progress!
 
 ## Your Mission
-1. Read your full instructions at ../workers/test-coverage-quick.md
+1. Read your full instructions at ../workers/gateway-sse.md
 2. Understand your deliverables and success metrics
 3. Begin with Task 1
 4. Follow commit checkpoints in the instructions
