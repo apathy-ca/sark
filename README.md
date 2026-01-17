@@ -161,9 +161,16 @@ kubectl apply -f k8s/
 
 ## Project Status
 
-🚀 **v1.4.0 - Current Release** (Released Feb 28, 2026)
+🚀 **v1.5.0 - Current Release** (Released Jan 17, 2026)
 
-**New in v1.4.0 - Rust Foundation:**
+**New in v1.5.0 - Production Readiness:**
+- ✅ **Gateway Transport Implementations** (HTTP, SSE, stdio)
+- ✅ **Security Fixes** (LDAP injection, CSRF, credentials)
+- ✅ **Frontend Authentication UI** (Login, MFA, API key management)
+- ✅ **E2E Integration Tests** (Complete user flow testing)
+- ✅ **Performance Benchmark Infrastructure** (Locust, pytest-benchmark)
+
+**Also includes v1.4.0 - Rust Foundation:**
 - ✅ **Embedded Rust OPA engine** (4-10x faster policy evaluation)
 - ✅ **Rust in-memory cache** (10-50x faster than Redis)
 - ✅ **Feature flags & gradual rollout** (0% → 100% with instant rollback)
@@ -188,9 +195,8 @@ kubectl apply -f k8s/
 - ✅ Production deployment guides
 
 **Future Roadmap:**
-- **v1.5.0** - Rust detection algorithms (10-100x faster injection/secret scanning)
-- **v1.6.0** - Advanced caching and policy compilation
-- **v2.0.0** - Production-ready after security audit
+- **v1.6.0** - Production Polish (test fixes, dependency updates, performance validation)
+- **v2.0.0** - GRID Reference Implementation (protocol abstraction, federation, cost attribution)
 
 📖 **[Roadmap](docs/ROADMAP.md)** | **[Changelog](CHANGELOG.md)**
 

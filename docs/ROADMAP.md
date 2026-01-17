@@ -1,60 +1,57 @@
 # SARK Path to Production Roadmap
 
-**Document Version:** 2.1
-**Last Updated:** 2025-12-26
-**Current Release:** v1.3.0 (Advanced Security Features)
-**Target Release:** v1.4.0 (Rust foundation optimization)
-**Target Production:** v2.0.0 (Q1 2026 - after security audit)
+**Document Version:** 2.2
+**Last Updated:** 2026-01-17
+**Current Release:** v1.5.0 (Production Readiness)
+**Target Release:** v1.6.0 (Polish & Validation)
+**Target Production:** v2.0.0 (Q2 2026 - GRID Reference Implementation)
 
 ---
 
 ## Executive Summary
 
 **Current Situation:**
-**v1.3.0 has been successfully completed** (Dec 26, 2025) with comprehensive security features addressing the Lethal Trifecta vulnerabilities. The implementation includes prompt injection detection, behavioral anomaly detection, secret scanning, MFA, and network-level controls. All security features are production-ready with exceptional performance (30-100x faster than targets).
+**v1.5.0 has been successfully released** (Jan 17, 2026) with production-ready gateway transports, security fixes, and testing infrastructure. The implementation includes HTTP/SSE/stdio gateway transports, LDAP/CSRF/credentials security fixes, frontend authentication UI, E2E integration tests, and performance benchmark infrastructure.
 
-**What We Have (v1.3.0 - Completed):**
+**What We Have (v1.5.0 - Completed):**
+- ✅ **Gateway Transports** (HTTP, SSE, stdio implementations)
+- ✅ **Security Fixes** (LDAP injection, CSRF protection, credentials hardening)
+- ✅ **Frontend Authentication** (Login, MFA, API key management UI)
+- ✅ **E2E Integration Tests** (Complete user flow testing)
+- ✅ **Performance Infrastructure** (Locust, pytest-benchmark frameworks)
+- ✅ **Rust Foundation** (v1.4.0: OPA engine, in-memory cache, 4-10x faster)
+- ✅ **Advanced Security** (v1.3.0: injection detection, anomaly detection, secret scanning, MFA, network controls)
 - ✅ Strong architectural foundation (multi-layer auth/authz)
-- ✅ Gateway infrastructure merged (models, tests, docs)
-- ✅ Advanced features (adapters, federation, GRID protocol)
 - ✅ Comprehensive audit logging and SIEM integration
-- ✅ **Prompt injection detection** (20+ patterns, entropy analysis, risk scoring)
-- ✅ **Behavioral anomaly detection** (30-day baseline, real-time alerts)
-- ✅ **Secret scanning & redaction** (25+ secret patterns, automatic redaction)
-- ✅ **MFA for critical actions** (TOTP, SMS, Push, Email)
-- ✅ **Network security controls** (NetworkPolicies, egress filtering)
-- ✅ **Comprehensive testing** (350+ unit tests, 530+ integration tests, 2200+ performance framework)
-- ✅ **Performance benchmarks** (all passing, 30-100x faster than targets)
 
-**What's Missing (Blocking Production):**
-- ❌ Gateway client is stubbed (returns empty lists, NotImplementedError)
-- ❌ No policy validation framework (risk of policy injection attacks)
-- ❌ 154 failing auth provider tests (77.8% pass rate)
-- ❌ No external security audit completed
+**What's Missing (Blocking v2.0 Production):**
+- ⚠️ Test suite needs cleanup (34 failing tests across export/tools routers)
+- ⚠️ Dependabot security vulnerabilities (4 remaining)
+- ⚠️ Performance benchmarks need validation in proper environment
+- ⚠️ Protocol abstraction for GRID v1.0 compliance (v2.0 work)
+- ❌ External security audit not yet scheduled
 
 **Revised Strategy:**
-**v1.2.0** will complete the production-critical implementation work (Gateway, policy validation, test fixes). **v2.0.0** will be released only after external security audit passes. This roadmap reflects incremental, honest versioning based on the Implementation Plan and Lethal Trifecta Analysis.
+**v1.6.0** will provide production polish (test fixes, dependency updates, performance validation) as a solid foundation for **v2.0.0**, which will transform SARK into the universal GRID v1.0 reference implementation with protocol abstraction, federation, and cost attribution.
 
 **Version Plan:**
-- **v1.1.0** (✅ Complete): Gateway infrastructure merged but stubbed
-- **v1.2.0** (⏭️ Skipped): Gateway working + policy validation + tests passing
-- **v1.3.0** (✅ Complete - Dec 26, 2025): Lethal Trifecta mitigations (prompt injection, anomaly, network, secrets, MFA)
-- **v1.4.0** (Next - 6-8 weeks): Rust foundation (OPA engine + fast cache) - 5-10x performance
-- **v1.5.0** (Future - 4-5 weeks): Rust detection (injection, anomaly, MCP parsing) - 10-100x performance
-- **v2.0.0** (Production): Security audit passed + production deployment
+- **v1.3.0** (✅ Complete - Dec 2025): Advanced Security (injection detection, anomaly, network, secrets, MFA)
+- **v1.4.0** (✅ Complete - Jan 2026): Rust Foundation (OPA engine, in-memory cache, 4-10x performance)
+- **v1.5.0** (✅ Complete - Jan 17, 2026): Production Readiness (gateway transports, security fixes, E2E tests)
+- **v1.6.0** (Next - 2-3 weeks): Polish & Validation (test fixes, dependabot, performance validation)
+- **v2.0.0** (Future - 16-20 weeks): GRID Reference Implementation (protocol abstraction, federation, cost attribution)
 
 ---
 
 ## Complete Version Timeline
 
 ```
-v1.1.0 ──► v1.2.0 ──► v1.3.0 ──► v1.4.0 ──► v1.5.0 ──► v2.0.0
-(Done)  (Skipped)  (DONE!)   (NEXT)    (Future)  (Production)
-  │         │         │          │         │         │
-Gateway  Gateway   Advanced   Rust      Rust    Security
-Stubbed  Skipped   Security   Core      Fast    Audit
-                   ✅ COMPLETE (5-10x)   (10-100x) Passed
-                   Dec 26/25
+v1.3.0 ──► v1.4.0 ──► v1.5.0 ──► v1.6.0 ──► v2.0.0
+(DONE)   (DONE)    (DONE!)   (NEXT)    (Future)
+  │         │         │          │         │
+Advanced  Rust    Production  Polish    GRID
+Security  Core    Readiness  Validation  Ref Impl
+✅ Dec25  ✅ Jan26  ✅ Jan17   (2-3wks)  (16-20wks)
 ```
 
 ### v1.2.0: Gateway + Policy + Tests (8 weeks)

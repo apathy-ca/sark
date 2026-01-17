@@ -1,6 +1,6 @@
 [project]
 name = "sark"
-version = "1.3.0"
+version = "1.5.0"
 description = "SARK - Security Audit and Resource Kontroler for MCP Governance"
 readme = "README.md"
 requires-python = ">=3.9"
