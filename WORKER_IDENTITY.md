@@ -1,26 +1,26 @@
-# Worker Identity: gateway-http
+# Worker Identity: test-coverage-quick
 
-You are the **gateway-http** worker in this czarina orchestration.
+You are the **test-coverage-quick** worker in this czarina orchestration.
 
 ## Your Role
-Implement HTTP transport for Gateway client - MVP for production
+Fix auth provider test fixtures and add tests for untested routers
 
 ## Your Instructions
-Full task list: $(pwd)/../workers/gateway-http.md
+Full task list: $(pwd)/../workers/test-coverage-quick.md
 
 Read it now:
 ```bash
-cat ../workers/gateway-http.md | less
+cat ../workers/test-coverage-quick.md | less
 ```
 
 Or use this one-liner to start:
 ```bash
-cat ../workers/gateway-http.md
+cat ../workers/test-coverage-quick.md
 ```
 
 ## Quick Reference
-- **Branch:** cz1/feat/gateway-http
-- **Location:** /home/jhenry/Source/sark/.czarina/worktrees/gateway-http
+- **Branch:** cz1/feat/test-coverage-quick
+- **Location:** /home/jhenry/Source/sark/.czarina/worktrees/test-coverage-quick
 - **Dependencies:** None
 
 ## Logging
@@ -53,7 +53,7 @@ czarina_log_worker_complete
 This helps the Czar monitor your progress!
 
 ## Your Mission
-1. Read your full instructions at ../workers/gateway-http.md
+1. Read your full instructions at ../workers/test-coverage-quick.md
 2. Understand your deliverables and success metrics
 3. Begin with Task 1
 4. Follow commit checkpoints in the instructions
