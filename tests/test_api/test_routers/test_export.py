@@ -195,7 +195,7 @@ class TestExportServersCsvEndpoint:
     @patch("sark.api.routers.export.get_db")
     @patch("sark.api.routers.export.get_current_user")
     def test_export_servers_csv_with_filter(
-        self, mock_get_user, mock_get_db, mock_user, mock_servers
+        self, mock_get_user, mock_get_db, client, mock_user, mock_servers
     ):
         """Test export servers CSV with status filter."""
         mock_get_user.return_value = mock_user
@@ -271,7 +271,7 @@ class TestExportServersJsonEndpoint:
     @patch("sark.api.routers.export.get_db")
     @patch("sark.api.routers.export.get_current_user")
     def test_export_servers_json_pretty_print(
-        self, mock_get_user, mock_get_db, mock_user, mock_servers
+        self, mock_get_user, mock_get_db, client, mock_user, mock_servers
     ):
         """Test export servers JSON with pretty printing."""
         mock_get_user.return_value = mock_user
@@ -322,7 +322,7 @@ class TestExportToolsCsvEndpoint:
     @patch("sark.api.routers.export.get_db")
     @patch("sark.api.routers.export.get_current_user")
     def test_export_tools_csv_handles_null_description(
-        self, mock_get_user, mock_get_db, mock_user
+        self, mock_get_user, mock_get_db, client, mock_user
     ):
         """Test export tools CSV handles null descriptions."""
         mock_get_user.return_value = mock_user

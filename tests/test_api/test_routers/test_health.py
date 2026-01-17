@@ -252,11 +252,20 @@ class TestCheckDatabaseHealth:
     async def test_check_database_health_success(self, mock_create_engine):
         """Test database health check succeeds when connection is healthy."""
         from sark.api.routers.health import check_database_health
+        from unittest.mock import MagicMock
 
         # Mock engine and connection
         mock_engine = AsyncMock()
         mock_conn = AsyncMock()
-        mock_engine.connect.return_value.__aenter__.return_value = mock_conn
+
+        # Create proper async context manager
+        async def mock_connect():
+            return mock_conn
+
+        mock_context = MagicMock()
+        mock_context.__aenter__ = AsyncMock(return_value=mock_conn)
+        mock_context.__aexit__ = AsyncMock(return_value=None)
+        mock_engine.connect = MagicMock(return_value=mock_context)
         mock_engine.dispose = AsyncMock()
         mock_create_engine.return_value = mock_engine
 
