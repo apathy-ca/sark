@@ -134,13 +134,14 @@ class TestHTTPTransportE2E:
         # Mock HTTP response
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers?offset=0&limit=100",
-            json=[s.model_dump() for s in sample_servers],
+            json={"servers": [s.model_dump(mode='json') for s in sample_servers]},
         )
 
         # Create client
         async with GatewayClient(
             gateway_url="http://gateway:8080",
             transport_mode=TransportMode.HTTP_ONLY,
+            enable_error_handling=False,
         ) as client:
             servers = await client.list_servers()
 
@@ -154,17 +155,18 @@ class TestHTTPTransportE2E:
         # Page 1: Full page
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers?offset=0&limit=100",
-            json=[sample_servers[0].model_dump()] * 100,
+            json={"servers": [sample_servers[0].model_dump(mode='json')] * 100},
         )
         # Page 2: Partial page (end)
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers?offset=100&limit=100",
-            json=[sample_servers[1].model_dump()] * 50,
+            json={"servers": [sample_servers[1].model_dump(mode='json')] * 50},
         )
 
         async with GatewayClient(
             gateway_url="http://gateway:8080",
             transport_mode=TransportMode.HTTP_ONLY,
+            enable_error_handling=False,
         ) as client:
             servers = await client.list_all_servers()
             assert len(servers) == 150
@@ -174,12 +176,13 @@ class TestHTTPTransportE2E:
         """E2E: Get specific server info."""
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers/postgres-mcp",
-            json=sample_servers[0].model_dump(),
+            json=sample_servers[0].model_dump(mode='json'),
         )
 
         async with GatewayClient(
             gateway_url="http://gateway:8080",
             transport_mode=TransportMode.HTTP_ONLY,
+            enable_error_handling=False,
         ) as client:
             server = await client.get_server_info("postgres-mcp")
             assert server.server_name == "postgres-mcp"
@@ -190,12 +193,13 @@ class TestHTTPTransportE2E:
         """E2E: List tools via HTTP transport."""
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/tools?offset=0&limit=100",
-            json=[t.model_dump() for t in sample_tools],
+            json={"tools": [t.model_dump(mode='json') for t in sample_tools]},
         )
 
         async with GatewayClient(
             gateway_url="http://gateway:8080",
             transport_mode=TransportMode.HTTP_ONLY,
+            enable_error_handling=False,
         ) as client:
             tools = await client.list_tools()
             assert len(tools) == 2
@@ -206,12 +210,13 @@ class TestHTTPTransportE2E:
         """E2E: List tools filtered by server."""
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/tools?server=postgres-mcp&offset=0&limit=100",
-            json=[sample_tools[0].model_dump()],
+            json={"tools": [sample_tools[0].model_dump(mode='json')]},
         )
 
         async with GatewayClient(
             gateway_url="http://gateway:8080",
             transport_mode=TransportMode.HTTP_ONLY,
+            enable_error_handling=False,
         ) as client:
             tools = await client.list_tools(server_name="postgres-mcp")
             assert len(tools) == 1
@@ -221,13 +226,14 @@ class TestHTTPTransportE2E:
     async def test_invoke_tool_http_e2e(self, httpx_mock: HTTPXMock):
         """E2E: Invoke tool via HTTP transport."""
         httpx_mock.add_response(
-            url="http://gateway:8080/api/v1/tools/invoke",
+            url="http://gateway:8080/api/v1/invoke",
             json={"result": {"rows": [{"id": 1, "name": "test"}]}, "status": "success"},
         )
 
         async with GatewayClient(
             gateway_url="http://gateway:8080",
             transport_mode=TransportMode.HTTP_ONLY,
+            enable_error_handling=False,
         ) as client:
             result = await client.invoke_tool(
                 server_name="postgres-mcp",
@@ -244,7 +250,7 @@ class TestHTTPTransportE2E:
     ):
         """E2E: Invoke tool with OPA authorization."""
         httpx_mock.add_response(
-            url="http://gateway:8080/api/v1/tools/invoke",
+            url="http://gateway:8080/api/v1/invoke",
             json={"result": "success"},
         )
 
@@ -252,6 +258,7 @@ class TestHTTPTransportE2E:
             gateway_url="http://gateway:8080",
             opa_client=mock_opa_client,
             transport_mode=TransportMode.HTTP_ONLY,
+            enable_error_handling=False,
         ) as client:
             result = await client.invoke_tool(
                 server_name="postgres-mcp",
@@ -269,12 +276,13 @@ class TestHTTPTransportE2E:
         """E2E: HTTP response caching."""
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers?offset=0&limit=100",
-            json=[s.model_dump() for s in sample_servers],
+            json={"servers": [s.model_dump(mode='json') for s in sample_servers]},
         )
 
         async with GatewayClient(
             gateway_url="http://gateway:8080",
             transport_mode=TransportMode.HTTP_ONLY,
+            enable_error_handling=False,
         ) as client:
             # First call - cache miss
             servers1 = await client.list_servers()
@@ -305,6 +313,7 @@ class TestHTTPTransportE2E:
             gateway_url="http://gateway:8080",
             max_connections=50,
             transport_mode=TransportMode.HTTP_ONLY,
+            enable_error_handling=False,
         ) as client:
             # Make 10 concurrent requests
             tasks = [client.get_server_info(f"server-{i}") for i in range(10)]
@@ -318,12 +327,13 @@ class TestHTTPTransportE2E:
         """E2E: HTTP transport health check."""
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers?offset=0&limit=100",
-            json=[],
+            json={"servers": []},
         )
 
         async with GatewayClient(
             gateway_url="http://gateway:8080",
             transport_mode=TransportMode.HTTP_ONLY,
+            enable_error_handling=False,
         ) as client:
             # Make a request to initialize HTTP client
             await client.list_servers()
@@ -342,7 +352,7 @@ class TestHTTPTransportE2E:
         httpx_mock.add_response(status_code=503)
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers?offset=0&limit=100",
-            json=[],
+            json={"servers": []},
         )
 
         async with GatewayClient(
@@ -404,12 +414,13 @@ class TestHTTPTransportE2E:
         """E2E: HTTP cache hit rate metrics."""
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers?offset=0&limit=100",
-            json=[s.model_dump() for s in sample_servers],
+            json={"servers": [s.model_dump(mode='json') for s in sample_servers]},
         )
 
         async with GatewayClient(
             gateway_url="http://gateway:8080",
             transport_mode=TransportMode.HTTP_ONLY,
+            enable_error_handling=False,
         ) as client:
             # First call - cache miss
             await client.list_servers()
@@ -960,12 +971,13 @@ class TestUnifiedClientE2E:
         """E2E: Auto transport selection uses HTTP for server listing."""
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers?offset=0&limit=100",
-            json=[s.model_dump() for s in sample_servers],
+            json={"servers": [s.model_dump(mode='json') for s in sample_servers]},
         )
 
         async with GatewayClient(
             gateway_url="http://gateway:8080",
             transport_mode=TransportMode.AUTO,  # Auto selection
+            enable_error_handling=False,
         ) as client:
             servers = await client.list_servers()
             assert len(servers) == 2
@@ -976,6 +988,7 @@ class TestUnifiedClientE2E:
         async with GatewayClient(
             gateway_url="http://gateway:8080",
             transport_mode=TransportMode.HTTP_ONLY,
+            enable_error_handling=False,
         ) as client:
             # SSE should not be available in HTTP_ONLY mode
             from sark.gateway import TransportNotAvailableError
@@ -989,10 +1002,13 @@ class TestUnifiedClientE2E:
         """E2E: Context manager cleanup."""
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers?offset=0&limit=100",
-            json=[],
+            json={"servers": []},
         )
 
-        async with GatewayClient(gateway_url="http://gateway:8080") as client:
+        async with GatewayClient(
+            gateway_url="http://gateway:8080",
+            enable_error_handling=False,
+        ) as client:
             await client.list_servers()
             # Client should be active
             assert not client._is_closed
@@ -1007,18 +1023,21 @@ class TestUnifiedClientE2E:
         """E2E: Multiple operations using same client."""
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers?offset=0&limit=100",
-            json=[s.model_dump() for s in sample_servers],
+            json={"servers": [s.model_dump(mode='json') for s in sample_servers]},
         )
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/tools?offset=0&limit=100",
-            json=[t.model_dump() for t in sample_tools],
+            json={"tools": [t.model_dump(mode='json') for t in sample_tools]},
         )
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers/postgres-mcp",
-            json=sample_servers[0].model_dump(),
+            json=sample_servers[0].model_dump(mode='json'),
         )
 
-        async with GatewayClient(gateway_url="http://gateway:8080") as client:
+        async with GatewayClient(
+            gateway_url="http://gateway:8080",
+            enable_error_handling=False,
+        ) as client:
             # Multiple operations
             servers = await client.list_servers()
             tools = await client.list_tools()
@@ -1043,7 +1062,10 @@ class TestUnifiedClientE2E:
                 },
             )
 
-        async with GatewayClient(gateway_url="http://gateway:8080") as client:
+        async with GatewayClient(
+            gateway_url="http://gateway:8080",
+            enable_error_handling=False,
+        ) as client:
             # Run 5 operations concurrently
             tasks = [client.get_server_info(f"server-{i}") for i in range(5)]
             results = await asyncio.gather(*tasks)
@@ -1087,7 +1109,7 @@ class TestUnifiedClientE2E:
         """E2E: Metrics collection across operations."""
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers?offset=0&limit=100",
-            json=[],
+            json={"servers": []},
         )
 
         async with GatewayClient(
@@ -1114,7 +1136,7 @@ class TestUnifiedClientE2E:
         httpx_mock.add_response(status_code=500)
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers?offset=0&limit=100",
-            json=[],
+            json={"servers": []},
         )
 
         async with GatewayClient(
@@ -1147,7 +1169,10 @@ class TestUnifiedClientE2E:
     @pytest.mark.asyncio
     async def test_client_without_gateway_url_e2e(self):
         """E2E: Client initialization without gateway URL (stdio only)."""
-        async with GatewayClient(transport_mode=TransportMode.STDIO_ONLY) as client:
+        async with GatewayClient(
+            transport_mode=TransportMode.STDIO_ONLY,
+            enable_error_handling=False,
+        ) as client:
             # Should work for stdio operations
             from sark.gateway import GatewayClientError
 
@@ -1375,7 +1400,7 @@ class TestAuthorizationSecurityE2E:
     async def test_opa_authorization_flow_e2e(self, mock_opa_client, httpx_mock: HTTPXMock):
         """E2E: Complete OPA authorization flow."""
         httpx_mock.add_response(
-            url="http://gateway:8080/api/v1/tools/invoke",
+            url="http://gateway:8080/api/v1/invoke",
             json={"result": "success"},
         )
 
@@ -1410,7 +1435,7 @@ class TestAuthorizationSecurityE2E:
         )
 
         httpx_mock.add_response(
-            url="http://gateway:8080/api/v1/tools/invoke",
+            url="http://gateway:8080/api/v1/invoke",
             json={"result": "success"},
         )
 
@@ -1459,7 +1484,7 @@ class TestAuthorizationSecurityE2E:
 
         def capture_headers(request):
             captured_headers.update(request.headers)
-            return httpx.Response(200, json=[])
+            return httpx.Response(200, json={"servers": []})
 
         httpx_mock.add_callback(capture_headers)
 
@@ -1483,7 +1508,7 @@ class TestAuthorizationSecurityE2E:
 
         def capture_headers(request):
             captured_headers.update(request.headers)
-            return httpx.Response(200, json=[])
+            return httpx.Response(200, json={"servers": []})
 
         httpx_mock.add_callback(capture_headers)
 
@@ -1511,7 +1536,7 @@ class TestPerformanceBenchmarksE2E:
         """E2E: HTTP request latency benchmark (<100ms p95)."""
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers?offset=0&limit=100",
-            json=[],
+            json={"servers": []},
         )
 
         async with GatewayClient(gateway_url="http://gateway:8080") as client:
@@ -1536,7 +1561,7 @@ class TestPerformanceBenchmarksE2E:
         """E2E: Cache hit rate benchmark (>80%)."""
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers?offset=0&limit=100",
-            json=[],
+            json={"servers": []},
         )
 
         async with GatewayClient(gateway_url="http://gateway:8080") as client:
@@ -1601,12 +1626,12 @@ class TestPerformanceBenchmarksE2E:
 
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers?offset=0&limit=100",
-            json=large_response[:100],
+            json={"servers": large_response[:100]},
         )
         for i in range(1, 10):
             httpx_mock.add_response(
                 url=f"http://gateway:8080/api/v1/servers?offset={i*100}&limit=100",
-                json=large_response[i * 100 : (i + 1) * 100],
+                json={"servers": large_response[i * 100 : (i + 1) * 100]},
             )
 
         async with GatewayClient(gateway_url="http://gateway:8080") as client:
@@ -1622,7 +1647,7 @@ class TestPerformanceBenchmarksE2E:
         for _i in range(50):
             httpx_mock.add_response(
                 url="http://gateway:8080/api/v1/servers?offset=0&limit=100",
-                json=[],
+                json={"servers": []},
             )
 
         async with GatewayClient(
