@@ -6,6 +6,7 @@ from uuid import UUID, uuid5
 
 from ldap3 import ALL, SIMPLE, Connection, Server
 from ldap3.core.exceptions import LDAPBindError, LDAPException
+from ldap3.utils.conv import escape_filter_chars
 from pydantic import Field
 
 from sark.services.auth.providers.base import (
@@ -154,7 +155,9 @@ class LDAPProvider(AuthProvider):
         Returns:
             Tuple of (user_dn, user_attributes)
         """
-        search_filter = self.config.user_search_filter.format(username=username)
+        # Escape username to prevent LDAP injection
+        safe_username = escape_filter_chars(username)
+        search_filter = self.config.user_search_filter.format(username=safe_username)
 
         self.logger.debug(
             "ldap_user_search",
@@ -273,7 +276,9 @@ class LDAPProvider(AuthProvider):
         if not self.config.group_search_base:
             return []
 
-        search_filter = self.config.group_search_filter.format(user_dn=user_dn)
+        # Escape user_dn to prevent LDAP injection
+        safe_user_dn = escape_filter_chars(user_dn)
+        search_filter = self.config.group_search_filter.format(user_dn=safe_user_dn)
 
         self.logger.debug(
             "ldap_group_search",

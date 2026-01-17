@@ -1,10 +1,15 @@
 """SARK configuration settings."""
 
+import logging
+import os
+import sys
 from functools import lru_cache
 from typing import Any
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+logger = logging.getLogger(__name__)
 
 
 class Settings(BaseSettings):
@@ -295,6 +300,63 @@ class Settings(BaseSettings):
         """Parse Kafka bootstrap servers from comma-separated string or list."""
         if isinstance(v, str):
             return [server.strip() for server in v.split(",")]
+        return v
+
+    @field_validator("postgres_password", mode="after")
+    @classmethod
+    def validate_postgres_password(cls, v: str) -> str:
+        """Validate PostgreSQL password - must be set in production."""
+        environment = os.getenv("ENVIRONMENT", "development")
+
+        if v == "sark":
+            if environment == "production":
+                logger.critical("POSTGRES_PASSWORD not set in production environment!")
+                sys.exit(1)
+            else:
+                logger.warning(
+                    "POSTGRES_PASSWORD using default value. "
+                    "DO NOT USE IN PRODUCTION! "
+                    "Set POSTGRES_PASSWORD environment variable."
+                )
+
+        return v
+
+    @field_validator("timescale_password", mode="after")
+    @classmethod
+    def validate_timescale_password(cls, v: str) -> str:
+        """Validate TimescaleDB password - must be set in production."""
+        environment = os.getenv("ENVIRONMENT", "development")
+
+        if v == "sark":
+            if environment == "production":
+                logger.critical("TIMESCALE_PASSWORD not set in production environment!")
+                sys.exit(1)
+            else:
+                logger.warning(
+                    "TIMESCALE_PASSWORD using default value. "
+                    "DO NOT USE IN PRODUCTION! "
+                    "Set TIMESCALE_PASSWORD environment variable."
+                )
+
+        return v
+
+    @field_validator("redis_password", mode="after")
+    @classmethod
+    def validate_redis_password(cls, v: str | None) -> str | None:
+        """Validate Redis password - should be set in production."""
+        environment = os.getenv("ENVIRONMENT", "development")
+
+        if not v:
+            if environment == "production":
+                logger.critical("REDIS_PASSWORD not set in production environment!")
+                sys.exit(1)
+            else:
+                logger.warning(
+                    "REDIS_PASSWORD not set - Redis will be unprotected. "
+                    "DO NOT USE IN PRODUCTION! "
+                    "Set REDIS_PASSWORD environment variable."
+                )
+
         return v
 
     @property
