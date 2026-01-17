@@ -2,18 +2,12 @@
 
 from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import pytest
-from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from sark.main import app
 from sark.models.mcp_server import MCPServer, MCPTool, SensitivityLevel, ServerStatus, TransportType
-
-
-# Create a test client
-client = TestClient(app)
 
 
 @pytest.fixture
@@ -41,7 +35,7 @@ def mock_servers():
             transport=TransportType.STDIO,
             endpoint="/path/to/server1",
             status=ServerStatus.ACTIVE,
-            sensitivity_level=SensitivityLevel.PUBLIC,
+            sensitivity_level=SensitivityLevel.LOW,
             created_at=datetime(2025, 1, 1, 12, 0, 0),
             updated_at=datetime(2025, 1, 1, 12, 0, 0),
             extra_metadata={"key": "value"},
@@ -53,7 +47,7 @@ def mock_servers():
             transport=TransportType.HTTP,
             endpoint="http://localhost:8080",
             status=ServerStatus.REGISTERED,
-            sensitivity_level=SensitivityLevel.INTERNAL,
+            sensitivity_level=SensitivityLevel.MEDIUM,
             created_at=datetime(2025, 1, 2, 12, 0, 0),
             updated_at=datetime(2025, 1, 2, 12, 0, 0),
             extra_metadata={},
@@ -71,7 +65,7 @@ def mock_tools():
             name="test-tool-1",
             description="Test tool 1",
             server_id=server_id,
-            sensitivity_level=SensitivityLevel.PUBLIC,
+            sensitivity_level=SensitivityLevel.LOW,
             created_at=datetime(2025, 1, 1, 12, 0, 0),
             extra_metadata={"requires_approval": False},
         ),
@@ -80,7 +74,7 @@ def mock_tools():
             name="test-tool-2",
             description="Test tool 2",
             server_id=server_id,
-            sensitivity_level=SensitivityLevel.SENSITIVE,
+            sensitivity_level=SensitivityLevel.HIGH,
             created_at=datetime(2025, 1, 2, 12, 0, 0),
             extra_metadata={"requires_approval": True},
         ),
@@ -92,7 +86,7 @@ class TestCreateExportEndpoint:
 
     @patch("sark.api.routers.export.get_db")
     @patch("sark.api.routers.export.get_current_user")
-    async def test_create_export_servers_json(self, mock_get_user, mock_get_db, mock_user, mock_servers):
+    def test_create_export_servers_json(self, mock_get_user, mock_get_db, client, mock_user, mock_servers):
         """Test creating export job for servers in JSON format."""
         mock_get_user.return_value = mock_user
 
@@ -121,7 +115,7 @@ class TestCreateExportEndpoint:
 
     @patch("sark.api.routers.export.get_db")
     @patch("sark.api.routers.export.get_current_user")
-    async def test_create_export_tools_csv(self, mock_get_user, mock_get_db, mock_user, mock_tools):
+    def test_create_export_tools_csv(self, mock_get_user, mock_get_db, client, mock_user, mock_tools):
         """Test creating export job for tools in CSV format."""
         mock_get_user.return_value = mock_user
 
@@ -148,7 +142,7 @@ class TestCreateExportEndpoint:
 
     @patch("sark.api.routers.export.get_db")
     @patch("sark.api.routers.export.get_current_user")
-    async def test_create_export_audit_logs(self, mock_get_user, mock_get_db, mock_user):
+    def test_create_export_audit_logs(self, mock_get_user, mock_get_db, client, mock_user):
         """Test creating export job for audit logs."""
         mock_get_user.return_value = mock_user
         mock_get_db.return_value = AsyncMock(spec=AsyncSession)
@@ -173,7 +167,7 @@ class TestExportServersCsvEndpoint:
 
     @patch("sark.api.routers.export.get_db")
     @patch("sark.api.routers.export.get_current_user")
-    async def test_export_servers_csv_success(self, mock_get_user, mock_get_db, mock_user, mock_servers):
+    def test_export_servers_csv_success(self, mock_get_user, mock_get_db, client, mock_user, mock_servers):
         """Test successful export of servers as CSV."""
         mock_get_user.return_value = mock_user
 
@@ -200,7 +194,7 @@ class TestExportServersCsvEndpoint:
 
     @patch("sark.api.routers.export.get_db")
     @patch("sark.api.routers.export.get_current_user")
-    async def test_export_servers_csv_with_filter(
+    def test_export_servers_csv_with_filter(
         self, mock_get_user, mock_get_db, mock_user, mock_servers
     ):
         """Test export servers CSV with status filter."""
@@ -219,7 +213,7 @@ class TestExportServersCsvEndpoint:
 
     @patch("sark.api.routers.export.get_db")
     @patch("sark.api.routers.export.get_current_user")
-    async def test_export_servers_csv_empty_result(self, mock_get_user, mock_get_db, mock_user):
+    def test_export_servers_csv_empty_result(self, mock_get_user, mock_get_db, client, mock_user):
         """Test export servers CSV with no data."""
         mock_get_user.return_value = mock_user
 
@@ -242,7 +236,7 @@ class TestExportServersJsonEndpoint:
 
     @patch("sark.api.routers.export.get_db")
     @patch("sark.api.routers.export.get_current_user")
-    async def test_export_servers_json_success(self, mock_get_user, mock_get_db, mock_user, mock_servers):
+    def test_export_servers_json_success(self, mock_get_user, mock_get_db, client, mock_user, mock_servers):
         """Test successful export of servers as JSON."""
         mock_get_user.return_value = mock_user
 
@@ -276,7 +270,7 @@ class TestExportServersJsonEndpoint:
 
     @patch("sark.api.routers.export.get_db")
     @patch("sark.api.routers.export.get_current_user")
-    async def test_export_servers_json_pretty_print(
+    def test_export_servers_json_pretty_print(
         self, mock_get_user, mock_get_db, mock_user, mock_servers
     ):
         """Test export servers JSON with pretty printing."""
@@ -302,7 +296,7 @@ class TestExportToolsCsvEndpoint:
 
     @patch("sark.api.routers.export.get_db")
     @patch("sark.api.routers.export.get_current_user")
-    async def test_export_tools_csv_success(self, mock_get_user, mock_get_db, mock_user, mock_tools):
+    def test_export_tools_csv_success(self, mock_get_user, mock_get_db, client, mock_user, mock_tools):
         """Test successful export of tools as CSV."""
         mock_get_user.return_value = mock_user
 
@@ -327,7 +321,7 @@ class TestExportToolsCsvEndpoint:
 
     @patch("sark.api.routers.export.get_db")
     @patch("sark.api.routers.export.get_current_user")
-    async def test_export_tools_csv_handles_null_description(
+    def test_export_tools_csv_handles_null_description(
         self, mock_get_user, mock_get_db, mock_user
     ):
         """Test export tools CSV handles null descriptions."""
@@ -338,7 +332,7 @@ class TestExportToolsCsvEndpoint:
             name="null-desc-tool",
             description=None,
             server_id=uuid4(),
-            sensitivity_level=SensitivityLevel.PUBLIC,
+            sensitivity_level=SensitivityLevel.LOW,
             created_at=datetime.now(),
             extra_metadata=None,
         )
@@ -361,7 +355,7 @@ class TestExportToolsJsonEndpoint:
 
     @patch("sark.api.routers.export.get_db")
     @patch("sark.api.routers.export.get_current_user")
-    async def test_export_tools_json_success(self, mock_get_user, mock_get_db, mock_user, mock_tools):
+    def test_export_tools_json_success(self, mock_get_user, mock_get_db, client, mock_user, mock_tools):
         """Test successful export of tools as JSON."""
         mock_get_user.return_value = mock_user
 
@@ -392,7 +386,7 @@ class TestExportToolsJsonEndpoint:
 
     @patch("sark.api.routers.export.get_db")
     @patch("sark.api.routers.export.get_current_user")
-    async def test_export_tools_json_with_pretty(self, mock_get_user, mock_get_db, mock_user, mock_tools):
+    def test_export_tools_json_with_pretty(self, mock_get_user, mock_get_db, client, mock_user, mock_tools):
         """Test export tools JSON with pretty formatting."""
         mock_get_user.return_value = mock_user
 
@@ -415,7 +409,7 @@ class TestExportErrorHandling:
 
     @patch("sark.api.routers.export.get_db")
     @patch("sark.api.routers.export.get_current_user")
-    async def test_export_handles_database_error(self, mock_get_user, mock_get_db, mock_user):
+    def test_export_handles_database_error(self, mock_get_user, mock_get_db, client, mock_user):
         """Test export handles database errors gracefully."""
         mock_get_user.return_value = mock_user
 

@@ -77,8 +77,8 @@ if settings.enable_metrics:
 app.include_router(health_router, tags=["health"])
 app.include_router(admin.router, tags=["admin"])
 app.include_router(export.router, tags=["export"])
-app.include_router(health_v2.router, tags=["health-v2"])
-app.include_router(websocket.router, tags=["websocket"])
+app.include_router(health_v2.router, prefix="/health", tags=["health-v2"])
+app.include_router(websocket.router, prefix="/ws", tags=["websocket"])
 
 
 @app.get("/")
