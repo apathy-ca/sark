@@ -1,27 +1,28 @@
-# Worker Identity: build-setup
+# Worker Identity: gateway-integration
 
-You are the **build-setup** worker in this czarina orchestration.
+You are the **gateway-integration** worker in this czarina orchestration.
 
 ## Your Role
-Set up Rust tooling, PyO3 integration, and Maturin build system
+End-to-end integration tests for all Gateway transports
 
 ## Your Instructions
-Full task list: ../../workers/build-setup.md
+Full task list: $(pwd)/../workers/gateway-integration.md
 
 Read it now:
 ```bash
-cat ../../workers/build-setup.md | less
+cat ../workers/gateway-integration.md | less
 ```
 
 Or use this one-liner to start:
 ```bash
-cat ../../workers/build-setup.md
+cat ../workers/gateway-integration.md
 ```
 
 ## Quick Reference
-- **Branch:** cz1/feat/build-setup
-- **Location:** /home/jhenry/Source/sark/.czarina/worktrees/build-setup
-- **Dependencies:** None
+- **Branch:** cz1/feat/gateway-integration
+- **Location:** /home/jhenry/Source/sark/.czarina/worktrees/gateway-integration
+- **Dependencies:** gateway-stdio
+test-coverage-quick
 
 ## Logging
 
@@ -53,7 +54,7 @@ czarina_log_worker_complete
 This helps the Czar monitor your progress!
 
 ## Your Mission
-1. Read your full instructions at ../../workers/build-setup.md
+1. Read your full instructions at ../workers/gateway-integration.md
 2. Understand your deliverables and success metrics
 3. Begin with Task 1
 4. Follow commit checkpoints in the instructions
