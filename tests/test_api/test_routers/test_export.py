@@ -81,37 +81,49 @@ def mock_tools():
     ]
 
 
+def create_mock_db_dependency(mock_data):
+    """Create a mock database dependency that returns specific data."""
+    async def mock_db_generator():
+        """Async generator that yields a mock session."""
+        mock_session = AsyncMock(spec=AsyncSession)
+        mock_result = MagicMock()
+        mock_result.scalars.return_value.all.return_value = mock_data
+        mock_session.execute = AsyncMock(return_value=mock_result)
+        yield mock_session
+    return mock_db_generator
+
+
 class TestCreateExportEndpoint:
     """Tests for POST /export endpoint."""
 
-    @patch("sark.api.routers.export.get_db")
-    @patch("sark.api.routers.export.get_current_user")
-    def test_create_export_servers_json(self, mock_get_user, mock_get_db, client, mock_user, mock_servers):
+    def test_create_export_servers_json(self, client, mock_user, mock_servers):
         """Test creating export job for servers in JSON format."""
-        mock_get_user.return_value = mock_user
+        from sark.api.main import app
+        from sark.db import get_db
 
-        # Mock database session
-        mock_db_session = AsyncMock(spec=AsyncSession)
-        mock_result = MagicMock()
-        mock_result.scalars.return_value.all.return_value = mock_servers
-        mock_db_session.execute = AsyncMock(return_value=mock_result)
-        mock_get_db.return_value = mock_db_session
+        # Override dependencies
+        app.dependency_overrides[get_db] = create_mock_db_dependency(mock_servers)
 
-        response = client.post(
-            "/api/v1/export",
-            json={
-                "format": "json",
-                "resource_type": "servers",
-            },
-        )
+        try:
+            response = client.post(
+                "/api/v1/export",
+                json={
+                    "format": "json",
+                    "resource_type": "servers",
+                },
+            )
 
-        assert response.status_code == 200
-        data = response.json()
-        assert data["format"] == "json"
-        assert data["resource_type"] == "servers"
-        assert data["record_count"] == len(mock_servers)
-        assert "exported_at" in data
-        assert data["download_url"] == "/api/v1/export/download/servers.json"
+            assert response.status_code == 200
+            data = response.json()
+            assert data["format"] == "json"
+            assert data["resource_type"] == "servers"
+            assert data["record_count"] == len(mock_servers)
+            assert "exported_at" in data
+            assert data["download_url"] == "/api/v1/export/download/servers.json"
+        finally:
+            # Clean up override
+            if get_db in app.dependency_overrides:
+                del app.dependency_overrides[get_db]
 
     @patch("sark.api.routers.export.get_db")
     @patch("sark.api.routers.export.get_current_user")
