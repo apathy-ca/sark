@@ -4630,10 +4630,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#contributors" class="md-nav__link">
+  <a href="#attribution-contributors" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Contributors
+        Attribution &amp; Contributors
       
     </span>
   </a>
@@ -5346,7 +5346,7 @@
 <p><strong>Target:</strong> Home users, open-source projects, advisory governance, transparency-first</p>
 <p><strong>Recommended Features:</strong>
 - ✅ Authentication supported (not mandatory)
-- ✅ Advisory policies (recommend, don't enforce)
+- ✅ Advisory policies (logging, auditing, and recommendations, not enforcement)
 - ⚠️ Semi-immutable audit (append-only with governance)
 - ⚠️ Optional SIEM (advisory logging)
 - ⚠️ Simple policies (rule-based or declarative)
@@ -7094,20 +7094,30 @@
 </tbody>
 </table>
 <hr />
-<h2 id="contributors">Contributors<a class="headerlink" href="#contributors" title="Permanent link">&para;</a></h2>
-<p>This specification was reverse-engineered from the SARK (Secure Autonomous Resource Kontroller) reference implementation by analyzing:</p>
-<ul>
-<li>SARK architecture and design patterns</li>
-<li>Policy engine integration (OPA/Rego)</li>
-<li>Authentication and authorization flows</li>
-<li>Audit logging and SIEM integration</li>
-<li>Protocol abstraction patterns</li>
-<li>Configuration and extension points</li>
-</ul>
+<h2 id="attribution-contributors">Attribution &amp; Contributors<a class="headerlink" href="#attribution-contributors" title="Permanent link">&para;</a></h2>
+<p><strong>GRID Protocol Specification v0.1</strong> was reverse-engineered from the <strong>SARK (Secure Autonomous Resource Kontroller)</strong> reference implementation.</p>
+<p><strong>Original Design &amp; Implementation:</strong>
+- <strong>James R. A. Henry</strong> - SARK architect and maintainer
+  - Designed and built the reference implementation
+  - Created the architecture that makes this specification possible</p>
+<p><strong>Specification &amp; Analysis:</strong>
+- <strong>Claude Code</strong> (Anthropic's Claude via Claude Code)
+  - Reverse-engineered patterns from SARK codebase
+  - Extracted universal governance concepts from MCP-specific implementation
+  - Formalized GRID specification
+  - Analyzed SARK's GRID compliance</p>
+<p><strong>Reference Materials Analyzed:</strong>
+- SARK architecture and design patterns
+- Policy engine integration (OPA/Rego)
+- Authentication and authorization flows
+- Audit logging and SIEM integration
+- Protocol abstraction patterns
+- Configuration and extension points</p>
+<p>This specification would not exist without SARK's elegant, production-proven design. GRID documents what SARK demonstrates: that universal machine-to-machine governance is possible, practical, and deployable at enterprise scale.</p>
 <hr />
 <p><strong>GRID Protocol v0.1 Specification</strong>
 <em>A Universal Governance Protocol for Machine-to-Machine Interactions</em></p>
-<p>For feedback, issues, or contributions: <a href="https://github.com/anthropics/grid-protocol">github.com/anthropics/grid-protocol</a></p>
+<p>For feedback, issues, or contributions: <a href="https://github.com/apathy-ca/grid-protocol">github.com/apathy-ca/grid-protocol</a></p>
 
 
 
