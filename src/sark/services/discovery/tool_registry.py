@@ -183,7 +183,8 @@ class ToolRegistry:
         """
         Check if text contains any of the specified keywords.
 
-        Uses word boundary matching to avoid false positives.
+        Uses flexible matching to handle snake_case, spaces, and word boundaries.
+        For example, "credit_card" will match "credit card", "credit_card", etc.
 
         Args:
             text: Text to search in (should be lowercase)
@@ -193,8 +194,13 @@ class ToolRegistry:
             True if any keyword is found
         """
         for keyword in keywords:
-            # Use word boundaries to match whole words only
-            pattern = r"\b" + re.escape(keyword) + r"\b"
+            # Replace underscores in keyword with pattern that matches underscore or space
+            # This allows "credit_card" to match both "credit_card" and "credit card"
+            keyword_pattern = keyword.replace("_", "[ _]")
+
+            # Use pattern that matches at word boundaries (start/end or after non-letter)
+            # Pattern: (start of string OR non-letter) + keyword + (end of string OR non-letter)
+            pattern = r"(?:^|[^a-z])" + keyword_pattern + r"(?:$|[^a-z])"
             if re.search(pattern, text):
                 return True
         return False

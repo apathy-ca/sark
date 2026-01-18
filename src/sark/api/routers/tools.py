@@ -59,6 +59,27 @@ class SensitivityDetectionResponse(BaseModel):
     detection_method: str
 
 
+# NOTE: Routes with static paths must be defined BEFORE routes with path parameters
+# to avoid FastAPI matching the static path as a parameter value
+
+
+@router.get("/statistics/sensitivity")
+async def get_sensitivity_statistics(
+    db: AsyncSession = Depends(get_db),
+) -> dict[str, Any]:
+    """
+    Get statistics about tool sensitivity distribution.
+
+    Returns:
+    - Total number of tools
+    - Count by sensitivity level (low, medium, high, critical)
+    - Number of manually overridden tools
+    """
+    tool_registry = ToolRegistry(db)
+    stats = await tool_registry.get_sensitivity_statistics()
+    return stats
+
+
 @router.get("/{tool_id}/sensitivity", response_model=SensitivityResponse)
 async def get_tool_sensitivity(
     tool_id: UUID,
@@ -254,23 +275,6 @@ async def get_tool_sensitivity_history(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(e),
         ) from e
-
-
-@router.get("/statistics/sensitivity")
-async def get_sensitivity_statistics(
-    db: AsyncSession = Depends(get_db),
-) -> dict[str, Any]:
-    """
-    Get statistics about tool sensitivity distribution.
-
-    Returns:
-    - Total number of tools
-    - Count by sensitivity level (low, medium, high, critical)
-    - Number of manually overridden tools
-    """
-    tool_registry = ToolRegistry(db)
-    stats = await tool_registry.get_sensitivity_statistics()
-    return stats
 
 
 @router.get("/sensitivity/{level}")

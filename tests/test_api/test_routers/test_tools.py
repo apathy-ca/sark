@@ -406,22 +406,40 @@ def test_detect_sensitivity_with_parameters(client):
 
 def test_get_sensitivity_history(client, mock_tool):
     """Test getting sensitivity change history."""
-    response = client.get(f"/api/v1/tools/{mock_tool.id}/sensitivity/history")
+    from sark.api.main import app
+    from sark.db import get_db
 
-    assert response.status_code == status.HTTP_200_OK
-    data = response.json()
-    assert isinstance(data, list)
-    # Should have at least current state
-    assert len(data) >= 1
+    app.dependency_overrides[get_db] = create_mock_db_for_tool(mock_tool, method="get")
+
+    try:
+        response = client.get(f"/api/v1/tools/{mock_tool.id}/sensitivity/history")
+
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert isinstance(data, list)
+        # Should have at least current state
+        assert len(data) >= 1
+    finally:
+        if get_db in app.dependency_overrides:
+            del app.dependency_overrides[get_db]
 
 
 
 def test_get_sensitivity_history_not_found(client):
     """Test getting history for non-existent tool."""
-    fake_id = uuid4()
-    response = client.get(f"/api/v1/tools/{fake_id}/sensitivity/history")
+    from sark.api.main import app
+    from sark.db import get_db
 
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+    app.dependency_overrides[get_db] = create_mock_db_empty()
+
+    try:
+        fake_id = uuid4()
+        response = client.get(f"/api/v1/tools/{fake_id}/sensitivity/history")
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+    finally:
+        if get_db in app.dependency_overrides:
+            del app.dependency_overrides[get_db]
 
 
 # ============================================================================
@@ -432,18 +450,32 @@ def test_get_sensitivity_history_not_found(client):
 
 def test_get_sensitivity_statistics(client, mock_tool):
     """Test getting sensitivity statistics."""
-    response = client.get("/api/v1/tools/statistics/sensitivity")
+    from sark.api.main import app
+    from sark.db import get_db
 
-    assert response.status_code == status.HTTP_200_OK
-    data = response.json()
-    assert "total_tools" in data
-    assert "by_sensitivity" in data
-    assert "overridden_count" in data
-    assert data["total_tools"] >= 1
-    assert "low" in data["by_sensitivity"]
-    assert "medium" in data["by_sensitivity"]
-    assert "high" in data["by_sensitivity"]
-    assert "critical" in data["by_sensitivity"]
+    app.dependency_overrides[get_db] = create_mock_db_for_tool(mock_tool, method="execute")
+
+    try:
+        response = client.get("/api/v1/tools/statistics/sensitivity")
+
+        # Debug output
+        if response.status_code != 200:
+            print(f"Status: {response.status_code}")
+            print(f"Response: {response.text}")
+
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert "total_tools" in data
+        assert "by_sensitivity" in data
+        assert "overridden_count" in data
+        assert data["total_tools"] >= 1
+        assert "low" in data["by_sensitivity"]
+        assert "medium" in data["by_sensitivity"]
+        assert "high" in data["by_sensitivity"]
+        assert "critical" in data["by_sensitivity"]
+    finally:
+        if get_db in app.dependency_overrides:
+            del app.dependency_overrides[get_db]
 
 
 # ============================================================================
@@ -454,14 +486,23 @@ def test_get_sensitivity_statistics(client, mock_tool):
 
 def test_list_tools_by_sensitivity_high(client, mock_tool):
     """Test listing tools by sensitivity level."""
-    response = client.get("/api/v1/tools/sensitivity/high")
+    from sark.api.main import app
+    from sark.db import get_db
 
-    assert response.status_code == status.HTTP_200_OK
-    data = response.json()
-    assert isinstance(data, list)
-    # Should include our mock tool
-    tool_ids = [item["id"] for item in data]
-    assert str(mock_tool.id) in tool_ids
+    app.dependency_overrides[get_db] = create_mock_db_for_tool(mock_tool, method="execute")
+
+    try:
+        response = client.get("/api/v1/tools/sensitivity/high")
+
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert isinstance(data, list)
+        # Should include our mock tool
+        tool_ids = [item["id"] for item in data]
+        assert str(mock_tool.id) in tool_ids
+    finally:
+        if get_db in app.dependency_overrides:
+            del app.dependency_overrides[get_db]
 
 
 
@@ -528,8 +569,15 @@ def test_detect_sensitivity_missing_name(client):
 
 def test_update_sensitivity_with_optional_reason(client, mock_tool, mock_user):
     """Test update with optional reason field."""
-    with patch("sark.services.policy.OPAClient.authorize", return_value=True):
-        with patch("sark.services.auth.get_current_user", return_value=mock_user):
+    from sark.api.main import app
+    from sark.db import get_db, get_timescale_db
+
+    # Override dependencies
+    app.dependency_overrides[get_db] = create_mock_db_for_tool(mock_tool)
+    app.dependency_overrides[get_timescale_db] = create_mock_timescale_db()
+
+    try:
+        with patch("sark.services.policy.opa_client.OPAClient.authorize", new_callable=AsyncMock, return_value=True):
             response = client.post(
                 f"/api/v1/tools/{mock_tool.id}/sensitivity",
                 json={
@@ -538,4 +586,9 @@ def test_update_sensitivity_with_optional_reason(client, mock_tool, mock_user):
                 },
             )
 
-    assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == status.HTTP_200_OK
+    finally:
+        if get_db in app.dependency_overrides:
+            del app.dependency_overrides[get_db]
+        if get_timescale_db in app.dependency_overrides:
+            del app.dependency_overrides[get_timescale_db]
