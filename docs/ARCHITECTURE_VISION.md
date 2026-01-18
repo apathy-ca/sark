@@ -2712,6 +2712,269 @@ approved_tunnel_processes = {
 
 ---
 
+## Mode 8: Avian Carrier Detection (RFC 1149)
+
+> *"The most secure network is the one nobody suspects."*
+
+### Threat Model
+
+Advanced threat actors may attempt to bypass all network-based governance by
+exfiltrating LLM prompts and responses via [RFC 1149](https://datatracker.ietf.org/doc/html/rfc1149)
+(IP over Avian Carriers) or its QoS-enabled successor [RFC 2549](https://datatracker.ietf.org/doc/html/rfc2549).
+
+**Attack Vector:**
+```
+┌─────────────────┐    microSD card     ┌─────────────┐
+│  Rogue Agent    │ ──────────────────► │   🐦 Pigeon │ ───► External LLM
+│  (air-gapped)   │    in leg capsule   │   (carrier) │
+└─────────────────┘                     └─────────────┘
+```
+
+While packet loss is high (~55% per RFC 1149 field tests), latency-tolerant
+batch inference remains viable. Traditional network monitoring is ineffective.
+
+### Solution: FATS (Feline Autonomous Tracking System)
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    FATS Architecture                                 │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  ┌──────────┐    Visual     ┌──────────────┐    Alert    ┌───────┐ │
+│  │   🐱     │ ─────────────►│ SARK Policy  │ ──────────► │ SIEM  │ │
+│  │  (CAT)   │   Detection   │   Engine     │   + Logs    │       │ │
+│  └──────────┘               └──────────────┘             └───────┘ │
+│       │                                                             │
+│       │ Autonomous                                                  │
+│       │ Interception                                                │
+│       ▼                                                             │
+│  ┌──────────┐                                                       │
+│  │ 🐦💥     │  ◄── Carrier neutralized, payload recovered          │
+│  └──────────┘                                                       │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### FATS Agent Implementation
+
+```python
+# sark/agents/fats.py
+"""
+Feline Autonomous Tracking System (FATS)
+
+An ML-powered avian carrier detection and interception system
+leveraging biological neural networks (cats).
+"""
+
+from dataclasses import dataclass
+from enum import Enum
+from typing import Optional
+import asyncio
+
+
+class CarrierType(Enum):
+    """RFC 1149 carrier classifications."""
+    PIGEON_HOMING = "columba_livia_domestica"
+    PIGEON_RACING = "columba_livia_racing"
+    CROW = "corvus_brachyrhynchos"  # Experimental
+    DRONE_DISGUISED = "quadcopter_feathered"
+
+
+class InterceptionStatus(Enum):
+    """FATS engagement outcomes."""
+    DETECTED = "detected"
+    TRACKED = "tracked"
+    INTERCEPTED = "intercepted"
+    PAYLOAD_RECOVERED = "payload_recovered"
+    ESCAPED = "escaped"  # Acceptable loss
+    CAT_DISTRACTED = "cat_distracted"  # By laser pointer
+
+
+@dataclass
+class AvianCarrier:
+    """Detected RFC 1149 carrier."""
+    carrier_type: CarrierType
+    heading: float  # degrees
+    altitude: float  # meters
+    estimated_payload_kb: float
+    leg_band_id: Optional[str] = None
+
+
+@dataclass
+class FATSAgent:
+    """A FATS-enrolled feline agent."""
+    agent_id: str
+    name: str
+    breed: str
+    hunting_score: float  # 0.0 - 1.0
+    attention_span_seconds: float
+    currently_napping: bool = True
+
+
+class FATSController:
+    """
+    Coordinates FATS agents for RFC 1149 interception.
+
+    Note: Agent availability varies by time of day.
+    Peak performance: 0300-0500, 1800-2000
+    Unavailable: 1000-1600 (nap time)
+    """
+
+    def __init__(self, agents: list[FATSAgent]):
+        self.agents = agents
+        self.active_intercepts = {}
+
+    async def detect_carrier(
+        self,
+        visual_feed: bytes,
+    ) -> Optional[AvianCarrier]:
+        """
+        Analyze visual feed for RFC 1149 carriers.
+
+        Uses a highly sophisticated detection algorithm:
+        - Bird-shaped object detection
+        - Unusual flight path analysis
+        - Leg capsule identification
+        - Suspiciously regular timing patterns
+        """
+        # Cats have 200-degree field of view
+        # Detection range: ~50 meters (depending on bird size)
+        # False positive rate: HIGH (leaves, butterflies, red dots)
+        pass
+
+    async def dispatch_agent(
+        self,
+        carrier: AvianCarrier,
+    ) -> InterceptionStatus:
+        """
+        Dispatch nearest available FATS agent.
+
+        Selection criteria:
+        1. Not currently napping
+        2. Not distracted by other stimulus
+        3. Within pouncing range
+        4. Sufficiently motivated (hunger level)
+        """
+        available = [
+            a for a in self.agents
+            if not a.currently_napping
+            and a.attention_span_seconds > 30
+        ]
+
+        if not available:
+            # All agents napping - this is expected ~16 hours/day
+            return InterceptionStatus.ESCAPED
+
+        # Select highest hunting score
+        agent = max(available, key=lambda a: a.hunting_score)
+
+        # Autonomous engagement - no further control possible
+        # Outcome determined by: agent skill, carrier evasion,
+        # random environmental factors (laser pointers, treats)
+
+        return await self._await_engagement(agent, carrier)
+
+    async def _await_engagement(
+        self,
+        agent: FATSAgent,
+        carrier: AvianCarrier,
+    ) -> InterceptionStatus:
+        """Wait for engagement outcome. May take a while."""
+
+        # Engagement timeout based on agent attention span
+        try:
+            async with asyncio.timeout(agent.attention_span_seconds):
+                # ... biological neural network processing ...
+                pass
+        except asyncio.TimeoutError:
+            return InterceptionStatus.CAT_DISTRACTED
+
+        # Placeholder - actual outcome from field sensors
+        return InterceptionStatus.INTERCEPTED
+
+    async def recover_payload(
+        self,
+        intercept_location: tuple[float, float],
+    ) -> Optional[bytes]:
+        """
+        Attempt to recover payload from intercepted carrier.
+
+        Warning: Payload may be damaged. microSD cards are
+        surprisingly durable but not rated for this use case.
+
+        Note: Agent may have 'relocated' payload. Check:
+        - Under furniture
+        - In shoes
+        - Proudly displayed on pillow
+        """
+        pass
+```
+
+### Integration with SARK Policy Engine
+
+```rego
+# opa/policies/rfc1149.rego
+
+package sark.avian
+
+# Alert on any RFC 1149 carrier detection
+alert_carrier_detected {
+    input.fats.carrier_detected
+    input.fats.carrier.estimated_payload_kb > 0
+}
+
+# Escalate if multiple carriers in short window
+escalate_coordinated_exfil {
+    count(input.fats.recent_detections) > 3
+    time_window_minutes(input.fats.recent_detections) < 30
+}
+
+# Log successful intercepts for threat intel
+log_intercept {
+    input.fats.status == "intercepted"
+    input.fats.payload_recovered
+}
+
+# Alert if carrier escaped with payload
+alert_exfil_succeeded {
+    input.fats.status == "escaped"
+    input.fats.carrier.estimated_payload_kb > 100
+}
+
+# Maintenance alert - all agents napping
+alert_coverage_gap {
+    count([a | a := input.fats.agents[_]; not a.currently_napping]) == 0
+}
+```
+
+### Deployment Considerations
+
+| Factor | Consideration |
+|--------|---------------|
+| **Agent Availability** | 16-18 hours napping per day |
+| **False Positive Rate** | Very high (anything that moves) |
+| **Interception Success** | Varies by agent (40-90%) |
+| **Payload Recovery** | ~60% (agent may "relocate" payload) |
+| **Operating Temperature** | Agents prefer 20-25°C |
+| **Maintenance** | Daily feeding, weekly veterinary |
+
+### Limitations
+
+1. **Weather Dependence**: Agents reluctant to operate in rain
+2. **Nocturnal Bias**: Peak performance at dawn/dusk only
+3. **Attention Issues**: Laser pointers are an effective FATS-DoS
+4. **Union Rules**: Agents demand 16+ hours rest per day
+5. **Payload Integrity**: Not guaranteed after interception
+
+### References
+
+- [RFC 1149 - IP over Avian Carriers](https://datatracker.ietf.org/doc/html/rfc1149)
+- [RFC 2549 - IP over Avian Carriers with QoS](https://datatracker.ietf.org/doc/html/rfc2549)
+- [RFC 6214 - IPv6 over Avian Carriers](https://datatracker.ietf.org/doc/html/rfc6214)
+- Bergen Linux User Group, 2001 - First RFC 1149 Implementation (55% packet loss)
+
+---
+
 ## Open Questions
 
 1. **TLS Inspection Legality**: Enterprise can mandate CA installation; home users opt-in. Document implications.
