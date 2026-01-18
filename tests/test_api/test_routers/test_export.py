@@ -125,32 +125,30 @@ class TestCreateExportEndpoint:
             if get_db in app.dependency_overrides:
                 del app.dependency_overrides[get_db]
 
-    @patch("sark.api.routers.export.get_db")
-    @patch("sark.api.routers.export.get_current_user")
-    def test_create_export_tools_csv(self, mock_get_user, mock_get_db, client, mock_user, mock_tools):
+    def test_create_export_tools_csv(self, client, mock_user, mock_tools):
         """Test creating export job for tools in CSV format."""
-        mock_get_user.return_value = mock_user
+        from sark.api.main import app
+        from sark.db import get_db
 
-        # Mock database session
-        mock_db_session = AsyncMock(spec=AsyncSession)
-        mock_result = MagicMock()
-        mock_result.scalars.return_value.all.return_value = mock_tools
-        mock_db_session.execute = AsyncMock(return_value=mock_result)
-        mock_get_db.return_value = mock_db_session
+        app.dependency_overrides[get_db] = create_mock_db_dependency(mock_tools)
 
-        response = client.post(
-            "/api/v1/export",
-            json={
-                "format": "csv",
-                "resource_type": "tools",
-            },
-        )
+        try:
+            response = client.post(
+                "/api/v1/export",
+                json={
+                    "format": "csv",
+                    "resource_type": "tools",
+                },
+            )
 
-        assert response.status_code == 200
-        data = response.json()
-        assert data["format"] == "csv"
-        assert data["resource_type"] == "tools"
-        assert data["record_count"] == len(mock_tools)
+            assert response.status_code == 200
+            data = response.json()
+            assert data["format"] == "csv"
+            assert data["resource_type"] == "tools"
+            assert data["record_count"] == len(mock_tools)
+        finally:
+            if get_db in app.dependency_overrides:
+                del app.dependency_overrides[get_db]
 
     @patch("sark.api.routers.export.get_db")
     @patch("sark.api.routers.export.get_current_user")
@@ -177,32 +175,30 @@ class TestCreateExportEndpoint:
 class TestExportServersCsvEndpoint:
     """Tests for GET /servers.csv endpoint."""
 
-    @patch("sark.api.routers.export.get_db")
-    @patch("sark.api.routers.export.get_current_user")
-    def test_export_servers_csv_success(self, mock_get_user, mock_get_db, client, mock_user, mock_servers):
+    def test_export_servers_csv_success(self, client, mock_user, mock_servers):
         """Test successful export of servers as CSV."""
-        mock_get_user.return_value = mock_user
+        from sark.api.main import app
+        from sark.db import get_db
 
-        # Mock database session
-        mock_db_session = AsyncMock(spec=AsyncSession)
-        mock_result = MagicMock()
-        mock_result.scalars.return_value.all.return_value = mock_servers
-        mock_db_session.execute = AsyncMock(return_value=mock_result)
-        mock_get_db.return_value = mock_db_session
+        app.dependency_overrides[get_db] = create_mock_db_dependency(mock_servers)
 
-        response = client.get("/api/v1/export/servers.csv")
+        try:
+            response = client.get("/api/v1/export/servers.csv")
 
-        assert response.status_code == 200
-        assert response.headers["content-type"] == "text/csv; charset=utf-8"
-        assert "Content-Disposition" in response.headers
-        assert "servers_" in response.headers["Content-Disposition"]
-        assert ".csv" in response.headers["Content-Disposition"]
+            assert response.status_code == 200
+            assert response.headers["content-type"] == "text/csv; charset=utf-8"
+            assert "Content-Disposition" in response.headers
+            assert "servers_" in response.headers["Content-Disposition"]
+            assert ".csv" in response.headers["Content-Disposition"]
 
-        # Verify CSV content contains server data
-        csv_content = response.text
-        assert "id,name,description,transport,endpoint,status,sensitivity_level,created_at" in csv_content
-        assert "test-server-1" in csv_content
-        assert "test-server-2" in csv_content
+            # Verify CSV content contains server data
+            csv_content = response.text
+            assert "id,name,description,transport,endpoint,status,sensitivity_level,created_at" in csv_content
+            assert "test-server-1" in csv_content
+            assert "test-server-2" in csv_content
+        finally:
+            if get_db in app.dependency_overrides:
+                del app.dependency_overrides[get_db]
 
     @patch("sark.api.routers.export.get_db")
     @patch("sark.api.routers.export.get_current_user")
@@ -246,39 +242,38 @@ class TestExportServersCsvEndpoint:
 class TestExportServersJsonEndpoint:
     """Tests for GET /servers.json endpoint."""
 
-    @patch("sark.api.routers.export.get_db")
-    @patch("sark.api.routers.export.get_current_user")
-    def test_export_servers_json_success(self, mock_get_user, mock_get_db, client, mock_user, mock_servers):
+    def test_export_servers_json_success(self, client, mock_user, mock_servers):
         """Test successful export of servers as JSON."""
-        mock_get_user.return_value = mock_user
+        from sark.api.main import app
+        from sark.db import get_db
 
-        mock_db_session = AsyncMock(spec=AsyncSession)
-        mock_result = MagicMock()
-        mock_result.scalars.return_value.all.return_value = mock_servers
-        mock_db_session.execute = AsyncMock(return_value=mock_result)
-        mock_get_db.return_value = mock_db_session
+        app.dependency_overrides[get_db] = create_mock_db_dependency(mock_servers)
 
-        response = client.get("/api/v1/export/servers.json")
+        try:
+            response = client.get("/api/v1/export/servers.json")
 
-        assert response.status_code == 200
-        assert response.headers["content-type"] == "application/json"
-        assert "Content-Disposition" in response.headers
-        assert ".json" in response.headers["Content-Disposition"]
+            assert response.status_code == 200
+            assert response.headers["content-type"] == "application/json"
+            assert "Content-Disposition" in response.headers
+            assert ".json" in response.headers["Content-Disposition"]
 
-        data = response.json()
-        assert data["export_type"] == "servers"
-        assert "exported_at" in data
-        assert data["total_records"] == len(mock_servers)
-        assert "servers" in data
-        assert len(data["servers"]) == len(mock_servers)
+            data = response.json()
+            assert data["export_type"] == "servers"
+            assert "exported_at" in data
+            assert data["total_records"] == len(mock_servers)
+            assert "servers" in data
+            assert len(data["servers"]) == len(mock_servers)
 
-        # Verify server data structure
-        server = data["servers"][0]
-        assert "id" in server
-        assert "name" in server
-        assert "transport" in server
-        assert "status" in server
-        assert "sensitivity_level" in server
+            # Verify server data structure
+            server = data["servers"][0]
+            assert "id" in server
+            assert "name" in server
+            assert "transport" in server
+            assert "status" in server
+            assert "sensitivity_level" in server
+        finally:
+            if get_db in app.dependency_overrides:
+                del app.dependency_overrides[get_db]
 
     @patch("sark.api.routers.export.get_db")
     @patch("sark.api.routers.export.get_current_user")
@@ -306,38 +301,34 @@ class TestExportServersJsonEndpoint:
 class TestExportToolsCsvEndpoint:
     """Tests for GET /tools.csv endpoint."""
 
-    @patch("sark.api.routers.export.get_db")
-    @patch("sark.api.routers.export.get_current_user")
-    def test_export_tools_csv_success(self, mock_get_user, mock_get_db, client, mock_user, mock_tools):
+    def test_export_tools_csv_success(self, client, mock_user, mock_tools):
         """Test successful export of tools as CSV."""
-        mock_get_user.return_value = mock_user
+        from sark.api.main import app
+        from sark.db import get_db
 
-        mock_db_session = AsyncMock(spec=AsyncSession)
-        mock_result = MagicMock()
-        mock_result.scalars.return_value.all.return_value = mock_tools
-        mock_db_session.execute = AsyncMock(return_value=mock_result)
-        mock_get_db.return_value = mock_db_session
+        app.dependency_overrides[get_db] = create_mock_db_dependency(mock_tools)
 
-        response = client.get("/api/v1/export/tools.csv")
+        try:
+            response = client.get("/api/v1/export/tools.csv")
 
-        assert response.status_code == 200
-        assert response.headers["content-type"] == "text/csv; charset=utf-8"
-        assert "Content-Disposition" in response.headers
-        assert "tools_" in response.headers["Content-Disposition"]
+            assert response.status_code == 200
+            assert response.headers["content-type"] == "text/csv; charset=utf-8"
+            assert "Content-Disposition" in response.headers
+            assert "tools_" in response.headers["Content-Disposition"]
 
-        # Verify CSV content
-        csv_content = response.text
-        assert "id,name,description,server_id,server_name,sensitivity_level" in csv_content
-        assert "test-tool-1" in csv_content
-        assert "test-tool-2" in csv_content
+            # Verify CSV content
+            csv_content = response.text
+            assert "id,name,description,server_id,server_name,sensitivity_level" in csv_content
+            assert "test-tool-1" in csv_content
+            assert "test-tool-2" in csv_content
+        finally:
+            if get_db in app.dependency_overrides:
+                del app.dependency_overrides[get_db]
 
-    @patch("sark.api.routers.export.get_db")
-    @patch("sark.api.routers.export.get_current_user")
-    def test_export_tools_csv_handles_null_description(
-        self, mock_get_user, mock_get_db, client, mock_user
-    ):
+    def test_export_tools_csv_handles_null_description(self, client, mock_user):
         """Test export tools CSV handles null descriptions."""
-        mock_get_user.return_value = mock_user
+        from sark.api.main import app
+        from sark.db import get_db
 
         tool_with_null = MCPTool(
             id=uuid4(),
@@ -349,52 +340,51 @@ class TestExportToolsCsvEndpoint:
             extra_metadata=None,
         )
 
-        mock_db_session = AsyncMock(spec=AsyncSession)
-        mock_result = MagicMock()
-        mock_result.scalars.return_value.all.return_value = [tool_with_null]
-        mock_db_session.execute = AsyncMock(return_value=mock_result)
-        mock_get_db.return_value = mock_db_session
+        app.dependency_overrides[get_db] = create_mock_db_dependency([tool_with_null])
 
-        response = client.get("/api/v1/export/tools.csv")
+        try:
+            response = client.get("/api/v1/export/tools.csv")
 
-        assert response.status_code == 200
-        csv_content = response.text
-        assert "null-desc-tool" in csv_content
+            assert response.status_code == 200
+            csv_content = response.text
+            assert "null-desc-tool" in csv_content
+        finally:
+            if get_db in app.dependency_overrides:
+                del app.dependency_overrides[get_db]
 
 
 class TestExportToolsJsonEndpoint:
     """Tests for GET /tools.json endpoint."""
 
-    @patch("sark.api.routers.export.get_db")
-    @patch("sark.api.routers.export.get_current_user")
-    def test_export_tools_json_success(self, mock_get_user, mock_get_db, client, mock_user, mock_tools):
+    def test_export_tools_json_success(self, client, mock_user, mock_tools):
         """Test successful export of tools as JSON."""
-        mock_get_user.return_value = mock_user
+        from sark.api.main import app
+        from sark.db import get_db
 
-        mock_db_session = AsyncMock(spec=AsyncSession)
-        mock_result = MagicMock()
-        mock_result.scalars.return_value.all.return_value = mock_tools
-        mock_db_session.execute = AsyncMock(return_value=mock_result)
-        mock_get_db.return_value = mock_db_session
+        app.dependency_overrides[get_db] = create_mock_db_dependency(mock_tools)
 
-        response = client.get("/api/v1/export/tools.json")
+        try:
+            response = client.get("/api/v1/export/tools.json")
 
-        assert response.status_code == 200
-        assert response.headers["content-type"] == "application/json"
+            assert response.status_code == 200
+            assert response.headers["content-type"] == "application/json"
 
-        data = response.json()
-        assert data["export_type"] == "tools"
-        assert "exported_at" in data
-        assert data["total_records"] == len(mock_tools)
-        assert "tools" in data
-        assert len(data["tools"]) == len(mock_tools)
+            data = response.json()
+            assert data["export_type"] == "tools"
+            assert "exported_at" in data
+            assert data["total_records"] == len(mock_tools)
+            assert "tools" in data
+            assert len(data["tools"]) == len(mock_tools)
 
-        # Verify tool data structure
-        tool = data["tools"][0]
-        assert "id" in tool
-        assert "name" in tool
-        assert "server_id" in tool
-        assert "sensitivity_level" in tool
+            # Verify tool data structure
+            tool = data["tools"][0]
+            assert "id" in tool
+            assert "name" in tool
+            assert "server_id" in tool
+            assert "sensitivity_level" in tool
+        finally:
+            if get_db in app.dependency_overrides:
+                del app.dependency_overrides[get_db]
 
     @patch("sark.api.routers.export.get_db")
     @patch("sark.api.routers.export.get_current_user")
@@ -419,20 +409,27 @@ class TestExportToolsJsonEndpoint:
 class TestExportErrorHandling:
     """Tests for error handling in export endpoints."""
 
-    @patch("sark.api.routers.export.get_db")
-    @patch("sark.api.routers.export.get_current_user")
-    def test_export_handles_database_error(self, mock_get_user, mock_get_db, client, mock_user):
+    def test_export_handles_database_error(self, client, mock_user):
         """Test export handles database errors gracefully."""
-        mock_get_user.return_value = mock_user
+        from sark.api.main import app
+        from sark.db import get_db
 
-        mock_db_session = AsyncMock(spec=AsyncSession)
-        mock_db_session.execute = AsyncMock(side_effect=Exception("Database error"))
-        mock_get_db.return_value = mock_db_session
+        async def mock_db_with_error():
+            """Mock that raises database error."""
+            mock_session = AsyncMock(spec=AsyncSession)
+            mock_session.execute = AsyncMock(side_effect=Exception("Database error"))
+            yield mock_session
 
-        response = client.get("/api/v1/export/servers.csv")
+        app.dependency_overrides[get_db] = mock_db_with_error
 
-        assert response.status_code == 500
-        assert "Failed to export" in response.json()["detail"]
+        try:
+            response = client.get("/api/v1/export/servers.csv")
+
+            assert response.status_code == 500
+            assert "Failed to export" in response.json()["detail"]
+        finally:
+            if get_db in app.dependency_overrides:
+                del app.dependency_overrides[get_db]
 
 
 class TestExportRequestModel:
