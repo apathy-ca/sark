@@ -1899,6 +1899,819 @@ def get_edr_connector(config: EDRConfig) -> EDRConnector:
 
 ---
 
+## Mode 7: Encrypted Tunnel Detection
+
+### The Problem
+
+LLM traffic can hide inside encrypted tunnels, evading all previous detection methods:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Evasion Scenarios                            │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  What SARK Sees              What's Actually Happening          │
+│  ──────────────              ────────────────────────           │
+│                                                                 │
+│  SSH to jumphost.corp     →  SSH tunnel to api.openai.com      │
+│  WireGuard to VPN         →  Claude API calls inside VPN       │
+│  HTTPS to cloudflare      →  DoH hiding DNS for api.anthropic  │
+│  TCP to proxy.internal    →  SOCKS proxy to api.mistral.ai     │
+│  QUIC to relay.corp       →  Cloudflare Tunnel to LLM          │
+│                                                                 │
+│  All our detection methods see the tunnel, not the payload     │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Tunnel Types to Detect
+
+| Tunnel Type | Protocol | Detection Difficulty |
+|-------------|----------|---------------------|
+| SSH Port Forward | TCP/22 | Medium - known ports, long-lived |
+| SSH Dynamic (SOCKS) | TCP/22 | Medium - same as above |
+| WireGuard VPN | UDP/51820 | Hard - looks like noise |
+| OpenVPN | UDP/1194 or TCP/443 | Medium - signatures exist |
+| IPsec | ESP/AH | Medium - protocol numbers |
+| Cloudflare Tunnel | QUIC/443 | Hard - legitimate traffic |
+| ngrok | HTTPS/443 | Hard - looks like normal HTTPS |
+| Tailscale | WireGuard-based | Hard - peer-to-peer mesh |
+| Tor | TCP/9001,9030 | Easy - known ports/nodes |
+| SOCKS Proxy | TCP/1080 | Easy - known port |
+| HTTP CONNECT | TCP/3128,8080 | Medium - proxy signatures |
+| DNS-over-HTTPS | HTTPS/443 | Hard - looks like HTTPS |
+| DNS-over-TLS | TLS/853 | Medium - known port |
+| ICMP Tunnel | ICMP | Medium - unusual ICMP patterns |
+| DNS Tunnel | UDP/53 | Medium - entropy analysis |
+
+### Detection Strategies
+
+#### Strategy 1: JA3/JA4 TLS Fingerprinting
+
+TLS handshakes have unique fingerprints. LLM client libraries have recognizable patterns:
+
+```python
+# sark/tunnel_detection/ja4_fingerprints.py
+
+# Known LLM client JA4 fingerprints
+LLM_CLIENT_FINGERPRINTS = {
+    # OpenAI Python SDK
+    "t13d1516h2_8daaf6152771_b0da82dd1658": {
+        "client": "openai-python",
+        "confidence": 0.95,
+    },
+    # Anthropic Python SDK
+    "t13d1517h2_8daaf6152771_e5627efa2ab1": {
+        "client": "anthropic-python",
+        "confidence": 0.95,
+    },
+    # httpx (common in LLM SDKs)
+    "t13d1516h2_8daaf6152771_02713d6af862": {
+        "client": "httpx",
+        "confidence": 0.7,  # Lower - used for many things
+    },
+    # aiohttp
+    "t13d1516h2_8daaf6152771_6e2c0f5a3b1d": {
+        "client": "aiohttp",
+        "confidence": 0.6,
+    },
+}
+
+# Known tunnel software JA4 fingerprints
+TUNNEL_FINGERPRINTS = {
+    "t13d1516h2_5b57614c22b0_06cda9e17597": "cloudflared",
+    "t13d1516h2_8daaf6152771_3c5a54f6e39d": "ngrok",
+    "t13d1516h2_2bab15409345_b8cc45678def": "tailscale",
+}
+
+class JA4Analyzer:
+    """Analyze JA4 fingerprints to detect LLM traffic and tunnels."""
+
+    def __init__(self, fingerprint_db: dict):
+        self.fingerprints = fingerprint_db
+
+    def analyze_tls_handshake(self, client_hello: bytes) -> TLSAnalysis:
+        """Extract and analyze JA4 fingerprint from TLS ClientHello."""
+
+        ja4 = self._compute_ja4(client_hello)
+        ja4s = self._compute_ja4s(client_hello)  # Server name hash
+        ja4h = self._compute_ja4h(client_hello)  # HTTP/2 fingerprint
+
+        result = TLSAnalysis(
+            ja4=ja4,
+            ja4s=ja4s,
+            ja4h=ja4h,
+        )
+
+        # Check against known fingerprints
+        if match := self.fingerprints.get(ja4):
+            result.client = match["client"]
+            result.confidence = match["confidence"]
+            result.is_llm_client = match["client"] in LLM_CLIENT_FINGERPRINTS
+
+        # Check for tunnel software
+        if tunnel := TUNNEL_FINGERPRINTS.get(ja4):
+            result.is_tunnel = True
+            result.tunnel_type = tunnel
+
+        return result
+```
+
+#### Strategy 2: Traffic Pattern Analysis (ML-based)
+
+LLM API calls have distinctive traffic patterns even when encrypted:
+
+```python
+# sark/tunnel_detection/traffic_patterns.py
+
+import numpy as np
+from dataclasses import dataclass
+
+@dataclass
+class FlowFeatures:
+    """Features extracted from an encrypted flow for ML classification."""
+
+    # Packet timing
+    inter_arrival_times: list[float]  # Time between packets
+
+    # Packet sizes
+    packet_sizes: list[int]           # Size of each packet
+    payload_sizes: list[int]          # Payload without headers
+
+    # Direction
+    upload_bytes: int
+    download_bytes: int
+    upload_packets: int
+    download_packets: int
+
+    # Duration
+    flow_duration: float
+
+    # Derived features
+    @property
+    def avg_packet_size(self) -> float:
+        return np.mean(self.packet_sizes)
+
+    @property
+    def packet_size_variance(self) -> float:
+        return np.var(self.packet_sizes)
+
+    @property
+    def upload_download_ratio(self) -> float:
+        if self.download_bytes == 0:
+            return float('inf')
+        return self.upload_bytes / self.download_bytes
+
+    @property
+    def burstiness(self) -> float:
+        """Measure of traffic burstiness (LLM streaming has characteristic patterns)."""
+        if len(self.inter_arrival_times) < 2:
+            return 0
+        return np.std(self.inter_arrival_times) / np.mean(self.inter_arrival_times)
+
+
+class LLMTrafficClassifier:
+    """
+    ML classifier to detect LLM API traffic patterns in encrypted flows.
+
+    LLM traffic has distinctive patterns:
+    - Request: Small upload (prompt), then wait
+    - Response: Streaming download (tokens), bursty
+    - Timing: Characteristic token generation cadence (~50-100ms between chunks)
+    """
+
+    def __init__(self, model_path: str):
+        self.model = self._load_model(model_path)
+
+        # Characteristic LLM patterns
+        self.LLM_PATTERNS = {
+            "chat_completion": {
+                "upload_download_ratio": (0.01, 0.3),  # Small prompt, large response
+                "burstiness": (0.5, 2.0),              # Bursty streaming
+                "inter_arrival_mean_ms": (30, 150),    # Token timing
+            },
+            "embedding": {
+                "upload_download_ratio": (0.5, 5.0),   # Larger input
+                "response_size": (1000, 10000),        # Fixed-size embedding
+                "duration_ms": (100, 2000),            # Quick response
+            },
+        }
+
+    def extract_features(self, flow: Flow) -> np.ndarray:
+        """Extract ML features from encrypted flow."""
+
+        features = FlowFeatures(
+            inter_arrival_times=flow.get_inter_arrival_times(),
+            packet_sizes=flow.get_packet_sizes(),
+            payload_sizes=flow.get_payload_sizes(),
+            upload_bytes=flow.upload_bytes,
+            download_bytes=flow.download_bytes,
+            upload_packets=flow.upload_packets,
+            download_packets=flow.download_packets,
+            flow_duration=flow.duration,
+        )
+
+        return np.array([
+            features.avg_packet_size,
+            features.packet_size_variance,
+            features.upload_download_ratio,
+            features.burstiness,
+            np.mean(features.inter_arrival_times) * 1000,  # Convert to ms
+            np.std(features.inter_arrival_times) * 1000,
+            features.flow_duration,
+            features.upload_packets,
+            features.download_packets,
+            # Packet size histogram (10 bins)
+            *np.histogram(features.packet_sizes, bins=10, range=(0, 1500))[0],
+        ])
+
+    def classify(self, flow: Flow) -> TrafficClassification:
+        """Classify encrypted flow as LLM traffic or not."""
+
+        features = self.extract_features(flow)
+
+        # ML prediction
+        proba = self.model.predict_proba(features.reshape(1, -1))[0]
+
+        return TrafficClassification(
+            is_llm_traffic=proba[1] > 0.7,
+            confidence=max(proba),
+            predicted_type=self._predict_llm_type(features),
+            features=features,
+        )
+
+    def _predict_llm_type(self, features: np.ndarray) -> str:
+        """Predict specific LLM API type (chat, embedding, etc.)."""
+        # Heuristic-based for now, could be another ML model
+        ratio = features[2]  # upload_download_ratio
+
+        if ratio < 0.3:
+            return "chat_completion_streaming"
+        elif ratio < 1.0:
+            return "chat_completion"
+        else:
+            return "embedding"
+```
+
+#### Strategy 3: Tunnel Endpoint Intelligence
+
+Maintain a database of known tunnel endpoints and flag traffic to them:
+
+```python
+# sark/tunnel_detection/endpoint_intel.py
+
+@dataclass
+class TunnelEndpoint:
+    """Known tunnel/proxy endpoint."""
+
+    ip_ranges: list[str]
+    domains: list[str]
+    service: str           # "cloudflare_tunnel", "ngrok", "tailscale", etc.
+    risk_level: str        # "high", "medium", "low"
+    can_inspect: bool      # Can we potentially inspect this?
+    notes: str
+
+TUNNEL_ENDPOINTS = {
+    "cloudflare_tunnel": TunnelEndpoint(
+        ip_ranges=["198.41.192.0/24", "198.41.200.0/24"],  # Cloudflare Tunnel IPs
+        domains=["*.trycloudflare.com", "*.cfargotunnel.com"],
+        service="cloudflare_tunnel",
+        risk_level="high",
+        can_inspect=False,  # End-to-end encrypted
+        notes="Cloudflare Argo Tunnel - can hide any traffic",
+    ),
+    "ngrok": TunnelEndpoint(
+        ip_ranges=["3.134.0.0/16"],  # ngrok AWS ranges
+        domains=["*.ngrok.io", "*.ngrok-free.app"],
+        service="ngrok",
+        risk_level="high",
+        can_inspect=False,
+        notes="ngrok tunnels - commonly used for dev, also exfil",
+    ),
+    "tailscale": TunnelEndpoint(
+        ip_ranges=["100.64.0.0/10"],  # CGNAT range used by Tailscale
+        domains=["*.ts.net", "*.tailscale.com"],
+        service="tailscale",
+        risk_level="medium",
+        can_inspect=False,
+        notes="Tailscale mesh VPN - P2P, hard to intercept",
+    ),
+    "tor_exit_nodes": TunnelEndpoint(
+        ip_ranges=[],  # Loaded dynamically from Tor directory
+        domains=[".onion"],
+        service="tor",
+        risk_level="high",
+        can_inspect=False,
+        notes="Tor network - anonymizing proxy",
+    ),
+    "mullvad_vpn": TunnelEndpoint(
+        ip_ranges=["45.83.220.0/22", "141.98.252.0/22"],
+        domains=["*.mullvad.net"],
+        service="mullvad",
+        risk_level="medium",
+        can_inspect=False,
+        notes="Privacy VPN - no logs claimed",
+    ),
+}
+
+class TunnelEndpointDetector:
+    """Detect traffic to known tunnel endpoints."""
+
+    def __init__(self):
+        self.endpoints = TUNNEL_ENDPOINTS
+        self._load_dynamic_lists()
+
+    def _load_dynamic_lists(self):
+        """Load dynamically updated lists (Tor exits, etc.)."""
+        # Tor exit nodes
+        self.endpoints["tor_exit_nodes"].ip_ranges = self._fetch_tor_exits()
+
+        # Known VPN providers
+        self._load_vpn_provider_ips()
+
+    def check_connection(
+        self,
+        dst_ip: str,
+        dst_port: int,
+        dst_domain: str | None,
+    ) -> TunnelDetection | None:
+        """Check if connection is to a known tunnel endpoint."""
+
+        import ipaddress
+
+        for name, endpoint in self.endpoints.items():
+            # Check IP ranges
+            try:
+                addr = ipaddress.ip_address(dst_ip)
+                for cidr in endpoint.ip_ranges:
+                    if addr in ipaddress.ip_network(cidr):
+                        return TunnelDetection(
+                            tunnel_type=name,
+                            endpoint=endpoint,
+                            match_type="ip",
+                            confidence=0.9,
+                        )
+            except ValueError:
+                pass
+
+            # Check domains
+            if dst_domain:
+                for pattern in endpoint.domains:
+                    if self._domain_matches(dst_domain, pattern):
+                        return TunnelDetection(
+                            tunnel_type=name,
+                            endpoint=endpoint,
+                            match_type="domain",
+                            confidence=0.95,
+                        )
+
+        return None
+```
+
+#### Strategy 4: Behavioral Analysis
+
+Look at what happens BEFORE and AFTER the tunnel:
+
+```python
+# sark/tunnel_detection/behavioral.py
+
+class TunnelBehaviorAnalyzer:
+    """
+    Analyze process behavior around tunnel connections.
+
+    Key insight: Even if we can't see inside the tunnel, we can see:
+    - What process created the tunnel
+    - What that process does before/after
+    - File access patterns
+    - Other network connections
+    """
+
+    def __init__(self, edr_connector: EDRConnector):
+        self.edr = edr_connector
+
+    async def analyze_tunnel_process(
+        self,
+        process_id: int,
+        device_id: str,
+    ) -> TunnelBehaviorAnalysis:
+        """Analyze the process that created a tunnel connection."""
+
+        # Get process tree from EDR
+        process_tree = await self.edr.get_process_tree(device_id, process_id)
+
+        # Get file access by this process
+        file_access = await self.edr.get_file_events(
+            device_id,
+            process_id,
+            time_window_minutes=5,
+        )
+
+        # Get other network connections by this process
+        other_connections = await self.edr.get_network_events(
+            device_id,
+            process_id,
+            time_window_minutes=5,
+        )
+
+        # Analyze patterns
+        analysis = TunnelBehaviorAnalysis()
+
+        # Check for LLM SDK files
+        llm_indicators = self._check_llm_file_access(file_access)
+        if llm_indicators:
+            analysis.llm_likelihood = "high"
+            analysis.evidence.append(f"Accessed LLM SDK files: {llm_indicators}")
+
+        # Check for API key access
+        if self._accessed_credentials(file_access):
+            analysis.llm_likelihood = "high"
+            analysis.evidence.append("Accessed credential files (.env, secrets)")
+
+        # Check process command line
+        if self._cmdline_has_llm_indicators(process_tree.command_line):
+            analysis.llm_likelihood = "high"
+            analysis.evidence.append(f"Command line indicates LLM: {process_tree.command_line}")
+
+        # Check environment variables (from EDR)
+        env_vars = await self.edr.get_process_environment(device_id, process_id)
+        if self._has_llm_env_vars(env_vars):
+            analysis.llm_likelihood = "high"
+            analysis.evidence.append("Has OPENAI_API_KEY or similar in environment")
+
+        return analysis
+
+    def _check_llm_file_access(self, file_events: list) -> list[str]:
+        """Check for access to LLM-related files."""
+
+        llm_patterns = [
+            r"openai",
+            r"anthropic",
+            r"langchain",
+            r"llama",
+            r"\.gguf$",        # LLM model files
+            r"\.safetensors$", # Model weights
+            r"transformers",
+            r"huggingface",
+        ]
+
+        matches = []
+        for event in file_events:
+            for pattern in llm_patterns:
+                if re.search(pattern, event.file_path, re.I):
+                    matches.append(event.file_path)
+
+        return matches
+
+    def _has_llm_env_vars(self, env_vars: dict) -> bool:
+        """Check for LLM API keys in environment."""
+
+        llm_env_patterns = [
+            "OPENAI_API_KEY",
+            "ANTHROPIC_API_KEY",
+            "GOOGLE_API_KEY",
+            "MISTRAL_API_KEY",
+            "GROQ_API_KEY",
+            "HUGGINGFACE_TOKEN",
+            "HF_TOKEN",
+        ]
+
+        return any(key in env_vars for key in llm_env_patterns)
+```
+
+#### Strategy 5: DNS Intelligence (Even with DoH)
+
+Even with DNS-over-HTTPS, we can learn from DNS patterns:
+
+```python
+# sark/tunnel_detection/dns_intel.py
+
+class DNSIntelligence:
+    """
+    DNS-based detection even in presence of DoH/DoT.
+
+    Strategies:
+    1. Monitor corporate DNS (before DoH)
+    2. Detect DoH providers and flag
+    3. Analyze SNI in TLS (not encrypted until ECH)
+    4. Certificate transparency logs
+    """
+
+    def __init__(self):
+        # Known DoH providers
+        self.doh_providers = {
+            "cloudflare": ["1.1.1.1", "1.0.0.1", "cloudflare-dns.com"],
+            "google": ["8.8.8.8", "8.8.4.4", "dns.google"],
+            "quad9": ["9.9.9.9", "dns.quad9.net"],
+            "nextdns": ["45.90.28.0/24", "dns.nextdns.io"],
+        }
+
+        # LLM domains to watch for in SNI
+        self.llm_domains = [
+            "api.openai.com",
+            "api.anthropic.com",
+            "generativelanguage.googleapis.com",
+            "api.mistral.ai",
+            "api.groq.com",
+            "api.cohere.ai",
+            "api-inference.huggingface.co",
+        ]
+
+    def analyze_tls_sni(self, client_hello: bytes) -> SNIAnalysis:
+        """
+        Extract and analyze SNI from TLS ClientHello.
+
+        Note: SNI is plaintext until ECH (Encrypted Client Hello) is deployed.
+        This remains a valuable detection point for now.
+        """
+
+        sni = self._extract_sni(client_hello)
+
+        if not sni:
+            return SNIAnalysis(
+                sni=None,
+                is_llm_domain=False,
+                is_doh_provider=False,
+                notes="No SNI present (possible ECH or non-TLS)"
+            )
+
+        # Check for LLM domains
+        is_llm = any(sni.endswith(domain) for domain in self.llm_domains)
+
+        # Check for DoH providers
+        is_doh = any(
+            sni.endswith(provider)
+            for providers in self.doh_providers.values()
+            for provider in providers
+            if isinstance(provider, str) and not provider[0].isdigit()
+        )
+
+        return SNIAnalysis(
+            sni=sni,
+            is_llm_domain=is_llm,
+            is_doh_provider=is_doh,
+            notes="SNI visible - not using ECH" if sni else None
+        )
+
+    def monitor_certificate_transparency(self, domain: str) -> list[CTLogEntry]:
+        """
+        Query Certificate Transparency logs for LLM-related certificates.
+
+        Even if traffic is tunneled, new certificates for LLM domains
+        appear in CT logs. Organizations using private LLM proxies
+        might issue internal certs we can detect.
+        """
+
+        # Query CT logs via crt.sh or similar
+        ct_entries = self._query_ct_logs(domain)
+
+        llm_related = []
+        for entry in ct_entries:
+            # Check for LLM-related SANs
+            for san in entry.subject_alt_names:
+                if any(llm in san for llm in ["openai", "anthropic", "llm", "ai-proxy"]):
+                    llm_related.append(entry)
+
+        return llm_related
+```
+
+### Integrated Tunnel Detection Pipeline
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                  Tunnel Detection Pipeline                       │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Network Traffic                                                │
+│       │                                                         │
+│       ▼                                                         │
+│  ┌─────────────────┐                                           │
+│  │ 1. Endpoint     │  Check against known tunnel IPs/domains   │
+│  │    Intel        │  (ngrok, Cloudflare, Tailscale, etc.)     │
+│  └────────┬────────┘                                           │
+│           │                                                     │
+│           ▼                                                     │
+│  ┌─────────────────┐                                           │
+│  │ 2. JA4          │  TLS fingerprint analysis                 │
+│  │    Fingerprint  │  Detect LLM client libraries              │
+│  └────────┬────────┘                                           │
+│           │                                                     │
+│           ▼                                                     │
+│  ┌─────────────────┐                                           │
+│  │ 3. SNI/DNS      │  Domain analysis (until ECH)              │
+│  │    Analysis     │  DoH provider detection                   │
+│  └────────┬────────┘                                           │
+│           │                                                     │
+│           ▼                                                     │
+│  ┌─────────────────┐                                           │
+│  │ 4. Traffic      │  ML on packet sizes/timing                │
+│  │    Patterns     │  Detect LLM streaming patterns            │
+│  └────────┬────────┘                                           │
+│           │                                                     │
+│           ▼                                                     │
+│  ┌─────────────────┐                                           │
+│  │ 5. EDR          │  What is the tunnel process doing?        │
+│  │    Correlation  │  File access, env vars, command line      │
+│  └────────┬────────┘                                           │
+│           │                                                     │
+│           ▼                                                     │
+│  ┌─────────────────┐                                           │
+│  │ Detection       │  Combine signals → confidence score       │
+│  │ Fusion          │  Alert, block, or audit                   │
+│  └─────────────────┘                                           │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Detection Fusion Logic
+
+```python
+# sark/tunnel_detection/fusion.py
+
+@dataclass
+class TunnelDetectionResult:
+    """Combined result from all detection strategies."""
+
+    # Individual signals
+    endpoint_intel: TunnelDetection | None
+    ja4_analysis: TLSAnalysis | None
+    sni_analysis: SNIAnalysis | None
+    traffic_pattern: TrafficClassification | None
+    behavioral: TunnelBehaviorAnalysis | None
+
+    # Combined assessment
+    is_tunnel: bool
+    tunnel_type: str | None
+    contains_llm_traffic: bool
+    llm_confidence: float
+
+    # Recommended action
+    action: str  # "allow", "alert", "block", "inspect"
+    reason: str
+
+class DetectionFusion:
+    """Combine signals from multiple detectors."""
+
+    def __init__(self, policy_engine: PolicyEngine):
+        self.policy = policy_engine
+
+        # Weights for different signals
+        self.weights = {
+            "endpoint_intel": 0.9,      # High confidence if known tunnel
+            "ja4_llm_client": 0.8,      # LLM client fingerprint
+            "sni_llm_domain": 0.95,     # Direct LLM domain (very high)
+            "traffic_pattern": 0.7,     # ML-based (good but not definitive)
+            "behavioral_env_vars": 0.85, # API keys in env
+            "behavioral_files": 0.6,    # LLM files accessed
+        }
+
+    def fuse(
+        self,
+        endpoint_intel: TunnelDetection | None,
+        ja4_analysis: TLSAnalysis | None,
+        sni_analysis: SNIAnalysis | None,
+        traffic_pattern: TrafficClassification | None,
+        behavioral: TunnelBehaviorAnalysis | None,
+    ) -> TunnelDetectionResult:
+        """Combine all signals into a single detection result."""
+
+        signals = []
+
+        # Collect signals with weights
+        if endpoint_intel:
+            signals.append(("endpoint_intel", endpoint_intel.confidence))
+
+        if ja4_analysis and ja4_analysis.is_llm_client:
+            signals.append(("ja4_llm_client", ja4_analysis.confidence))
+
+        if sni_analysis and sni_analysis.is_llm_domain:
+            signals.append(("sni_llm_domain", 0.95))
+
+        if traffic_pattern and traffic_pattern.is_llm_traffic:
+            signals.append(("traffic_pattern", traffic_pattern.confidence))
+
+        if behavioral:
+            if behavioral.has_llm_env_vars:
+                signals.append(("behavioral_env_vars", 0.85))
+            if behavioral.llm_file_access:
+                signals.append(("behavioral_files", 0.6))
+
+        # Calculate weighted confidence
+        if not signals:
+            llm_confidence = 0.0
+        else:
+            weighted_sum = sum(
+                self.weights.get(sig, 0.5) * conf
+                for sig, conf in signals
+            )
+            total_weight = sum(
+                self.weights.get(sig, 0.5)
+                for sig, _ in signals
+            )
+            llm_confidence = weighted_sum / total_weight
+
+        # Determine if tunnel
+        is_tunnel = endpoint_intel is not None
+        tunnel_type = endpoint_intel.tunnel_type if endpoint_intel else None
+
+        # Determine action based on policy
+        action, reason = self._determine_action(
+            is_tunnel=is_tunnel,
+            llm_confidence=llm_confidence,
+            signals=signals,
+        )
+
+        return TunnelDetectionResult(
+            endpoint_intel=endpoint_intel,
+            ja4_analysis=ja4_analysis,
+            sni_analysis=sni_analysis,
+            traffic_pattern=traffic_pattern,
+            behavioral=behavioral,
+            is_tunnel=is_tunnel,
+            tunnel_type=tunnel_type,
+            contains_llm_traffic=llm_confidence > 0.7,
+            llm_confidence=llm_confidence,
+            action=action,
+            reason=reason,
+        )
+
+    def _determine_action(
+        self,
+        is_tunnel: bool,
+        llm_confidence: float,
+        signals: list,
+    ) -> tuple[str, str]:
+        """Determine action based on detection and policy."""
+
+        # High confidence LLM in tunnel → alert or block
+        if is_tunnel and llm_confidence > 0.8:
+            return ("alert", f"High confidence LLM traffic in tunnel ({llm_confidence:.0%})")
+
+        # Known high-risk tunnel → alert
+        if is_tunnel:
+            return ("alert", f"Traffic to known tunnel endpoint")
+
+        # Moderate confidence LLM → audit
+        if llm_confidence > 0.5:
+            return ("audit", f"Possible LLM traffic ({llm_confidence:.0%})")
+
+        return ("allow", "No significant indicators")
+```
+
+### Policy Response Options
+
+```rego
+# opa/policies/tunnel_detection.rego
+
+package sark.tunnel
+
+# Block known tunnel endpoints entirely
+deny_tunnel {
+    input.tunnel_detection.is_tunnel
+    input.tunnel_detection.tunnel_type in ["ngrok", "cloudflare_tunnel", "tor"]
+    not tunnel_allowed_for_user
+}
+
+# Alert on suspected LLM traffic in tunnels
+alert_llm_in_tunnel {
+    input.tunnel_detection.is_tunnel
+    input.tunnel_detection.contains_llm_traffic
+    input.tunnel_detection.llm_confidence > 0.7
+}
+
+# Allow corporate VPN but audit LLM traffic
+audit_llm_in_vpn {
+    input.tunnel_detection.tunnel_type == "corporate_vpn"
+    input.tunnel_detection.contains_llm_traffic
+}
+
+# Exceptions for approved users/processes
+tunnel_allowed_for_user {
+    input.user.groups[_] == "tunnel-exemption"
+}
+
+tunnel_allowed_for_user {
+    input.process.name in approved_tunnel_processes
+}
+
+approved_tunnel_processes = {
+    "corporate-vpn-client",
+    "approved-ssh-client",
+}
+```
+
+### Limitations and Mitigations
+
+| Limitation | Mitigation |
+|------------|------------|
+| **ECH hides SNI** | JA4 + traffic analysis + behavioral |
+| **Novel tunnel software** | ML-based pattern detection |
+| **Steganography** | Out of scope (very hard) |
+| **Low-and-slow exfil** | Long-term behavioral baselines |
+| **Encrypted DNS everywhere** | Monitor DoH endpoints, CT logs |
+| **ML evasion** | Multiple orthogonal signals, ensemble |
+
+---
+
 ## Open Questions
 
 1. **TLS Inspection Legality**: Enterprise can mandate CA installation; home users opt-in. Document implications.
