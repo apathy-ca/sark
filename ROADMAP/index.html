@@ -5054,50 +5054,47 @@
 
 
 <h1 id="sark-path-to-production-roadmap">SARK Path to Production Roadmap<a class="headerlink" href="#sark-path-to-production-roadmap" title="Permanent link">&para;</a></h1>
-<p><strong>Document Version:</strong> 2.1
-<strong>Last Updated:</strong> 2025-12-26
-<strong>Current Release:</strong> v1.3.0 (Advanced Security Features)
-<strong>Target Release:</strong> v1.4.0 (Rust foundation optimization)
-<strong>Target Production:</strong> v2.0.0 (Q1 2026 - after security audit)</p>
+<p><strong>Document Version:</strong> 2.2
+<strong>Last Updated:</strong> 2026-01-17
+<strong>Current Release:</strong> v1.5.0 (Production Readiness)
+<strong>Target Release:</strong> v1.6.0 (Polish &amp; Validation)
+<strong>Target Production:</strong> v2.0.0 (Q2 2026 - GRID Reference Implementation)</p>
 <hr />
 <h2 id="executive-summary">Executive Summary<a class="headerlink" href="#executive-summary" title="Permanent link">&para;</a></h2>
 <p><strong>Current Situation:</strong>
-<strong>v1.3.0 has been successfully completed</strong> (Dec 26, 2025) with comprehensive security features addressing the Lethal Trifecta vulnerabilities. The implementation includes prompt injection detection, behavioral anomaly detection, secret scanning, MFA, and network-level controls. All security features are production-ready with exceptional performance (30-100x faster than targets).</p>
-<p><strong>What We Have (v1.3.0 - Completed):</strong>
+<strong>v1.5.0 has been successfully released</strong> (Jan 17, 2026) with production-ready gateway transports, security fixes, and testing infrastructure. The implementation includes HTTP/SSE/stdio gateway transports, LDAP/CSRF/credentials security fixes, frontend authentication UI, E2E integration tests, and performance benchmark infrastructure.</p>
+<p><strong>What We Have (v1.5.0 - Completed):</strong>
+- ✅ <strong>Gateway Transports</strong> (HTTP, SSE, stdio implementations)
+- ✅ <strong>Security Fixes</strong> (LDAP injection, CSRF protection, credentials hardening)
+- ✅ <strong>Frontend Authentication</strong> (Login, MFA, API key management UI)
+- ✅ <strong>E2E Integration Tests</strong> (Complete user flow testing)
+- ✅ <strong>Performance Infrastructure</strong> (Locust, pytest-benchmark frameworks)
+- ✅ <strong>Rust Foundation</strong> (v1.4.0: OPA engine, in-memory cache, 4-10x faster)
+- ✅ <strong>Advanced Security</strong> (v1.3.0: injection detection, anomaly detection, secret scanning, MFA, network controls)
 - ✅ Strong architectural foundation (multi-layer auth/authz)
-- ✅ Gateway infrastructure merged (models, tests, docs)
-- ✅ Advanced features (adapters, federation, GRID protocol)
-- ✅ Comprehensive audit logging and SIEM integration
-- ✅ <strong>Prompt injection detection</strong> (20+ patterns, entropy analysis, risk scoring)
-- ✅ <strong>Behavioral anomaly detection</strong> (30-day baseline, real-time alerts)
-- ✅ <strong>Secret scanning &amp; redaction</strong> (25+ secret patterns, automatic redaction)
-- ✅ <strong>MFA for critical actions</strong> (TOTP, SMS, Push, Email)
-- ✅ <strong>Network security controls</strong> (NetworkPolicies, egress filtering)
-- ✅ <strong>Comprehensive testing</strong> (350+ unit tests, 530+ integration tests, 2200+ performance framework)
-- ✅ <strong>Performance benchmarks</strong> (all passing, 30-100x faster than targets)</p>
-<p><strong>What's Missing (Blocking Production):</strong>
-- ❌ Gateway client is stubbed (returns empty lists, NotImplementedError)
-- ❌ No policy validation framework (risk of policy injection attacks)
-- ❌ 154 failing auth provider tests (77.8% pass rate)
-- ❌ No external security audit completed</p>
+- ✅ Comprehensive audit logging and SIEM integration</p>
+<p><strong>What's Missing (Blocking v2.0 Production):</strong>
+- ⚠️ Test suite needs cleanup (34 failing tests across export/tools routers)
+- ⚠️ Dependabot security vulnerabilities (4 remaining)
+- ⚠️ Performance benchmarks need validation in proper environment
+- ⚠️ Protocol abstraction for GRID v1.0 compliance (v2.0 work)
+- ❌ External security audit not yet scheduled</p>
 <p><strong>Revised Strategy:</strong>
-<strong>v1.2.0</strong> will complete the production-critical implementation work (Gateway, policy validation, test fixes). <strong>v2.0.0</strong> will be released only after external security audit passes. This roadmap reflects incremental, honest versioning based on the Implementation Plan and Lethal Trifecta Analysis.</p>
+<strong>v1.6.0</strong> will provide production polish (test fixes, dependency updates, performance validation) as a solid foundation for <strong>v2.0.0</strong>, which will transform SARK into the universal GRID v1.0 reference implementation with protocol abstraction, federation, and cost attribution.</p>
 <p><strong>Version Plan:</strong>
-- <strong>v1.1.0</strong> (✅ Complete): Gateway infrastructure merged but stubbed
-- <strong>v1.2.0</strong> (⏭️ Skipped): Gateway working + policy validation + tests passing
-- <strong>v1.3.0</strong> (✅ Complete - Dec 26, 2025): Lethal Trifecta mitigations (prompt injection, anomaly, network, secrets, MFA)
-- <strong>v1.4.0</strong> (Next - 6-8 weeks): Rust foundation (OPA engine + fast cache) - 5-10x performance
-- <strong>v1.5.0</strong> (Future - 4-5 weeks): Rust detection (injection, anomaly, MCP parsing) - 10-100x performance
-- <strong>v2.0.0</strong> (Production): Security audit passed + production deployment</p>
+- <strong>v1.3.0</strong> (✅ Complete - Dec 2025): Advanced Security (injection detection, anomaly, network, secrets, MFA)
+- <strong>v1.4.0</strong> (✅ Complete - Jan 2026): Rust Foundation (OPA engine, in-memory cache, 4-10x performance)
+- <strong>v1.5.0</strong> (✅ Complete - Jan 17, 2026): Production Readiness (gateway transports, security fixes, E2E tests)
+- <strong>v1.6.0</strong> (Next - 2-3 weeks): Polish &amp; Validation (test fixes, dependabot, performance validation)
+- <strong>v2.0.0</strong> (Future - 16-20 weeks): GRID Reference Implementation (protocol abstraction, federation, cost attribution)</p>
 <hr />
 <h2 id="complete-version-timeline">Complete Version Timeline<a class="headerlink" href="#complete-version-timeline" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>v1.1.0 ──► v1.2.0 ──► v1.3.0 ──► v1.4.0 ──► v1.5.0 ──► v2.0.0
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>(Done)  (Skipped)  (DONE!)   (NEXT)    (Future)  (Production)
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  │         │         │          │         │         │
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Gateway  Gateway   Advanced   Rust      Rust    Security
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>Stubbed  Skipped   Security   Core      Fast    Audit
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>                   ✅ COMPLETE (5-10x)   (10-100x) Passed
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>                   Dec 26/25
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>v1.3.0 ──► v1.4.0 ──► v1.5.0 ──► v1.6.0 ──► v2.0.0
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>(DONE)   (DONE)    (DONE!)   (NEXT)    (Future)
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  │         │         │          │         │
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Advanced  Rust    Production  Polish    GRID
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>Security  Core    Readiness  Validation  Ref Impl
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>✅ Dec25  ✅ Jan26  ✅ Jan17   (2-3wks)  (16-20wks)
 </span></code></pre></div>
 <h3 id="v120-gateway-policy-tests-8-weeks">v1.2.0: Gateway + Policy + Tests (8 weeks)<a class="headerlink" href="#v120-gateway-policy-tests-8-weeks" title="Permanent link">&para;</a></h3>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>┌─────────────┬─────────────┬─────────────┬─────────────┐
