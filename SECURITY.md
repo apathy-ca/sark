@@ -4,10 +4,13 @@
 
 We release patches for security vulnerabilities. Currently supported versions:
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 0.2.x   | :white_check_mark: |
-| 0.1.x   | :x:                |
+| Version | Supported          | Notes |
+| ------- | ------------------ | ----- |
+| 1.6.x   | :white_check_mark: | Current release (96% vulnerability fix rate) |
+| 1.5.x   | :white_check_mark: | Production readiness release |
+| 1.4.x   | :white_check_mark: | Rust foundation release |
+| 1.3.x   | :white_check_mark: | Security baseline |
+| < 1.3.0 | :x:                | End of life |
 
 ## Reporting a Vulnerability
 
@@ -185,17 +188,23 @@ Comprehensive security documentation available:
 - **[docs/SECURITY_HARDENING.md](docs/SECURITY_HARDENING.md)** - Security hardening checklist (60+ items)
 - **[docs/INCIDENT_RESPONSE.md](docs/INCIDENT_RESPONSE.md)** - Incident response playbooks
 
-## Security Audit Results (Phase 2)
+## Security Audit Results (v1.6.0)
 
-**Status**: ✅ **0 P0/P1 Security Vulnerabilities**
+**Status**: ✅ **1 Low-Severity Vulnerability** (96% remediation rate - 24/25 CVEs fixed)
 
 **Security Scan Results**:
 - Bandit: No high/critical issues
 - Trivy: No high/critical vulnerabilities in container images
-- Safety: No known vulnerabilities in dependencies
+- pip-audit: 1 low-severity vulnerability (nbconvert - Windows-only, dev dependency)
 - OWASP ZAP: No high/critical findings
 
-**Last Security Audit**: November 2025 (Phase 2 completion)
+**v1.6.0 Security Improvements**:
+- Fixed 24/25 Dependabot vulnerabilities (96% fix rate)
+- Eliminated ecdsa dependency (CVE-2024-23342)
+- Upgraded 12 packages for security patches
+- See [v1.6.0 Security Audit](docs/v1.6.0/SECURITY_AUDIT.md) for details
+
+**Last Security Audit**: January 2026 (v1.6.0 release)
 
 ## Security Best Practices for Users
 
@@ -233,4 +242,4 @@ For general questions, see [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ---
 
-**Note**: This security policy is reviewed and updated quarterly. Last updated: November 2025.
+**Note**: This security policy is reviewed and updated quarterly. Last updated: January 2026 (v1.6.0).

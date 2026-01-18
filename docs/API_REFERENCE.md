@@ -1,6 +1,6 @@
 # SARK API Reference
 
-**Version:** 0.1.0
+**Version:** 1.6.0
 **Base URL:** `https://sark.example.com`
 **API Prefix:** `/api/v1` or `/api`
 
@@ -58,7 +58,7 @@ Basic health check (liveness probe).
 ```json
 {
   "status": "healthy",
-  "version": "0.1.0",
+  "version": "1.6.0",
   "environment": "production"
 }
 ```
@@ -89,7 +89,7 @@ Detailed health check with individual dependency status and latency.
 ```json
 {
   "status": "healthy",
-  "version": "0.1.0",
+  "version": "1.6.0",
   "environment": "production",
   "overall_healthy": true,
   "dependencies": {
