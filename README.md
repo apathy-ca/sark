@@ -80,7 +80,7 @@ docker compose --profile full up -d
 - **🆕 Network Controls** - Kubernetes policies, egress filtering
 
 ### Production Ready
-- ✅ 64% test coverage (improving to 85%), 0 known P0/P1 vulnerabilities
+- ✅ 64% test coverage (improving to 85%), 1 low-severity vulnerability (Windows-only, dev dependency)
 - ✅ <100ms p95 latency, 847 req/s sustained throughput
 - ✅ Kubernetes-native, Helm charts, Terraform modules
 - ✅ 100+ pages of documentation
@@ -161,16 +161,23 @@ kubectl apply -f k8s/
 
 ## Project Status
 
-🚀 **v1.5.0 - Current Release** (Released Jan 17, 2026)
+🚀 **v1.6.0 - Current Release** (Released Jan 18, 2026)
 
-**New in v1.5.0 - Production Readiness:**
+**New in v1.6.0 - Polish & Validation:**
+- ✅ **Security Hardening** - 96% vulnerability remediation (24/25 CVEs fixed)
+- ✅ **Test Infrastructure** - 39 tests fixed, 100% pass rate for export + tools routers
+- ✅ **Dependency Cleanup** - Eliminated ecdsa, migrated to PyJWT[crypto]
+- ✅ **Bug Fixes** - Keyword detection for snake_case, FastAPI route ordering
+- ✅ **Documentation** - Comprehensive release notes, migration guides
+
+**v1.5.0 - Production Readiness:**
 - ✅ **Gateway Transport Implementations** (HTTP, SSE, stdio)
 - ✅ **Security Fixes** (LDAP injection, CSRF, credentials)
 - ✅ **Frontend Authentication UI** (Login, MFA, API key management)
 - ✅ **E2E Integration Tests** (Complete user flow testing)
 - ✅ **Performance Benchmark Infrastructure** (Locust, pytest-benchmark)
 
-**Also includes v1.4.0 - Rust Foundation:**
+**v1.4.0 - Rust Foundation:**
 - ✅ **Embedded Rust OPA engine** (4-10x faster policy evaluation)
 - ✅ **Rust in-memory cache** (10-50x faster than Redis)
 - ✅ **Feature flags & gradual rollout** (0% → 100% with instant rollback)

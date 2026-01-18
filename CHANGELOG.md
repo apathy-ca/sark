@@ -10,6 +10,105 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Nothing yet
 
+## [1.6.0] - 2026-01-18
+
+### Security
+
+**Vulnerability Remediation (96% fix rate - 24/25 CVEs)**:
+- aiohttp 3.13.2 → 3.13.3 (7 CVEs: CVE-2025-69223 through CVE-2025-69230)
+- urllib3 1.26.20 → 2.6.3 (4 CVEs: CVE-2025-50181, CVE-2025-66418, CVE-2025-66471, CVE-2026-21441)
+- authlib 1.3.2 → 1.6.6 (CVE-2025-68158)
+- werkzeug 3.1.3 → 3.1.5 (CVE-2026-21860)
+- filelock 3.16.1 → 3.17.0 (CVE-2025-65114)
+- virtualenv 20.28.0 → 20.29.1 (CVE-2025-65111)
+- bokeh 3.6.2 → 3.7.0 (CVE-2025-65108)
+- fonttools 4.55.3 → 4.55.5 (CVE-2026-22220)
+- pyasn1 0.6.1 → 0.6.2 (CVE-2026-23490)
+- pynacl 1.6.0 → 1.6.2 (CVE-2025-69277)
+- azure-core 1.32.0 → 1.38.0 (CVE-2026-21226)
+- kubernetes 34.1.0 → 35.0.0 (for urllib3 2.x compatibility)
+
+**Eliminated ecdsa dependency**:
+- Migrated from python-jose to PyJWT[crypto]
+- Eliminated CVE-2024-23342 (Minerva timing attack in ecdsa)
+- Updated 9 files with new JWT library
+- Changed exception handling: JWTError → jwt.InvalidTokenError
+
+**Remaining**:
+- nbconvert 7.16.4 (CVE-2025-22250) - Windows-only, dev dependency, awaiting upstream fix
+
+### Fixed
+
+**Test Infrastructure (39 tests fixed)**:
+- Export router: 17/17 passing (100%)
+  - Fixed SessionMiddleware dependency error
+  - Corrected route path from empty string to "/"
+  - Created async database mocking helper functions
+  - Converted from @patch decorators to dependency_overrides pattern
+- Tools router: 22/22 passing (100%)
+  - Fixed keyword detection regex to handle snake_case identifiers
+  - Fixed FastAPI route ordering (static paths before parameterized)
+  - Applied dependency_overrides pattern to all tests
+  - Created 3 helper functions for database mocking
+
+**Keyword Detection Bug**:
+- Changed regex from `\b{keyword}\b` to `(?:^|[^a-z]){keyword}(?:$|[^a-z])`
+- Now correctly matches keywords in snake_case identifiers
+- Handles both "credit_card" and "credit card" formats
+
+**FastAPI Route Ordering**:
+- Moved `/statistics/sensitivity` before `/{tool_id}/sensitivity`
+- Added documentation comment about route ordering requirement
+- Prevents FastAPI from matching static path as UUID parameter
+
+### Documentation
+
+**Added**:
+- docs/v1.6.0/RELEASE_NOTES.md - Comprehensive release documentation
+- docs/v1.6.0/SECURITY_AUDIT.md - Complete vulnerability audit
+- docs/v1.6.0/TEST_FIXES.md - Test infrastructure improvements
+
+**Updated**:
+- README.md - v1.6.0 as current release
+- ROADMAP.md - Added v1.6.0 completion
+- CHANGELOG.md - This file
+
+## [1.5.0] - 2026-01-17
+
+### Added
+
+**Gateway Transport Implementations**:
+- HTTP transport with full request/response support
+- SSE (Server-Sent Events) transport for streaming
+- stdio transport for local MCP servers
+- Transport auto-detection and fallback
+
+**Frontend Authentication UI**:
+- Login page with session management
+- MFA setup and verification flows
+- API key management interface
+- User profile and settings
+
+**E2E Integration Tests**:
+- Complete user authentication flow tests
+- MCP server registration and discovery tests
+- Policy evaluation integration tests
+- Frontend-backend integration tests
+
+**Performance Benchmark Infrastructure**:
+- Locust load testing setup
+- pytest-benchmark for micro-benchmarks
+- Automated performance regression detection
+- Grafana dashboards for metrics visualization
+
+### Fixed
+
+**Security**:
+- LDAP injection vulnerability in authentication
+- CSRF token validation in API endpoints
+- Credential exposure in logs and responses
+- Session fixation attacks
+
 ## [1.4.0] - 2026-02-28
 
 ### Added
