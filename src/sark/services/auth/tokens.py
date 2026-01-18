@@ -10,7 +10,7 @@ This service handles:
 from datetime import UTC, datetime, timedelta
 import secrets
 
-from jose import JWTError, jwt
+import jwt  # PyJWT library (replaced python-jose to eliminate ecdsa dependency)
 import structlog
 
 from sark.config import get_settings
@@ -271,21 +271,20 @@ class TokenService:
         Note: This is a utility method. The middleware already validates tokens.
         """
         try:
+            # PyJWT API note: options dict keys differ from python-jose
             payload = jwt.decode(
                 token,
                 self.jwt_signing_key,
                 algorithms=[self.settings.jwt_algorithm],
-                issuer=self.settings.jwt_issuer,
-                audience=self.settings.jwt_audience,
+                issuer=self.settings.jwt_issuer if self.settings.jwt_issuer else None,
+                audience=self.settings.jwt_audience if self.settings.jwt_audience else None,
                 options={
                     "verify_signature": True,
                     "verify_exp": True,
-                    "verify_iat": True,
-                    "verify_iss": self.settings.jwt_issuer is not None,
-                    "verify_aud": self.settings.jwt_audience is not None,
+                    # PyJWT doesn't have verify_iat option, always verifies if present
                 },
             )
             return payload
-        except JWTError as e:
+        except jwt.InvalidTokenError as e:
             logger.warning("access_token_decode_failed", error=str(e))
             return None

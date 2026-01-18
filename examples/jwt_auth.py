@@ -15,7 +15,7 @@ Usage:
 from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
-from jose import JWTError, jwt
+import jwt
 
 
 class JWTAuthExample:
@@ -107,7 +107,7 @@ class JWTAuthExample:
             Decoded token claims or None if invalid
 
         Raises:
-            JWTError: If token validation fails
+            jwt.InvalidTokenError: If token validation fails
         """
         try:
             payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
@@ -123,7 +123,7 @@ class JWTAuthExample:
 
             return payload
 
-        except JWTError as e:
+        except jwt.InvalidTokenError as e:
             print(f"✗ Token validation failed: {e}")
             raise
 
@@ -173,7 +173,7 @@ def example_hs256():
     try:
         payload = jwt_handler.validate_token(access_token)
         print(f"\nDecoded Payload:\n{payload}\n")
-    except JWTError:
+    except jwt.InvalidTokenError:
         print("Token validation failed")
 
     # Step 4: Demonstrate token expiration

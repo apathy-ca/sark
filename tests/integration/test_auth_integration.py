@@ -15,7 +15,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
 from fastapi import HTTPException, status
-from jose import jwt
+import jwt
 import pytest
 
 from sark.models.user import User

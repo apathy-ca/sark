@@ -6,7 +6,7 @@ from uuid import UUID
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jose import JWTError, jwt
+import jwt  # PyJWT library (replaced python-jose to eliminate ecdsa dependency)
 import structlog
 
 from sark.config import get_settings
@@ -159,7 +159,7 @@ class JWTHandler:
 
             return payload
 
-        except JWTError as e:
+        except jwt.InvalidTokenError as e:
             logger.warning("token_validation_failed", error=str(e))
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -197,7 +197,7 @@ class JWTHandler:
 
             return payload
 
-        except JWTError as e:
+        except jwt.InvalidTokenError as e:
             logger.warning("refresh_token_validation_failed", error=str(e))
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

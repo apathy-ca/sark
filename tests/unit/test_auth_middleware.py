@@ -5,7 +5,7 @@ from unittest.mock import MagicMock
 
 from fastapi import FastAPI, Request
 from fastapi.testclient import TestClient
-from jose import jwt
+import jwt
 import pytest
 
 from sark.api.middleware.auth import AuthenticationError, AuthMiddleware

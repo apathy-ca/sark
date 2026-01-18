@@ -240,14 +240,43 @@ The maintainer considers timing attacks out of scope. Options:
 ## Compliance Impact
 
 **Before**: 25 known vulnerabilities
-**After**: 2 vulnerabilities (ecdsa and nbconvert - accepted risks)
-**Fix Rate**: 92% (23/25)
+**After**: 1 vulnerability (nbconvert - accepted risk)
+**Fix Rate**: 96% (24/25)
 
 **Risk Assessment:**
-- **ecdsa**: Low risk - timing attacks require precise local access
+- **ecdsa**: ✅ **ELIMINATED** - Replaced python-jose with PyJWT (uses cryptography library)
 - **nbconvert**: No risk for Linux (production target platform)
 
 This brings SARK to production-ready security standards for v1.6.0 release.
+
+---
+
+## ecdsa Elimination (Post-Audit Update)
+
+After completing the initial audit, the ecdsa dependency was eliminated by replacing `python-jose` with `PyJWT[crypto]`:
+
+**Migration Details:**
+- **Old**: python-jose[cryptography] (depends on ecdsa for ECDSA signatures)
+- **New**: PyJWT[crypto] (uses cryptography library for all algorithms)
+
+**Code Changes:**
+- Updated `src/sark/services/auth/jwt.py` - JWT token creation/validation
+- Updated `src/sark/services/auth/tokens.py` - Token management service
+- Updated `src/sark/api/middleware/auth.py` - Authentication middleware
+- Updated test files: `tests/unit/auth/test_jwt.py`, `tests/unit/test_auth_middleware.py`, `tests/integration/test_auth_integration.py`
+- Updated example: `examples/jwt_auth.py`
+
+**API Compatibility:**
+- PyJWT has nearly identical API to python-jose
+- Exception changed: `JWTError` → `jwt.InvalidTokenError`
+- Options dict keys slightly different (verified compatible)
+
+**Security Improvement:**
+- Eliminates CVE-2024-23342 (Minerva timing attack on P-256)
+- Uses cryptography library (actively maintained, FIPS-compliant)
+- Better algorithm support (RS256, ES256, PS256, etc.)
+
+**Result:** SARK now has **ZERO ecdsa dependencies** and uses industry-standard cryptography throughout.
 
 ---
 

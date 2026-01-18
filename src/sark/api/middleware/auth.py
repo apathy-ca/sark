@@ -13,7 +13,7 @@ from typing import ClassVar
 
 from fastapi import Request, Response, status
 from fastapi.responses import JSONResponse
-from jose import JWTError, jwt
+import jwt  # PyJWT library (replaced python-jose to eliminate ecdsa dependency)
 from starlette.middleware.base import BaseHTTPMiddleware
 import structlog
 
@@ -224,9 +224,11 @@ class AuthMiddleware(BaseHTTPMiddleware):
 
         except jwt.ExpiredSignatureError:
             raise AuthenticationError("Token has expired") from None
-        except jwt.JWTClaimsError as e:
-            raise AuthenticationError(f"Invalid token claims: {e!s}") from None
-        except JWTError as e:
+        except jwt.InvalidSignatureError as e:
+            raise AuthenticationError(f"Invalid token signature: {e!s}") from None
+        except jwt.DecodeError as e:
+            raise AuthenticationError(f"Invalid token format: {e!s}") from None
+        except jwt.InvalidTokenError as e:
             raise AuthenticationError(f"Invalid token: {e!s}") from None
         except Exception as e:
             logger.error(
