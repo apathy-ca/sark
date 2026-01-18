@@ -890,6 +890,432 @@ services:
 
 ---
 
+---
+
+## Mode 5: Agent-to-Agent (A2A) Governance
+
+### The Problem
+
+MCP enables agent-to-agent communication that bypasses all network-level controls:
+
+```
+Network-Level Blind Spots:
+
+┌─────────────────────────────────────────────────────────────────┐
+│ Host Machine                                                    │
+│                                                                 │
+│   Agent A ←───stdio───→ Agent B ←───stdio───→ Agent C          │
+│       │                     │                     │             │
+│       └─────────────────────┴─────────────────────┘             │
+│                         │                                       │
+│              No network traffic                                 │
+│              No packets to capture                              │
+│              Gateway never sees it                              │
+│              FlowSpec can't redirect it                         │
+│              TAP captures nothing                               │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**A2A Transport Types:**
+
+| Transport | Description | Network Visible? |
+|-----------|-------------|------------------|
+| stdio | Agent spawns another agent as subprocess | No |
+| Unix socket | Local IPC | No |
+| localhost HTTP | Same-host HTTP | Only with loopback capture |
+| In-process | Agent loads another as library | No |
+| Kubernetes pod-to-pod | Same-node optimized | Sometimes |
+
+### Solution 1: SARK SDK (Embedded Policy Enforcement)
+
+Embed policy enforcement directly in the MCP client SDK:
+
+```python
+# sark_sdk/mcp_client.py
+
+class SARKMCPClient:
+    """MCP client with embedded SARK policy enforcement."""
+
+    def __init__(
+        self,
+        agent_id: str,
+        sark_policy_cache: PolicyCache,
+        sark_audit: AuditClient,
+    ):
+        self.agent_id = agent_id
+        self.policy = sark_policy_cache      # Local OPA or cached rules
+        self.audit = sark_audit              # Async audit shipping
+        self._mcp_client = MCPClient()       # Underlying MCP client
+
+    async def call_tool(
+        self,
+        server: str,
+        tool: str,
+        arguments: dict,
+    ) -> ToolResult:
+        """Call MCP tool with policy enforcement."""
+
+        # Build policy input
+        policy_input = {
+            "caller": {
+                "agent_id": self.agent_id,
+                "type": "agent",
+            },
+            "callee": {
+                "server": server,
+                "tool": tool,
+            },
+            "action": "invoke",
+            "arguments": arguments,
+            "context": {
+                "transport": self._mcp_client.transport_type,
+                "timestamp": time.time(),
+            },
+        }
+
+        # Evaluate policy LOCALLY (no network round-trip)
+        decision = await self.policy.evaluate(policy_input)
+
+        # Audit (async, non-blocking)
+        asyncio.create_task(self.audit.log(policy_input, decision))
+
+        if not decision.allow:
+            raise PolicyDeniedError(
+                f"A2A call denied: {decision.reason}",
+                policy_id=decision.policy_id,
+            )
+
+        # Policy passed - make the actual MCP call
+        return await self._mcp_client.call_tool(server, tool, arguments)
+
+
+# Usage in agent code:
+client = SARKMCPClient(
+    agent_id="agent-orchestrator-1",
+    sark_policy_cache=LocalOPACache("./policies"),
+    sark_audit=AsyncAuditClient("https://sark.internal/audit"),
+)
+
+# All tool calls now governed
+result = await client.call_tool("code-agent", "write_file", {"path": "/tmp/x"})
+```
+
+**Characteristics:**
+- Zero network latency (local policy eval)
+- Works with any transport (stdio, socket, HTTP)
+- Requires SDK adoption
+- Policy sync needed (pull from central SARK)
+
+### Solution 2: eBPF Syscall Interception
+
+Intercept at the kernel level - sees everything:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ Linux Kernel                                                    │
+│                                                                 │
+│  ┌───────────────────────────────────────────────────────────┐ │
+│  │ eBPF Probes                                               │ │
+│  │                                                           │ │
+│  │  kprobe:sys_write    →  Capture pipe/socket writes       │ │
+│  │  kprobe:sys_read     →  Capture pipe/socket reads        │ │
+│  │  kprobe:sys_execve   →  Track subprocess spawning        │ │
+│  │  kprobe:sys_connect  →  Track outbound connections       │ │
+│  │  kprobe:sys_accept   →  Track inbound connections        │ │
+│  │                                                           │ │
+│  │  Filter: Only processes in "agent" cgroup                │ │
+│  │                                                           │ │
+│  └───────────────────────────────────────────────────────────┘ │
+│                           │                                     │
+│                           │ perf buffer / ring buffer           │
+│                           ▼                                     │
+└─────────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ SARK eBPF Agent (Userspace)                                     │
+│                                                                 │
+│  - Reassemble MCP JSON-RPC messages from syscall data          │
+│  - Parse tool invocations                                       │
+│  - Evaluate policy                                              │
+│  - SIGSTOP/SIGCONT for blocking mode (dangerous)               │
+│  - Or: audit-only mode (observe + alert)                       │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**eBPF Probe Skeleton:**
+
+```c
+// sark_ebpf/probe.c
+
+#include <linux/bpf.h>
+#include <bpf/bpf_helpers.h>
+
+struct mcp_event {
+    u32 pid;
+    u32 tid;
+    u64 timestamp;
+    u32 syscall;        // write, read, execve
+    u32 fd;
+    char comm[16];      // process name
+    char data[256];     // first 256 bytes of payload
+};
+
+struct {
+    __uint(type, BPF_MAP_TYPE_RINGBUF);
+    __uint(max_entries, 256 * 1024);
+} events SEC(".maps");
+
+struct {
+    __uint(type, BPF_MAP_TYPE_HASH);
+    __uint(max_entries, 1024);
+    __type(key, u32);   // PID
+    __type(value, u8);  // 1 = monitored agent
+} monitored_pids SEC(".maps");
+
+SEC("kprobe/sys_write")
+int probe_write(struct pt_regs *ctx) {
+    u32 pid = bpf_get_current_pid_tgid() >> 32;
+
+    // Only monitor known agent processes
+    if (!bpf_map_lookup_elem(&monitored_pids, &pid))
+        return 0;
+
+    int fd = (int)PT_REGS_PARM1(ctx);
+    char *buf = (char *)PT_REGS_PARM2(ctx);
+    size_t count = (size_t)PT_REGS_PARM3(ctx);
+
+    // Check if this looks like MCP JSON-RPC
+    char preview[32];
+    bpf_probe_read_user(preview, sizeof(preview), buf);
+
+    if (preview[0] != '{')  // Quick JSON check
+        return 0;
+
+    // Emit event to userspace
+    struct mcp_event *evt = bpf_ringbuf_reserve(&events, sizeof(*evt), 0);
+    if (!evt)
+        return 0;
+
+    evt->pid = pid;
+    evt->tid = bpf_get_current_pid_tgid() & 0xFFFFFFFF;
+    evt->timestamp = bpf_ktime_get_ns();
+    evt->syscall = __NR_write;
+    evt->fd = fd;
+    bpf_get_current_comm(evt->comm, sizeof(evt->comm));
+    bpf_probe_read_user(evt->data, sizeof(evt->data), buf);
+
+    bpf_ringbuf_submit(evt, 0);
+    return 0;
+}
+```
+
+**Characteristics:**
+- Sees ALL inter-process communication
+- No agent code changes needed
+- Linux-only (macOS: dtrace/esf, Windows: ETW)
+- Complex to parse MCP from raw syscalls
+- Blocking mode is risky (SIGSTOP can deadlock)
+
+### Solution 3: MCP Protocol Extension
+
+Extend MCP protocol to require authorization tokens:
+
+```
+Standard MCP:
+
+  Client                              Server
+    │                                   │
+    │─── initialize ───────────────────→│
+    │←── capabilities ──────────────────│
+    │                                   │
+    │─── tools/call ───────────────────→│
+    │←── result ────────────────────────│
+
+
+MCP + SARK Extension:
+
+  Client                              Server                    SARK
+    │                                   │                        │
+    │─── initialize ───────────────────→│                        │
+    │    {                              │                        │
+    │      "sark": {                    │                        │
+    │        "agent_id": "agent-a",     │                        │
+    │        "capabilities_token": "eyJ"│                        │
+    │      }                            │                        │
+    │    }                              │                        │
+    │                                   │────── verify ─────────→│
+    │                                   │←───── ok ──────────────│
+    │←── capabilities ──────────────────│                        │
+    │    {                              │                        │
+    │      "sark": {                    │                        │
+    │        "policy_id": "pol-123",    │                        │
+    │        "session_token": "xyz"     │                        │
+    │      }                            │                        │
+    │    }                              │                        │
+    │                                   │                        │
+    │─── tools/call ───────────────────→│                        │
+    │    {                              │                        │
+    │      "sark": {                    │                        │
+    │        "authz_token": "abc",      │                        │
+    │        "trace_id": "trace-456"    │                        │
+    │      }                            │                        │
+    │    }                              │                        │
+    │                                   │────── authorize ──────→│
+    │                                   │←───── allow ───────────│
+    │                                   │                        │
+    │←── result ────────────────────────│                        │
+```
+
+**Protocol Extension Schema:**
+
+```typescript
+// MCP SARK Extension
+
+interface SARKClientCapabilities {
+  sark?: {
+    version: "1.0";
+    agent_id: string;
+    agent_type: "human" | "agent" | "service";
+    capabilities_token?: string;  // JWT proving agent identity
+  };
+}
+
+interface SARKServerCapabilities {
+  sark?: {
+    version: "1.0";
+    policy_id: string;           // Which policy governs this server
+    session_token: string;       // Session-bound token for subsequent calls
+    required: boolean;           // If true, reject clients without SARK
+  };
+}
+
+interface SARKToolCallExtension {
+  sark?: {
+    authz_token: string;         // Pre-authorized token (optional)
+    trace_id: string;            // Distributed tracing
+    context?: Record<string, unknown>;  // Additional policy context
+  };
+}
+
+interface SARKToolResultExtension {
+  sark?: {
+    audit_id: string;            // Reference to audit log entry
+    policy_decision: "allow" | "deny" | "redact";
+    redacted_fields?: string[];  // Fields removed by policy
+  };
+}
+```
+
+**Characteristics:**
+- Standards-track approach (could propose to MCP spec)
+- Explicit, auditable
+- Requires both client and server changes
+- Can be adopted incrementally (non-SARK agents still work)
+
+### Solution 4: Agent Sidecar (Per-Agent Proxy)
+
+Each agent gets its own tiny SARK instance:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ Kubernetes Pod                                                  │
+│                                                                 │
+│  ┌─────────────┐      ┌─────────────┐      ┌─────────────┐    │
+│  │   Agent A   │      │    SARK     │      │   Agent B   │    │
+│  │             │─────→│   Sidecar   │─────→│             │    │
+│  │  MCP Client │      │             │      │  MCP Server │    │
+│  └─────────────┘      │  - Policy   │      └─────────────┘    │
+│                       │  - Audit    │                          │
+│                       │  - 50MB RAM │                          │
+│                       └──────┬──────┘                          │
+│                              │                                  │
+│                         Audit logs                              │
+│                              │                                  │
+└──────────────────────────────┼──────────────────────────────────┘
+                               ▼
+                    Central SARK (aggregation)
+```
+
+**Sidecar Container Spec:**
+
+```yaml
+# Kubernetes sidecar injection
+apiVersion: v1
+kind: Pod
+metadata:
+  name: agent-pod
+  annotations:
+    sark.io/inject: "true"
+    sark.io/policy: "agent-policy-v1"
+spec:
+  containers:
+    - name: agent
+      image: my-agent:latest
+      env:
+        - name: MCP_PROXY
+          value: "localhost:9999"  # Point to sidecar
+
+    - name: sark-sidecar
+      image: ghcr.io/sark/sidecar:latest
+      resources:
+        requests:
+          memory: "50Mi"
+          cpu: "50m"
+        limits:
+          memory: "100Mi"
+          cpu: "100m"
+      ports:
+        - containerPort: 9999  # MCP proxy port
+      env:
+        - name: SARK_POLICY_URL
+          value: "http://sark-central/policies"
+        - name: SARK_AUDIT_URL
+          value: "http://sark-central/audit"
+```
+
+**Characteristics:**
+- Works with unmodified agents (just change endpoint)
+- Resource overhead per agent
+- Kubernetes-native (mutating webhook for injection)
+- Can do stdio proxying (trickier)
+
+### A2A Governance Comparison
+
+| Approach | Sees stdio? | Blocking? | Agent Changes? | Overhead |
+|----------|-------------|-----------|----------------|----------|
+| SDK Embedded | ✅ | ✅ | Yes (use SDK) | Minimal |
+| eBPF Interception | ✅ | ⚠️ Risky | No | Medium |
+| Protocol Extension | ✅ | ✅ | Yes (both sides) | Minimal |
+| Agent Sidecar | ❌ HTTP only | ✅ | Config only | Per-agent |
+
+### Recommended Approach: Layered
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    A2A Governance Stack                         │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Layer 1: SDK (Primary)                                        │
+│  └─ Embedded policy for agents using SARK SDK                  │
+│                                                                 │
+│  Layer 2: Protocol Extension (Standards)                       │
+│  └─ MCP extension for cross-org agent communication           │
+│                                                                 │
+│  Layer 3: eBPF (Audit)                                         │
+│  └─ Passive observation for agents not using SDK              │
+│  └─ Detect shadow/unauthorized A2A traffic                    │
+│                                                                 │
+│  Layer 4: Sidecar (Legacy)                                     │
+│  └─ For agents that can't adopt SDK but use HTTP              │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
 ## Open Questions
 
 1. **TLS Inspection Legality**: Enterprise can mandate CA installation; home users opt-in. Document implications.
