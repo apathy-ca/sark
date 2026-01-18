@@ -1304,12 +1304,595 @@ spec:
 │  Layer 2: Protocol Extension (Standards)                       │
 │  └─ MCP extension for cross-org agent communication           │
 │                                                                 │
-│  Layer 3: eBPF (Audit)                                         │
-│  └─ Passive observation for agents not using SDK              │
-│  └─ Detect shadow/unauthorized A2A traffic                    │
+│  Layer 3: EDR Integration (Enterprise)                         │
+│  └─ Consume telemetry from existing EDR                       │
+│  └─ Leverage EDR response capabilities                        │
 │                                                                 │
-│  Layer 4: Sidecar (Legacy)                                     │
+│  Layer 4: eBPF (Standalone/Home)                               │
+│  └─ For environments without EDR                              │
+│  └─ YORI home deployment                                      │
+│                                                                 │
+│  Layer 5: Sidecar (Legacy)                                     │
 │  └─ For agents that can't adopt SDK but use HTTP              │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Mode 6: EDR Integration
+
+### Why EDR?
+
+Enterprise environments already have endpoint agents with deep visibility:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                 What EDR Already Sees                           │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Process Tree          Network Connections      File Access     │
+│  ────────────          ───────────────────      ───────────     │
+│  claude-agent (1234)   1234 → api.anthropic.com  /tmp/code.py  │
+│   └─ python (1235)     1235 → api.openai.com     ~/.ssh/id_rsa │
+│       └─ node (1236)   1236 → localhost:8080     /etc/passwd   │
+│                                                                 │
+│  User Context          Command Lines            DNS Queries     │
+│  ────────────          ─────────────            ───────────     │
+│  alice@workstation     python agent.py          api.openai.com │
+│  DOMAIN\svc-agent      node mcp-server.js       api.groq.com   │
+│                                                                 │
+│  Already correlated, timestamped, and queryable                │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### EDR Vendor Integrations
+
+| EDR | Integration Method | Capabilities |
+|-----|-------------------|--------------|
+| **CrowdStrike Falcon** | Streaming API, Falcon Fusion SOAR | Real-time events, automated response |
+| **Microsoft Defender** | Microsoft Graph Security API, Sentinel | Process events, network, custom detections |
+| **SentinelOne** | Deep Visibility API, Storyline | Full process tree, automated remediation |
+| **Carbon Black** | Carbon Black Cloud API | Process, network, file events |
+| **Elastic Security** | Elasticsearch queries, Fleet | Custom rules, osquery integration |
+| **Wazuh** (OSS) | Wazuh API, Syslog | File integrity, process monitoring |
+| **osquery** (OSS) | SQL queries, Fleet | Process, network, file tables |
+
+### Architecture: SARK as EDR Consumer
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      Enterprise Network                         │
+│                                                                 │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐            │
+│  │ Workstation │  │   Server    │  │  Container  │            │
+│  │             │  │             │  │             │            │
+│  │ ┌─────────┐ │  │ ┌─────────┐ │  │ ┌─────────┐ │            │
+│  │ │EDR Agent│ │  │ │EDR Agent│ │  │ │EDR Agent│ │            │
+│  │ └────┬────┘ │  │ └────┬────┘ │  │ └────┬────┘ │            │
+│  └──────┼──────┘  └──────┼──────┘  └──────┼──────┘            │
+│         │                │                │                    │
+│         └────────────────┼────────────────┘                    │
+│                          │                                      │
+│                          ▼                                      │
+│              ┌───────────────────────┐                         │
+│              │     EDR Cloud/SIEM    │                         │
+│              │  (CrowdStrike, etc.)  │                         │
+│              └───────────┬───────────┘                         │
+│                          │                                      │
+│                          │ Streaming API / Webhook              │
+│                          ▼                                      │
+│              ┌───────────────────────┐                         │
+│              │        SARK           │                         │
+│              │                       │                         │
+│              │  ┌─────────────────┐  │                         │
+│              │  │ EDR Connector   │  │                         │
+│              │  │  - CrowdStrike  │  │                         │
+│              │  │  - Defender     │  │                         │
+│              │  │  - SentinelOne  │  │                         │
+│              │  └────────┬────────┘  │                         │
+│              │           │           │                         │
+│              │           ▼           │                         │
+│              │  ┌─────────────────┐  │                         │
+│              │  │ LLM/MCP Filter  │  │  Filter for AI-related │
+│              │  │                 │  │  process/network activity│
+│              │  └────────┬────────┘  │                         │
+│              │           │           │                         │
+│              │           ▼           │                         │
+│              │  ┌─────────────────┐  │                         │
+│              │  │ Policy Engine   │  │  Same OPA policies     │
+│              │  │ (OPA)           │  │                         │
+│              │  └────────┬────────┘  │                         │
+│              │           │           │                         │
+│              │           ▼           │                         │
+│              │  ┌─────────────────┐  │                         │
+│              │  │ Response        │  │  Alert, block via EDR, │
+│              │  │ Orchestrator    │  │  or just audit         │
+│              │  └─────────────────┘  │                         │
+│              │                       │                         │
+│              └───────────────────────┘                         │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### CrowdStrike Integration Example
+
+```python
+# sark/integrations/crowdstrike.py
+
+from falconpy import EventStreams, RealTimeResponse
+import asyncio
+
+class CrowdStrikeConnector:
+    """
+    Consume CrowdStrike Falcon telemetry for LLM/MCP governance.
+
+    Uses:
+    - Event Streams API for real-time process/network events
+    - Real Time Response for automated remediation
+    """
+
+    def __init__(
+        self,
+        client_id: str,
+        client_secret: str,
+        sark_policy_engine: PolicyEngine,
+    ):
+        self.streams = EventStreams(
+            client_id=client_id,
+            client_secret=client_secret,
+        )
+        self.rtr = RealTimeResponse(
+            client_id=client_id,
+            client_secret=client_secret,
+        )
+        self.policy = sark_policy_engine
+
+        # LLM-related process and network patterns
+        self.llm_indicators = LLMIndicators()
+
+    async def stream_events(self):
+        """Stream and filter events for LLM/MCP activity."""
+
+        # Subscribe to relevant event types
+        stream = self.streams.stream_events(
+            app_id="sark-governance",
+            event_types=[
+                "ProcessRollup2",      # Process creation
+                "NetworkConnectIP4",   # Network connections
+                "DnsRequest",          # DNS queries
+                "SyntheticProcessRollup2",  # Script execution
+            ]
+        )
+
+        async for event in stream:
+            if llm_event := self._filter_llm_event(event):
+                await self._evaluate_and_respond(llm_event)
+
+    def _filter_llm_event(self, event: dict) -> Optional[LLMEvent]:
+        """Filter EDR events for LLM/MCP relevance."""
+
+        event_type = event.get("event_type")
+
+        if event_type == "NetworkConnectIP4":
+            # Check if connection is to known LLM endpoint
+            remote_ip = event.get("RemoteAddressIP4")
+            remote_port = event.get("RemotePort")
+
+            if provider := self.llm_indicators.identify_by_ip(remote_ip):
+                return LLMEvent(
+                    type="llm_api_call",
+                    provider=provider,
+                    process_id=event.get("TargetProcessId"),
+                    process_name=event.get("FileName"),
+                    user=event.get("UserName"),
+                    device_id=event.get("aid"),
+                    timestamp=event.get("timestamp"),
+                    raw_event=event,
+                )
+
+        elif event_type == "DnsRequest":
+            # Check if DNS query is for LLM domain
+            domain = event.get("DomainName")
+
+            if provider := self.llm_indicators.identify_by_domain(domain):
+                return LLMEvent(
+                    type="llm_dns_query",
+                    provider=provider,
+                    domain=domain,
+                    process_id=event.get("ContextProcessId"),
+                    user=event.get("UserName"),
+                    device_id=event.get("aid"),
+                    timestamp=event.get("timestamp"),
+                    raw_event=event,
+                )
+
+        elif event_type == "ProcessRollup2":
+            # Check if process is known MCP server or agent
+            process_name = event.get("FileName", "").lower()
+            command_line = event.get("CommandLine", "")
+
+            if self.llm_indicators.is_mcp_process(process_name, command_line):
+                return LLMEvent(
+                    type="mcp_process_start",
+                    process_name=process_name,
+                    command_line=command_line,
+                    parent_process=event.get("ParentBaseFileName"),
+                    user=event.get("UserName"),
+                    device_id=event.get("aid"),
+                    timestamp=event.get("timestamp"),
+                    raw_event=event,
+                )
+
+        return None
+
+    async def _evaluate_and_respond(self, event: LLMEvent):
+        """Evaluate policy and optionally respond via EDR."""
+
+        # Build policy input
+        policy_input = {
+            "event_type": event.type,
+            "user": event.user,
+            "device_id": event.device_id,
+            "process": {
+                "name": event.process_name,
+                "id": event.process_id,
+                "command_line": getattr(event, "command_line", None),
+            },
+            "llm": {
+                "provider": event.provider,
+                "domain": getattr(event, "domain", None),
+            },
+            "context": {
+                "timestamp": event.timestamp,
+                "source": "crowdstrike",
+            },
+        }
+
+        # Evaluate policy
+        decision = await self.policy.evaluate(policy_input)
+
+        # Always audit
+        await self.audit_log.write(event, decision)
+
+        # Respond based on policy decision
+        if not decision.allow:
+            if decision.action == "alert":
+                await self.alert_manager.send(event, decision)
+
+            elif decision.action == "block":
+                # Use CrowdStrike RTR to kill process
+                await self._kill_process_via_rtr(
+                    device_id=event.device_id,
+                    process_id=event.process_id,
+                    reason=decision.reason,
+                )
+
+            elif decision.action == "isolate":
+                # Network isolate the host via CrowdStrike
+                await self._isolate_host_via_rtr(
+                    device_id=event.device_id,
+                    reason=decision.reason,
+                )
+
+    async def _kill_process_via_rtr(
+        self,
+        device_id: str,
+        process_id: int,
+        reason: str,
+    ):
+        """Kill a process using CrowdStrike Real Time Response."""
+
+        # Initiate RTR session
+        session = self.rtr.init_session(
+            device_id=device_id,
+            queue_offline=True,
+        )
+
+        # Execute kill command
+        self.rtr.execute_command(
+            session_id=session["session_id"],
+            base_command="kill",
+            command_string=f"kill {process_id}",
+        )
+
+        # Log the response action
+        await self.audit_log.write_response(
+            action="process_killed",
+            device_id=device_id,
+            process_id=process_id,
+            reason=reason,
+        )
+
+
+class LLMIndicators:
+    """Indicators for identifying LLM/MCP activity in EDR telemetry."""
+
+    # Known LLM API IP ranges (simplified - real impl would auto-update)
+    LLM_IP_RANGES = {
+        "openai": ["104.18.0.0/15", "172.64.0.0/13"],
+        "anthropic": ["104.18.32.0/20"],
+        "google": ["142.250.0.0/15"],
+    }
+
+    # Known LLM API domains
+    LLM_DOMAINS = {
+        "api.openai.com": "openai",
+        "api.anthropic.com": "anthropic",
+        "generativelanguage.googleapis.com": "google",
+        "api.mistral.ai": "mistral",
+        "api.groq.com": "groq",
+        "api.cohere.ai": "cohere",
+    }
+
+    # MCP process patterns
+    MCP_PATTERNS = [
+        r"mcp[-_]server",
+        r"claude[-_]",
+        r"openai[-_]agent",
+        r"langchain",
+        r"autogen",
+        r"crewai",
+    ]
+
+    def identify_by_ip(self, ip: str) -> Optional[str]:
+        """Identify LLM provider by IP address."""
+        import ipaddress
+        try:
+            addr = ipaddress.ip_address(ip)
+            for provider, ranges in self.LLM_IP_RANGES.items():
+                for cidr in ranges:
+                    if addr in ipaddress.ip_network(cidr):
+                        return provider
+        except ValueError:
+            pass
+        return None
+
+    def identify_by_domain(self, domain: str) -> Optional[str]:
+        """Identify LLM provider by domain."""
+        domain = domain.lower().rstrip(".")
+        return self.LLM_DOMAINS.get(domain)
+
+    def is_mcp_process(self, name: str, cmdline: str) -> bool:
+        """Check if process appears to be MCP-related."""
+        import re
+        text = f"{name} {cmdline}".lower()
+        return any(re.search(p, text) for p in self.MCP_PATTERNS)
+```
+
+### Microsoft Defender Integration Example
+
+```python
+# sark/integrations/defender.py
+
+from msgraph import GraphServiceClient
+from azure.identity import ClientSecretCredential
+
+class DefenderConnector:
+    """
+    Consume Microsoft Defender for Endpoint telemetry.
+
+    Uses:
+    - Microsoft Graph Security API
+    - Advanced Hunting (KQL queries)
+    - Live Response for remediation
+    """
+
+    def __init__(
+        self,
+        tenant_id: str,
+        client_id: str,
+        client_secret: str,
+        sark_policy_engine: PolicyEngine,
+    ):
+        credential = ClientSecretCredential(
+            tenant_id=tenant_id,
+            client_id=client_id,
+            client_secret=client_secret,
+        )
+        self.graph = GraphServiceClient(credential)
+        self.policy = sark_policy_engine
+
+    async def run_hunting_query(self) -> list[LLMEvent]:
+        """
+        Run Advanced Hunting query to find LLM/MCP activity.
+
+        This runs periodically (e.g., every minute) to catch events.
+        """
+
+        # KQL query for LLM API connections
+        query = """
+        let LLMDomains = dynamic([
+            "api.openai.com",
+            "api.anthropic.com",
+            "generativelanguage.googleapis.com",
+            "api.mistral.ai"
+        ]);
+        DeviceNetworkEvents
+        | where Timestamp > ago(5m)
+        | where RemoteUrl has_any (LLMDomains)
+        | project
+            Timestamp,
+            DeviceId,
+            DeviceName,
+            InitiatingProcessFileName,
+            InitiatingProcessCommandLine,
+            InitiatingProcessAccountName,
+            RemoteUrl,
+            RemoteIP,
+            RemotePort
+        | join kind=leftouter (
+            DeviceProcessEvents
+            | where Timestamp > ago(1h)
+            | project ProcessId, ParentProcessName=InitiatingProcessFileName
+        ) on $left.InitiatingProcessId == $right.ProcessId
+        """
+
+        result = await self.graph.security.run_hunting_query(query)
+
+        events = []
+        for row in result.results:
+            events.append(LLMEvent(
+                type="llm_api_call",
+                provider=self._domain_to_provider(row["RemoteUrl"]),
+                process_name=row["InitiatingProcessFileName"],
+                command_line=row["InitiatingProcessCommandLine"],
+                user=row["InitiatingProcessAccountName"],
+                device_id=row["DeviceId"],
+                device_name=row["DeviceName"],
+                timestamp=row["Timestamp"],
+                raw_event=row,
+            ))
+
+        return events
+
+    async def create_custom_detection(self):
+        """
+        Create a custom detection rule in Defender for LLM policy violations.
+
+        This makes Defender itself alert on suspicious LLM activity.
+        """
+
+        detection_rule = {
+            "displayName": "SARK: Unauthorized LLM API Access",
+            "isEnabled": True,
+            "severity": "medium",
+            "category": "DataExfiltration",
+            "description": "Detects access to LLM APIs from unauthorized processes",
+            "recommendedActions": "Review process and user. Check SARK audit logs.",
+            "query": """
+                let AuthorizedProcesses = dynamic(["python.exe", "node.exe", "java.exe"]);
+                let LLMDomains = dynamic(["api.openai.com", "api.anthropic.com"]);
+                DeviceNetworkEvents
+                | where RemoteUrl has_any (LLMDomains)
+                | where InitiatingProcessFileName !in (AuthorizedProcesses)
+                | project Timestamp, DeviceName, InitiatingProcessFileName,
+                         InitiatingProcessAccountName, RemoteUrl
+            """,
+        }
+
+        await self.graph.security.custom_detection_rules.post(detection_rule)
+
+
+### osquery Integration (Open Source)
+
+```sql
+-- osquery pack for LLM/MCP monitoring
+-- Deploy via Fleet, Kolide, or standalone
+
+{
+  "platform": "linux,darwin,windows",
+  "queries": {
+    "llm_network_connections": {
+      "query": "SELECT p.name, p.cmdline, p.uid, s.remote_address, s.remote_port FROM process_open_sockets s JOIN processes p ON s.pid = p.pid WHERE s.remote_address IN ('104.18.6.192', '104.18.7.192') OR s.remote_port = 443",
+      "interval": 60,
+      "description": "Connections to known LLM API endpoints"
+    },
+    "mcp_processes": {
+      "query": "SELECT name, cmdline, uid, parent, start_time FROM processes WHERE cmdline LIKE '%mcp%' OR cmdline LIKE '%langchain%' OR cmdline LIKE '%autogen%'",
+      "interval": 300,
+      "description": "Running MCP-related processes"
+    },
+    "llm_dns_queries": {
+      "query": "SELECT * FROM dns_resolvers WHERE nameserver LIKE '%openai%' OR nameserver LIKE '%anthropic%'",
+      "interval": 600,
+      "description": "DNS configuration pointing to LLM providers"
+    },
+    "env_api_keys": {
+      "query": "SELECT key, value FROM process_envs WHERE key LIKE '%API_KEY%' OR key LIKE '%OPENAI%' OR key LIKE '%ANTHROPIC%'",
+      "interval": 3600,
+      "description": "Processes with LLM API keys in environment"
+    }
+  }
+}
+```
+
+### SARK EDR Connector Interface
+
+```python
+# sark/integrations/base.py
+
+from abc import ABC, abstractmethod
+from typing import AsyncIterator
+
+class EDRConnector(ABC):
+    """Base class for EDR integrations."""
+
+    @abstractmethod
+    async def stream_events(self) -> AsyncIterator[LLMEvent]:
+        """Stream LLM-related events from EDR."""
+        pass
+
+    @abstractmethod
+    async def kill_process(self, device_id: str, process_id: int) -> bool:
+        """Kill a process via EDR response capabilities."""
+        pass
+
+    @abstractmethod
+    async def isolate_host(self, device_id: str) -> bool:
+        """Network isolate a host via EDR."""
+        pass
+
+    @abstractmethod
+    async def run_query(self, query: str) -> list[dict]:
+        """Run a hunting/search query against EDR data."""
+        pass
+
+
+# Factory for EDR connectors
+def get_edr_connector(config: EDRConfig) -> EDRConnector:
+    """Get the appropriate EDR connector based on configuration."""
+
+    connectors = {
+        "crowdstrike": CrowdStrikeConnector,
+        "defender": DefenderConnector,
+        "sentinelone": SentinelOneConnector,
+        "carbonblack": CarbonBlackConnector,
+        "elastic": ElasticSecurityConnector,
+        "wazuh": WazuhConnector,
+        "osquery": OsqueryConnector,
+    }
+
+    connector_class = connectors.get(config.vendor)
+    if not connector_class:
+        raise ValueError(f"Unknown EDR vendor: {config.vendor}")
+
+    return connector_class(**config.credentials)
+```
+
+### EDR vs Custom eBPF Comparison
+
+| Aspect | Custom eBPF | EDR Integration |
+|--------|-------------|-----------------|
+| **Deployment** | New agent to deploy | Already deployed |
+| **Approval** | Security team review | Already approved |
+| **Maintenance** | You maintain probes | Vendor maintains |
+| **Coverage** | Linux only (custom) | Cross-platform |
+| **Response** | Custom implementation | Built-in RTR/Live Response |
+| **Correlation** | Build yourself | EDR correlates for you |
+| **Cost** | Engineering time | EDR license (existing) |
+| **Latency** | Real-time | Near real-time (1-60s) |
+
+### When to Use Each
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Decision Matrix                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Enterprise with EDR?                                          │
+│  ├─ YES → Use EDR integration                                  │
+│  │        (CrowdStrike, Defender, SentinelOne, etc.)          │
+│  │                                                             │
+│  └─ NO → Consider:                                             │
+│          ├─ osquery (free, cross-platform)                    │
+│          ├─ Wazuh (free, full SIEM)                           │
+│          └─ Custom eBPF (Linux only, most control)            │
+│                                                                 │
+│  Home/YORI?                                                    │
+│  └─ Custom eBPF or osquery                                    │
+│     (No enterprise EDR, need lightweight solution)            │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
