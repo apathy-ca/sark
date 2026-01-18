@@ -650,5 +650,5 @@ GET /api/auth/health
 
 For issues and questions:
 - GitHub Issues: https://github.com/apathy-ca/sark/issues
-- Documentation: https://sark.readthedocs.io
-- Security Issues: security@example.com
+- Documentation: https://github.com/apathy-ca/sark
+- Security Issues: Report via [GitHub Security Advisories](https://github.com/apathy-ca/sark/security/advisories/new)

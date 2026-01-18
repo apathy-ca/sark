@@ -708,9 +708,9 @@ TBD
 
 ## 📞 Support
 
-- **Documentation**: https://github.com/example/sark/tree/main/docs
-- **Issues**: https://github.com/example/sark/issues
-- **Security**: security@example.com
+- **Documentation**: https://github.com/apathy-ca/sark/tree/main/docs
+- **Issues**: https://github.com/apathy-ca/sark/issues
+- **Security**: Report vulnerabilities via [GitHub Security Advisories](https://github.com/apathy-ca/sark/security/advisories/new)
 
 ---
 

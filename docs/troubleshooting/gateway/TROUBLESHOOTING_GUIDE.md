@@ -1674,9 +1674,9 @@ File a bug report when you encounter:
 
 ### Where to Report
 
-- **GitHub Issues:** https://github.com/your-org/sark/issues
-- **Security Issues:** security@example.com (do NOT file public issue)
-- **Support:** support@example.com
+- **GitHub Issues:** https://github.com/apathy-ca/sark/issues
+- **Security Issues:** Report via [GitHub Security Advisories](https://github.com/apathy-ca/sark/security/advisories/new) (do NOT file public issue)
+- **Documentation:** See [SECURITY.md](../../SECURITY.md) for vulnerability reporting guidelines
 
 ---
 

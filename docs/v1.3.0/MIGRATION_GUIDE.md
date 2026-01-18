@@ -843,9 +843,9 @@ curl -X POST http://localhost:8000/api/v1/security/test-alert \
 ## Support
 
 For migration assistance:
-- **GitHub Issues**: https://github.com/your-org/sark/issues
-- **Documentation**: https://sark-docs.example.com
-- **Security Team**: security@example.com
+- **GitHub Issues**: https://github.com/apathy-ca/sark/issues
+- **Documentation**: https://github.com/apathy-ca/sark
+- **Security**: Report vulnerabilities via [GitHub Security Advisories](https://github.com/apathy-ca/sark/security/advisories/new)
 
 ---
 

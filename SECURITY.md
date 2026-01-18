@@ -16,9 +16,9 @@ We release patches for security vulnerabilities. Currently supported versions:
 
 **Please do not report security vulnerabilities through public GitHub issues.**
 
-Instead, please report them via email to: **security@example.com** (replace with actual security contact)
+Instead, please report them via **[GitHub Security Advisories](https://github.com/apathy-ca/sark/security/advisories/new)**.
 
-You should receive a response within 48 hours. If for some reason you do not, please follow up via email to ensure we received your original message.
+You should receive a response within 48 hours. If for some reason you do not, please follow up to ensure we received your original message.
 
 Please include the following information:
 
@@ -234,9 +234,9 @@ Future security enhancements (Phase 3):
 
 ## Contact
 
-For security concerns, contact:
-- **Email**: security@example.com (replace with actual contact)
-- **PGP Key**: Available upon request
+For security concerns:
+- **GitHub Security Advisories**: [Report a vulnerability](https://github.com/apathy-ca/sark/security/advisories/new) (preferred)
+- **PGP Key**: Available upon request for sensitive disclosures
 
 For general questions, see [CONTRIBUTING.md](CONTRIBUTING.md)
 
