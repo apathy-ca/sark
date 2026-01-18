@@ -204,7 +204,7 @@ The AI use case is just the most visible right now.
 ### Q: What about YORI (GRID-Home)?
 
 **A:** YORI is planned as the home/open-source profile of GRID:
-- Advisory governance (recommendations, not enforcement)
+- Advisory governance (logging, auditing, and recommendations, not enforcement)
 - Simpler setup
 - Privacy-focused
 - Community-driven policies
@@ -276,7 +276,7 @@ GRID Protocol Specification v0.1 was reverse-engineered from the SARK (Secure Au
 - Secure (zero-trust, immutable audit)
 - Operational (SIEM integration, observability)
 
-Special thanks to James Henry for creating SARK and proving the viability of this governance model at enterprise scale.
+Special thanks to James R. A. Henry for creating SARK and proving the viability of this governance model at enterprise scale.
 
 ---
 

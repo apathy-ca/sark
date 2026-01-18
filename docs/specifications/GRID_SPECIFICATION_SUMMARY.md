@@ -45,7 +45,7 @@ Audit Trail → Compliance System
 - Use case: Regulated organizations, enterprise
 
 **GRID-Home** (YORI - planned)
-- Advisory governance (recommendations, not enforcement)
+- Advisory governance (logging, auditing, and recommendations, not enforcement)
 - Optional SIEM
 - Simple configurations
 - Privacy-focused
