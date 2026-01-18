@@ -43,7 +43,7 @@ class ExportResponse(BaseModel):
     download_url: str | None = None
 
 
-@router.post("", response_model=ExportResponse)
+@router.post("/", response_model=ExportResponse)
 async def create_export(
     request: ExportRequest,
     user: UserContext = Depends(get_current_user),
