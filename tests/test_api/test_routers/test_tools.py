@@ -1,10 +1,12 @@
 """Tests for Tools API endpoints."""
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
+from datetime import datetime
 
 from fastapi import status
 import pytest
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from sark.models.mcp_server import MCPServer, MCPTool, SensitivityLevel, ServerStatus, TransportType
 
@@ -38,18 +40,73 @@ def mock_server(db_session):
 
 
 @pytest.fixture
-def mock_tool(db_session, mock_server):
+def mock_tool():
     """Create a mock tool."""
     tool = MCPTool(
         id=uuid4(),
-        server_id=mock_server.id,
+        server_id=uuid4(),
         name="test_delete_user",
         description="Deletes a user from the system",
         sensitivity_level=SensitivityLevel.HIGH,
+        created_at=datetime.now(),
+        updated_at=datetime.now(),
     )
-    db_session.add(tool)
-    db_session.commit()
     return tool
+
+
+def create_mock_db_for_tool(tool, method="get"):
+    """Create a mock database dependency that returns a specific tool.
+
+    Args:
+        tool: The MCPTool object to return
+        method: Query method - "get" for db.get(), "execute" for db.execute()
+    """
+    async def mock_db_generator():
+        mock_session = AsyncMock(spec=AsyncSession)
+
+        if method == "get":
+            # Mock session.get() for ToolRegistry.get_tool()
+            mock_session.get = AsyncMock(return_value=tool)
+        elif method == "execute":
+            # Mock session.execute() for queries
+            mock_result = MagicMock()
+            mock_result.scalars.return_value.all.return_value = [tool] if tool else []
+            mock_result.scalars.return_value.first.return_value = tool
+            mock_session.execute = AsyncMock(return_value=mock_result)
+
+        mock_session.commit = AsyncMock()
+        mock_session.flush = AsyncMock()
+        mock_session.refresh = AsyncMock()
+        yield mock_session
+    return mock_db_generator
+
+
+def create_mock_db_empty():
+    """Create a mock database dependency that returns no results."""
+    async def mock_db_generator():
+        mock_session = AsyncMock(spec=AsyncSession)
+
+        # Mock session.get() to return None
+        mock_session.get = AsyncMock(return_value=None)
+
+        # Mock session.execute() to return empty results
+        mock_result = MagicMock()
+        mock_result.scalars.return_value.first.return_value = None
+        mock_result.scalars.return_value.all.return_value = []
+        mock_session.execute = AsyncMock(return_value=mock_result)
+
+        yield mock_session
+    return mock_db_generator
+
+
+def create_mock_timescale_db():
+    """Create a mock timescale database dependency for audit logs."""
+    async def mock_db_generator():
+        mock_session = AsyncMock(spec=AsyncSession)
+        mock_session.execute = AsyncMock()
+        mock_session.commit = AsyncMock()
+        yield mock_session
+    return mock_db_generator
 
 
 # ============================================================================
@@ -60,28 +117,49 @@ def mock_tool(db_session, mock_server):
 
 def test_get_tool_sensitivity_success(client, mock_tool):
     """Test getting tool sensitivity level."""
-    response = client.get(f"/api/v1/tools/{mock_tool.id}/sensitivity")
+    from sark.api.main import app
+    from sark.db import get_db
 
-    assert response.status_code == status.HTTP_200_OK
-    data = response.json()
-    assert data["tool_id"] == str(mock_tool.id)
-    assert data["tool_name"] == mock_tool.name
-    assert data["sensitivity_level"] == "high"
-    assert data["is_overridden"] is False
+    app.dependency_overrides[get_db] = create_mock_db_for_tool(mock_tool)
+
+    try:
+        response = client.get(f"/api/v1/tools/{mock_tool.id}/sensitivity")
+
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data["tool_id"] == str(mock_tool.id)
+        assert data["tool_name"] == mock_tool.name
+        assert data["sensitivity_level"] == "high"
+        assert data["is_overridden"] is False
+    finally:
+        if get_db in app.dependency_overrides:
+            del app.dependency_overrides[get_db]
 
 
 
 def test_get_tool_sensitivity_not_found(client):
     """Test getting sensitivity for non-existent tool."""
-    fake_id = uuid4()
-    response = client.get(f"/api/v1/tools/{fake_id}/sensitivity")
+    from sark.api.main import app
+    from sark.db import get_db
 
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+    app.dependency_overrides[get_db] = create_mock_db_empty()
+
+    try:
+        fake_id = uuid4()
+        response = client.get(f"/api/v1/tools/{fake_id}/sensitivity")
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+    finally:
+        if get_db in app.dependency_overrides:
+            del app.dependency_overrides[get_db]
 
 
 
-def test_get_tool_sensitivity_with_override(client, db_session, mock_tool):
+def test_get_tool_sensitivity_with_override(client, mock_tool):
     """Test getting tool sensitivity that has been manually overridden."""
+    from sark.api.main import app
+    from sark.db import get_db
+
     # Add override metadata
     mock_tool.extra_metadata = {
         "sensitivity_override": {
@@ -92,13 +170,18 @@ def test_get_tool_sensitivity_with_override(client, db_session, mock_tool):
             "reason": "Security review",
         }
     }
-    db_session.commit()
 
-    response = client.get(f"/api/v1/tools/{mock_tool.id}/sensitivity")
+    app.dependency_overrides[get_db] = create_mock_db_for_tool(mock_tool)
 
-    assert response.status_code == status.HTTP_200_OK
-    data = response.json()
-    assert data["is_overridden"] is True
+    try:
+        response = client.get(f"/api/v1/tools/{mock_tool.id}/sensitivity")
+
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data["is_overridden"] is True
+    finally:
+        if get_db in app.dependency_overrides:
+            del app.dependency_overrides[get_db]
 
 
 # ============================================================================
@@ -107,24 +190,34 @@ def test_get_tool_sensitivity_with_override(client, db_session, mock_tool):
 
 
 
-@patch("sark.services.policy.OPAClient.authorize", return_value=True)
-def test_update_tool_sensitivity_success(
-    mock_authorize, client, mock_tool, mock_user
-):
+def test_update_tool_sensitivity_success(client, mock_tool):
     """Test manually updating tool sensitivity level."""
-    with patch("sark.services.auth.get_current_user", return_value=mock_user):
-        response = client.post(
-            f"/api/v1/tools/{mock_tool.id}/sensitivity",
-            json={
-                "sensitivity_level": "critical",
-                "reason": "Handles sensitive data",
-            },
-        )
+    from sark.api.main import app
+    from sark.db import get_db, get_timescale_db
 
-    assert response.status_code == status.HTTP_200_OK
-    data = response.json()
-    assert data["sensitivity_level"] == "critical"
-    assert data["is_overridden"] is True
+    # Override dependencies
+    app.dependency_overrides[get_db] = create_mock_db_for_tool(mock_tool)
+    app.dependency_overrides[get_timescale_db] = create_mock_timescale_db()
+
+    try:
+        with patch("sark.services.policy.opa_client.OPAClient.authorize", new_callable=AsyncMock, return_value=True):
+            response = client.post(
+                f"/api/v1/tools/{mock_tool.id}/sensitivity",
+                json={
+                    "sensitivity_level": "critical",
+                    "reason": "Handles sensitive data",
+                },
+            )
+
+            assert response.status_code == status.HTTP_200_OK
+            data = response.json()
+            assert data["sensitivity_level"] == "critical"
+            assert data["is_overridden"] is True
+    finally:
+        if get_db in app.dependency_overrides:
+            del app.dependency_overrides[get_db]
+        if get_timescale_db in app.dependency_overrides:
+            del app.dependency_overrides[get_timescale_db]
 
 
 
@@ -165,21 +258,31 @@ def test_update_tool_sensitivity_invalid_level(
 
 
 
-@patch("sark.services.policy.OPAClient.authorize", return_value=True)
-def test_update_tool_sensitivity_not_found(mock_authorize, client, mock_user):
+def test_update_tool_sensitivity_not_found(client):
     """Test updating sensitivity for non-existent tool."""
-    fake_id = uuid4()
+    from sark.api.main import app
+    from sark.db import get_db, get_timescale_db
 
-    with patch("sark.services.auth.get_current_user", return_value=mock_user):
-        response = client.post(
-            f"/api/v1/tools/{fake_id}/sensitivity",
-            json={
-                "sensitivity_level": "high",
-                "reason": "Test",
-            },
-        )
+    app.dependency_overrides[get_db] = create_mock_db_empty()
+    app.dependency_overrides[get_timescale_db] = create_mock_timescale_db()
 
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+    try:
+        fake_id = uuid4()
+        with patch("sark.services.policy.opa_client.OPAClient.authorize", new_callable=AsyncMock, return_value=True):
+            response = client.post(
+                f"/api/v1/tools/{fake_id}/sensitivity",
+                json={
+                    "sensitivity_level": "high",
+                    "reason": "Test",
+                },
+            )
+
+            assert response.status_code == status.HTTP_404_NOT_FOUND
+    finally:
+        if get_db in app.dependency_overrides:
+            del app.dependency_overrides[get_db]
+        if get_timescale_db in app.dependency_overrides:
+            del app.dependency_overrides[get_timescale_db]
 
 
 # ============================================================================
