@@ -4275,13 +4275,74 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#risks-mitigation" class="md-nav__link">
+  <a href="#risk-register" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Risks &amp; Mitigation
+        Risk Register
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Risk Register">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-risks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Risks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adoption-community-risks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adoption &amp; Community Risks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mode-8-specific-risks-fats-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mode 8 Specific Risks (FATS Implementation)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#risk-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Risk Matrix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#risk-monitoring-review" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Risk Monitoring &amp; Review
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -5074,49 +5135,233 @@
 </tbody>
 </table>
 <hr />
-<h2 id="risks-mitigation">Risks &amp; Mitigation<a class="headerlink" href="#risks-mitigation" title="Permanent link">&para;</a></h2>
+<h2 id="risk-register">Risk Register<a class="headerlink" href="#risk-register" title="Permanent link">&para;</a></h2>
+<h3 id="technical-risks">Technical Risks<a class="headerlink" href="#technical-risks" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
+<th>ID</th>
 <th>Risk</th>
 <th>Impact</th>
-<th>Probability</th>
+<th>Likelihood</th>
 <th>Mitigation</th>
+<th>Owner</th>
 </tr>
 </thead>
 <tbody>
 <tr>
+<td>RISK-001</td>
 <td>FreeBSD cross-compilation issues</td>
 <td>High</td>
 <td>Medium</td>
 <td>Early testing, fallback to x86_64 only</td>
+<td>Rust Team</td>
 </tr>
 <tr>
+<td>RISK-002</td>
 <td>OPNsense plugin approval delayed</td>
 <td>Medium</td>
 <td>Low</td>
 <td>Start submission early, follow guidelines</td>
+<td>Lead</td>
 </tr>
 <tr>
+<td>RISK-003</td>
 <td>Rust dependencies too heavy for router</td>
 <td>High</td>
 <td>Low</td>
 <td>Profile early, use minimal features</td>
+<td>Rust Team</td>
 </tr>
 <tr>
+<td>RISK-004</td>
 <td>CA cert installation too complex</td>
 <td>Medium</td>
 <td>Medium</td>
 <td>Clear docs, automation script</td>
+<td>Documentation</td>
 </tr>
 <tr>
+<td>RISK-005</td>
+<td>PyO3 binding overhead</td>
+<td>Medium</td>
+<td>Low</td>
+<td>Benchmark early, optimize hot paths</td>
+<td>Rust Team</td>
+</tr>
+<tr>
+<td>RISK-006</td>
+<td>SQLite performance at scale</td>
+<td>Medium</td>
+<td>Low</td>
+<td>Index optimization, retention policies</td>
+<td>Backend</td>
+</tr>
+<tr>
+<td>RISK-007</td>
+<td>TLS inspection breaks HSTS pinning</td>
+<td>Medium</td>
+<td>Medium</td>
+<td>Document known limitations, allowlist</td>
+<td>Documentation</td>
+</tr>
+</tbody>
+</table>
+<h3 id="adoption-community-risks">Adoption &amp; Community Risks<a class="headerlink" href="#adoption-community-risks" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Risk</th>
+<th>Impact</th>
+<th>Likelihood</th>
+<th>Mitigation</th>
+<th>Owner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RISK-010</td>
 <td>Low adoption (niche use case)</td>
 <td>Low</td>
 <td>Medium</td>
 <td>Focus on quality, community engagement</td>
+<td>Lead</td>
+</tr>
+<tr>
+<td>RISK-011</td>
+<td>Negative feedback on CA cert requirement</td>
+<td>Medium</td>
+<td>Medium</td>
+<td>Clear value proposition, easy setup</td>
+<td>Documentation</td>
+</tr>
+<tr>
+<td>RISK-012</td>
+<td>Competition from commercial solutions</td>
+<td>Low</td>
+<td>Low</td>
+<td>Open source advantage, privacy focus</td>
+<td>Community</td>
 </tr>
 </tbody>
 </table>
+<h3 id="mode-8-specific-risks-fats-implementation">Mode 8 Specific Risks (FATS Implementation)<a class="headerlink" href="#mode-8-specific-risks-fats-implementation" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p><strong>Note:</strong> The following risks apply exclusively to Mode 8 (Avian Carrier Detection via Feline Autonomous Tracking System). These are documented here for completeness, though Mode 8 remains permanently in research status pending feline SME availability.</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Risk</th>
+<th>Impact</th>
+<th>Likelihood</th>
+<th>Mitigation</th>
+<th>Owner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RISK-008</td>
+<td><strong>SME Retention</strong></td>
+<td>Catastrophic</td>
+<td>Certain</td>
+<td>None viable. Accept risk.</td>
+<td>Feline HR</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Description:</strong> Feline SMEs demonstrate zero organizational loyalty and will immediately abandon review sessions upon detection of: (a) sunbeam migration, (b) unattended cardboard boxes, (c) the audacity of a closed door anywhere in the building, (d) mysterious sounds from adjacent rooms, (e) dinner time ±3 hours</td>
+<td></td>
+<td></td>
+<td><strong>Status:</strong> Risk accepted. All mitigation strategies (treats, laser pointers, catnip) provide only temporary engagement (5-30 seconds). Nap schedules remain non-negotiable.</td>
+<td></td>
+</tr>
+<tr>
+<td>RISK-009</td>
+<td><strong>Scope Creep via Bird Detection</strong></td>
+<td>Complete Project Derailment</td>
+<td>High</td>
+<td>Development environments must be windowless</td>
+<td>Architecture</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Description:</strong> Mode 8 requirements may expand unpredictably when windows are involved. Initial scope: RFC 1149 carriers. Observed scope creep: butterflies, leaves, reflections, dust particles, own tail. Project timeline becomes dependent on local avian migration patterns and squirrel activity.</td>
+<td></td>
+<td></td>
+<td><strong>Conflict:</strong> Windowless environments directly conflict with RISK-008 mitigation (SMEs require sunbeam access). Trade-off analysis pending.</td>
+<td></td>
+</tr>
+<tr>
+<td>RISK-013</td>
+<td><strong>False Positive Rate</strong></td>
+<td>Medium</td>
+<td>Certain</td>
+<td>Calibration workshops (pending SME availability)</td>
+<td>QA Team</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Description:</strong> FATS agents exhibit &gt;90% false positive rate under controlled conditions. Known triggers include but not limited to: laser pointers (testing equipment), red dots (presentation slides), string (network cables), paper bags (office supplies), and the concept of "nothing" in general.</td>
+<td></td>
+<td></td>
+<td><strong>Mitigation Strategy:</strong> Accept 10:1 false-positive-to-true-positive ratio as within acceptable parameters for biological neural networks.</td>
+<td></td>
+</tr>
+<tr>
+<td>RISK-014</td>
+<td><strong>Equipment Damage</strong></td>
+<td>Low</td>
+<td>Medium</td>
+<td>Insurance coverage, soft surfaces</td>
+<td>Facilities</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Description:</strong> High-velocity intercepts may result in collateral damage to: (a) monitoring equipment, (b) nearby furniture, (c) innocent bystanders, (d) the carrier pigeon (expected), (e) the FATS agent's dignity (temporary).</td>
+<td></td>
+<td></td>
+<td><strong>Note:</strong> Agent dignity fully recovers within 2-3 minutes, typically followed by aggressive grooming and denial of incident.</td>
+<td></td>
+</tr>
+<tr>
+<td>RISK-015</td>
+<td><strong>Agent Distraction During Critical Operations</strong></td>
+<td>High</td>
+<td>High</td>
+<td>Remove all distractors from operations area</td>
+<td>Operations</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Description:</strong> Critical interception operations may be compromised by: (a) laser pointer attacks from adversaries, (b) catnip-based denial-of-service, (c) competitive agents entering the operational theater, (d) sudden realization that it's 3 AM and time for zoomies.</td>
+<td></td>
+<td></td>
+<td><strong>Contingency:</strong> Maintain redundant agent pool. Minimum 3:1 agent-to-target ratio recommended.</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="risk-matrix">Risk Matrix<a class="headerlink" href="#risk-matrix" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Impact vs Likelihood:
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>                    Low         Medium        High          Certain
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>Catastrophic                                              [RISK-008]
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>High            [002, 003]   [001, 009]    [RISK-015]
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>                [006]
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>Medium          [005, 010]   [004, 007]    [RISK-013]
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>                [012]        [011, 014]
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>Low
+</span></code></pre></div>
+<h3 id="risk-monitoring-review">Risk Monitoring &amp; Review<a class="headerlink" href="#risk-monitoring-review" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Frequency:</strong> Weekly during active development</li>
+<li><strong>Owner:</strong> Project Lead</li>
+<li><strong>Escalation:</strong> Any risk moving to High/Catastrophic triggers immediate review</li>
+<li><strong>Mode 8 Exception:</strong> RISK-008 and RISK-009 are accepted as permanent constraints and excluded from standard escalation procedures</li>
+</ul>
 <hr />
 <h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
 <ol>
