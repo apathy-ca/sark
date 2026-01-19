@@ -1572,4 +1572,8 @@
          <loc>https://sark.example.com/v2.0/PROTOCOL_ADAPTER_SPEC/</loc>
          <lastmod>2026-01-19</lastmod>
     </url>
+    <url>
+         <loc>https://sark.example.com/v2.0/YORI_PROJECT_PLAN/</loc>
+         <lastmod>2026-01-19</lastmod>
+    </url>
 </urlset>
