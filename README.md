@@ -54,7 +54,7 @@ docker compose --profile full up -d
 
 **Next Steps:**
 - 📖 **[15-Minute Quick Start](docs/QUICK_START.md)** - Complete getting started guide
-- 🔨 **[Rust Development Setup](docs/v1.4.0/RUST_SETUP.md)** - Building and working with Rust extensions
+- 💻 **[Development Guide](docs/DEVELOPMENT.md)** - Development workflow and standards
 - 🎓 **[Tutorials](tutorials/)** - Step-by-step examples
 - 📚 **[API Reference](docs/API_REFERENCE.md)** - Complete API documentation
 
