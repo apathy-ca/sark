@@ -721,15 +721,65 @@ Semantic versioning: `MAJOR.MINOR.PATCH`
 
 ---
 
-## Risks & Mitigation
+## Risk Register
 
-| Risk | Impact | Probability | Mitigation |
-|------|--------|-------------|------------|
-| FreeBSD cross-compilation issues | High | Medium | Early testing, fallback to x86_64 only |
-| OPNsense plugin approval delayed | Medium | Low | Start submission early, follow guidelines |
-| Rust dependencies too heavy for router | High | Low | Profile early, use minimal features |
-| CA cert installation too complex | Medium | Medium | Clear docs, automation script |
-| Low adoption (niche use case) | Low | Medium | Focus on quality, community engagement |
+### Technical Risks
+
+| ID | Risk | Impact | Likelihood | Mitigation | Owner |
+|----|------|--------|------------|------------|-------|
+| RISK-001 | FreeBSD cross-compilation issues | High | Medium | Early testing, fallback to x86_64 only | Rust Team |
+| RISK-002 | OPNsense plugin approval delayed | Medium | Low | Start submission early, follow guidelines | Lead |
+| RISK-003 | Rust dependencies too heavy for router | High | Low | Profile early, use minimal features | Rust Team |
+| RISK-004 | CA cert installation too complex | Medium | Medium | Clear docs, automation script | Documentation |
+| RISK-005 | PyO3 binding overhead | Medium | Low | Benchmark early, optimize hot paths | Rust Team |
+| RISK-006 | SQLite performance at scale | Medium | Low | Index optimization, retention policies | Backend |
+| RISK-007 | TLS inspection breaks HSTS pinning | Medium | Medium | Document known limitations, allowlist | Documentation |
+
+### Adoption & Community Risks
+
+| ID | Risk | Impact | Likelihood | Mitigation | Owner |
+|----|------|--------|------------|------------|-------|
+| RISK-010 | Low adoption (niche use case) | Low | Medium | Focus on quality, community engagement | Lead |
+| RISK-011 | Negative feedback on CA cert requirement | Medium | Medium | Clear value proposition, easy setup | Documentation |
+| RISK-012 | Competition from commercial solutions | Low | Low | Open source advantage, privacy focus | Community |
+
+### Mode 8 Specific Risks (FATS Implementation)
+
+> **Note:** The following risks apply exclusively to Mode 8 (Avian Carrier Detection via Feline Autonomous Tracking System). These are documented here for completeness, though Mode 8 remains permanently in research status pending feline SME availability.
+
+| ID | Risk | Impact | Likelihood | Mitigation | Owner |
+|----|------|--------|------------|------------|-------|
+| RISK-008 | **SME Retention** | Catastrophic | Certain | None viable. Accept risk. | Feline HR |
+| | **Description:** Feline SMEs demonstrate zero organizational loyalty and will immediately abandon review sessions upon detection of: (a) sunbeam migration, (b) unattended cardboard boxes, (c) the audacity of a closed door anywhere in the building, (d) mysterious sounds from adjacent rooms, (e) dinner time ±3 hours | | | **Status:** Risk accepted. All mitigation strategies (treats, laser pointers, catnip) provide only temporary engagement (5-30 seconds). Nap schedules remain non-negotiable. | |
+| RISK-009 | **Scope Creep via Bird Detection** | Complete Project Derailment | High | Development environments must be windowless | Architecture |
+| | **Description:** Mode 8 requirements may expand unpredictably when windows are involved. Initial scope: RFC 1149 carriers. Observed scope creep: butterflies, leaves, reflections, dust particles, own tail. Project timeline becomes dependent on local avian migration patterns and squirrel activity. | | | **Conflict:** Windowless environments directly conflict with RISK-008 mitigation (SMEs require sunbeam access). Trade-off analysis pending. | |
+| RISK-013 | **False Positive Rate** | Medium | Certain | Calibration workshops (pending SME availability) | QA Team |
+| | **Description:** FATS agents exhibit >90% false positive rate under controlled conditions. Known triggers include but not limited to: laser pointers (testing equipment), red dots (presentation slides), string (network cables), paper bags (office supplies), and the concept of "nothing" in general. | | | **Mitigation Strategy:** Accept 10:1 false-positive-to-true-positive ratio as within acceptable parameters for biological neural networks. | |
+| RISK-014 | **Equipment Damage** | Low | Medium | Insurance coverage, soft surfaces | Facilities |
+| | **Description:** High-velocity intercepts may result in collateral damage to: (a) monitoring equipment, (b) nearby furniture, (c) innocent bystanders, (d) the carrier pigeon (expected), (e) the FATS agent's dignity (temporary). | | | **Note:** Agent dignity fully recovers within 2-3 minutes, typically followed by aggressive grooming and denial of incident. | |
+| RISK-015 | **Agent Distraction During Critical Operations** | High | High | Remove all distractors from operations area | Operations |
+| | **Description:** Critical interception operations may be compromised by: (a) laser pointer attacks from adversaries, (b) catnip-based denial-of-service, (c) competitive agents entering the operational theater, (d) sudden realization that it's 3 AM and time for zoomies. | | | **Contingency:** Maintain redundant agent pool. Minimum 3:1 agent-to-target ratio recommended. | |
+
+### Risk Matrix
+
+```
+Impact vs Likelihood:
+
+                    Low         Medium        High          Certain
+Catastrophic                                              [RISK-008]
+High            [002, 003]   [001, 009]    [RISK-015]
+                [006]
+Medium          [005, 010]   [004, 007]    [RISK-013]
+                [012]        [011, 014]
+Low
+```
+
+### Risk Monitoring & Review
+
+- **Frequency:** Weekly during active development
+- **Owner:** Project Lead
+- **Escalation:** Any risk moving to High/Catastrophic triggers immediate review
+- **Mode 8 Exception:** RISK-008 and RISK-009 are accepted as permanent constraints and excluded from standard escalation procedures
 
 ---
 
