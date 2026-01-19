@@ -236,6 +236,23 @@ SARK is the **reference implementation of GRID Protocol Specification v0.1**.
 
 ---
 
+## Related Projects
+
+### YORI - Home LLM Gateway
+
+**[YORI](https://github.com/apathy-ca/yori)** is a lightweight LLM governance gateway for home networks, built on SARK's Rust components.
+
+- **Target:** OPNsense routers, home users (vs SARK's enterprise Kubernetes)
+- **Resources:** 512MB RAM, 1 CPU (vs SARK's 4 CPU, 8GB RAM)
+- **Database:** SQLite (vs PostgreSQL + TimescaleDB)
+- **Features:** Observe, advisory, and optional enforcement modes for family LLM usage
+
+YORI reuses SARK's battle-tested Rust core (`sark-opa`, `sark-cache`) via PyO3 bindings, bringing enterprise-grade policy evaluation to resource-constrained home routers.
+
+📖 **[YORI Repository](https://github.com/apathy-ca/yori)** | **[Project Plan](docs/v2.0/YORI_PROJECT_PLAN.md)**
+
+---
+
 ## Contributing
 
 We welcome contributions! See **[CONTRIBUTING.md](CONTRIBUTING.md)** for:
