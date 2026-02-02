@@ -151,6 +151,94 @@ opa-test: ## Test OPA policies
 opa-check: ## Check OPA policy syntax
 	docker compose exec opa opa check /policies
 
+# ============================================================================
+# Home Deployment Commands
+# ============================================================================
+# Lightweight deployment profile for home routers (OPNsense, 512MB RAM)
+# Uses SQLite, embedded OPA, and in-memory caching
+# ============================================================================
+
+.PHONY: home-up home-down home-logs home-shell home-status home-restart home-clean home-build home-init
+
+HOME_COMPOSE := docker compose -f docker-compose.home.yml
+
+home-init: ## Initialize home deployment directories and default config
+	@echo "Initializing SARK home deployment..."
+	@mkdir -p data/db data/policies data/certs data/config data/logs
+	@if [ ! -f .env.home ]; then \
+		cp .env.home.example .env.home 2>/dev/null || echo "# SARK Home Configuration" > .env.home; \
+		echo "Created .env.home from template"; \
+	fi
+	@echo "Home deployment initialized. Run 'make home-up' to start."
+
+home-build: ## Build SARK home Docker image
+	@echo "Building SARK home image..."
+	$(HOME_COMPOSE) build
+
+home-up: ## Start SARK home deployment
+	@echo "Starting SARK home deployment..."
+	@mkdir -p data/db data/policies data/certs data/logs
+	$(HOME_COMPOSE) up -d
+	@echo ""
+	@echo "SARK Home is starting..."
+	@echo "  HTTPS Proxy: https://localhost:$${SARK_HOME_HTTPS_PORT:-8443}"
+	@echo "  Health:      http://localhost:$${SARK_HOME_HEALTH_PORT:-9090}/health"
+	@echo ""
+	@echo "Run 'make home-logs' to view logs"
+	@echo "Run 'make home-status' to check status"
+
+home-up-build: ## Start SARK home deployment with rebuild
+	@echo "Building and starting SARK home deployment..."
+	$(HOME_COMPOSE) up -d --build
+
+home-down: ## Stop SARK home deployment
+	@echo "Stopping SARK home deployment..."
+	$(HOME_COMPOSE) down
+
+home-logs: ## View SARK home logs (follow mode)
+	$(HOME_COMPOSE) logs -f
+
+home-logs-tail: ## View last 100 lines of SARK home logs
+	$(HOME_COMPOSE) logs --tail=100
+
+home-shell: ## Open shell in SARK home container
+	$(HOME_COMPOSE) exec sark-home /bin/sh
+
+home-status: ## Check SARK home deployment status
+	@echo "=== Container Status ==="
+	$(HOME_COMPOSE) ps
+	@echo ""
+	@echo "=== Health Check ==="
+	@curl -sf http://localhost:$${SARK_HOME_HEALTH_PORT:-9090}/health 2>/dev/null | python3 -m json.tool 2>/dev/null || echo "Service not responding (may still be starting)"
+	@echo ""
+	@echo "=== Resource Usage ==="
+	@docker stats --no-stream sark-home 2>/dev/null || echo "Container not running"
+
+home-restart: ## Restart SARK home deployment
+	@echo "Restarting SARK home deployment..."
+	$(HOME_COMPOSE) restart
+
+home-clean: ## Clean SARK home deployment (remove containers and volumes)
+	@echo "Cleaning SARK home deployment..."
+	$(HOME_COMPOSE) down -v
+	@echo "Home deployment cleaned. Data volumes removed."
+
+home-db-shell: ## Connect to SARK home SQLite database
+	$(HOME_COMPOSE) exec sark-home sqlite3 /var/db/sark/home.db
+
+home-audit-shell: ## Connect to SARK home audit SQLite database
+	$(HOME_COMPOSE) exec sark-home sqlite3 /var/db/sark/audit.db
+
+home-config: ## Show current SARK home configuration
+	@echo "=== SARK Home Configuration ==="
+	@echo "Environment file: .env.home"
+	@echo ""
+	@if [ -f .env.home ]; then \
+		cat .env.home | grep -v "^#" | grep -v "^$$"; \
+	else \
+		echo "No .env.home file found. Run 'make home-init' to create one."; \
+	fi
+
 # Kubernetes commands
 k8s-deploy: ## Deploy to Kubernetes using Kustomize
 	kubectl apply -k k8s/base
