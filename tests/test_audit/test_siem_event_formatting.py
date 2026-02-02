@@ -45,7 +45,7 @@ def minimal_event() -> AuditEvent:
     return AuditEvent(
         id=uuid4(),
         timestamp=datetime.now(UTC),
-        event_type=AuditEventType.SESSION_STARTED,
+        event_type=AuditEventType.USER_LOGIN,
         severity=SeverityLevel.LOW,
         user_email="minimal@example.com",
     )

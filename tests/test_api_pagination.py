@@ -10,12 +10,32 @@ import pytest
 from sark.models.mcp_server import MCPServer, SensitivityLevel, ServerStatus, TransportType
 
 
+def _get_mock_user():
+    """Create a mock user context for tests."""
+    from sark.api.dependencies import UserContext
+    return UserContext({
+        "user_id": str(uuid4()),
+        "email": "test@example.com",
+        "name": "Test User",
+        "roles": ["admin"],
+        "teams": [],
+        "permissions": ["servers:read", "servers:write"],
+    })
+
+
 @pytest.fixture
 def client() -> TestClient:
-    """Create test client."""
+    """Create test client with mocked authentication."""
     from sark.api.main import app
+    from sark.api.dependencies import get_current_user
 
-    return TestClient(app)
+    # Override auth dependency to return mock user
+    app.dependency_overrides[get_current_user] = _get_mock_user
+
+    yield TestClient(app)
+
+    # Clean up overrides
+    app.dependency_overrides.clear()
 
 
 @pytest.fixture

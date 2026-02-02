@@ -8,9 +8,9 @@ import pytest
 
 from sark.models.api_key import APIKey
 from sark.services.auth.api_keys import APIKeyService
-from sark.services.auth.providers.ldap import LDAPProvider
-from sark.services.auth.providers.oidc import OIDCProvider
-from sark.services.auth.providers.saml import SAMLProvider
+from sark.services.auth.providers.ldap import LDAPProvider, LDAPProviderConfig
+from sark.services.auth.providers.oidc import OIDCProvider, OIDCProviderConfig
+from sark.services.auth.providers.saml import SAMLProvider, SAMLProviderConfig
 
 # Fixtures
 
@@ -33,36 +33,42 @@ def mock_db_session():
 @pytest.fixture
 def oidc_provider():
     """Create OIDC provider for testing."""
-    return OIDCProvider(
+    config = OIDCProviderConfig(
+        name="test-oidc",
+        issuer_url="https://accounts.google.com",
         client_id="test_client_id",
         client_secret="test_client_secret",
-        provider="google",
     )
+    return OIDCProvider(config)
 
 
 @pytest.fixture
 def saml_provider():
     """Create SAML provider for testing."""
-    return SAMLProvider(
-        sp_entity_id="https://sark.example.com",
-        sp_acs_url="https://sark.example.com/api/auth/saml/acs",
-        sp_sls_url="https://sark.example.com/api/auth/saml/slo",
+    config = SAMLProviderConfig(
+        name="test-saml",
         idp_entity_id="https://idp.example.com",
         idp_sso_url="https://idp.example.com/sso",
         idp_x509_cert="MIIC...",  # Dummy cert
+        sp_entity_id="https://sark.example.com",
+        sp_acs_url="https://sark.example.com/api/auth/saml/acs",
+        sp_slo_url="https://sark.example.com/api/auth/saml/slo",
     )
+    return SAMLProvider(config)
 
 
 @pytest.fixture
 def ldap_provider():
     """Create LDAP provider for testing."""
-    return LDAPProvider(
-        server_uri="ldap://test.example.com:389",
+    config = LDAPProviderConfig(
+        name="test-ldap",
+        server_url="ldap://test.example.com:389",
+        base_dn="ou=users,dc=example,dc=com",
         bind_dn="cn=admin,dc=example,dc=com",
         bind_password="admin_password",
-        user_base_dn="ou=users,dc=example,dc=com",
-        group_base_dn="ou=groups,dc=example,dc=com",
+        group_search_base="ou=groups,dc=example,dc=com",
     )
+    return LDAPProvider(config)
 
 
 @pytest.fixture
@@ -80,75 +86,60 @@ class TestCompleteAuthFlows:
     @pytest.mark.asyncio
     async def test_oidc_authorization_flow(self, oidc_provider):
         """Test OIDC authorization URL generation."""
-        # Get authorization URL
-        auth_url = await oidc_provider.get_authorization_url(
-            state="test_state", redirect_uri="https://example.com/callback"
-        )
-        assert "https://accounts.google.com/o/oauth2/v2/auth" in auth_url
-        assert "client_id=test_client_id" in auth_url
-        assert "state=test_state" in auth_url
+        mock_discovery = {
+            "authorization_endpoint": "https://accounts.google.com/o/oauth2/v2/auth",
+            "token_endpoint": "https://oauth2.googleapis.com/token",
+            "userinfo_endpoint": "https://openidconnect.googleapis.com/v1/userinfo",
+        }
+        with patch.object(oidc_provider, "_get_discovery_document", return_value=mock_discovery):
+            # Get authorization URL
+            auth_url = await oidc_provider.get_authorization_url(
+                state="test_state", redirect_uri="https://example.com/callback"
+            )
+            assert "https://accounts.google.com/o/oauth2/v2/auth" in auth_url
+            assert "client_id=test_client_id" in auth_url
+            assert "state=test_state" in auth_url
 
     @pytest.mark.asyncio
     async def test_oidc_token_validation(self, oidc_provider):
         """Test OIDC token validation."""
-        mock_claims = {
-            "sub": "user123",
+        mock_userinfo = {
+            "sub": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
             "email": "user@example.com",
             "name": "Test User",
             "given_name": "Test",
             "family_name": "User",
         }
 
-        with patch.object(oidc_provider, "_get_jwks", return_value=Mock()):
-            with patch.object(oidc_provider.jwt, "decode", return_value=mock_claims):
-                user_info = await oidc_provider.validate_token("mock_access_token")
+        with patch.object(oidc_provider, "_get_userinfo", return_value=mock_userinfo):
+            result = await oidc_provider.validate_token("mock_access_token")
 
-                assert user_info is not None
-                assert user_info.user_id == "user123"
-                assert user_info.email == "user@example.com"
-                assert user_info.name == "Test User"
+            assert result is not None
+            assert result.success is True
+            assert result.email == "user@example.com"
+            assert result.display_name == "Test User"
 
     @pytest.mark.asyncio
     async def test_ldap_complete_flow(self, ldap_provider):
         """Test complete LDAP authentication flow."""
-        # Mock LDAP entry
-        mock_entry = Mock()
-        mock_entry.entry_dn = "uid=jdoe,ou=users,dc=example,dc=com"
-        mock_entry.mail = Mock(value="jdoe@example.com")
-        mock_entry.cn = Mock(value="John Doe")
-        mock_entry.givenName = Mock(value="John")
-        mock_entry.sn = Mock(value="Doe")
+        user_dn = "uid=jdoe,ou=users,dc=example,dc=com"
+        user_attrs = {
+            "uid": "jdoe",
+            "mail": "jdoe@example.com",
+            "cn": "John Doe",
+        }
+        groups = ["developers", "admins"]
 
-        # Mock group entries
-        mock_group1 = Mock()
-        mock_group1.cn = Mock(value="developers")
-        mock_group2 = Mock()
-        mock_group2.cn = Mock(value="admins")
+        with patch.object(ldap_provider, "_search_user", return_value=(user_dn, user_attrs)):
+            with patch.object(ldap_provider, "_bind_user", return_value=True):
+                with patch.object(ldap_provider, "_get_user_groups", return_value=groups):
+                    result = await ldap_provider.authenticate("jdoe", "secret")
 
-        # Mock connections
-        mock_user_search_conn = Mock()
-        mock_user_search_conn.entries = [mock_entry]
-
-        mock_user_bind_conn = Mock()
-
-        mock_group_conn = Mock()
-        mock_group_conn.entries = [mock_group1, mock_group2]
-
-        with patch.object(ldap_provider, "_get_connection") as mock_get_conn:
-            # Three calls: user search, user bind, group search
-            mock_get_conn.side_effect = [
-                mock_user_search_conn,
-                mock_user_bind_conn,
-                mock_group_conn,
-            ]
-
-            user_info = await ldap_provider.authenticate({"username": "jdoe", "password": "secret"})
-
-            assert user_info is not None
-            assert user_info.user_id == "uid=jdoe,ou=users,dc=example,dc=com"
-            assert user_info.email == "jdoe@example.com"
-            assert user_info.name == "John Doe"
-            assert user_info.groups == ["developers", "admins"]
+                    assert result is not None
+                    assert result.success is True
+                    assert result.email == "jdoe@example.com"
+                    assert result.display_name == "John Doe"
+                    assert result.groups == ["developers", "admins"]
 
     @pytest.mark.asyncio
     async def test_api_key_validation_flow(self, api_key_service, mock_db_session):
@@ -430,34 +421,36 @@ class TestCrossProviderScenarios:
     async def test_user_with_multiple_auth_methods(self, oidc_provider, ldap_provider):
         """Test user can authenticate via multiple methods."""
         # OIDC authentication
-        mock_claims = {
-            "sub": "oidc_user123",
+        mock_userinfo = {
+            "sub": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
             "email": "user@example.com",
             "name": "Test User",
         }
 
-        with patch.object(oidc_provider, "_get_jwks", return_value=Mock()):
-            with patch.object(oidc_provider.jwt, "decode", return_value=mock_claims):
-                user_info_oidc = await oidc_provider.validate_token("oidc_token")
-                assert user_info_oidc is not None
-                assert user_info_oidc.user_id == "oidc_user123"
+        with patch.object(oidc_provider, "_get_userinfo", return_value=mock_userinfo):
+            result_oidc = await oidc_provider.validate_token("oidc_token")
+            assert result_oidc is not None
+            assert result_oidc.success is True
+            assert result_oidc.email == "user@example.com"
 
         # LDAP authentication
-        mock_entry = Mock()
-        mock_entry.entry_dn = "uid=user,ou=users,dc=example,dc=com"
-        mock_entry.mail = Mock(value="user@example.com")
-        mock_entry.cn = Mock(value="Test User")
+        user_dn = "uid=user,ou=users,dc=example,dc=com"
+        user_attrs = {
+            "uid": "user",
+            "mail": "user@example.com",
+            "cn": "Test User",
+        }
 
-        mock_conn = Mock()
-        mock_conn.entries = [mock_entry]
-
-        with patch.object(ldap_provider, "_get_connection", return_value=mock_conn):
-            user_info_ldap = await ldap_provider.lookup_user("user")
-            assert user_info_ldap is not None
-            assert user_info_ldap.email == "user@example.com"
+        with patch.object(ldap_provider, "_search_user", return_value=(user_dn, user_attrs)):
+            with patch.object(ldap_provider, "_bind_user", return_value=True):
+                with patch.object(ldap_provider, "_get_user_groups", return_value=[]):
+                    result_ldap = await ldap_provider.authenticate("user", "password")
+                    assert result_ldap is not None
+                    assert result_ldap.success is True
+                    assert result_ldap.email == "user@example.com"
 
         # Both should have same email
-        assert user_info_oidc.email == user_info_ldap.email
+        assert result_oidc.email == result_ldap.email
 
     @pytest.mark.asyncio
     async def test_api_key_with_scope_validation(self, api_key_service, mock_db_session):
