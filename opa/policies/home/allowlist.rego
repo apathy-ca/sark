@@ -279,7 +279,7 @@ reason := sprintf("User group '%s' is in blocklist", [input.user.user_group]) if
     user_group_in_blocklist
 }
 
-reason := sprintf("Device IP in blocked CIDR range") if {
+reason := "Device IP in blocked CIDR range" if {
     device_in_blocked_cidr
 }
 
