@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+    <mount>//OPNsense/SARK/general</mount>
+    <version>2.0.0</version>
+    <description>SARK Home Gateway General Settings</description>
+    <items>
+        <!-- Service Configuration -->
+        <enabled type="BooleanField">
+            <default>0</default>
+            <Required>Y</Required>
+            <ValidationMessage>Service enabled state is required</ValidationMessage>
+        </enabled>
+        <mode type="OptionField">
+            <default>observe</default>
+            <Required>Y</Required>
+            <OptionValues>
+                <observe>Observe Only</observe>
+                <advisory>Advisory (Alerts)</advisory>
+                <enforce>Enforce (Block)</enforce>
+            </OptionValues>
+            <ValidationMessage>Select a governance mode</ValidationMessage>
+        </mode>
+        <listenAddress type="NetworkField">
+            <default>0.0.0.0</default>
+            <Required>Y</Required>
+            <NetMaskAllowed>N</NetMaskAllowed>
+            <ValidationMessage>Valid IP address required</ValidationMessage>
+        </listenAddress>
+        <listenPort type="IntegerField">
+            <default>8443</default>
+            <Required>Y</Required>
+            <MinimumValue>1</MinimumValue>
+            <MaximumValue>65535</MaximumValue>
+            <ValidationMessage>Port must be between 1 and 65535</ValidationMessage>
+        </listenPort>
+        <tlsEnabled type="BooleanField">
+            <default>1</default>
+        </tlsEnabled>
+        <logLevel type="OptionField">
+            <default>info</default>
+            <OptionValues>
+                <debug>Debug</debug>
+                <info>Info</info>
+                <warning>Warning</warning>
+                <error>Error</error>
+            </OptionValues>
+        </logLevel>
+
+        <!-- Budget Controls -->
+        <dailyTokenLimit type="IntegerField">
+            <default>100000</default>
+            <MinimumValue>0</MinimumValue>
+            <ValidationMessage>Token limit must be non-negative</ValidationMessage>
+        </dailyTokenLimit>
+        <dailyCostLimit type="TextField">
+            <default>5.00</default>
+            <Mask>/^\d+(\.\d{1,2})?$/</Mask>
+            <ValidationMessage>Cost must be a valid decimal (e.g., 5.00)</ValidationMessage>
+        </dailyCostLimit>
+        <monthlyBudget type="TextField">
+            <default>50.00</default>
+            <Mask>/^\d+(\.\d{1,2})?$/</Mask>
+            <ValidationMessage>Budget must be a valid decimal (e.g., 50.00)</ValidationMessage>
+        </monthlyBudget>
+
+        <!-- Time Controls -->
+        <bedtimeEnabled type="BooleanField">
+            <default>0</default>
+        </bedtimeEnabled>
+        <bedtimeStart type="TextField">
+            <default>21:00</default>
+            <Mask>/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/</Mask>
+            <ValidationMessage>Time must be in HH:MM format</ValidationMessage>
+        </bedtimeStart>
+        <bedtimeEnd type="TextField">
+            <default>07:00</default>
+            <Mask>/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/</Mask>
+            <ValidationMessage>Time must be in HH:MM format</ValidationMessage>
+        </bedtimeEnd>
+        <bedtimeUsers type="CSVListField">
+            <default></default>
+            <ValidationMessage>Comma-separated list of usernames</ValidationMessage>
+        </bedtimeUsers>
+
+        <!-- Users Configuration -->
+        <users>
+            <user type="ArrayField">
+                <name type="TextField">
+                    <Required>Y</Required>
+                    <Mask>/^[a-zA-Z0-9_-]+$/</Mask>
+                    <ValidationMessage>Username must be alphanumeric with underscores/dashes</ValidationMessage>
+                </name>
+                <role type="OptionField">
+                    <default>child</default>
+                    <OptionValues>
+                        <admin>Administrator</admin>
+                        <parent>Parent</parent>
+                        <child>Child</child>
+                        <guest>Guest</guest>
+                    </OptionValues>
+                </role>
+                <dailyLimit type="IntegerField">
+                    <default>10000</default>
+                    <MinimumValue>0</MinimumValue>
+                </dailyLimit>
+                <enabled type="BooleanField">
+                    <default>1</default>
+                </enabled>
+            </user>
+        </users>
+
+        <!-- API Providers Configuration -->
+        <providers>
+            <provider type="ArrayField">
+                <name type="TextField">
+                    <Required>Y</Required>
+                    <ValidationMessage>Provider name is required</ValidationMessage>
+                </name>
+                <type type="OptionField">
+                    <default>openai</default>
+                    <OptionValues>
+                        <openai>OpenAI</openai>
+                        <anthropic>Anthropic</anthropic>
+                        <google>Google AI</google>
+                        <azure>Azure OpenAI</azure>
+                        <local>Local/Ollama</local>
+                    </OptionValues>
+                </type>
+                <apiKey type="TextField">
+                    <Mask>/^[a-zA-Z0-9_-]+$/</Mask>
+                </apiKey>
+                <endpoint type="UrlField">
+                    <ValidationMessage>Valid URL required</ValidationMessage>
+                </endpoint>
+                <enabled type="BooleanField">
+                    <default>1</default>
+                </enabled>
+                <rateLimit type="IntegerField">
+                    <default>60</default>
+                    <MinimumValue>0</MinimumValue>
+                    <ValidationMessage>Rate limit (requests per minute)</ValidationMessage>
+                </rateLimit>
+            </provider>
+        </providers>
+    </items>
+</model>

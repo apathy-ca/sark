@@ -1,0 +1,115 @@
+#!/bin/sh
+
+# PROVIDE: sark
+# REQUIRE: NETWORKING DAEMON
+# BEFORE: LOGIN
+# KEYWORD: shutdown
+
+# SARK Home Gateway - FreeBSD rc.d service script
+# Zero-trust LLM governance for home networks
+
+. /etc/rc.subr
+
+name="sark"
+rcvar="sark_enable"
+desc="SARK Home LLM Gateway"
+
+load_rc_config $name
+
+# Defaults
+: ${sark_enable:="NO"}
+: ${sark_user:="sark"}
+: ${sark_group:="sark"}
+: ${sark_config:="/usr/local/etc/sark/config.yaml"}
+: ${sark_pidfile:="/var/run/sark/sark.pid"}
+: ${sark_logfile:="/var/log/sark/sark.log"}
+
+pidfile="${sark_pidfile}"
+command="/usr/local/bin/sark"
+command_args="serve --config ${sark_config} --daemon --pidfile ${sark_pidfile} --log ${sark_logfile}"
+procname="/usr/local/bin/sark"
+
+# Pre-start checks
+start_precmd="sark_prestart"
+stop_postcmd="sark_poststop"
+
+sark_prestart()
+{
+    # Create runtime directories if they don't exist
+    if [ ! -d /var/run/sark ]; then
+        mkdir -p /var/run/sark
+        chown ${sark_user}:${sark_group} /var/run/sark
+    fi
+
+    if [ ! -d /var/log/sark ]; then
+        mkdir -p /var/log/sark
+        chown ${sark_user}:${sark_group} /var/log/sark
+    fi
+
+    # Check if config exists
+    if [ ! -f "${sark_config}" ]; then
+        echo "Warning: Config file ${sark_config} not found, using defaults"
+    fi
+
+    # Ensure data directory exists
+    if [ ! -d /var/db/sark ]; then
+        mkdir -p /var/db/sark
+        chown ${sark_user}:${sark_group} /var/db/sark
+    fi
+
+    return 0
+}
+
+sark_poststop()
+{
+    # Cleanup PID file if it exists
+    if [ -f "${pidfile}" ]; then
+        rm -f "${pidfile}"
+    fi
+    return 0
+}
+
+# Custom status command for better output
+sark_status()
+{
+    if [ -f "${pidfile}" ]; then
+        pid=$(cat "${pidfile}")
+        if ps -p ${pid} > /dev/null 2>&1; then
+            echo "${name} is running as pid ${pid}"
+            return 0
+        else
+            echo "${name} is not running (stale pid file)"
+            return 1
+        fi
+    else
+        echo "${name} is not running"
+        return 1
+    fi
+}
+
+# Custom reload command
+extra_commands="status reload configtest"
+reload_cmd="sark_reload"
+configtest_cmd="sark_configtest"
+
+sark_reload()
+{
+    if [ -f "${pidfile}" ]; then
+        pid=$(cat "${pidfile}")
+        echo "Reloading ${name} configuration..."
+        kill -HUP ${pid}
+        return $?
+    else
+        echo "${name} is not running"
+        return 1
+    fi
+}
+
+sark_configtest()
+{
+    echo "Testing ${name} configuration..."
+    ${command} config test --config ${sark_config}
+    return $?
+}
+
+run_rc_command "$1"

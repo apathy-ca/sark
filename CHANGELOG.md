@@ -10,6 +10,84 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Nothing yet
 
+## [1.7.0] - 2026-02-02
+
+### Added
+
+**Home Deployment Profile (YORI Integration)**
+
+A lightweight deployment profile targeting home networks and low-resource environments:
+
+- **Foundation Configuration**
+  - `HomeDeploymentConfig` dataclass for 512MB RAM, single-core systems
+  - Docker Compose configuration (`docker-compose.home.yml`)
+  - Makefile targets: `home-up`, `home-down`, `home-logs`
+  - Environment template (`.env.home.example`)
+  - Comprehensive [Home Deployment Guide](docs/deployment/HOME_DEPLOYMENT.md)
+
+- **Rego Policy Templates for Home Governance**
+  - Bedtime policies for time-based LLM access control
+  - Cost limit policies for budget management
+  - Parental control policies with content filtering
+  - Privacy protection policies for PII detection
+  - Allowlist/blocklist management
+  - Common helpers for policy development
+  - [Policy Cookbook](docs/policies/POLICY_COOKBOOK.md) with examples
+
+- **Python Governance Modules**
+  - Allowlist management (`src/sark/services/governance/allowlist.py`)
+  - Time-based rules (`src/sark/services/governance/time_rules.py`)
+  - Emergency override system (`src/sark/services/governance/emergency.py`)
+  - Consent tracking (`src/sark/services/governance/consent.py`)
+  - Policy enforcement framework (`src/sark/services/governance/enforcement.py`)
+  - Override authorization (`src/sark/services/governance/override.py`)
+  - REST API endpoints (`src/sark/api/governance/router.py`)
+  - [Governance Guide](docs/governance/HOME_GOVERNANCE.md)
+
+- **Analytics and Monitoring**
+  - Token usage tracking (`src/sark/services/analytics/token_tracker.py`)
+  - Cost calculation service (`src/sark/services/analytics/cost_calculator.py`)
+  - Trend analysis (`src/sark/services/analytics/trend_analyzer.py`)
+  - Usage reporting with CSV/JSON export (`src/sark/services/analytics/usage_reporter.py`)
+  - REST API endpoints (`src/sark/api/analytics/router.py`)
+  - [Analytics Guide](docs/analytics/HOME_ANALYTICS.md)
+
+- **OPNsense Plugin**
+  - Web UI dashboard with usage statistics
+  - Service management (start/stop/restart)
+  - Policy configuration interface
+  - Log viewer with filtering
+  - FreeBSD rc.d service script
+  - MVC architecture following OPNsense patterns
+  - [Plugin Development Guide](docs/opnsense/PLUGIN_DEVELOPMENT.md)
+
+- **Comprehensive Test Suite**
+  - Unit tests for governance modules
+  - Unit tests for analytics services
+  - OPA policy tests with full coverage
+  - Integration tests for home deployment
+  - Test fixtures for home configuration
+
+### Changed
+- Configuration system extended to support deployment profiles
+- OPA policies reorganized with `home/` subdirectory
+- Updated pyproject.toml version to 1.7.0
+
+### Technical Notes
+- Targets 512MB RAM, single-core systems
+- Uses SQLite instead of PostgreSQL for home deployment
+- Embedded OPA evaluation instead of external server
+- All data stays on-premise (privacy-first design)
+- Progressive control: observe → advisory → enforce modes
+
+### Documentation
+- Added `docs/deployment/HOME_DEPLOYMENT.md`
+- Added `docs/policies/HOME_POLICIES.md`
+- Added `docs/policies/POLICY_COOKBOOK.md`
+- Added `docs/governance/HOME_GOVERNANCE.md`
+- Added `docs/analytics/HOME_ANALYTICS.md`
+- Added `docs/opnsense/PLUGIN_DEVELOPMENT.md`
+
 ## [1.6.0] - 2026-01-18
 
 ### Security

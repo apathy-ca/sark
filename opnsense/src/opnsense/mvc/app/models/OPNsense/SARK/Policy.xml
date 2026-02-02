@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+    <mount>//OPNsense/SARK/policy</mount>
+    <version>2.0.0</version>
+    <description>SARK Home Gateway Policy Settings</description>
+    <items>
+        <!-- Built-in Policy Toggles -->
+        <builtIn>
+            <tokenLimits type="BooleanField">
+                <default>1</default>
+            </tokenLimits>
+            <costCaps type="BooleanField">
+                <default>1</default>
+            </costCaps>
+            <bedtimeHours type="BooleanField">
+                <default>0</default>
+            </bedtimeHours>
+            <homeworkMode type="BooleanField">
+                <default>0</default>
+            </homeworkMode>
+            <ageAppropriate type="BooleanField">
+                <default>1</default>
+            </ageAppropriate>
+            <piiProtection type="BooleanField">
+                <default>1</default>
+            </piiProtection>
+            <modelAllowlist type="BooleanField">
+                <default>0</default>
+            </modelAllowlist>
+            <rateLimiting type="BooleanField">
+                <default>1</default>
+            </rateLimiting>
+        </builtIn>
+
+        <!-- Allowed Models (when modelAllowlist is enabled) -->
+        <allowedModels type="CSVListField">
+            <default>gpt-4o,gpt-4o-mini,claude-3-5-sonnet,claude-3-haiku</default>
+            <ValidationMessage>Comma-separated list of allowed model identifiers</ValidationMessage>
+        </allowedModels>
+
+        <!-- Age-appropriate settings -->
+        <ageSettings>
+            <defaultAgeGroup type="OptionField">
+                <default>teen</default>
+                <OptionValues>
+                    <child>Child (under 13)</child>
+                    <teen>Teen (13-17)</teen>
+                    <adult>Adult (18+)</adult>
+                </OptionValues>
+            </defaultAgeGroup>
+            <enforceForAll type="BooleanField">
+                <default>0</default>
+            </enforceForAll>
+        </ageSettings>
+
+        <!-- Homework Mode Settings -->
+        <homeworkSettings>
+            <subjectsAllowed type="CSVListField">
+                <default>math,science,history,english,programming</default>
+            </subjectsAllowed>
+            <noDirectAnswers type="BooleanField">
+                <default>1</default>
+            </noDirectAnswers>
+            <requireExplanation type="BooleanField">
+                <default>1</default>
+            </requireExplanation>
+        </homeworkSettings>
+
+        <!-- PII Protection Settings -->
+        <piiSettings>
+            <redactNames type="BooleanField">
+                <default>1</default>
+            </redactNames>
+            <redactAddresses type="BooleanField">
+                <default>1</default>
+            </redactAddresses>
+            <redactPhones type="BooleanField">
+                <default>1</default>
+            </redactPhones>
+            <redactEmails type="BooleanField">
+                <default>1</default>
+            </redactEmails>
+            <redactSSN type="BooleanField">
+                <default>1</default>
+            </redactSSN>
+            <redactCreditCards type="BooleanField">
+                <default>1</default>
+            </redactCreditCards>
+        </piiSettings>
+
+        <!-- Custom Policy Rules -->
+        <rules>
+            <rule type="ArrayField">
+                <name type="TextField">
+                    <Required>Y</Required>
+                    <ValidationMessage>Rule name is required</ValidationMessage>
+                </name>
+                <type type="OptionField">
+                    <default>block_keyword</default>
+                    <OptionValues>
+                        <block_keyword>Block Keyword</block_keyword>
+                        <block_pattern>Block Pattern (Regex)</block_pattern>
+                        <allow_keyword>Allow Keyword</allow_keyword>
+                        <rate_limit>Rate Limit</rate_limit>
+                        <transform>Transform Content</transform>
+                        <alert>Alert Only</alert>
+                    </OptionValues>
+                </type>
+                <pattern type="TextField">
+                    <Required>Y</Required>
+                    <ValidationMessage>Pattern or keyword is required</ValidationMessage>
+                </pattern>
+                <action type="OptionField">
+                    <default>block</default>
+                    <OptionValues>
+                        <block>Block Request</block>
+                        <warn>Warn User</warn>
+                        <log>Log Only</log>
+                        <redact>Redact Content</redact>
+                        <notify>Notify Parent</notify>
+                    </OptionValues>
+                </action>
+                <priority type="IntegerField">
+                    <default>50</default>
+                    <MinimumValue>1</MinimumValue>
+                    <MaximumValue>100</MaximumValue>
+                    <ValidationMessage>Priority must be between 1-100 (higher = more important)</ValidationMessage>
+                </priority>
+                <enabled type="BooleanField">
+                    <default>1</default>
+                </enabled>
+                <appliesToUsers type="CSVListField">
+                    <default></default>
+                    <ValidationMessage>Leave empty for all users, or comma-separated usernames</ValidationMessage>
+                </appliesToUsers>
+            </rule>
+        </rules>
+    </items>
+</model>
