@@ -128,6 +128,34 @@ kubectl apply -f k8s/
 - AWS EKS, GCP GKE, Azure AKS
 - Terraform modules included for all platforms
 
+### Home Deployment (v2.0.0)
+
+Lightweight deployment for home networks and low-resource environments:
+
+```bash
+# Quick start with Docker
+make home-up
+
+# Or with Docker Compose directly
+docker compose -f docker-compose.home.yml up -d
+```
+
+- **Target:** 512MB RAM, single core
+- **Database:** SQLite (instead of PostgreSQL)
+- **Platform:** OPNsense plugin or Docker
+- **Features:** Family governance (bedtime, parental controls, cost limits)
+
+📖 **[Home Deployment Guide](docs/deployment/HOME_DEPLOYMENT.md)** | **[Policy Cookbook](docs/policies/POLICY_COOKBOOK.md)**
+
+### Enterprise Deployment
+
+Full-featured deployment with PostgreSQL, Redis, and external OPA:
+
+```bash
+# Kubernetes with Helm
+helm install sark ./helm/sark -n production --create-namespace
+```
+
 📖 **[Deployment Guide](docs/DEPLOYMENT.md)** | **[Terraform Guide](terraform/README.md)** | **[Production Readiness](docs/PRODUCTION_READINESS.md)**
 
 ---
@@ -161,9 +189,17 @@ kubectl apply -f k8s/
 
 ## Project Status
 
-🚀 **v1.6.0 - Current Release** (Released Jan 18, 2026)
+🚀 **v2.0.0 - Current Release** (Released Feb 2, 2026)
 
-**New in v1.6.0 - Polish & Validation:**
+**New in v2.0.0 - YORI Home Deployment:**
+- ✅ **Home Deployment Profile** - 512MB RAM, single-core target for home networks
+- ✅ **Governance Modules** - Allowlist, time rules, emergency override, consent tracking
+- ✅ **Policy Templates** - Bedtime, parental controls, privacy, cost limits
+- ✅ **Analytics Services** - Token tracking, cost calculation, usage reporting
+- ✅ **OPNsense Plugin** - Web UI dashboard, service management, policy configuration
+- ✅ **Comprehensive Tests** - Unit, integration, and OPA policy tests
+
+**v1.6.0 - Polish & Validation:**
 - ✅ **Security Hardening** - 96% vulnerability remediation (24/25 CVEs fixed)
 - ✅ **Test Infrastructure** - 39 tests fixed, 100% pass rate for export + tools routers
 - ✅ **Dependency Cleanup** - Eliminated ecdsa, migrated to PyJWT[crypto]
@@ -202,8 +238,9 @@ kubectl apply -f k8s/
 - ✅ Production deployment guides
 
 **Future Roadmap:**
-- **v1.6.0** - Production Polish (test fixes, dependency updates, performance validation)
-- **v2.0.0** - GRID Reference Implementation (protocol abstraction, federation, cost attribution)
+- **v2.1.0** - OPNsense plugin submission to official repository
+- **v2.2.0** - Local LLM support (Ollama integration)
+- **v3.0.0** - GRID Reference Implementation (protocol abstraction, federation, cost attribution)
 
 📖 **[Roadmap](docs/ROADMAP.md)** | **[Changelog](CHANGELOG.md)**
 
@@ -238,14 +275,20 @@ SARK is the **reference implementation of GRID Protocol Specification v0.1**.
 
 ## Related Projects
 
-### YORI - Home LLM Gateway
+### YORI - Home LLM Gateway (Integrated in v2.0.0)
 
-**[YORI](https://github.com/apathy-ca/yori)** is a lightweight LLM governance gateway for home networks, built on SARK's Rust components.
+**YORI** (Your Observant Router Intelligence) provides zero-trust LLM governance for home networks. As of v2.0.0, YORI's home deployment profile is **integrated directly into SARK**.
 
-- **Target:** OPNsense routers, home users (vs SARK's enterprise Kubernetes)
-- **Resources:** 512MB RAM, 1 CPU (vs SARK's 4 CPU, 8GB RAM)
-- **Database:** SQLite (vs PostgreSQL + TimescaleDB)
-- **Features:** Observe, advisory, and optional enforcement modes for family LLM usage
+**Deployment Options:**
+- **SARK Home Profile** - Use `make home-up` or the OPNsense plugin (recommended)
+- **Standalone YORI** - See [YORI repository](https://github.com/apathy-ca/yori) for standalone builds
+
+**Features:**
+- **Target:** OPNsense routers, home users (512MB RAM, 1 CPU)
+- **Database:** SQLite (lightweight, no external dependencies)
+- **Policies:** Bedtime rules, parental controls, privacy protection, cost limits
+- **Governance:** Allowlist, time-based rules, emergency override, consent tracking
+- **Analytics:** Token tracking, cost estimation, usage reports
 
 YORI reuses SARK's battle-tested Rust core (`sark-opa`, `sark-cache`) via PyO3 bindings, bringing enterprise-grade policy evaluation to resource-constrained home routers.
 
