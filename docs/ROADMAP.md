@@ -179,7 +179,7 @@ Security  Core    Readiness  Validation  Ref Impl
 - Benchmark tests: Added missing fixtures (~7 failures resolved)
 
 **Infrastructure:**
-- SARK now uses GRID Core (`../sark-core`) for shared Rust components
+- SARK now uses GRID Core (`../grid-core`) for shared Rust components
 - Dependabot monitors pip, cargo, and GitHub Actions dependencies
 - Automated weekly security updates with grouped PRs
 

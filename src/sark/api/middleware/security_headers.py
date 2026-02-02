@@ -169,7 +169,12 @@ class CSRFProtectionMiddleware(BaseHTTPMiddleware):
         return await call_next(request)
 
     def _validate_csrf_token(self, request: Request) -> bool:
-        """Validate CSRF token against session.
+        """Validate CSRF token using double-submit cookie pattern.
+
+        Uses double-submit cookie pattern which works without server-side sessions:
+        1. A CSRF token is stored in a cookie (csrf_token)
+        2. The same token must be submitted in a header (X-CSRF-Token)
+        3. Both must match - attackers can't read cookies cross-origin
 
         Args:
             request: HTTP request
@@ -180,19 +185,26 @@ class CSRFProtectionMiddleware(BaseHTTPMiddleware):
         # Get token from header
         token_from_header = request.headers.get(self.csrf_header_name)
 
-        # Get token from session/cookie
-        if not hasattr(request, "session"):
-            # If session is not available, require token in header only
-            # This provides basic CSRF protection
-            return token_from_header is not None
+        # First try session-based validation (preferred)
+        if hasattr(request, "session"):
+            token_from_session = request.session.get("csrf_token")
+            if token_from_header and token_from_session:
+                return secrets.compare_digest(token_from_header, token_from_session)
 
-        token_from_session = request.session.get("csrf_token")
+        # Fall back to double-submit cookie pattern
+        # Get token from cookie
+        token_from_cookie = request.cookies.get("csrf_token")
 
-        if not token_from_header or not token_from_session:
+        # Both header and cookie must be present and match
+        if not token_from_header or not token_from_cookie:
+            return False
+
+        # Validate token format (must be URL-safe base64, 32+ chars)
+        if len(token_from_header) < 32 or len(token_from_cookie) < 32:
             return False
 
         # Use constant-time comparison to prevent timing attacks
-        return secrets.compare_digest(token_from_header, token_from_session)
+        return secrets.compare_digest(token_from_header, token_from_cookie)
 
     def generate_csrf_token(self) -> str:
         """Generate cryptographically secure CSRF token.
@@ -240,3 +252,40 @@ def add_security_middleware(
             CSRFProtectionMiddleware,
             exempt_paths=csrf_exempt_paths,
         )
+
+
+def set_csrf_cookie(response, token: str | None = None) -> str:
+    """Set CSRF token cookie on response for double-submit pattern.
+
+    This should be called on login/session creation endpoints to initialize
+    the CSRF token cookie. The client must then include this token in the
+    X-CSRF-Token header for state-changing requests.
+
+    Args:
+        response: FastAPI/Starlette Response object
+        token: Optional token to use (generates new one if not provided)
+
+    Returns:
+        The CSRF token that was set
+
+    Example:
+        >>> from fastapi import Response
+        >>> @app.post("/auth/login")
+        >>> async def login(response: Response):
+        ...     # ... authenticate user ...
+        ...     csrf_token = set_csrf_cookie(response)
+        ...     return {"csrf_token": csrf_token}  # Also return for SPA usage
+    """
+    if token is None:
+        token = secrets.token_urlsafe(32)
+
+    response.set_cookie(
+        key="csrf_token",
+        value=token,
+        httponly=False,  # Must be readable by JavaScript for header submission
+        secure=True,  # Only send over HTTPS
+        samesite="strict",  # Strict same-site policy
+        max_age=86400,  # 24 hours
+    )
+
+    return token

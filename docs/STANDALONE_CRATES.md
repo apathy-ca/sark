@@ -40,8 +40,8 @@ grid-cache = { git = "https://github.com/apathy-ca/grid-core" }
 ```toml
 # Cargo.toml (if you have grid-core cloned locally)
 [dependencies]
-grid-opa = { path = "../sark-core/crates/grid-opa" }
-grid-cache = { path = "../sark-core/crates/grid-cache" }
+grid-opa = { path = "../grid-core/crates/grid-opa" }
+grid-cache = { path = "../grid-core/crates/grid-cache" }
 ```
 
 ### Feature Flags

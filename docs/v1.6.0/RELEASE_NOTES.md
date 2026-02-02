@@ -177,14 +177,14 @@ except jwt.InvalidTokenError as e:
 SARK now uses **[GRID Core](https://github.com/apathy-ca/grid-core)** as the source for its high-performance Rust components. This enables code sharing between SARK and [YORI](https://github.com/apathy-ca/yori).
 
 **Changes:**
-- `Cargo.toml`: Dependencies changed from internal `rust/sark-*` to `../sark-core/crates/grid-*`
+- `Cargo.toml`: Dependencies changed from internal `rust/sark-*` to `../grid-core/crates/grid-*`
 - `src/lib.rs`: Imports changed from `sark_cache`/`sark_opa` to `grid_cache`/`grid_opa`
 
 **Crate Mapping:**
 | Previous | Current | Location |
 |----------|---------|----------|
-| `sark-opa` | `grid-opa` | `../sark-core/crates/grid-opa` |
-| `sark-cache` | `grid-cache` | `../sark-core/crates/grid-cache` |
+| `sark-opa` | `grid-opa` | `../grid-core/crates/grid-opa` |
+| `sark-cache` | `grid-cache` | `../grid-core/crates/grid-cache` |
 
 **Benefits:**
 - Single source of truth for OPA and cache implementations

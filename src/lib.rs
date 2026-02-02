@@ -1,7 +1,7 @@
 use pyo3::prelude::*;
 
 // Import types from grid-core (shared Rust components)
-// See ../sark-core/README.md for documentation
+// See ../grid-core/README.md for documentation
 use grid_cache::python::RustCache;
 use grid_opa::python::RustOPAEngine;
 

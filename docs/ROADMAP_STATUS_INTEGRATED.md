@@ -16,9 +16,9 @@ This document integrates **actual code analysis findings** with the existing roa
 | Category | Score | Notes |
 |----------|-------|-------|
 | Rust Core | 95/100 | Excellent - fully implemented, well-tested |
-| Python Services | 65/100 | Mixed - critical stubs remain |
+| Python Services | 80/100 | Gateway transports fully implemented |
 | Test Coverage | 60/100 | 64.95% actual vs 85% claimed |
-| Security | 55/100 | Critical LDAP injection, CSRF incomplete |
+| Security | 75/100 | ✅ LDAP injection fixed, ✅ CSRF fixed, minor issues remain |
 | Documentation | 70/100 | Good but overstates reality |
 | Frontend | 40/100 | Foundation only, blocked |
 | DevOps | 75/100 | Infrastructure ready, waiting on UI |
@@ -125,16 +125,12 @@ def health_check(): return False        # PLACEHOLDER
 
 #### Critical (P0) - Fix Before Production
 
-| Issue | Location | Risk | Remediation |
-|-------|----------|------|-------------|
-| **LDAP Filter Injection** | `services/auth/providers/ldap.py:157,276` | Auth bypass, data extraction | Use `ldap3.escape_filter_chars()` |
+| Issue | Location | Risk | Status |
+|-------|----------|------|--------|
+| ~~**LDAP Filter Injection**~~ | `services/auth/providers/ldap.py:159,280` | Auth bypass, data extraction | ✅ **FIXED** - Uses `escape_filter_chars()` |
 
 ```python
-# CURRENT (VULNERABLE)
-search_filter = self.config.user_search_filter.format(username=username)
-
-# REQUIRED FIX
-from ldap3.utils.conv import escape_filter_chars
+# FIXED - Now uses proper escaping at lines 159 and 280
 safe_username = escape_filter_chars(username)
 search_filter = self.config.user_search_filter.format(username=safe_username)
 ```
@@ -143,7 +139,7 @@ search_filter = self.config.user_search_filter.format(username=safe_username)
 
 | Issue | Location | Risk | Status |
 |-------|----------|------|--------|
-| Incomplete CSRF | `api/middleware/security_headers.py:162-206` | CSRF attacks | Token validation returns True always |
+| ~~Incomplete CSRF~~ | `api/middleware/security_headers.py:171-207` | CSRF attacks | ✅ **FIXED** - Double-submit cookie pattern implemented |
 | Default Credentials | `config/settings.py:137,160` | Unauthorized access | `postgres_password: str = "sark"` used if env not set |
 | Environment Injection | `adapters/mcp_adapter.py:169` | Code execution | User env vars merged with os.environ |
 

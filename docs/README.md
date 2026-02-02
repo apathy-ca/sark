@@ -79,7 +79,7 @@ The documentation is organized into the following sections:
 - **[Standalone Crates](STANDALONE_CRATES.md)**: Using grid-opa and grid-cache independently
 - **[Cross-Compilation](CROSS_COMPILATION.md)**: Building for FreeBSD, ARM, and other platforms
 
-> **Note**: As of v1.6.0, SARK uses **[GRID Core](https://github.com/apathy-ca/grid-core)** (`../sark-core`) as the shared Rust component library. GRID Core provides `grid-opa` and `grid-cache` crates used by both SARK and [YORI](https://github.com/apathy-ca/yori).
+> **Note**: As of v1.6.0, SARK uses **[GRID Core](https://github.com/apathy-ca/grid-core)** (`../grid-core`) as the shared Rust component library. GRID Core provides `grid-opa` and `grid-cache` crates used by both SARK and [YORI](https://github.com/apathy-ca/yori).
 
 ### Reports
 - **Executive Summary**: Project overview

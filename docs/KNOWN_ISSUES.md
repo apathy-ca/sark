@@ -398,7 +398,7 @@ Additional fixtures for integration tests:
 - `tests/benchmarks/__init__.py` - NEW: Package init
 
 **Rust Migration (2026-02-01):**
-- `Cargo.toml` - Updated to use grid-core from ../sark-core
+- `Cargo.toml` - Updated to use grid-core from ../grid-core
 - `src/lib.rs` - Updated imports to use grid_cache/grid_opa
 
 ### Coverage Report Location
