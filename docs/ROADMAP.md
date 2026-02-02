@@ -2,18 +2,18 @@
 
 **Document Version:** 3.0
 **Last Updated:** 2026-02-02
-**Current Release:** v2.0.0 (YORI Home Deployment)
-**Target Release:** v2.1.0 (GRID Reference Implementation)
-**Target Production:** v2.1.0 (Q2 2026 - GRID Reference Implementation)
+**Current Release:** v1.7.0 (YORI Home Deployment)
+**Target Release:** v2.0.0 (GRID Reference Implementation)
+**Target Production:** v2.0.0 (Q2 2026 - GRID Reference Implementation)
 
 ---
 
 ## Executive Summary
 
 **Current Situation:**
-**v2.0.0 has been successfully released** (Feb 2, 2026) with the YORI home deployment profile integration, bringing zero-trust LLM governance to home networks and low-resource environments.
+**v1.7.0 has been successfully released** (Feb 2, 2026) with the YORI home deployment profile integration, bringing zero-trust LLM governance to home networks and low-resource environments.
 
-**What We Have (v2.0.0 - Completed):**
+**What We Have (v1.7.0 - Completed):**
 - ✅ **Gateway Transports** (HTTP, SSE, stdio implementations)
 - ✅ **Security Fixes** (LDAP injection, CSRF protection, credentials hardening)
 - ✅ **Frontend Authentication** (Login, MFA, API key management UI)
@@ -27,7 +27,7 @@
 - ✅ **Dependabot Configuration** (v1.6.0: automated security updates)
 - ✅ Strong architectural foundation (multi-layer auth/authz)
 - ✅ Comprehensive audit logging and SIEM integration
-- ✅ **YORI Home Deployment Profile** (v2.0.0 - NEW):
+- ✅ **YORI Home Deployment Profile** (v1.7.0 - NEW):
   - ✅ Home deployment configuration (512MB RAM target)
   - ✅ Rego policy templates (bedtime, parental, privacy, cost limits)
   - ✅ Python governance modules (allowlist, time rules, emergency, consent)
@@ -35,29 +35,29 @@
   - ✅ OPNsense plugin with web UI
   - ✅ Comprehensive test suite
 
-**What's Missing (Blocking v2.1.0 Production):**
-- ⚠️ Protocol abstraction for GRID v1.0 compliance (v2.1.0 work)
-- ⚠️ Federation support (v2.1.0 work)
-- ⚠️ Cost attribution (v2.1.0 work)
+**What's Missing (Blocking v2.0.0 Production):**
+- ⚠️ Protocol abstraction for GRID v1.0 compliance (v2.0.0 work)
+- ⚠️ Federation support (v2.0.0 work)
+- ⚠️ Cost attribution (v2.0.0 work)
 - ❌ External security audit not yet scheduled
 
 **Revised Strategy:**
-**v2.0.0** delivers YORI home deployment profile for home networks. **v2.1.0** will transform SARK into the universal GRID v1.0 reference implementation with protocol abstraction, federation, and cost attribution.
+**v1.7.0** delivers YORI home deployment profile for home networks. **v2.0.0** will transform SARK into the universal GRID v1.0 reference implementation with protocol abstraction, federation, and cost attribution.
 
 **Version Plan:**
 - **v1.3.0** (✅ Complete - Dec 2025): Advanced Security (injection detection, anomaly, network, secrets, MFA)
 - **v1.4.0** (✅ Complete - Jan 2026): Rust Foundation (OPA engine, in-memory cache, 4-10x performance)
 - **v1.5.0** (✅ Complete - Jan 17, 2026): Production Readiness (gateway transports, security fixes, E2E tests)
 - **v1.6.0** (✅ Complete - Feb 1, 2026): Polish & Validation (test fixes, GRID Core, dependabot, security deps)
-- **v2.0.0** (✅ Complete - Feb 2, 2026): YORI Home Deployment (home profile, governance, analytics, OPNsense plugin)
-- **v2.1.0** (Future - 16-20 weeks): GRID Reference Implementation (protocol abstraction, federation, cost attribution)
+- **v1.7.0** (✅ Complete - Feb 2, 2026): YORI Home Deployment (home profile, governance, analytics, OPNsense plugin)
+- **v2.0.0** (Future - 16-20 weeks): GRID Reference Implementation (protocol abstraction, federation, cost attribution)
 
 ---
 
 ## Complete Version Timeline
 
 ```
-v1.3.0 ──► v1.4.0 ──► v1.5.0 ──► v1.6.0 ──► v2.0.0 ──► v2.1.0
+v1.3.0 ──► v1.4.0 ──► v1.5.0 ──► v1.6.0 ──► v1.7.0 ──► v2.0.0
 (DONE)   (DONE)    (DONE)    (DONE!)    (DONE!)    (NEXT)
   │         │         │          │         │          │
 Advanced  Rust    Production  Polish    YORI      GRID
@@ -65,7 +65,7 @@ Security  Core    Readiness  Validation  Home    Ref Impl
 ✅ Dec25  ✅ Jan26  ✅ Jan17   ✅ Feb01  ✅ Feb02  (16-20wks)
 ```
 
-### v2.0.0: YORI Home Deployment ✅ COMPLETE (Feb 2, 2026)
+### v1.7.0: YORI Home Deployment ✅ COMPLETE (Feb 2, 2026)
 
 ```
 ┌──────────┬──────────┬──────────┬──────────┬──────────┬──────────┐
@@ -224,14 +224,14 @@ Security  Core    Readiness  Validation  Home    Ref Impl
 
 **See:** `docs/KNOWN_ISSUES.md` for test status details
 
-### v2.0.0: Production Release (After Security Audit)
+### v1.7.0: Production Release (After Security Audit)
 
 ```
 ┌──────────┬──────────┬──────────┬──────────┬──────────┐
 │  Week 1-2│  Week 3-4│  Week 5-6│  Week 7  │          │
 ├──────────┼──────────┼──────────┼──────────┤          │
 │  Audit   │ External │Remediate │  Deploy  │ Release  │
-│   Prep   │ Pen Test │  & Test  │ Staging  │  v2.0.0  │
+│   Prep   │ Pen Test │  & Test  │ Staging  │  v1.7.0  │
 │          │          │          │  to Prod │          │
 └──────────┴──────────┴──────────┴──────────┴──────────┘
 ```
@@ -248,18 +248,18 @@ Security  Core    Readiness  Validation  Home    Ref Impl
 
 ## Total Timeline to Production
 
-**Path 1: Minimum Viable (v1.2.0 → v2.0.0):**
+**Path 1: Minimum Viable (v1.2.0 → v1.7.0):**
 - v1.2.0: 8 weeks (Gateway + Policy + Tests)
 - Security Audit: 6-7 weeks
 - **Total: 14-15 weeks** to basic production
 
-**Path 2: Enhanced Security (v1.2.0 → v1.3.0 → v2.0.0):**
+**Path 2: Enhanced Security (v1.2.0 → v1.3.0 → v1.7.0):**
 - v1.2.0: 8 weeks
 - v1.3.0: 8 weeks (Advanced security)
 - Security Audit: 6-7 weeks
 - **Total: 22-23 weeks** to production with advanced features
 
-**Path 3: Full Performance (v1.2.0 → v1.3.0 → v1.4.0 → v1.5.0 → v2.0.0):**
+**Path 3: Full Performance (v1.2.0 → v1.3.0 → v1.4.0 → v1.5.0 → v1.7.0):**
 - v1.2.0: 8 weeks
 - v1.3.0: 8 weeks
 - v1.4.0: 6-8 weeks (Rust foundation)
@@ -981,7 +981,7 @@ The following items are **intentionally deferred** to focus on production-critic
 - Network-level controls
 - Secret scanning
 - MFA for critical actions
-- **Reason:** Important security enhancements but not blockers for v2.0.0 production
+- **Reason:** Important security enhancements but not blockers for v1.7.0 production
 - **Target:** v1.3.0 release (Q2 2026)
 
 ### Web UI Enhancements
@@ -1038,7 +1038,7 @@ On December 8, 2025, a comprehensive security analysis using Simon Willison's "L
 Adopt honest, incremental versioning with clear milestones:
 - **v1.2.0:** Complete gateway implementation + critical fixes (Weeks 1-8)
 - **v1.3.0:** Advanced Lethal Trifecta security features (Q2 2026)
-- **v2.0.0:** Production release after security audit (Week 15)
+- **v1.7.0:** Production release after security audit (Week 15)
 
 **This Roadmap:**
 Addresses these gaps with a focused 15-week plan using semantic versioning that reflects actual readiness.

@@ -128,7 +128,7 @@ kubectl apply -f k8s/
 - AWS EKS, GCP GKE, Azure AKS
 - Terraform modules included for all platforms
 
-### Home Deployment (v2.0.0)
+### Home Deployment (v1.7.0)
 
 Lightweight deployment for home networks and low-resource environments:
 
@@ -189,9 +189,9 @@ helm install sark ./helm/sark -n production --create-namespace
 
 ## Project Status
 
-🚀 **v2.0.0 - Current Release** (Released Feb 2, 2026)
+🚀 **v1.7.0 - Current Release** (Released Feb 2, 2026)
 
-**New in v2.0.0 - YORI Home Deployment:**
+**New in v1.7.0 - YORI Home Deployment:**
 - ✅ **Home Deployment Profile** - 512MB RAM, single-core target for home networks
 - ✅ **Governance Modules** - Allowlist, time rules, emergency override, consent tracking
 - ✅ **Policy Templates** - Bedtime, parental controls, privacy, cost limits
@@ -238,9 +238,9 @@ helm install sark ./helm/sark -n production --create-namespace
 - ✅ Production deployment guides
 
 **Future Roadmap:**
-- **v2.1.0** - OPNsense plugin submission to official repository
-- **v2.2.0** - Local LLM support (Ollama integration)
-- **v3.0.0** - GRID Reference Implementation (protocol abstraction, federation, cost attribution)
+- **v1.8.0** - OPNsense plugin submission to official repository
+- **v1.9.0** - Local LLM support (Ollama integration)
+- **v2.0.0** - GRID Reference Implementation (protocol abstraction, federation, cost attribution)
 
 📖 **[Roadmap](docs/ROADMAP.md)** | **[Changelog](CHANGELOG.md)**
 
@@ -275,9 +275,9 @@ SARK is the **reference implementation of GRID Protocol Specification v0.1**.
 
 ## Related Projects
 
-### YORI - Home LLM Gateway (Integrated in v2.0.0)
+### YORI - Home LLM Gateway (Integrated in v1.7.0)
 
-**YORI** (Your Observant Router Intelligence) provides zero-trust LLM governance for home networks. As of v2.0.0, YORI's home deployment profile is **integrated directly into SARK**.
+**YORI** (Your Observant Router Intelligence) provides zero-trust LLM governance for home networks. As of v1.7.0, YORI's home deployment profile is **integrated directly into SARK**.
 
 **Deployment Options:**
 - **SARK Home Profile** - Use `make home-up` or the OPNsense plugin (recommended)

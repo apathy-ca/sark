@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Nothing yet
 
-## [2.0.0] - 2026-02-02
+## [1.7.0] - 2026-02-02
 
 ### Added
 
@@ -71,7 +71,7 @@ A lightweight deployment profile targeting home networks and low-resource enviro
 ### Changed
 - Configuration system extended to support deployment profiles
 - OPA policies reorganized with `home/` subdirectory
-- Updated pyproject.toml version to 2.0.0
+- Updated pyproject.toml version to 1.7.0
 
 ### Technical Notes
 - Targets 512MB RAM, single-core systems
