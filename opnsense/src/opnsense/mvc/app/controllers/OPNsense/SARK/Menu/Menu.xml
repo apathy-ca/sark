@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<menu>
+    <Services>
+        <SARK VisibleName="SARK Home Gateway" cssClass="fa fa-shield" order="90">
+            <Dashboard VisibleName="Dashboard" url="/ui/sark" order="10"/>
+            <Settings VisibleName="Settings" url="/ui/sark/settings" order="20"/>
+            <Policies VisibleName="Policies" url="/ui/sark/policies" order="30"/>
+            <Logs VisibleName="Logs" url="/ui/sark/logs" order="40"/>
+        </SARK>
+    </Services>
+</menu>

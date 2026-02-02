@@ -1,0 +1,39 @@
+@dir /usr/local/etc/sark
+@dir /var/db/sark
+@dir /var/log/sark
+@dir /var/run/sark
+
+# rc.d service script
+etc/rc.d/sark
+
+# MVC Controllers
+opnsense/mvc/app/controllers/OPNsense/SARK/IndexController.php
+opnsense/mvc/app/controllers/OPNsense/SARK/Api/AnalyticsController.php
+opnsense/mvc/app/controllers/OPNsense/SARK/Api/PolicyController.php
+opnsense/mvc/app/controllers/OPNsense/SARK/Api/ServiceController.php
+opnsense/mvc/app/controllers/OPNsense/SARK/Api/SettingsController.php
+
+# MVC Models
+opnsense/mvc/app/models/OPNsense/SARK/General.php
+opnsense/mvc/app/models/OPNsense/SARK/General.xml
+opnsense/mvc/app/models/OPNsense/SARK/Policy.php
+opnsense/mvc/app/models/OPNsense/SARK/Policy.xml
+
+# MVC Views
+opnsense/mvc/app/views/OPNsense/SARK/index.volt
+opnsense/mvc/app/views/OPNsense/SARK/logs.volt
+opnsense/mvc/app/views/OPNsense/SARK/policies.volt
+opnsense/mvc/app/views/OPNsense/SARK/settings.volt
+
+# Service configuration
+opnsense/service/conf/actions.d/actions_sark.conf
+
+# Menu integration
+@unexec rm -f /usr/local/opnsense/mvc/app/controllers/OPNsense/SARK/*.php 2>/dev/null || true
+@unexec rm -f /usr/local/opnsense/mvc/app/controllers/OPNsense/SARK/Api/*.php 2>/dev/null || true
+@unexec rm -rf /usr/local/opnsense/mvc/app/controllers/OPNsense/SARK 2>/dev/null || true
+@unexec rm -f /usr/local/opnsense/mvc/app/models/OPNsense/SARK/*.php 2>/dev/null || true
+@unexec rm -f /usr/local/opnsense/mvc/app/models/OPNsense/SARK/*.xml 2>/dev/null || true
+@unexec rm -rf /usr/local/opnsense/mvc/app/models/OPNsense/SARK 2>/dev/null || true
+@unexec rm -f /usr/local/opnsense/mvc/app/views/OPNsense/SARK/*.volt 2>/dev/null || true
+@unexec rm -rf /usr/local/opnsense/mvc/app/views/OPNsense/SARK 2>/dev/null || true

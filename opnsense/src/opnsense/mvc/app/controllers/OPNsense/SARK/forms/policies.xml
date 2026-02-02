@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+    <field>
+        <id>policy.builtIn.tokenLimits</id>
+        <label>Token Limits</label>
+        <type>checkbox</type>
+        <help>Enforce daily token usage limits per user</help>
+    </field>
+    <field>
+        <id>policy.builtIn.costCaps</id>
+        <label>Cost Caps</label>
+        <type>checkbox</type>
+        <help>Set maximum daily/monthly spending limits</help>
+    </field>
+    <field>
+        <id>policy.builtIn.bedtimeHours</id>
+        <label>Bedtime Hours</label>
+        <type>checkbox</type>
+        <help>Block AI access during specified hours</help>
+    </field>
+    <field>
+        <id>policy.builtIn.homeworkMode</id>
+        <label>Homework Mode</label>
+        <type>checkbox</type>
+        <help>Restrict to educational assistance only</help>
+    </field>
+    <field>
+        <id>policy.builtIn.ageAppropriate</id>
+        <label>Age-Appropriate Content</label>
+        <type>checkbox</type>
+        <help>Filter responses based on user age</help>
+    </field>
+    <field>
+        <id>policy.builtIn.piiProtection</id>
+        <label>PII Protection</label>
+        <type>checkbox</type>
+        <help>Redact personal information from requests</help>
+    </field>
+    <field>
+        <id>policy.builtIn.modelAllowlist</id>
+        <label>Model Allowlist</label>
+        <type>checkbox</type>
+        <help>Restrict which AI models can be used</help>
+    </field>
+    <field>
+        <id>policy.builtIn.rateLimiting</id>
+        <label>Rate Limiting</label>
+        <type>checkbox</type>
+        <help>Limit requests per minute per user</help>
+    </field>
+    <field>
+        <id>policy.allowedModels</id>
+        <label>Allowed Models</label>
+        <type>text</type>
+        <help>Comma-separated list of allowed model identifiers</help>
+    </field>
+</form>
