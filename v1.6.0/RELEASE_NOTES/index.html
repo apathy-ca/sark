@@ -4394,13 +4394,13 @@
 <h3 id="shared-rust-components">Shared Rust Components<a class="headerlink" href="#shared-rust-components" title="Permanent link">&para;</a></h3>
 <p>SARK now uses <strong><a href="https://github.com/apathy-ca/grid-core">GRID Core</a></strong> as the source for its high-performance Rust components. This enables code sharing between SARK and <a href="https://github.com/apathy-ca/yori">YORI</a>.</p>
 <p><strong>Changes:</strong>
-- <code>Cargo.toml</code>: Dependencies changed from internal <code>rust/sark-*</code> to <code>../sark-core/crates/grid-*</code>
+- <code>Cargo.toml</code>: Dependencies changed from internal <code>rust/sark-*</code> to <code>../grid-core/crates/grid-*</code>
 - <code>src/lib.rs</code>: Imports changed from <code>sark_cache</code>/<code>sark_opa</code> to <code>grid_cache</code>/<code>grid_opa</code></p>
 <p><strong>Crate Mapping:</strong>
 | Previous | Current | Location |
 |----------|---------|----------|
-| <code>sark-opa</code> | <code>grid-opa</code> | <code>../sark-core/crates/grid-opa</code> |
-| <code>sark-cache</code> | <code>grid-cache</code> | <code>../sark-core/crates/grid-cache</code> |</p>
+| <code>sark-opa</code> | <code>grid-opa</code> | <code>../grid-core/crates/grid-opa</code> |
+| <code>sark-cache</code> | <code>grid-cache</code> | <code>../grid-core/crates/grid-cache</code> |</p>
 <p><strong>Benefits:</strong>
 - Single source of truth for OPA and cache implementations
 - Shared improvements benefit both SARK and YORI projects
