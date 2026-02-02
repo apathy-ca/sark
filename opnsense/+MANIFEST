@@ -1,0 +1,35 @@
+name:           os-sark
+version:        2.0.0
+comment:        SARK Home LLM Gateway
+maintainer:     sark@example.com
+origin:         opnsense/os-sark
+categories:     security,net-mgmt
+www:            https://github.com/sark-project/sark
+prefix:         /usr/local
+licenselogic:   single
+licenses:       [MIT]
+desc:           <<EOD
+SARK Home LLM Gateway - Zero-trust governance for AI in your home.
+
+Features:
+- Budget controls (token/cost limits)
+- Parental controls (bedtime, homework mode)
+- Privacy protection (PII redaction)
+- Usage analytics and reporting
+- Multi-provider support (OpenAI, Anthropic, Google, Azure, local)
+- Policy-based access control
+
+For more information, visit https://github.com/sark-project/sark
+EOD
+deps:           {
+    python311: {origin: lang/python311, version: "3.11"},
+    py311-fastapi: {origin: www/py-fastapi, version: "0.109"}
+}
+scripts: {
+    post-install: <<EOS
+/usr/local/opnsense/service/configd_ctl.py sark restart || true
+EOS
+    pre-deinstall: <<EOS
+/usr/local/opnsense/service/configd_ctl.py sark stop || true
+EOS
+}

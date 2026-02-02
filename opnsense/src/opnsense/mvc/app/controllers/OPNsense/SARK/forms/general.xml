@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+    <field>
+        <id>general.enabled</id>
+        <label>Enable SARK</label>
+        <type>checkbox</type>
+        <help>Enable the SARK Home Gateway service</help>
+    </field>
+    <field>
+        <id>general.mode</id>
+        <label>Governance Mode</label>
+        <type>dropdown</type>
+        <help>How strictly to enforce governance policies</help>
+    </field>
+    <field>
+        <id>general.listenAddress</id>
+        <label>Listen Address</label>
+        <type>text</type>
+        <help>IP address to listen on (0.0.0.0 for all interfaces)</help>
+    </field>
+    <field>
+        <id>general.listenPort</id>
+        <label>Listen Port</label>
+        <type>text</type>
+        <help>Port for the SARK proxy service</help>
+    </field>
+    <field>
+        <id>general.tlsEnabled</id>
+        <label>Enable TLS</label>
+        <type>checkbox</type>
+        <help>Enable TLS/HTTPS encryption</help>
+    </field>
+    <field>
+        <id>general.logLevel</id>
+        <label>Log Level</label>
+        <type>dropdown</type>
+        <help>Logging verbosity level</help>
+    </field>
+    <field>
+        <id>general.dailyTokenLimit</id>
+        <label>Daily Token Limit</label>
+        <type>text</type>
+        <help>Maximum tokens per day (0 for unlimited)</help>
+    </field>
+    <field>
+        <id>general.dailyCostLimit</id>
+        <label>Daily Cost Limit ($)</label>
+        <type>text</type>
+        <help>Maximum spending per day</help>
+    </field>
+    <field>
+        <id>general.monthlyBudget</id>
+        <label>Monthly Budget ($)</label>
+        <type>text</type>
+        <help>Total monthly spending limit</help>
+    </field>
+    <field>
+        <id>general.bedtimeEnabled</id>
+        <label>Enable Bedtime</label>
+        <type>checkbox</type>
+        <help>Enable bedtime restrictions</help>
+    </field>
+    <field>
+        <id>general.bedtimeStart</id>
+        <label>Bedtime Start</label>
+        <type>text</type>
+        <help>Time when bedtime starts (HH:MM)</help>
+    </field>
+    <field>
+        <id>general.bedtimeEnd</id>
+        <label>Bedtime End</label>
+        <type>text</type>
+        <help>Time when bedtime ends (HH:MM)</help>
+    </field>
+    <field>
+        <id>general.bedtimeUsers</id>
+        <label>Bedtime Users</label>
+        <type>text</type>
+        <help>Comma-separated list of users subject to bedtime (empty = all children)</help>
+    </field>
+</form>
