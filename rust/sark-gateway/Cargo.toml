@@ -1,0 +1,53 @@
+[package]
+name = "sark-gateway"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "High-performance Rust gateway for SARK - handles hot path authorization"
+
+[[bin]]
+name = "sark-gateway"
+path = "src/main.rs"
+
+[dependencies]
+# GRID Core components (shared with YORI)
+grid-opa.workspace = true
+grid-cache.workspace = true
+
+# HTTP server
+axum.workspace = true
+tokio.workspace = true
+tower.workspace = true
+tower-http.workspace = true
+
+# Serialization
+serde.workspace = true
+serde_json.workspace = true
+
+# Error handling
+anyhow.workspace = true
+thiserror.workspace = true
+
+# Logging
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+# Auth (JWT)
+jsonwebtoken.workspace = true
+
+# Time
+chrono.workspace = true
+
+# Config
+config.workspace = true
+
+# CLI
+clap.workspace = true
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
