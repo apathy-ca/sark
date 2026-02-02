@@ -409,6 +409,10 @@
          <lastmod>2026-02-02</lastmod>
     </url>
     <url>
+         <loc>https://sark.example.com/analytics/HOME_ANALYTICS/</loc>
+         <lastmod>2026-02-02</lastmod>
+    </url>
+    <url>
          <loc>https://sark.example.com/api/v2/ADAPTER_INTERFACE/</loc>
          <lastmod>2026-02-02</lastmod>
     </url>
@@ -605,6 +609,10 @@
          <lastmod>2026-02-02</lastmod>
     </url>
     <url>
+         <loc>https://sark.example.com/deployment/HOME_DEPLOYMENT/</loc>
+         <lastmod>2026-02-02</lastmod>
+    </url>
+    <url>
          <loc>https://sark.example.com/deployment/INTEGRATION/</loc>
          <lastmod>2026-02-02</lastmod>
     </url>
@@ -781,6 +789,10 @@
          <lastmod>2026-02-02</lastmod>
     </url>
     <url>
+         <loc>https://sark.example.com/governance/HOME_GOVERNANCE/</loc>
+         <lastmod>2026-02-02</lastmod>
+    </url>
+    <url>
          <loc>https://sark.example.com/how-to/gateway/how-to-implement-tool/</loc>
          <lastmod>2026-02-02</lastmod>
     </url>
@@ -814,6 +826,10 @@
     </url>
     <url>
          <loc>https://sark.example.com/monitoring/MONITORING_GUIDE/</loc>
+         <lastmod>2026-02-02</lastmod>
+    </url>
+    <url>
+         <loc>https://sark.example.com/opnsense/PLUGIN_DEVELOPMENT/</loc>
          <lastmod>2026-02-02</lastmod>
     </url>
     <url>
@@ -862,6 +878,14 @@
     </url>
     <url>
          <loc>https://sark.example.com/planning/SARK_v2.0_ROADMAP/</loc>
+         <lastmod>2026-02-02</lastmod>
+    </url>
+    <url>
+         <loc>https://sark.example.com/policies/HOME_POLICIES/</loc>
+         <lastmod>2026-02-02</lastmod>
+    </url>
+    <url>
+         <loc>https://sark.example.com/policies/POLICY_COOKBOOK/</loc>
          <lastmod>2026-02-02</lastmod>
     </url>
     <url>

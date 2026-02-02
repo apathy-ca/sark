@@ -3003,6 +3003,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#v170-yori-home-deployment-complete-feb-2-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.7.0: YORI Home Deployment ✅ COMPLETE (Feb 2, 2026)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#v120-gateway-policy-tests-8-weeks" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3058,10 +3069,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#v200-production-release-after-security-audit" class="md-nav__link">
+  <a href="#v170-production-release-after-security-audit" class="md-nav__link">
     <span class="md-ellipsis">
       
-        v2.0.0: Production Release (After Security Audit)
+        v1.7.0: Production Release (After Security Audit)
       
     </span>
   </a>
@@ -4393,6 +4404,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#v170-yori-home-deployment-complete-feb-2-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v1.7.0: YORI Home Deployment ✅ COMPLETE (Feb 2, 2026)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#v120-gateway-policy-tests-8-weeks" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4448,10 +4470,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#v200-production-release-after-security-audit" class="md-nav__link">
+  <a href="#v170-production-release-after-security-audit" class="md-nav__link">
     <span class="md-ellipsis">
       
-        v2.0.0: Production Release (After Security Audit)
+        v1.7.0: Production Release (After Security Audit)
       
     </span>
   </a>
@@ -5076,16 +5098,16 @@
 
 
 <h1 id="sark-path-to-production-roadmap">SARK Path to Production Roadmap<a class="headerlink" href="#sark-path-to-production-roadmap" title="Permanent link">&para;</a></h1>
-<p><strong>Document Version:</strong> 2.3
-<strong>Last Updated:</strong> 2026-02-01
-<strong>Current Release:</strong> v1.6.0 (Polish &amp; Validation)
+<p><strong>Document Version:</strong> 3.0
+<strong>Last Updated:</strong> 2026-02-02
+<strong>Current Release:</strong> v1.7.0 (YORI Home Deployment)
 <strong>Target Release:</strong> v2.0.0 (GRID Reference Implementation)
 <strong>Target Production:</strong> v2.0.0 (Q2 2026 - GRID Reference Implementation)</p>
 <hr />
 <h2 id="executive-summary">Executive Summary<a class="headerlink" href="#executive-summary" title="Permanent link">&para;</a></h2>
 <p><strong>Current Situation:</strong>
-<strong>v1.6.0 has been successfully released</strong> (Feb 1, 2026) with test infrastructure fixes, security dependency updates, GRID Core migration, and Dependabot configuration. This release provides a stable, well-tested foundation for v2.0.0 development.</p>
-<p><strong>What We Have (v1.6.0 - Completed):</strong>
+<strong>v1.7.0 has been successfully released</strong> (Feb 2, 2026) with the YORI home deployment profile integration, bringing zero-trust LLM governance to home networks and low-resource environments.</p>
+<p><strong>What We Have (v1.7.0 - Completed):</strong>
 - ✅ <strong>Gateway Transports</strong> (HTTP, SSE, stdio implementations)
 - ✅ <strong>Security Fixes</strong> (LDAP injection, CSRF protection, credentials hardening)
 - ✅ <strong>Frontend Authentication</strong> (Login, MFA, API key management UI)
@@ -5098,37 +5120,70 @@
 - ✅ <strong>Security Dependencies</strong> (v1.6.0: aiohttp, urllib3, werkzeug, pyasn1, pynacl, azure-core)
 - ✅ <strong>Dependabot Configuration</strong> (v1.6.0: automated security updates)
 - ✅ Strong architectural foundation (multi-layer auth/authz)
-- ✅ Comprehensive audit logging and SIEM integration</p>
-<p><strong>What's Missing (Blocking v2.0 Production):</strong>
-- ⚠️ Protocol abstraction for GRID v1.0 compliance (v2.0 work)
-- ⚠️ Federation support (v2.0 work)
-- ⚠️ Cost attribution (v2.0 work)
+- ✅ Comprehensive audit logging and SIEM integration
+- ✅ <strong>YORI Home Deployment Profile</strong> (v1.7.0 - NEW):
+  - ✅ Home deployment configuration (512MB RAM target)
+  - ✅ Rego policy templates (bedtime, parental, privacy, cost limits)
+  - ✅ Python governance modules (allowlist, time rules, emergency, consent)
+  - ✅ Analytics and monitoring (token tracking, cost calculation, usage reports)
+  - ✅ OPNsense plugin with web UI
+  - ✅ Comprehensive test suite</p>
+<p><strong>What's Missing (Blocking v2.0.0 Production):</strong>
+- ⚠️ Protocol abstraction for GRID v1.0 compliance (v2.0.0 work)
+- ⚠️ Federation support (v2.0.0 work)
+- ⚠️ Cost attribution (v2.0.0 work)
 - ❌ External security audit not yet scheduled</p>
 <p><strong>Revised Strategy:</strong>
-<strong>v1.6.0</strong> provides a polished, stable foundation. <strong>v2.0.0</strong> will transform SARK into the universal GRID v1.0 reference implementation with protocol abstraction, federation, and cost attribution.</p>
+<strong>v1.7.0</strong> delivers YORI home deployment profile for home networks. <strong>v2.0.0</strong> will transform SARK into the universal GRID v1.0 reference implementation with protocol abstraction, federation, and cost attribution.</p>
 <p><strong>Version Plan:</strong>
 - <strong>v1.3.0</strong> (✅ Complete - Dec 2025): Advanced Security (injection detection, anomaly, network, secrets, MFA)
 - <strong>v1.4.0</strong> (✅ Complete - Jan 2026): Rust Foundation (OPA engine, in-memory cache, 4-10x performance)
 - <strong>v1.5.0</strong> (✅ Complete - Jan 17, 2026): Production Readiness (gateway transports, security fixes, E2E tests)
 - <strong>v1.6.0</strong> (✅ Complete - Feb 1, 2026): Polish &amp; Validation (test fixes, GRID Core, dependabot, security deps)
+- <strong>v1.7.0</strong> (✅ Complete - Feb 2, 2026): YORI Home Deployment (home profile, governance, analytics, OPNsense plugin)
 - <strong>v2.0.0</strong> (Future - 16-20 weeks): GRID Reference Implementation (protocol abstraction, federation, cost attribution)</p>
 <hr />
 <h2 id="complete-version-timeline">Complete Version Timeline<a class="headerlink" href="#complete-version-timeline" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>v1.3.0 ──► v1.4.0 ──► v1.5.0 ──► v1.6.0 ──► v2.0.0
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>(DONE)   (DONE)    (DONE)    (DONE!)    (NEXT)
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  │         │         │          │         │
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Advanced  Rust    Production  Polish    GRID
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>Security  Core    Readiness  Validation  Ref Impl
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>✅ Dec25  ✅ Jan26  ✅ Jan17   ✅ Feb01  (16-20wks)
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>v1.3.0 ──► v1.4.0 ──► v1.5.0 ──► v1.6.0 ──► v1.7.0 ──► v2.0.0
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>(DONE)   (DONE)    (DONE)    (DONE!)    (DONE!)    (NEXT)
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  │         │         │          │         │          │
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Advanced  Rust    Production  Polish    YORI      GRID
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>Security  Core    Readiness  Validation  Home    Ref Impl
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>✅ Dec25  ✅ Jan26  ✅ Jan17   ✅ Feb01  ✅ Feb02  (16-20wks)
 </span></code></pre></div>
+<h3 id="v170-yori-home-deployment-complete-feb-2-2026">v1.7.0: YORI Home Deployment ✅ COMPLETE (Feb 2, 2026)<a class="headerlink" href="#v170-yori-home-deployment-complete-feb-2-2026" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>┌──────────┬──────────┬──────────┬──────────┬──────────┬──────────┐
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>│  Worker 1│  Worker 2│  Worker 3│  Worker 4│  Worker 5│  Worker 6│
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>├──────────┼──────────┼──────────┼──────────┼──────────┼──────────┤
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>│Foundation│ Policy   │ Python   │ Analytics│ OPNsense │   Test   │
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>│  Config  │Templates │Governance│  Module  │  Plugin  │   Suite  │
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>│    ✅    │    ✅    │    ✅    │    ✅    │    ✅    │    ✅    │
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>└──────────┴──────────┴──────────┴──────────┴──────────┴──────────┘
+</span></code></pre></div>
+<p><strong>Deliverables: ✅ ALL COMPLETE</strong>
+- ✅ HomeDeploymentConfig for 512MB RAM, single-core systems
+- ✅ Docker Compose for home deployment
+- ✅ Rego policy templates (bedtime, parental, privacy, cost limits)
+- ✅ Python governance modules (allowlist, time rules, emergency, consent)
+- ✅ Analytics services (token tracking, cost calculation, usage reports)
+- ✅ OPNsense plugin with PHP controllers and Volt templates
+- ✅ Comprehensive test suite (unit, integration, OPA)
+- ✅ Documentation (HOME_DEPLOYMENT, POLICY_COOKBOOK, guides)</p>
+<p><strong>Features:</strong>
+- Zero-trust LLM governance for home networks
+- Progressive control: observe → advisory → enforce modes
+- Privacy-first design (all data stays on-premise)
+- Uses SQLite instead of PostgreSQL
+- Embedded OPA evaluation</p>
+<p><strong>See:</strong> <code>docs/deployment/HOME_DEPLOYMENT.md</code> for complete setup guide</p>
 <h3 id="v120-gateway-policy-tests-8-weeks">v1.2.0: Gateway + Policy + Tests (8 weeks)<a class="headerlink" href="#v120-gateway-policy-tests-8-weeks" title="Permanent link">&para;</a></h3>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>┌─────────────┬─────────────┬─────────────┬─────────────┐
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>│   Week 1-4  │   Week 5-6  │   Week 7-8  │             │
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>├─────────────┼─────────────┼─────────────┤             │
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>│   Gateway   │   Policy    │  Fix Tests  │   Release   │
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>│ HTTP/SSE/   │  Validation │  Auth Tests │   v1.2.0    │
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>│  stdio      │  Framework  │  Coverage   │             │
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>└─────────────┴─────────────┴─────────────┴─────────────┘
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>┌─────────────┬─────────────┬─────────────┬─────────────┐
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>│   Week 1-4  │   Week 5-6  │   Week 7-8  │             │
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>├─────────────┼─────────────┼─────────────┤             │
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>│   Gateway   │   Policy    │  Fix Tests  │   Release   │
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>│ HTTP/SSE/   │  Validation │  Auth Tests │   v1.2.0    │
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>│  stdio      │  Framework  │  Coverage   │             │
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>└─────────────┴─────────────┴─────────────┴─────────────┘
 </span></code></pre></div>
 <p><strong>Deliverables:</strong>
 - Real MCP communication (HTTP, SSE, stdio)
@@ -5136,13 +5191,13 @@
 - 100% test pass rate, 85%+ coverage</p>
 <p><strong>See:</strong> <code>docs/v1.2.0/IMPLEMENTATION_PLAN.md</code></p>
 <h3 id="v130-advanced-security-complete-dec-26-2025">v1.3.0: Advanced Security ✅ COMPLETE (Dec 26, 2025)<a class="headerlink" href="#v130-advanced-security-complete-dec-26-2025" title="Permanent link">&para;</a></h3>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>┌──────────┬──────────┬──────────┬──────────┬──────────┬──────────┬──────────┬──────────┐
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>│  Week 1-2│  Week 3-4│  Week 5  │  Week 6  │  Week 7  │  Week 8  │          │          │
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>├──────────┼──────────┼──────────┼──────────┼──────────┼──────────┤          │          │
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>│ Prompt   │ Anomaly  │ Network  │  Secret  │   MFA    │  E2E     │ Release  │          │
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>│Injection │Detection │ Controls │ Scanning │  System  │   Test   │  v1.3.0  │          │
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>│   ✅     │    ✅    │    ✅    │    ✅    │    ✅    │    ✅    │    ✅    │          │
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>└──────────┴──────────┴──────────┴──────────┴──────────┴──────────┴──────────┴──────────┘
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>┌──────────┬──────────┬──────────┬──────────┬──────────┬──────────┬──────────┬──────────┐
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>│  Week 1-2│  Week 3-4│  Week 5  │  Week 6  │  Week 7  │  Week 8  │          │          │
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>├──────────┼──────────┼──────────┼──────────┼──────────┼──────────┤          │          │
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>│ Prompt   │ Anomaly  │ Network  │  Secret  │   MFA    │  E2E     │ Release  │          │
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>│Injection │Detection │ Controls │ Scanning │  System  │   Test   │  v1.3.0  │          │
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>│   ✅     │    ✅    │    ✅    │    ✅    │    ✅    │    ✅    │    ✅    │          │
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>└──────────┴──────────┴──────────┴──────────┴──────────┴──────────┴──────────┴──────────┘
 </span></code></pre></div>
 <p><strong>Deliverables: ✅ ALL COMPLETE</strong>
 - ✅ Prompt injection detection (20+ patterns, entropy analysis, 30x faster than target)
@@ -5156,13 +5211,13 @@
 - ✅ Complete documentation (1200+ lines across 4 major documents)</p>
 <p><strong>See:</strong> <code>docs/v1.3.0/RELEASE_NOTES.md</code> for complete feature list</p>
 <h3 id="v140-rust-foundation-6-8-weeks">v1.4.0: Rust Foundation (6-8 weeks)<a class="headerlink" href="#v140-rust-foundation-6-8-weeks" title="Permanent link">&para;</a></h3>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>┌──────────┬──────────┬──────────┬──────────┬──────────┬──────────┐
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>│  Week 1-3│  Week 2-3│  Week 4-5│  Week 5-6│  Week 6  │          │
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>├──────────┼──────────┼──────────┼──────────┼──────────┤          │
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>│   Rust   │   Rust   │   A/B    │ Perf     │   Docs   │ Release  │
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>│  OPA     │  Cache   │  Testing │ Testing  │          │  v1.4.0  │
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>│  Engine  │          │          │          │          │          │
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>└──────────┴──────────┴──────────┴──────────┴──────────┴──────────┘
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>┌──────────┬──────────┬──────────┬──────────┬──────────┬──────────┐
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>│  Week 1-3│  Week 2-3│  Week 4-5│  Week 5-6│  Week 6  │          │
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>├──────────┼──────────┼──────────┼──────────┼──────────┤          │
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>│   Rust   │   Rust   │   A/B    │ Perf     │   Docs   │ Release  │
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>│  OPA     │  Cache   │  Testing │ Testing  │          │  v1.4.0  │
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>│  Engine  │          │          │          │          │          │
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>└──────────┴──────────┴──────────┴──────────┴──────────┴──────────┘
 </span></code></pre></div>
 <p><strong>Deliverables:</strong>
 - Embedded Rust OPA engine (4-10x faster)
@@ -5175,13 +5230,13 @@
 - Throughput: 850 → 2,000+ req/s</p>
 <p><strong>See:</strong> <code>docs/v1.4.0/IMPLEMENTATION_PLAN.md</code></p>
 <h3 id="v150-rust-detection-4-5-weeks">v1.5.0: Rust Detection (4-5 weeks)<a class="headerlink" href="#v150-rust-detection-4-5-weeks" title="Permanent link">&para;</a></h3>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>┌──────────┬──────────┬──────────┬──────────┬──────────┐
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>│  Week 1-2│  Week 2-3│  Week 3  │  Week 4-5│          │
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>├──────────┼──────────┼──────────┼──────────┤          │
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>│ Injection│ Anomaly  │   MCP    │   E2E    │ Release  │
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>│ Detector │ Detector │  Parser  │   Test   │  v1.5.0  │
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>│  (Rust)  │  (Rust)  │  (Rust)  │          │          │
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>└──────────┴──────────┴──────────┴──────────┴──────────┘
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>┌──────────┬──────────┬──────────┬──────────┬──────────┐
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>│  Week 1-2│  Week 2-3│  Week 3  │  Week 4-5│          │
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>├──────────┼──────────┼──────────┼──────────┤          │
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>│ Injection│ Anomaly  │   MCP    │   E2E    │ Release  │
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>│ Detector │ Detector │  Parser  │   Test   │  v1.5.0  │
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>│  (Rust)  │  (Rust)  │  (Rust)  │          │          │
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>└──────────┴──────────┴──────────┴──────────┴──────────┘
 </span></code></pre></div>
 <p><strong>Deliverables:</strong>
 - Rust injection detector (10-50x faster)
@@ -5195,13 +5250,13 @@
 - Throughput: 2,000 → 5,000+ req/s</p>
 <p><strong>See:</strong> <code>docs/v1.5.0/IMPLEMENTATION_PLAN.md</code></p>
 <h3 id="v160-polish-validation-complete-feb-1-2026">v1.6.0: Polish &amp; Validation ✅ COMPLETE (Feb 1, 2026)<a class="headerlink" href="#v160-polish-validation-complete-feb-1-2026" title="Permanent link">&para;</a></h3>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>┌──────────┬──────────┬──────────┬──────────┬──────────┐
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>│  Week 1  │  Week 1  │  Week 1  │  Week 1  │          │
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>├──────────┼──────────┼──────────┼──────────┤          │
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>│   Test   │ Security │   GRID   │  Docs &amp;  │ Release  │
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>│  Fixes   │   Deps   │   Core   │ Roadmap  │  v1.6.0  │
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>│    ✅    │    ✅    │    ✅    │    ✅    │    ✅    │
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>└──────────┴──────────┴──────────┴──────────┴──────────┘
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>┌──────────┬──────────┬──────────┬──────────┬──────────┐
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>│  Week 1  │  Week 1  │  Week 1  │  Week 1  │          │
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>├──────────┼──────────┼──────────┼──────────┤          │
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>│   Test   │ Security │   GRID   │  Docs &amp;  │ Release  │
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>│  Fixes   │   Deps   │   Core   │ Roadmap  │  v1.6.0  │
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>│    ✅    │    ✅    │    ✅    │    ✅    │    ✅    │
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>└──────────┴──────────┴──────────┴──────────┴──────────┘
 </span></code></pre></div>
 <p><strong>Deliverables: ✅ ALL COMPLETE</strong>
 - ✅ Test suite fixes (auth providers, pagination, SIEM, benchmarks)
@@ -5220,14 +5275,14 @@
 - Dependabot monitors pip, cargo, and GitHub Actions dependencies
 - Automated weekly security updates with grouped PRs</p>
 <p><strong>See:</strong> <code>docs/KNOWN_ISSUES.md</code> for test status details</p>
-<h3 id="v200-production-release-after-security-audit">v2.0.0: Production Release (After Security Audit)<a class="headerlink" href="#v200-production-release-after-security-audit" title="Permanent link">&para;</a></h3>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>┌──────────┬──────────┬──────────┬──────────┬──────────┐
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>│  Week 1-2│  Week 3-4│  Week 5-6│  Week 7  │          │
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>├──────────┼──────────┼──────────┼──────────┤          │
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>│  Audit   │ External │Remediate │  Deploy  │ Release  │
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>│   Prep   │ Pen Test │  &amp; Test  │ Staging  │  v2.0.0  │
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>│          │          │          │  to Prod │          │
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>└──────────┴──────────┴──────────┴──────────┴──────────┘
+<h3 id="v170-production-release-after-security-audit">v1.7.0: Production Release (After Security Audit)<a class="headerlink" href="#v170-production-release-after-security-audit" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>┌──────────┬──────────┬──────────┬──────────┬──────────┐
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>│  Week 1-2│  Week 3-4│  Week 5-6│  Week 7  │          │
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>├──────────┼──────────┼──────────┼──────────┤          │
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>│  Audit   │ External │Remediate │  Deploy  │ Release  │
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>│   Prep   │ Pen Test │  &amp; Test  │ Staging  │  v1.7.0  │
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>│          │          │          │  to Prod │          │
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>└──────────┴──────────┴──────────┴──────────┴──────────┘
 </span></code></pre></div>
 <p><strong>Deliverables:</strong>
 - Zero critical/high vulnerabilities
@@ -5237,16 +5292,16 @@
 <p><strong>See:</strong> Phases 4 (Security Audit) below</p>
 <hr />
 <h2 id="total-timeline-to-production">Total Timeline to Production<a class="headerlink" href="#total-timeline-to-production" title="Permanent link">&para;</a></h2>
-<p><strong>Path 1: Minimum Viable (v1.2.0 → v2.0.0):</strong>
+<p><strong>Path 1: Minimum Viable (v1.2.0 → v1.7.0):</strong>
 - v1.2.0: 8 weeks (Gateway + Policy + Tests)
 - Security Audit: 6-7 weeks
 - <strong>Total: 14-15 weeks</strong> to basic production</p>
-<p><strong>Path 2: Enhanced Security (v1.2.0 → v1.3.0 → v2.0.0):</strong>
+<p><strong>Path 2: Enhanced Security (v1.2.0 → v1.3.0 → v1.7.0):</strong>
 - v1.2.0: 8 weeks
 - v1.3.0: 8 weeks (Advanced security)
 - Security Audit: 6-7 weeks
 - <strong>Total: 22-23 weeks</strong> to production with advanced features</p>
-<p><strong>Path 3: Full Performance (v1.2.0 → v1.3.0 → v1.4.0 → v1.5.0 → v2.0.0):</strong>
+<p><strong>Path 3: Full Performance (v1.2.0 → v1.3.0 → v1.4.0 → v1.5.0 → v1.7.0):</strong>
 - v1.2.0: 8 weeks
 - v1.3.0: 8 weeks
 - v1.4.0: 6-8 weeks (Rust foundation)
@@ -5271,11 +5326,11 @@
 <h3 id="current-state-analysis">Current State Analysis<a class="headerlink" href="#current-state-analysis" title="Permanent link">&para;</a></h3>
 <p><strong>Problem:</strong>
 The Gateway client in <code>src/sark/api/routers/gateway.py</code> and <code>src/sark/models/gateway.py</code> returns stubbed responses:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_servers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">GatewayServerInfo</span><span class="p">]:</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="k">return</span> <span class="p">[]</span>  <span class="c1"># STUBBED!</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_server_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GatewayServerInfo</span><span class="p">]:</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Gateway client not fully implemented&quot;</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_servers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">GatewayServerInfo</span><span class="p">]:</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    <span class="k">return</span> <span class="p">[]</span>  <span class="c1"># STUBBED!</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_server_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GatewayServerInfo</span><span class="p">]:</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Gateway client not fully implemented&quot;</span><span class="p">)</span>
 </span></code></pre></div>
 <p>This means:
 - No actual MCP server communication happens
@@ -5453,10 +5508,10 @@ The Gateway client in <code>src/sark/api/routers/gateway.py</code> and <code>src
 <h3 id="current-risk">Current Risk<a class="headerlink" href="#current-risk" title="Permanent link">&para;</a></h3>
 <p><strong>Problem:</strong>
 Policies loaded from files/API without validation. Rego is Turing-complete, allowing arbitrary logic:</p>
-<div class="language-rego highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># MALICIOUS POLICY EXAMPLE</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="k">package</span><span class="w"> </span><span class="n">gateway</span><span class="p">.</span><span class="n">authorization</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="k">default</span><span class="w"> </span><span class="n">allow</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="k">true</span><span class="w">  </span><span class="c1"># Approve everything!</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="n">filtered_params</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">input</span><span class="p">.</span><span class="n">params</span><span class="w">  </span><span class="c1"># Don&#39;t filter anything!</span>
+<div class="language-rego highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># MALICIOUS POLICY EXAMPLE</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="k">package</span><span class="w"> </span><span class="n">gateway</span><span class="p">.</span><span class="n">authorization</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="k">default</span><span class="w"> </span><span class="n">allow</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="k">true</span><span class="w">  </span><span class="c1"># Approve everything!</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">filtered_params</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">input</span><span class="p">.</span><span class="n">params</span><span class="w">  </span><span class="c1"># Don&#39;t filter anything!</span>
 </span></code></pre></div>
 <p><strong>Impact:</strong>
 - Single malicious policy bypasses all security
@@ -6103,20 +6158,20 @@ Policies loaded from files/API without validation. Rego is Turing-complete, allo
 - <strong>Total: ~$83,000</strong></p>
 <hr />
 <h2 id="timeline-summary">Timeline Summary<a class="headerlink" href="#timeline-summary" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Week 1-2:  Gateway HTTP transport + SSE transport
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>Week 3:    Gateway stdio transport
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>Week 4:    Gateway integration &amp; end-to-end testing
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>Week 5:    Policy validation engine
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>Week 6:    Policy validation integration &amp; migration
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>Week 7:    Fix auth provider tests
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>Week 8:    Improve test coverage
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>Week 9:    Security audit preparation
-</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>Week 10:   Internal security review
-</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>Week 11:   External security testing (vendor)
-</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>Week 12:   Remediation &amp; re-test
-</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>Week 13:   Staging deployment
-</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>Week 14:   Canary production deployment
-</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>Week 15:   Full production go-live
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>Week 1-2:  Gateway HTTP transport + SSE transport
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>Week 3:    Gateway stdio transport
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>Week 4:    Gateway integration &amp; end-to-end testing
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>Week 5:    Policy validation engine
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>Week 6:    Policy validation integration &amp; migration
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>Week 7:    Fix auth provider tests
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>Week 8:    Improve test coverage
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>Week 9:    Security audit preparation
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>Week 10:   Internal security review
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>Week 11:   External security testing (vendor)
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>Week 12:   Remediation &amp; re-test
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>Week 13:   Staging deployment
+</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>Week 14:   Canary production deployment
+</span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>Week 15:   Full production go-live
 </span></code></pre></div>
 <p><strong>Critical Path:</strong> Gateway (4 weeks) → Policy (2 weeks) → Tests (2 weeks) → Security Audit (4 weeks) → Deployment (3 weeks)</p>
 <p><strong>Total Duration:</strong> 15 weeks from start to production</p>
@@ -6137,7 +6192,7 @@ Policies loaded from files/API without validation. Rego is Turing-complete, allo
 <li>Network-level controls</li>
 <li>Secret scanning</li>
 <li>MFA for critical actions</li>
-<li><strong>Reason:</strong> Important security enhancements but not blockers for v2.0.0 production</li>
+<li><strong>Reason:</strong> Important security enhancements but not blockers for v1.7.0 production</li>
 <li><strong>Target:</strong> v1.3.0 release (Q2 2026)</li>
 </ul>
 <h3 id="web-ui-enhancements">Web UI Enhancements<a class="headerlink" href="#web-ui-enhancements" title="Permanent link">&para;</a></h3>
@@ -6203,7 +6258,7 @@ On December 8, 2025, a comprehensive security analysis using Simon Willison's "L
 Adopt honest, incremental versioning with clear milestones:
 - <strong>v1.2.0:</strong> Complete gateway implementation + critical fixes (Weeks 1-8)
 - <strong>v1.3.0:</strong> Advanced Lethal Trifecta security features (Q2 2026)
-- <strong>v2.0.0:</strong> Production release after security audit (Week 15)</p>
+- <strong>v1.7.0:</strong> Production release after security audit (Week 15)</p>
 <p><strong>This Roadmap:</strong>
 Addresses these gaps with a focused 15-week plan using semantic versioning that reflects actual readiness.</p>
 
