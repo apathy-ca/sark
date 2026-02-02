@@ -1,0 +1,164 @@
+# ============================================================================
+# SARK Home Deployment Docker Compose Configuration
+# ============================================================================
+# Lightweight deployment profile optimized for home routers and low-resource
+# environments (512MB RAM, single core).
+#
+# Key differences from enterprise deployment:
+# - Single container (all-in-one)
+# - SQLite instead of PostgreSQL
+# - In-memory caching instead of Redis/Valkey
+# - Embedded OPA instead of external OPA server
+# - Resource-limited (512MB RAM, 1 CPU)
+#
+# Usage:
+# - docker compose -f docker-compose.home.yml up -d
+# - Or via Makefile: make home-up
+#
+# See docs/deployment/HOME_DEPLOYMENT.md for detailed instructions.
+# ============================================================================
+
+services:
+  # ============================================================================
+  # SARK Home - All-in-One Service
+  # ============================================================================
+  # Single container running the complete SARK home stack:
+  # - FastAPI proxy server
+  # - SQLite databases (main + audit)
+  # - Embedded OPA policy engine
+  # - In-memory caching
+  # ============================================================================
+  sark-home:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+      args:
+        - DEPLOYMENT_PROFILE=home
+    image: sark:home
+    container_name: sark-home
+    restart: unless-stopped
+
+    # Environment configuration
+    env_file:
+      - .env.home
+    environment:
+      # Deployment profile
+      - SARK_HOME_MODE=${SARK_HOME_MODE:-observe}
+      - SARK_HOME_ENVIRONMENT=${SARK_HOME_ENVIRONMENT:-production}
+      - SARK_HOME_DEBUG=${SARK_HOME_DEBUG:-false}
+      - SARK_HOME_LOG_LEVEL=${SARK_HOME_LOG_LEVEL:-INFO}
+
+      # Server configuration
+      - SARK_HOME_HOST=0.0.0.0
+      - SARK_HOME_PORT=8443
+      - SARK_HOME_WORKERS=1
+
+      # Database paths (inside container)
+      - SARK_HOME_DB_PATH=/var/db/sark/home.db
+      - SARK_HOME_AUDIT_DB_PATH=/var/db/sark/audit.db
+
+      # Policy configuration
+      - SARK_HOME_OPA_MODE=embedded
+      - SARK_HOME_POLICIES_DIR=/usr/local/etc/sark/policies
+
+      # TLS configuration
+      - SARK_HOME_TLS_ENABLED=${SARK_HOME_TLS_ENABLED:-true}
+      - SARK_HOME_TLS_CERT_PATH=/usr/local/etc/sark/certs/server.crt
+      - SARK_HOME_TLS_KEY_PATH=/usr/local/etc/sark/certs/server.key
+
+      # Resource limits
+      - SARK_HOME_MAX_MEMORY_MB=256
+      - SARK_HOME_MAX_CONNECTIONS=50
+
+      # Audit configuration
+      - SARK_HOME_AUDIT_ENABLED=true
+      - SARK_HOME_AUDIT_RETENTION_DAYS=${SARK_HOME_AUDIT_RETENTION_DAYS:-365}
+
+      # Cache configuration
+      - SARK_HOME_CACHE_ENABLED=true
+      - SARK_HOME_CACHE_SIZE_MB=32
+
+    # Port mappings
+    ports:
+      - "${SARK_HOME_HTTPS_PORT:-8443}:8443"   # HTTPS proxy
+      - "${SARK_HOME_HTTP_PORT:-8080}:8080"    # HTTP redirect (optional)
+      - "${SARK_HOME_HEALTH_PORT:-9090}:9090"  # Health/metrics endpoint
+
+    # Volume mounts for persistent data
+    volumes:
+      # SQLite databases
+      - sark-home-db:/var/db/sark
+
+      # Policy files
+      - ${SARK_HOME_POLICIES_PATH:-./data/policies}:/usr/local/etc/sark/policies:ro
+
+      # TLS certificates
+      - ${SARK_HOME_CERTS_PATH:-./data/certs}:/usr/local/etc/sark/certs:ro
+
+      # Log files
+      - sark-home-logs:/var/log/sark
+
+      # Configuration (read-only)
+      - ${SARK_HOME_CONFIG_PATH:-./data/config}:/usr/local/etc/sark/config:ro
+
+    # Resource constraints for home deployment
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+        reservations:
+          memory: 128M
+          cpus: "0.25"
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9090/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # Network configuration
+    networks:
+      - sark-home-network
+
+    # Security options
+    security_opt:
+      - no-new-privileges:true
+
+    # Read-only root filesystem (optional, for extra security)
+    # Uncomment if desired - requires writable tmpfs for /tmp
+    # read_only: true
+    # tmpfs:
+    #   - /tmp:size=64M
+
+# ============================================================================
+# Networks
+# ============================================================================
+networks:
+  sark-home-network:
+    driver: bridge
+    name: sark-home-network
+
+# ============================================================================
+# Volumes
+# ============================================================================
+volumes:
+  # SQLite database storage
+  sark-home-db:
+    name: sark-home-db
+    driver: local
+
+  # Log file storage
+  sark-home-logs:
+    name: sark-home-logs
+    driver: local
