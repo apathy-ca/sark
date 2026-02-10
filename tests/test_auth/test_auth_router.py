@@ -17,10 +17,15 @@ from sark.services.auth.providers.base import UserInfo
 
 
 @pytest.fixture
-def app():
+def app(mock_settings, mock_session_service):
     """Create FastAPI test app."""
     app = FastAPI()
     app.include_router(router)
+
+    # Initialize app.state for dependency injection
+    app.state.settings = mock_settings
+    app.state.session_service = mock_session_service
+
     return app
 
 
@@ -87,9 +92,7 @@ class TestListProviders:
 
     def test_list_providers_all_enabled(self, client, app, mock_settings):
         """Test listing providers when all are enabled."""
-        from sark.api.routers.auth import get_settings
-
-        app.dependency_overrides[get_settings] = lambda: mock_settings
+        # app.state is already initialized in the fixture
 
         response = client.get("/api/auth/providers")
 
@@ -113,9 +116,7 @@ class TestListProviders:
         mock_settings.oidc_enabled = False
         mock_settings.saml_enabled = False
 
-        from sark.api.routers.auth import get_settings
 
-        app.dependency_overrides[get_settings] = lambda: mock_settings
 
         response = client.get("/api/auth/providers")
 
@@ -136,7 +137,6 @@ class TestLogin:
         self, client, app, mock_settings, mock_session_service, mock_session
     ):
         """Test successful LDAP login."""
-        from sark.api.routers.auth import get_session_service, get_settings
 
         mock_user_info = UserInfo(
             user_id="uid=jdoe,ou=users,dc=example,dc=com",
@@ -146,8 +146,6 @@ class TestLogin:
 
         mock_session_service.create_session.return_value = (mock_session, mock_session.session_id)
 
-        app.dependency_overrides[get_settings] = lambda: mock_settings
-        app.dependency_overrides[get_session_service] = lambda: mock_session_service
 
         with patch("sark.api.routers.auth.LDAPProvider") as mock_ldap_class:
             mock_ldap_instance = AsyncMock()
@@ -172,10 +170,7 @@ class TestLogin:
 
     def test_login_ldap_invalid_credentials(self, client, app, mock_settings, mock_session_service):
         """Test LDAP login with invalid credentials."""
-        from sark.api.routers.auth import get_session_service, get_settings
 
-        app.dependency_overrides[get_settings] = lambda: mock_settings
-        app.dependency_overrides[get_session_service] = lambda: mock_session_service
 
         with patch("sark.api.routers.auth.LDAPProvider") as mock_ldap_class:
             mock_ldap_instance = AsyncMock()
@@ -195,12 +190,9 @@ class TestLogin:
 
     def test_login_ldap_disabled(self, client, app, mock_settings, mock_session_service):
         """Test login when LDAP is disabled."""
-        from sark.api.routers.auth import get_session_service, get_settings
 
         mock_settings.ldap_enabled = False
 
-        app.dependency_overrides[get_settings] = lambda: mock_settings
-        app.dependency_overrides[get_session_service] = lambda: mock_session_service
 
         response = client.post(
             "/api/auth/login",
@@ -215,10 +207,7 @@ class TestLogin:
 
     def test_login_unsupported_provider(self, client, app, mock_settings, mock_session_service):
         """Test login with unsupported provider."""
-        from sark.api.routers.auth import get_session_service, get_settings
 
-        app.dependency_overrides[get_settings] = lambda: mock_settings
-        app.dependency_overrides[get_session_service] = lambda: mock_session_service
 
         response = client.post(
             "/api/auth/login",
@@ -238,11 +227,9 @@ class TestLogin:
 class TestOIDCAuthorize:
     """Test OIDC authorization endpoint."""
 
-    def test_oidc_authorize_success(self, client, app, mock_settings):
+    def test_oidc_authorize_success(self, client, app, mock_settings, mock_session_service):
         """Test OIDC authorization URL generation."""
-        from sark.api.routers.auth import get_settings
 
-        app.dependency_overrides[get_settings] = lambda: mock_settings
 
         with patch("sark.api.routers.auth.OIDCProvider") as mock_oidc_class:
             mock_oidc_instance = AsyncMock()
@@ -263,13 +250,11 @@ class TestOIDCAuthorize:
             assert response.status_code == 307
             assert "Location" in response.headers
 
-    def test_oidc_authorize_disabled(self, client, app, mock_settings):
+    def test_oidc_authorize_disabled(self, client, app, mock_settings, mock_session_service):
         """Test OIDC authorization when disabled."""
-        from sark.api.routers.auth import get_settings
 
         mock_settings.oidc_enabled = False
 
-        app.dependency_overrides[get_settings] = lambda: mock_settings
 
         response = client.get(
             "/api/auth/oidc/authorize",
@@ -289,7 +274,6 @@ class TestOIDCCallback:
         self, client, app, mock_settings, mock_session_service, mock_session
     ):
         """Test successful OIDC callback."""
-        from sark.api.routers.auth import get_session_service, get_settings
 
         mock_user_info = UserInfo(
             user_id="google_user123",
@@ -299,8 +283,6 @@ class TestOIDCCallback:
 
         mock_session_service.create_session.return_value = (mock_session, mock_session.session_id)
 
-        app.dependency_overrides[get_settings] = lambda: mock_settings
-        app.dependency_overrides[get_session_service] = lambda: mock_session_service
 
         with patch("sark.api.routers.auth.OIDCProvider") as mock_oidc_class:
             mock_oidc_instance = AsyncMock()
@@ -320,10 +302,7 @@ class TestOIDCCallback:
 
     def test_oidc_callback_auth_failure(self, client, app, mock_settings, mock_session_service):
         """Test OIDC callback when authentication fails."""
-        from sark.api.routers.auth import get_session_service, get_settings
 
-        app.dependency_overrides[get_settings] = lambda: mock_settings
-        app.dependency_overrides[get_session_service] = lambda: mock_session_service
 
         with patch("sark.api.routers.auth.OIDCProvider") as mock_oidc_class:
             mock_oidc_instance = AsyncMock()
@@ -385,7 +364,6 @@ class TestLogout:
 
         app.dependency_overrides[get_current_session] = lambda: mock_session
         app.dependency_overrides[require_auth] = lambda: mock_session
-        app.dependency_overrides[get_session_service] = lambda: mock_session_service
 
         response = client.post("/api/auth/logout")
 
@@ -414,7 +392,6 @@ class TestLogout:
 
         app.dependency_overrides[get_current_session] = lambda: mock_session
         app.dependency_overrides[require_auth] = lambda: mock_session
-        app.dependency_overrides[get_session_service] = lambda: mock_session_service
 
         response = client.post("/api/auth/logout/all")
 
@@ -436,9 +413,7 @@ class TestAuthHealth:
 
     def test_health_check_all_healthy(self, client, app, mock_settings):
         """Test health check when all providers are healthy."""
-        from sark.api.routers.auth import get_settings
 
-        app.dependency_overrides[get_settings] = lambda: mock_settings
 
         with patch("sark.api.routers.auth.OIDCProvider") as mock_oidc_class:
             with patch("sark.api.routers.auth.SAMLProvider") as mock_saml_class:
@@ -465,9 +440,7 @@ class TestAuthHealth:
 
     def test_health_check_degraded(self, client, app, mock_settings):
         """Test health check when some providers are unhealthy."""
-        from sark.api.routers.auth import get_settings
 
-        app.dependency_overrides[get_settings] = lambda: mock_settings
 
         with patch("sark.api.routers.auth.OIDCProvider") as mock_oidc_class:
             with patch("sark.api.routers.auth.SAMLProvider") as mock_saml_class:
