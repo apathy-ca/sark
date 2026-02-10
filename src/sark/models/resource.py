@@ -41,12 +41,12 @@ class ResourceStatus(str, Enum):
     DECOMMISSIONED = "decommissioned"
 
 
-# Association table for resource managers (many-to-many with users)
+# Association table for resource managers (many-to-many with principals)
 resource_managers = Table(
     "resource_managers",
     Base.metadata,
     Column("resource_id", UUID(as_uuid=True), ForeignKey("grid_resources.id", ondelete="CASCADE")),
-    Column("user_id", UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE")),
+    Column("principal_id", UUID(as_uuid=True), ForeignKey("principals.id", ondelete="CASCADE")),
 )
 
 
@@ -79,9 +79,8 @@ class GridResource(Base):
     last_health_check = Column(DateTime(timezone=True), nullable=True)
 
     # Ownership and access control
-    # Note: These will be migrated to Principal objects once principal-model is implemented
     owner_id = Column(
-        UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+        UUID(as_uuid=True), ForeignKey("principals.id", ondelete="SET NULL"), nullable=True
     )
     team_id = Column(UUID(as_uuid=True), ForeignKey("teams.id", ondelete="SET NULL"), nullable=True)
 
@@ -101,9 +100,9 @@ class GridResource(Base):
     )
 
     # Relationships
-    owner = relationship("User", foreign_keys=[owner_id], back_populates="owned_grid_resources")
+    owner = relationship("Principal", foreign_keys=[owner_id], back_populates="owned_grid_resources")
     team = relationship("Team", foreign_keys=[team_id], back_populates="managed_grid_resources")
-    managers = relationship("User", secondary=resource_managers, back_populates="managed_grid_resources")
+    managers = relationship("Principal", secondary=resource_managers, back_populates="managed_grid_resources")
     tools = relationship("ResourceTool", back_populates="grid_resource", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
