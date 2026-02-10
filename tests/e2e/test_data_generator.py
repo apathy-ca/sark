@@ -14,7 +14,7 @@ from faker import Faker
 from sark.models.audit import AuditEvent, AuditEventType, SeverityLevel
 from sark.models.mcp_server import MCPServer, SensitivityLevel, ServerStatus, TransportType
 from sark.models.policy import Policy, PolicyStatus
-from sark.models.user import Team, User
+from sark.models.principal import Principal, Team
 
 # Initialize Faker for realistic data
 fake = Faker()
@@ -30,7 +30,7 @@ def generate_user(
     is_admin: bool = False,
     is_active: bool = True,
     team_id: UUID | None = None,
-) -> User:
+) -> Principal:
     """
     Generate a single user with realistic data.
 
@@ -51,7 +51,7 @@ def generate_user(
     if team_id:
         extra_metadata["team_id"] = str(team_id)
 
-    return User(
+    return Principal(
         id=uuid4(),
         email=email,
         full_name=f"{first_name} {last_name}",
@@ -79,7 +79,7 @@ def generate_users(count: int, **kwargs) -> list[User]:
     return [generate_user(**kwargs) for _ in range(count)]
 
 
-def generate_admin_user() -> User:
+def generate_admin_user() -> Principal:
     """Generate an admin user."""
     return generate_user(role="admin", is_admin=True)
 

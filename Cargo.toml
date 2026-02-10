@@ -13,9 +13,9 @@ license = "MIT"
 authors = ["James Henry"]
 
 [workspace.dependencies]
-# GRID Core components
-grid-opa = { path = "../grid-core/crates/grid-opa" }
-grid-cache = { path = "../grid-core/crates/grid-cache" }
+# GRID Core components (absolute paths work across worktrees)
+grid-opa = { path = "../../../../grid-core/crates/grid-opa" }
+grid-cache = { path = "../../../../grid-core/crates/grid-cache" }
 
 # Python bindings
 pyo3 = { version = "0.22", features = ["extension-module"] }

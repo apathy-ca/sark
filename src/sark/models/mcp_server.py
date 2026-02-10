@@ -70,7 +70,7 @@ class MCPServer(Base):
 
     # Ownership and access
     owner_id = Column(
-        UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+        UUID(as_uuid=True), ForeignKey("principals.id", ondelete="SET NULL"), nullable=True
     )
     team_id = Column(UUID(as_uuid=True), ForeignKey("teams.id", ondelete="SET NULL"), nullable=True)
 
@@ -88,7 +88,7 @@ class MCPServer(Base):
     )
 
     # Relationships
-    owner = relationship("User", back_populates="owned_servers")
+    owner = relationship("Principal", back_populates="owned_servers")
     team = relationship("Team", back_populates="managed_servers")
     tools = relationship("MCPTool", back_populates="server", cascade="all, delete-orphan")
 

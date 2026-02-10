@@ -12,7 +12,7 @@ from uuid import UUID, uuid4
 import pytest
 
 from sark.models.mcp_server import MCPServer, SensitivityLevel, ServerStatus, TransportType
-from sark.models.user import User
+from sark.models.principal import Principal
 from sark.services.auth.api_key import APIKeyService
 from sark.services.auth.jwt import JWTHandler
 from sark.services.policy.opa_client import AuthorizationInput, OPAClient
@@ -516,7 +516,7 @@ def test_server_search_performance():
 def test_end_to_end_quick_flow():
     """Quick end-to-end smoke test of critical path."""
     # 1. Create user
-    user = User(
+    user = Principal(
         id=uuid4(),
         email="smoke@example.com",
         full_name="Smoke Test User",

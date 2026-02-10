@@ -166,6 +166,42 @@ MIIEpAIBAAKCAQEA0Z3VS5JJcds3xfn/ygWyF06bpk5u6rVl
         assert len(findings) > 0
         assert any("Anthropic" in f.secret_type for f in findings)
 
+    # Test Azure Storage Account key
+    def test_azure_storage_key_detected(self, scanner):
+        """Test detection of Azure Storage Account key"""
+        data = {
+            "connection_string": "DefaultEndpointsProtocol=https;AccountName=myaccount;AccountKey=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrst+/ab=="
+        }
+
+        findings = scanner.scan(data)
+
+        assert len(findings) > 0
+        assert any("Azure" in f.secret_type for f in findings)
+
+    # Test Heroku API key
+    def test_heroku_key_detected(self, scanner):
+        """Test detection of Heroku API key"""
+        data = {
+            "api_key": "12345678-1234-1234-1234-123456789abc"
+        }
+
+        findings = scanner.scan(data)
+
+        assert len(findings) > 0
+        assert any("Heroku" in f.secret_type for f in findings)
+
+    # Test Mailgun API key
+    def test_mailgun_key_detected(self, scanner):
+        """Test detection of Mailgun API key"""
+        data = {
+            "mailgun_key": "key-1234567890abcdef1234567890abcdef"
+        }
+
+        findings = scanner.scan(data)
+
+        assert len(findings) > 0
+        assert any("Mailgun" in f.secret_type for f in findings)
+
     # Test redaction
     def test_redact_single_secret(self, scanner):
         """Test redaction of single secret"""

@@ -477,3 +477,273 @@ class TestEventTimestamps:
         # Assert
         added_event = mock_db_session.add.call_args[0][0]
         assert added_event.timestamp.tzinfo is not None
+
+
+class TestGRIDSpecCompliance:
+    """Test GRID spec compliance fields (Wave 2 SIEM integration)."""
+
+    @pytest.mark.asyncio
+    async def test_log_event_with_grid_fields(self, audit_service, mock_db_session):
+        """Test that GRID spec fields are populated correctly."""
+        # Arrange
+        grid_data = {
+            "event_type": AuditEventType.TOOL_INVOKED,
+            "principal_type": "user",
+            "principal_attributes": {"user_id": "user-123", "role": "developer"},
+            "resource_type": "tool",
+            "action_operation": "invoke",
+            "action_parameters": {"query": "SELECT * FROM users"},
+            "policy_version": "1.2.3",
+            "environment": "production",
+            "success": True,
+            "error_message": None,
+            "latency_ms": 42.5,
+            "cost": 0.001,
+            "retention_days": 365,
+        }
+
+        # Act
+        with patch.object(audit_service, "_forward_to_siem", new_callable=AsyncMock):
+            await audit_service.log_event(**grid_data)
+
+        # Assert
+        added_event = mock_db_session.add.call_args[0][0]
+        assert added_event.principal_type == "user"
+        assert added_event.principal_attributes == {"user_id": "user-123", "role": "developer"}
+        assert added_event.resource_type == "tool"
+        assert added_event.action_operation == "invoke"
+        assert added_event.action_parameters == {"query": "SELECT * FROM users"}
+        assert added_event.policy_version == "1.2.3"
+        assert added_event.environment == "production"
+        assert added_event.success is True
+        assert added_event.error_message is None
+        assert added_event.latency_ms == 42.5
+        assert added_event.cost == 0.001
+        assert added_event.retention_until is not None
+
+    @pytest.mark.asyncio
+    async def test_retention_until_calculated_from_retention_days(
+        self, audit_service, mock_db_session
+    ):
+        """Test that retention_until is calculated from retention_days."""
+        # Act
+        with patch.object(audit_service, "_forward_to_siem", new_callable=AsyncMock):
+            await audit_service.log_event(
+                event_type=AuditEventType.USER_LOGIN,
+                retention_days=30,
+            )
+
+        # Assert
+        added_event = mock_db_session.add.call_args[0][0]
+        assert added_event.retention_until is not None
+        # Retention should be approximately 30 days from now
+        from datetime import timedelta
+        expected = datetime.now(UTC) + timedelta(days=30)
+        actual = added_event.retention_until
+        # Allow 1 second tolerance
+        assert abs((actual - expected).total_seconds()) < 1
+
+    @pytest.mark.asyncio
+    async def test_default_retention_90_days(self, audit_service, mock_db_session):
+        """Test that default retention is 90 days."""
+        # Act
+        with patch.object(audit_service, "_forward_to_siem", new_callable=AsyncMock):
+            await audit_service.log_event(event_type=AuditEventType.USER_LOGIN)
+
+        # Assert
+        added_event = mock_db_session.add.call_args[0][0]
+        assert added_event.retention_until is not None
+        from datetime import timedelta
+        expected = datetime.now(UTC) + timedelta(days=90)
+        actual = added_event.retention_until
+        # Allow 1 second tolerance
+        assert abs((actual - expected).total_seconds()) < 1
+
+    @pytest.mark.asyncio
+    async def test_authorization_decision_populates_grid_fields(
+        self,
+        audit_service,
+        mock_db_session,
+        sample_user_id,
+    ):
+        """Test that authorization decisions populate GRID spec fields."""
+        # Act
+        with patch.object(audit_service, "_forward_to_siem", new_callable=AsyncMock):
+            await audit_service.log_authorization_decision(
+                user_id=sample_user_id,
+                user_email="user@example.com",
+                tool_name="execute_sql",
+                decision="allow",
+                policy_version="2.0.0",
+                environment="staging",
+                latency_ms=15.3,
+            )
+
+        # Assert
+        added_event = mock_db_session.add.call_args[0][0]
+        assert added_event.principal_type == "user"
+        assert added_event.principal_attributes == {
+            "user_id": str(sample_user_id),
+            "email": "user@example.com",
+        }
+        assert added_event.resource_type == "tool"
+        assert added_event.action_operation == "authorization_check"
+        assert added_event.policy_version == "2.0.0"
+        assert added_event.environment == "staging"
+        assert added_event.success is True  # allow = success
+        assert added_event.latency_ms == 15.3
+
+    @pytest.mark.asyncio
+    async def test_authorization_deny_marks_success_false(
+        self,
+        audit_service,
+        mock_db_session,
+        sample_user_id,
+    ):
+        """Test that authorization denials mark success as False."""
+        # Act
+        with patch.object(audit_service, "_forward_to_siem", new_callable=AsyncMock):
+            await audit_service.log_authorization_decision(
+                user_id=sample_user_id,
+                user_email="user@example.com",
+                tool_name="delete_database",
+                decision="deny",
+            )
+
+        # Assert
+        added_event = mock_db_session.add.call_args[0][0]
+        assert added_event.success is False  # deny = failure
+
+    @pytest.mark.asyncio
+    async def test_tool_invocation_populates_grid_fields(
+        self,
+        audit_service,
+        mock_db_session,
+        sample_user_id,
+        sample_server_id,
+    ):
+        """Test that tool invocations populate GRID spec fields."""
+        # Arrange
+        parameters = {"query": "SELECT * FROM users", "limit": 100}
+
+        # Act
+        with patch.object(audit_service, "_forward_to_siem", new_callable=AsyncMock):
+            await audit_service.log_tool_invocation(
+                user_id=sample_user_id,
+                user_email="analyst@example.com",
+                server_id=sample_server_id,
+                tool_name="run_query",
+                parameters=parameters,
+                success=True,
+                latency_ms=125.7,
+                environment="production",
+            )
+
+        # Assert
+        added_event = mock_db_session.add.call_args[0][0]
+        assert added_event.principal_type == "user"
+        assert added_event.resource_type == "tool"
+        assert added_event.action_operation == "invoke"
+        assert added_event.action_parameters == parameters
+        assert added_event.environment == "production"
+        assert added_event.success is True
+        assert added_event.latency_ms == 125.7
+
+    @pytest.mark.asyncio
+    async def test_tool_invocation_with_error(
+        self,
+        audit_service,
+        mock_db_session,
+        sample_user_id,
+        sample_server_id,
+    ):
+        """Test tool invocation with error message."""
+        # Act
+        with patch.object(audit_service, "_forward_to_siem", new_callable=AsyncMock):
+            await audit_service.log_tool_invocation(
+                user_id=sample_user_id,
+                user_email="user@example.com",
+                server_id=sample_server_id,
+                tool_name="failing_tool",
+                success=False,
+                error_message="Connection timeout",
+                latency_ms=5000.0,
+            )
+
+        # Assert
+        added_event = mock_db_session.add.call_args[0][0]
+        assert added_event.success is False
+        assert added_event.error_message == "Connection timeout"
+
+    @pytest.mark.asyncio
+    async def test_server_registration_populates_grid_fields(
+        self,
+        audit_service,
+        mock_db_session,
+        sample_user_id,
+        sample_server_id,
+    ):
+        """Test that server registration populates GRID spec fields."""
+        # Act
+        with patch.object(audit_service, "_forward_to_siem", new_callable=AsyncMock):
+            await audit_service.log_server_registration(
+                user_id=sample_user_id,
+                user_email="admin@example.com",
+                server_id=sample_server_id,
+                server_name="postgres-mcp-server",
+                environment="production",
+            )
+
+        # Assert
+        added_event = mock_db_session.add.call_args[0][0]
+        assert added_event.principal_type == "user"
+        assert added_event.resource_type == "server"
+        assert added_event.action_operation == "register"
+        assert added_event.environment == "production"
+        assert added_event.success is True
+
+    @pytest.mark.asyncio
+    async def test_security_violation_populates_grid_fields(
+        self,
+        audit_service,
+        mock_db_session,
+        sample_user_id,
+    ):
+        """Test that security violations populate GRID spec fields."""
+        # Act
+        with patch.object(audit_service, "_forward_to_siem", new_callable=AsyncMock):
+            await audit_service.log_security_violation(
+                user_id=sample_user_id,
+                user_email="attacker@example.com",
+                violation_type="sql_injection_attempt",
+                environment="production",
+            )
+
+        # Assert
+        added_event = mock_db_session.add.call_args[0][0]
+        assert added_event.principal_type == "user"
+        assert added_event.action_operation == "security_violation"
+        assert added_event.environment == "production"
+        assert added_event.success is False  # Security violations are failures
+        assert added_event.error_message == "sql_injection_attempt"
+
+    @pytest.mark.asyncio
+    async def test_security_violation_anonymous_principal(
+        self,
+        audit_service,
+        mock_db_session,
+    ):
+        """Test security violation with anonymous principal."""
+        # Act
+        with patch.object(audit_service, "_forward_to_siem", new_callable=AsyncMock):
+            await audit_service.log_security_violation(
+                user_id=None,
+                user_email=None,
+                violation_type="brute_force_attempt",
+                ip_address="198.51.100.99",
+            )
+
+        # Assert
+        added_event = mock_db_session.add.call_args[0][0]
+        assert added_event.principal_type == "anonymous"
+        assert added_event.principal_attributes is None

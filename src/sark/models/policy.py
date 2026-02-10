@@ -6,6 +6,7 @@ from uuid import uuid4
 
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy import Enum as SQLEnum
+from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -28,6 +29,14 @@ class PolicyType(str, Enum):
     VALIDATION = "validation"
     TRANSFORMATION = "transformation"
     AUDIT = "audit"
+
+
+class Effect(str, Enum):
+    """Policy rule effect enumeration."""
+
+    ALLOW = "allow"
+    DENY = "deny"
+    CONSTRAIN = "constrain"
 
 
 class Policy(Base):
@@ -87,7 +96,7 @@ class PolicyVersion(Base):
     tested = Column(Boolean, default=False, nullable=False)
 
     created_by = Column(
-        UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+        UUID(as_uuid=True), ForeignKey("principals.id", ondelete="SET NULL"), nullable=True
     )
     created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC))
 
@@ -95,7 +104,54 @@ class PolicyVersion(Base):
 
     # Relationships
     policy = relationship("Policy", back_populates="versions", foreign_keys=[policy_id])
+    rules = relationship(
+        "PolicyRule",
+        back_populates="policy_version",
+        cascade="all, delete-orphan",
+        order_by="PolicyRule.priority",
+    )
 
     def __repr__(self) -> str:
         """String representation of policy version."""
         return f"<PolicyVersion(id={self.id}, policy_id={self.policy_id}, version={self.version})>"
+
+
+class PolicyRule(Base):
+    """Structured policy rule metadata for introspection and composition.
+
+    This model stores structured metadata alongside Rego content to enable
+    programmatic policy introspection and composition. The Rego content in
+    PolicyVersion is still used for actual OPA evaluation.
+    """
+
+    __tablename__ = "policy_rules"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    policy_version_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("policy_versions.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+
+    name = Column(String(255), nullable=False)
+    priority = Column(Integer, nullable=False, default=0, index=True)
+    effect = Column(SQLEnum(Effect), nullable=False)
+
+    # Matchers stored as JSON arrays
+    principal_matchers = Column(JSON, nullable=False, default=list)
+    resource_matchers = Column(JSON, nullable=False, default=list)
+    action_matchers = Column(JSON, nullable=False, default=list)
+
+    # Conditions and constraints stored as JSON arrays
+    conditions = Column(JSON, nullable=False, default=list)
+    constraints = Column(JSON, nullable=False, default=list)
+
+    created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC))
+
+    # Relationships
+    policy_version = relationship("PolicyVersion", back_populates="rules")
+
+    def __repr__(self) -> str:
+        """String representation of policy rule."""
+        return f"<PolicyRule(id={self.id}, name={self.name}, effect={self.effect}, priority={self.priority})>"

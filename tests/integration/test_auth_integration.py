@@ -18,7 +18,7 @@ from fastapi import HTTPException, status
 import jwt
 import pytest
 
-from sark.models.user import User
+from sark.models.principal import Principal
 from sark.services.auth.api_key import APIKeyService
 from sark.services.auth.jwt import JWTHandler
 from sark.services.auth.session import SessionService
@@ -51,7 +51,7 @@ def session_service():
 @pytest.fixture
 def test_user():
     """Test user fixture."""
-    return User(
+    return Principal(
         id=uuid4(),
         email="test@example.com",
         full_name="Test User",
@@ -68,7 +68,7 @@ def test_user():
 @pytest.fixture
 def admin_user():
     """Admin user fixture."""
-    return User(
+    return Principal(
         id=uuid4(),
         email="admin@example.com",
         full_name="Admin User",

@@ -21,7 +21,7 @@ from sark.models.api_key import APIKey  # noqa: F401
 from sark.models.audit import AuditEvent  # noqa: F401
 from sark.models.mcp_server import MCPServer, MCPTool  # noqa: F401
 from sark.models.policy import Policy, PolicyVersion  # noqa: F401
-from sark.models.user import Team, User  # noqa: F401
+from sark.models.principal import Principal, Team  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

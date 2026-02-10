@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 from enum import Enum
 from uuid import uuid4
 
-from sqlalchemy import JSON, Column, DateTime, String
+from sqlalchemy import JSON, Boolean, Column, DateTime, Float, Integer, String
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -75,7 +75,30 @@ class AuditEvent(Base):
     # Flexible details storage
     details = Column(JSON, nullable=False, default=dict)
 
+    # GRID spec compliance fields (Wave 2 SIEM integration)
+    # Principal information
+    principal_type = Column(String(50), nullable=True)  # "user", "service", "system"
+    principal_attributes = Column(JSON, nullable=True)  # Structured principal data
+
+    # Resource information
+    resource_type = Column(String(50), nullable=True, index=True)  # "tool", "server", "policy"
+
+    # Action details
+    action_operation = Column(String(100), nullable=True, index=True)  # Specific operation performed
+    action_parameters = Column(JSON, nullable=True)  # Sanitized action parameters
+
+    # Policy context
+    policy_version = Column(String(50), nullable=True)  # Version of policy evaluated
+    environment = Column(String(50), nullable=True)  # "production", "staging", "development"
+
+    # Outcome tracking
+    success = Column(Boolean, nullable=True)  # Operation success/failure
+    error_message = Column(String(500), nullable=True)  # Error details if failed
+    latency_ms = Column(Float, nullable=True)  # Operation latency in milliseconds
+    cost = Column(Float, nullable=True)  # Cost tracking for billing/analytics
+
     # Retention metadata
+    retention_until = Column(DateTime(timezone=True), nullable=True)  # Data retention deadline
     siem_forwarded = Column(DateTime(timezone=True), nullable=True)
 
     def __repr__(self) -> str:
