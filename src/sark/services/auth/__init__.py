@@ -1,6 +1,6 @@
 """Authentication services."""
 
-from sark.services.auth.api_key import APIKey, APIKeyService, get_api_key, require_scope
+from sark.services.auth.api_keys import APIKey, APIKeyService, get_api_key, require_scope
 from sark.services.auth.jwt import JWTHandler, get_current_user
 from sark.services.auth.providers import (
     AuthProvider,
