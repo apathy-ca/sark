@@ -66,6 +66,8 @@ class Principal(Base):
     # Relationships
     teams = relationship("Team", secondary=principal_teams, back_populates="members")
     owned_servers = relationship("MCPServer", back_populates="owner")
+    owned_grid_resources = relationship("GridResource", foreign_keys="GridResource.owner_id", back_populates="owner")
+    managed_grid_resources = relationship("GridResource", secondary="resource_managers", back_populates="managers")
 
     def to_policy_input(self) -> dict:
         """Convert principal to OPA policy input format.
@@ -118,6 +120,7 @@ class Team(Base):
     # Relationships
     members = relationship("Principal", secondary=principal_teams, back_populates="teams")
     managed_servers = relationship("MCPServer", back_populates="team")
+    managed_grid_resources = relationship("GridResource", foreign_keys="GridResource.team_id", back_populates="team")
 
     def __repr__(self) -> str:
         """String representation of team."""
