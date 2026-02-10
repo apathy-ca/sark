@@ -24,7 +24,7 @@ try:
         TrustLevel,
     )
     from sark.models.mcp_server import MCPServer, MCPTool
-    from sark.models.policy import Policy, PolicyVersion
+    from sark.models.policy import Effect, Policy, PolicyRule, PolicyVersion
     from sark.models.session import (
         Session,
         SessionCreateRequest,
@@ -55,7 +55,7 @@ except ModuleNotFoundError:
         TrustLevel,
     )
     from .mcp_server import MCPServer, MCPTool  # type: ignore
-    from .policy import Policy, PolicyVersion  # type: ignore
+    from .policy import Effect, Policy, PolicyRule, PolicyVersion  # type: ignore
     from .session import (  # type: ignore
         Session,
         SessionCreateRequest,
@@ -79,6 +79,7 @@ __all__ = [
     "Capability",
     "CapabilityBase",
     "CapabilitySchema",
+    "Effect",
     "GatewayAuditEvent",
     "GatewayAuthorizationRequest",
     "GatewayAuthorizationResponse",
@@ -89,6 +90,7 @@ __all__ = [
     "MCPServer",
     "MCPTool",
     "Policy",
+    "PolicyRule",
     "PolicyVersion",
     # v2.0 type aliases
     "Resource",
