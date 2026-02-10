@@ -80,6 +80,12 @@ class SecretScanner:
         (r"SK[0-9a-fA-F]{32}", "Twilio API Key", 0.85),
         # Anthropic
         (r"sk-ant-[a-zA-Z0-9\-_]{70,}", "Anthropic API Key", 1.0),
+        # Azure Storage
+        (r"AccountKey=[A-Za-z0-9+/]{86,90}={0,2}", "Azure Storage Account Key", 0.95),
+        # Heroku
+        (r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}", "Heroku API Key", 0.75),
+        # Mailgun
+        (r"key-[0-9a-zA-Z]{32}", "Mailgun API Key", 0.95),
         # Potential base64 encoded secrets (long base64 strings - minimum 64 chars)
         (
             r"(?:[A-Za-z0-9+/]{4}){16,}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?",
@@ -260,6 +266,8 @@ class SecretScanner:
             "postgres://",
             "mysql://",
             "mongodb://",
+            "AccountKey=",
+            "key-",
         ]
     )
 
@@ -275,11 +283,11 @@ class SecretScanner:
         # Use membership test on first few chars for common patterns
         if len(value) >= 3:
             prefix_3 = value[:3]
-            if prefix_3 in ("sk-", "ghp", "gho", "ghs", "glp", "xox", "sk_", "rk_", "pk_"):
+            if prefix_3 in ("sk-", "ghp", "gho", "ghs", "glp", "xox", "sk_", "rk_", "pk_", "key"):
                 return True
 
             # Check for longer prefixes
-            if value[:4] == "AKIA" or value[:4] == "AIza" or value[:4] == "ya29":
+            if value[:4] == "AKIA" or value[:4] == "AIza" or value[:4] == "ya29" or value[:4] == "key-":
                 return True
 
             if (
@@ -290,8 +298,12 @@ class SecretScanner:
             ):
                 return True
 
+        # Check for UUID pattern (potential Heroku key)
+        if len(value) == 36 and value.count('-') == 4:
+            return True
+
         # Check for secret keywords (case-insensitive for these specific ones)
-        if "password" in value or "secret" in value or "token" in value or "api_key" in value:
+        if "password" in value or "secret" in value or "token" in value or "api_key" in value or "AccountKey=" in value:
             return True
 
         # For longer strings (40+), check if they look like base64/random tokens
