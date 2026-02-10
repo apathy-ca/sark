@@ -2,6 +2,7 @@
 
 # Handle both installed package (sark) and test environment (src.sark) imports
 try:
+    from sark.models.action import Action, ActionContext, ActionRequest, OperationType
     from sark.models.audit import AuditEvent
     from sark.models.base import (
         CapabilityBase,
@@ -33,6 +34,7 @@ try:
     )
     from sark.models.user import Team, User
 except ModuleNotFoundError:
+    from .action import Action, ActionContext, ActionRequest, OperationType  # type: ignore
     from .audit import AuditEvent  # type: ignore
     from .base import (  # type: ignore
         CapabilityBase,
@@ -72,6 +74,10 @@ Capability = MCPTool  # Will become generic Capability class in v2.0
 
 __all__ = [
     "A2AAuthorizationRequest",
+    # v2.0 Action model
+    "Action",
+    "ActionContext",
+    "ActionRequest",
     "AgentContext",
     "AgentType",
     # Existing models
@@ -88,6 +94,7 @@ __all__ = [
     "InvocationResult",
     "MCPServer",
     "MCPTool",
+    "OperationType",
     "Policy",
     "PolicyVersion",
     # v2.0 type aliases
