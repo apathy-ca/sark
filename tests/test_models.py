@@ -5,7 +5,7 @@ from datetime import UTC, datetime
 from sark.models.action import Action, ActionContext, ActionRequest, OperationType
 from sark.models.audit import AuditEvent, AuditEventType, SeverityLevel
 from sark.models.mcp_server import MCPServer, SensitivityLevel, ServerStatus, TransportType
-from sark.models.user import User
+from sark.models.principal import Principal
 
 
 class TestMCPServerModel:
@@ -43,14 +43,14 @@ class TestMCPServerModel:
         assert "test-server" in repr_str
 
 
-class TestUserModel:
-    """Tests for User model."""
+class TestPrincipalModel:
+    """Tests for Principal model."""
 
     def test_user_creation(self) -> None:
         """Test creating user instance."""
-        user = User(
+        user = Principal(
             email="test@example.com",
-            full_name="Test User",
+            full_name="Test Principal",
             hashed_password="hashed_pw",
             is_active=True,
             is_admin=False,

@@ -19,7 +19,7 @@ from uuid import uuid4
 import pytest
 
 from sark.models.mcp_server import MCPServer, SensitivityLevel, TransportType
-from sark.models.user import User
+from sark.models.principal import Principal
 from sark.services.auth.api_key import APIKeyService
 from sark.services.auth.jwt import JWTHandler
 from sark.services.policy.opa_client import OPAClient
@@ -120,7 +120,7 @@ def api_key_service():
 @pytest.fixture
 def test_user():
     """Regular test user."""
-    return User(
+    return Principal(
         id=uuid4(),
         email="test@example.com",
         full_name="Test User",
@@ -137,7 +137,7 @@ def test_user():
 @pytest.fixture
 def admin_user():
     """Admin test user."""
-    return User(
+    return Principal(
         id=uuid4(),
         email="admin@example.com",
         full_name="Admin User",
