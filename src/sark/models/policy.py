@@ -87,7 +87,7 @@ class PolicyVersion(Base):
     tested = Column(Boolean, default=False, nullable=False)
 
     created_by = Column(
-        UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+        UUID(as_uuid=True), ForeignKey("principals.id", ondelete="SET NULL"), nullable=True
     )
     created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC))
 

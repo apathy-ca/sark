@@ -14,7 +14,7 @@ import pytest
 from sark.models.audit import AuditEvent, AuditEventType, SeverityLevel
 from sark.models.mcp_server import MCPServer, SensitivityLevel, ServerStatus, TransportType
 from sark.models.policy import Policy, PolicyStatus
-from sark.models.user import Team, User
+from sark.models.principal import Principal, Team
 from sark.services.auth.jwt import JWTHandler
 
 # ============================================================================
@@ -49,7 +49,7 @@ async def test_complete_user_registration_to_server_management():
 
     # Mock user creation
     user_id = uuid4()
-    created_user = User(
+    created_user = Principal(
         id=user_id,
         email=user_data["email"],
         full_name=user_data["full_name"],
@@ -186,7 +186,7 @@ async def test_admin_policy_creation_to_enforcement():
     7. Verify policy decision is logged
     """
     # Step 1: Admin Login
-    admin_user = User(
+    admin_user = Principal(
         id=uuid4(),
         email="admin@example.com",
         full_name="Admin User",
@@ -243,7 +243,7 @@ async def test_admin_policy_creation_to_enforcement():
     assert policy_activated is True
 
     # Step 5: Regular User Attempts Server Registration
-    regular_user = User(
+    regular_user = Principal(
         id=uuid4(),
         email="user@example.com",
         full_name="Regular User",
@@ -364,7 +364,7 @@ async def test_multi_team_server_sharing():
     )
 
     # Step 2: Create Users and Assign to Teams
-    engineer_user = User(
+    engineer_user = Principal(
         id=uuid4(),
         email="engineer@example.com",
         full_name="Engineer User",
@@ -377,7 +377,7 @@ async def test_multi_team_server_sharing():
         updated_at=datetime.now(UTC),
     )
 
-    data_scientist_user = User(
+    data_scientist_user = Principal(
         id=uuid4(),
         email="datascientist@example.com",
         full_name="Data Scientist",
@@ -488,7 +488,7 @@ async def test_complete_audit_trail_flow():
     5. Verify event ordering and completeness
     6. Test audit event correlation
     """
-    user = User(
+    user = Principal(
         id=uuid4(),
         email="audited@example.com",
         full_name="Audited User",

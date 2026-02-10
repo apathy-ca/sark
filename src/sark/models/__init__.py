@@ -31,7 +31,7 @@ try:
         SessionListResponse,
         SessionResponse,
     )
-    from sark.models.user import Team, User
+    from sark.models.principal import Principal, PrincipalType, Team
 except ModuleNotFoundError:
     from .audit import AuditEvent  # type: ignore
     from .base import (  # type: ignore
@@ -62,7 +62,10 @@ except ModuleNotFoundError:
         SessionListResponse,
         SessionResponse,
     )
-    from .user import Team, User  # type: ignore
+    from .principal import Principal, PrincipalType, Team  # type: ignore
+
+# Backward compatibility alias - to be deprecated
+User = Principal  # Use Principal instead - User is deprecated
 
 # v2.0 type aliases - gradual terminology migration
 # In v2.0, these will become actual base classes
@@ -90,6 +93,8 @@ __all__ = [
     "MCPTool",
     "Policy",
     "PolicyVersion",
+    "Principal",
+    "PrincipalType",
     # v2.0 type aliases
     "Resource",
     # v2.0 base classes
@@ -103,5 +108,5 @@ __all__ = [
     "SessionResponse",
     "Team",
     "TrustLevel",
-    "User",
+    "User",  # Deprecated - use Principal
 ]

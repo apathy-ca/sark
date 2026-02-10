@@ -18,7 +18,7 @@ import pytest
 
 from sark.models.mcp_server import MCPServer, SensitivityLevel, TransportType
 from sark.models.policy import Policy, PolicyStatus, PolicyVersion
-from sark.models.user import User
+from sark.models.principal import Principal
 from sark.services.policy.opa_client import OPAClient
 from sark.services.policy.policy_service import PolicyService
 
@@ -80,7 +80,7 @@ def test_server():
 @pytest.fixture
 def test_user():
     """Test user fixture."""
-    return User(
+    return Principal(
         id=uuid4(),
         email="test@example.com",
         full_name="Test User",
