@@ -26,6 +26,13 @@ try:
     )
     from sark.models.mcp_server import MCPServer, MCPTool
     from sark.models.policy import Policy, PolicyVersion
+    from sark.models.resource import (
+        Classification,
+        GridResource,
+        ResourceStatus,
+        ResourceTool,
+        ResourceType,
+    )
     from sark.models.session import (
         Session,
         SessionCreateRequest,
@@ -58,6 +65,13 @@ except ModuleNotFoundError:
     )
     from .mcp_server import MCPServer, MCPTool  # type: ignore
     from .policy import Policy, PolicyVersion  # type: ignore
+    from .resource import (  # type: ignore
+        Classification,
+        GridResource,
+        ResourceStatus,
+        ResourceTool,
+        ResourceType,
+    )
     from .session import (  # type: ignore
         Session,
         SessionCreateRequest,
@@ -69,10 +83,9 @@ except ModuleNotFoundError:
 # Backward compatibility alias - to be deprecated
 User = Principal  # Use Principal instead - User is deprecated
 
-# v2.0 type aliases - gradual terminology migration
-# In v2.0, these will become actual base classes
-# For v1.x, they're aliases to help adopt v2.0 terminology
-Resource = MCPServer  # Will become generic Resource class in v2.0
+# v2.0 GRID-compliant models
+# Resource is now a proper GRID-compliant model (not just an alias)
+# Capability remains an alias for now (MCPTool -> ResourceTool migration)
 Capability = MCPTool  # Will become generic Capability class in v2.0
 
 __all__ = [
@@ -88,11 +101,13 @@ __all__ = [
     "Capability",
     "CapabilityBase",
     "CapabilitySchema",
+    "Classification",
     "GatewayAuditEvent",
     "GatewayAuthorizationRequest",
     "GatewayAuthorizationResponse",
     "GatewayServerInfo",
     "GatewayToolInfo",
+    "GridResource",
     "InvocationRequest",
     "InvocationResult",
     "MCPServer",
@@ -102,8 +117,11 @@ __all__ = [
     "PolicyVersion",
     "Principal",
     "PrincipalType",
-    # v2.0 type aliases
+    # v2.0 GRID-compliant models (Resource from base.py, GridResource from resource.py)
     "Resource",
+    "ResourceStatus",
+    "ResourceTool",
+    "ResourceType",
     # v2.0 base classes
     "ResourceBase",
     "ResourceSchema",
