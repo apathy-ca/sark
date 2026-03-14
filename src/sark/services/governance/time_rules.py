@@ -23,13 +23,20 @@ logger = structlog.get_logger()
 
 # Day name mapping
 DAYS_MAP = {
-    "mon": 0, "monday": 0,
-    "tue": 1, "tuesday": 1,
-    "wed": 2, "wednesday": 2,
-    "thu": 3, "thursday": 3,
-    "fri": 4, "friday": 4,
-    "sat": 5, "saturday": 5,
-    "sun": 6, "sunday": 6,
+    "mon": 0,
+    "monday": 0,
+    "tue": 1,
+    "tuesday": 1,
+    "wed": 2,
+    "wednesday": 2,
+    "thu": 3,
+    "thursday": 3,
+    "fri": 4,
+    "friday": 4,
+    "sat": 5,
+    "saturday": 5,
+    "sun": 6,
+    "sunday": 6,
 }
 
 
@@ -243,9 +250,7 @@ class TimeRulesService:
 
     async def get_rule(self, rule_id: int) -> TimeRule | None:
         """Get time rule by ID."""
-        result = await self.db.execute(
-            select(TimeRule).where(TimeRule.id == rule_id)
-        )
+        result = await self.db.execute(select(TimeRule).where(TimeRule.id == rule_id))
         return result.scalar_one_or_none()
 
     async def update_rule(
@@ -363,9 +368,7 @@ class TimeRulesService:
 
     async def _get_rule_by_name(self, name: str) -> TimeRule | None:
         """Get rule by name."""
-        result = await self.db.execute(
-            select(TimeRule).where(TimeRule.name == name)
-        )
+        result = await self.db.execute(select(TimeRule).where(TimeRule.name == name))
         return result.scalar_one_or_none()
 
     async def _get_active_rules(self) -> list[TimeRule]:

@@ -131,9 +131,7 @@ class TestCostCalculatorService:
             assert "response_per_1m" in rate
 
     @pytest.mark.asyncio
-    async def test_get_rates_filtered_by_provider(
-        self, calculator: CostCalculatorService
-    ) -> None:
+    async def test_get_rates_filtered_by_provider(self, calculator: CostCalculatorService) -> None:
         """Test getting rates filtered by provider."""
         rates = await calculator.get_rates(provider="openai")
 

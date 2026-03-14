@@ -203,9 +203,7 @@ class TestHomeDeploymentCostTracking:
             metadata = {"provider": "openai"}
 
             # Act
-            await ctx.cost_tracker.record_invocation_cost(
-                request, result, resource_id, metadata
-            )
+            await ctx.cost_tracker.record_invocation_cost(request, result, resource_id, metadata)
 
             # Assert
             ctx.cost_tracker.record_invocation_cost.assert_called_once()

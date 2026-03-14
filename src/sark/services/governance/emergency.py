@@ -262,9 +262,7 @@ class EmergencyService:
         from sqlalchemy import func
 
         # Total overrides
-        total_result = await self.db.execute(
-            select(func.count(EmergencyOverride.id))
-        )
+        total_result = await self.db.execute(select(func.count(EmergencyOverride.id)))
         total = total_result.scalar() or 0
 
         # Active override

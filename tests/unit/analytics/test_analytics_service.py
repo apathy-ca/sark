@@ -103,9 +103,7 @@ class TestAnalyticsService:
         assert "generated_at" in result
 
     @pytest.mark.asyncio
-    async def test_record_usage(
-        self, analytics: AnalyticsService, mock_db: MagicMock
-    ) -> None:
+    async def test_record_usage(self, analytics: AnalyticsService, mock_db: MagicMock) -> None:
         """Test record_usage creates event with cost estimate."""
         # Mock the token tracker's record method
         with patch.object(
@@ -140,9 +138,7 @@ class TestAnalyticsService:
             mock_record.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_get_usage_trend(
-        self, analytics: AnalyticsService, mock_db: MagicMock
-    ) -> None:
+    async def test_get_usage_trend(self, analytics: AnalyticsService, mock_db: MagicMock) -> None:
         """Test get_usage_trend returns trend data."""
         with patch.object(
             analytics.trend_analyzer,
@@ -164,9 +160,7 @@ class TestAnalyticsService:
             mock_analyze.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_get_cost_trend(
-        self, analytics: AnalyticsService, mock_db: MagicMock
-    ) -> None:
+    async def test_get_cost_trend(self, analytics: AnalyticsService, mock_db: MagicMock) -> None:
         """Test get_cost_trend returns cost trend data."""
         with patch.object(
             analytics.trend_analyzer,
@@ -187,9 +181,7 @@ class TestAnalyticsService:
             mock_analyze.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_generate_report(
-        self, analytics: AnalyticsService, mock_db: MagicMock
-    ) -> None:
+    async def test_generate_report(self, analytics: AnalyticsService, mock_db: MagicMock) -> None:
         """Test generate_report returns a report."""
         with patch.object(
             analytics.usage_reporter,
@@ -205,14 +197,10 @@ class TestAnalyticsService:
             result = await analytics.generate_report(period=ReportPeriod.WEEK)
 
             assert result["report_id"] == "abc123"
-            mock_generate.assert_called_once_with(
-                period=ReportPeriod.WEEK, device_ip=None
-            )
+            mock_generate.assert_called_once_with(period=ReportPeriod.WEEK, device_ip=None)
 
     @pytest.mark.asyncio
-    async def test_export_report_csv(
-        self, analytics: AnalyticsService, mock_db: MagicMock
-    ) -> None:
+    async def test_export_report_csv(self, analytics: AnalyticsService, mock_db: MagicMock) -> None:
         """Test export_report_csv returns CSV string."""
         with patch.object(
             analytics.usage_reporter,
@@ -228,9 +216,7 @@ class TestAnalyticsService:
             mock_export.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_cleanup_old_data(
-        self, analytics: AnalyticsService, mock_db: MagicMock
-    ) -> None:
+    async def test_cleanup_old_data(self, analytics: AnalyticsService, mock_db: MagicMock) -> None:
         """Test cleanup_old_data removes old records."""
         mock_events_result = MagicMock()
         mock_events_result.rowcount = 50
@@ -238,9 +224,7 @@ class TestAnalyticsService:
         mock_aggregates_result = MagicMock()
         mock_aggregates_result.rowcount = 10
 
-        mock_db.execute = AsyncMock(
-            side_effect=[mock_events_result, mock_aggregates_result]
-        )
+        mock_db.execute = AsyncMock(side_effect=[mock_events_result, mock_aggregates_result])
 
         result = await analytics.cleanup_old_data(retention_days=365)
 
@@ -254,23 +238,28 @@ class TestAnalyticsService:
         self, analytics: AnalyticsService, mock_db: MagicMock
     ) -> None:
         """Test get_device_summary returns comprehensive device data."""
-        with patch.object(
-            analytics.token_tracker,
-            "get_device_stats",
-            new_callable=AsyncMock,
-        ) as mock_stats, patch.object(
-            analytics.trend_analyzer,
-            "analyze_trend",
-            new_callable=AsyncMock,
-        ) as mock_trend, patch.object(
-            analytics.trend_analyzer,
-            "get_peak_hours",
-            new_callable=AsyncMock,
-        ) as mock_peak, patch.object(
-            analytics.token_tracker,
-            "get_hourly_distribution",
-            new_callable=AsyncMock,
-        ) as mock_hourly:
+        with (
+            patch.object(
+                analytics.token_tracker,
+                "get_device_stats",
+                new_callable=AsyncMock,
+            ) as mock_stats,
+            patch.object(
+                analytics.trend_analyzer,
+                "analyze_trend",
+                new_callable=AsyncMock,
+            ) as mock_trend,
+            patch.object(
+                analytics.trend_analyzer,
+                "get_peak_hours",
+                new_callable=AsyncMock,
+            ) as mock_peak,
+            patch.object(
+                analytics.token_tracker,
+                "get_hourly_distribution",
+                new_callable=AsyncMock,
+            ) as mock_hourly,
+        ):
             mock_stats.return_value = {
                 "device_ip": "192.168.1.100",
                 "request_count": 100,

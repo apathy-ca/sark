@@ -204,9 +204,7 @@ class TestCSRFValidation:
     def test_csrf_header_name_customizable(self):
         """Test that CSRF header name can be customized."""
         app = Starlette()
-        custom_middleware = CSRFProtectionMiddleware(
-            app, csrf_header_name="X-Custom-CSRF-Token"
-        )
+        custom_middleware = CSRFProtectionMiddleware(app, csrf_header_name="X-Custom-CSRF-Token")
 
         assert custom_middleware.csrf_header_name == "X-Custom-CSRF-Token"
 

@@ -177,6 +177,7 @@ class TestServerListAPI:
         ]
 
         with patch("sark.services.gateway.authorization.evaluate_policy") as mock_opa:
+
             async def mock_evaluate(policy_path, input_data):
                 server = input_data["resource"]["server"]
                 if server == "openai-proxy":
@@ -222,6 +223,7 @@ class TestToolListAPI:
         ]
 
         with patch("sark.services.gateway.authorization.evaluate_policy") as mock_opa:
+
             async def mock_evaluate(policy_path, input_data):
                 sensitivity = input_data["resource"]["sensitivity"]
                 if sensitivity != "critical":

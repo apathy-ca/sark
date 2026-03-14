@@ -241,9 +241,7 @@ class AllowlistService:
 
     async def get_entry(self, entry_id: int) -> AllowlistEntry | None:
         """Get allowlist entry by ID."""
-        result = await self.db.execute(
-            select(AllowlistEntry).where(AllowlistEntry.id == entry_id)
-        )
+        result = await self.db.execute(select(AllowlistEntry).where(AllowlistEntry.id == entry_id))
         return result.scalar_one_or_none()
 
     async def update_entry(

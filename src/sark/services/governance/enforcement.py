@@ -320,9 +320,7 @@ class EnforcementService:
             )
         return None
 
-    async def _check_override(
-        self, request_id: str, pin: str
-    ) -> EnforcementDecision | None:
+    async def _check_override(self, request_id: str, pin: str) -> EnforcementDecision | None:
         """Check if valid override exists."""
         if await self.override.validate_override(request_id, pin):
             return EnforcementDecision(
@@ -332,9 +330,7 @@ class EnforcementService:
             )
         return None
 
-    async def _check_time_rules(
-        self, device_ip: str | None
-    ) -> EnforcementDecision | None:
+    async def _check_time_rules(self, device_ip: str | None) -> EnforcementDecision | None:
         """Check time rules."""
         result = await self.time_rules.check_rules(device_ip=device_ip)
 
@@ -355,9 +351,7 @@ class EnforcementService:
 
         return None
 
-    async def _check_opa_policies(
-        self, request: dict[str, Any]
-    ) -> EnforcementDecision:
+    async def _check_opa_policies(self, request: dict[str, Any]) -> EnforcementDecision:
         """Evaluate OPA policies."""
         if self.opa_client is None:
             # No OPA client - default allow

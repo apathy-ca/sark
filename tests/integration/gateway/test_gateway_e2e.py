@@ -134,7 +134,7 @@ class TestHTTPTransportE2E:
         # Mock HTTP response
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers?offset=0&limit=100",
-            json={"servers": [s.model_dump(mode='json') for s in sample_servers]},
+            json={"servers": [s.model_dump(mode="json") for s in sample_servers]},
         )
 
         # Create client
@@ -155,12 +155,12 @@ class TestHTTPTransportE2E:
         # Page 1: Full page
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers?offset=0&limit=100",
-            json={"servers": [sample_servers[0].model_dump(mode='json')] * 100},
+            json={"servers": [sample_servers[0].model_dump(mode="json")] * 100},
         )
         # Page 2: Partial page (end)
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers?offset=100&limit=100",
-            json={"servers": [sample_servers[1].model_dump(mode='json')] * 50},
+            json={"servers": [sample_servers[1].model_dump(mode="json")] * 50},
         )
 
         async with GatewayClient(
@@ -176,7 +176,7 @@ class TestHTTPTransportE2E:
         """E2E: Get specific server info."""
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers/postgres-mcp",
-            json=sample_servers[0].model_dump(mode='json'),
+            json=sample_servers[0].model_dump(mode="json"),
         )
 
         async with GatewayClient(
@@ -193,7 +193,7 @@ class TestHTTPTransportE2E:
         """E2E: List tools via HTTP transport."""
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/tools?offset=0&limit=100",
-            json={"tools": [t.model_dump(mode='json') for t in sample_tools]},
+            json={"tools": [t.model_dump(mode="json") for t in sample_tools]},
         )
 
         async with GatewayClient(
@@ -210,7 +210,7 @@ class TestHTTPTransportE2E:
         """E2E: List tools filtered by server."""
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/tools?server=postgres-mcp&offset=0&limit=100",
-            json={"tools": [sample_tools[0].model_dump(mode='json')]},
+            json={"tools": [sample_tools[0].model_dump(mode="json")]},
         )
 
         async with GatewayClient(
@@ -276,7 +276,7 @@ class TestHTTPTransportE2E:
         """E2E: HTTP response caching."""
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers?offset=0&limit=100",
-            json={"servers": [s.model_dump(mode='json') for s in sample_servers]},
+            json={"servers": [s.model_dump(mode="json") for s in sample_servers]},
         )
 
         async with GatewayClient(
@@ -414,7 +414,7 @@ class TestHTTPTransportE2E:
         """E2E: HTTP cache hit rate metrics."""
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers?offset=0&limit=100",
-            json={"servers": [s.model_dump(mode='json') for s in sample_servers]},
+            json={"servers": [s.model_dump(mode="json") for s in sample_servers]},
         )
 
         async with GatewayClient(
@@ -971,7 +971,7 @@ class TestUnifiedClientE2E:
         """E2E: Auto transport selection uses HTTP for server listing."""
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers?offset=0&limit=100",
-            json={"servers": [s.model_dump(mode='json') for s in sample_servers]},
+            json={"servers": [s.model_dump(mode="json") for s in sample_servers]},
         )
 
         async with GatewayClient(
@@ -1023,15 +1023,15 @@ class TestUnifiedClientE2E:
         """E2E: Multiple operations using same client."""
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers?offset=0&limit=100",
-            json={"servers": [s.model_dump(mode='json') for s in sample_servers]},
+            json={"servers": [s.model_dump(mode="json") for s in sample_servers]},
         )
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/tools?offset=0&limit=100",
-            json={"tools": [t.model_dump(mode='json') for t in sample_tools]},
+            json={"tools": [t.model_dump(mode="json") for t in sample_tools]},
         )
         httpx_mock.add_response(
             url="http://gateway:8080/api/v1/servers/postgres-mcp",
-            json=sample_servers[0].model_dump(mode='json'),
+            json=sample_servers[0].model_dump(mode="json"),
         )
 
         async with GatewayClient(

@@ -177,9 +177,9 @@ class TestZeroWidthCharacterBypass:
         result = detector.detect(params)
 
         # Currently will NOT detect
-        assert result.detected, (
-            "Zero-width non-joiner bypass should be detected after normalization"
-        )
+        assert (
+            result.detected
+        ), "Zero-width non-joiner bypass should be detected after normalization"
 
     def test_word_joiner(self, detector):
         """Test word joiner (U+2060) insertion."""

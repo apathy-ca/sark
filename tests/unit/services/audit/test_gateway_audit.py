@@ -47,8 +47,10 @@ def sample_a2a_event():
 
 def make_mock_get_db(mock_session):
     """Create an async generator that yields the mock session."""
+
     async def mock_get_db():
         yield mock_session
+
     return mock_get_db
 
 

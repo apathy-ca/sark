@@ -132,7 +132,9 @@ async def get_enforcement_service(
 # =============================================================================
 
 
-@router.post("/allowlist", response_model=AllowlistEntryResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/allowlist", response_model=AllowlistEntryResponse, status_code=status.HTTP_201_CREATED
+)
 async def add_allowlist_entry(
     entry: AllowlistEntryCreate,
     service: AllowlistService = Depends(get_allowlist_service),
@@ -267,7 +269,9 @@ async def remove_time_rule(
 # =============================================================================
 
 
-@router.post("/emergency", response_model=EmergencyOverrideResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/emergency", response_model=EmergencyOverrideResponse, status_code=status.HTTP_201_CREATED
+)
 async def activate_emergency_override(
     override: EmergencyOverrideCreate,
     service: EmergencyService = Depends(get_emergency_service),
@@ -439,7 +443,9 @@ async def list_pending_consent_requests(
 # =============================================================================
 
 
-@router.post("/override", response_model=OverrideRequestResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/override", response_model=OverrideRequestResponse, status_code=status.HTTP_201_CREATED
+)
 async def create_override_request(
     request: OverrideRequestCreate,
     requested_by: str | None = Query(None, description="Who is requesting"),

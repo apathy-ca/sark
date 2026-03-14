@@ -287,9 +287,7 @@ class OverrideService:
         # Total by status
         for status in OverrideStatus:
             result = await self.db.execute(
-                select(func.count(OverrideRequest.id)).where(
-                    OverrideRequest.status == status.value
-                )
+                select(func.count(OverrideRequest.id)).where(OverrideRequest.status == status.value)
             )
             stats[f"total_{status.value}"] = result.scalar() or 0
 

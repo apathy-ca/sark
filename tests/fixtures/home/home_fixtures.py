@@ -48,11 +48,13 @@ class HomeDeploymentConfig:
     enable_rate_limiting: bool = True
     daily_budget_usd: Decimal = Decimal("10.00")
     monthly_budget_usd: Decimal = Decimal("100.00")
-    allowed_endpoints: list[str] = field(default_factory=lambda: [
-        "api.openai.com",
-        "api.anthropic.com",
-        "generativelanguage.googleapis.com",
-    ])
+    allowed_endpoints: list[str] = field(
+        default_factory=lambda: [
+            "api.openai.com",
+            "api.anthropic.com",
+            "generativelanguage.googleapis.com",
+        ]
+    )
 
 
 @dataclass
@@ -108,9 +110,7 @@ async def home_deployment_context(
     )
 
     mock_cost_tracker = MagicMock()
-    mock_cost_tracker.check_budget_before_invocation = AsyncMock(
-        return_value=(True, None)
-    )
+    mock_cost_tracker.check_budget_before_invocation = AsyncMock(return_value=(True, None))
     mock_cost_tracker.record_invocation_cost = AsyncMock()
 
     mock_rate_limiter = MagicMock()
@@ -394,9 +394,7 @@ def home_chat_request() -> GatewayAuthorizationRequest:
         server_name="openai-proxy",
         tool_name="chat_completion",
         parameters={
-            "messages": [
-                {"role": "user", "content": "Help me with my homework"}
-            ],
+            "messages": [{"role": "user", "content": "Help me with my homework"}],
             "model": "gpt-3.5-turbo",
         },
     )

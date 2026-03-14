@@ -136,9 +136,7 @@ class TestTrendAnalyzerService:
         assert abs(result["change_percent"]) <= 10
 
     @pytest.mark.asyncio
-    async def test_get_peak_hours(
-        self, analyzer: TrendAnalyzerService, mock_db: MagicMock
-    ) -> None:
+    async def test_get_peak_hours(self, analyzer: TrendAnalyzerService, mock_db: MagicMock) -> None:
         """Test get_peak_hours returns hourly breakdown."""
         mock_result = MagicMock()
         mock_result.fetchall.return_value = [
@@ -163,11 +161,11 @@ class TestTrendAnalyzerService:
         """Test get_weekday_patterns returns weekday breakdown."""
         mock_result = MagicMock()
         mock_result.fetchall.return_value = [
-            ("0", 50, 5000),   # Sunday
-            ("1", 100, 10000), # Monday (busiest)
-            ("2", 90, 9000),   # Tuesday
-            ("5", 80, 8000),   # Friday
-            ("6", 40, 4000),   # Saturday
+            ("0", 50, 5000),  # Sunday
+            ("1", 100, 10000),  # Monday (busiest)
+            ("2", 90, 9000),  # Tuesday
+            ("5", 80, 8000),  # Friday
+            ("6", 40, 4000),  # Saturday
         ]
 
         mock_db.execute = AsyncMock(return_value=mock_result)
@@ -225,15 +223,11 @@ class TestTrendAnalyzerService:
         """Test compare_periods compares current to previous."""
         # Mock current period (higher values)
         mock_current = MagicMock()
-        mock_current.one.return_value = MagicMock(
-            requests=100, tokens=10000, cost=1.50, devices=5
-        )
+        mock_current.one.return_value = MagicMock(requests=100, tokens=10000, cost=1.50, devices=5)
 
         # Mock previous period (lower values)
         mock_previous = MagicMock()
-        mock_previous.one.return_value = MagicMock(
-            requests=80, tokens=8000, cost=1.20, devices=4
-        )
+        mock_previous.one.return_value = MagicMock(requests=80, tokens=8000, cost=1.20, devices=4)
 
         mock_db.execute = AsyncMock(side_effect=[mock_current, mock_previous])
 

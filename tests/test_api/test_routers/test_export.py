@@ -83,6 +83,7 @@ def mock_tools():
 
 def create_mock_db_dependency(mock_data):
     """Create a mock database dependency that returns specific data."""
+
     async def mock_db_generator():
         """Async generator that yields a mock session."""
         mock_session = AsyncMock(spec=AsyncSession)
@@ -90,6 +91,7 @@ def create_mock_db_dependency(mock_data):
         mock_result.scalars.return_value.all.return_value = mock_data
         mock_session.execute = AsyncMock(return_value=mock_result)
         yield mock_session
+
     return mock_db_generator
 
 
@@ -193,7 +195,10 @@ class TestExportServersCsvEndpoint:
 
             # Verify CSV content contains server data
             csv_content = response.text
-            assert "id,name,description,transport,endpoint,status,sensitivity_level,created_at" in csv_content
+            assert (
+                "id,name,description,transport,endpoint,status,sensitivity_level,created_at"
+                in csv_content
+            )
             assert "test-server-1" in csv_content
             assert "test-server-2" in csv_content
         finally:
@@ -388,7 +393,9 @@ class TestExportToolsJsonEndpoint:
 
     @patch("sark.api.routers.export.get_db")
     @patch("sark.api.routers.export.get_current_user")
-    def test_export_tools_json_with_pretty(self, mock_get_user, mock_get_db, client, mock_user, mock_tools):
+    def test_export_tools_json_with_pretty(
+        self, mock_get_user, mock_get_db, client, mock_user, mock_tools
+    ):
         """Test export tools JSON with pretty formatting."""
         mock_get_user.return_value = mock_user
 

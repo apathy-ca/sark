@@ -14,9 +14,7 @@ class TestEnforcementService:
     @pytest.mark.asyncio
     async def test_evaluate_default_allow(self, enforcement_service: EnforcementService):
         """Test evaluation returns allow by default (no rules)."""
-        decision = await enforcement_service.evaluate(
-            {"device_ip": "192.168.1.50"}
-        )
+        decision = await enforcement_service.evaluate({"device_ip": "192.168.1.50"})
 
         assert decision.allowed is True
         assert decision.decision_source == "opa"  # Falls through to OPA
@@ -31,9 +29,7 @@ class TestEnforcementService:
         # Activate emergency
         await emergency_service.activate(duration_minutes=60, reason="test")
 
-        decision = await enforcement_service.evaluate(
-            {"device_ip": "192.168.1.50"}
-        )
+        decision = await enforcement_service.evaluate({"device_ip": "192.168.1.50"})
 
         assert decision.allowed is True
         assert decision.decision_source == "emergency"
@@ -48,9 +44,7 @@ class TestEnforcementService:
         # Add to allowlist
         await allowlist_service.add_device("192.168.1.50", name="admin-device")
 
-        decision = await enforcement_service.evaluate(
-            {"device_ip": "192.168.1.50"}
-        )
+        decision = await enforcement_service.evaluate({"device_ip": "192.168.1.50"})
 
         assert decision.allowed is True
         assert decision.decision_source == "allowlist"
@@ -69,9 +63,7 @@ class TestEnforcementService:
             name="admin-user",
         )
 
-        decision = await enforcement_service.evaluate(
-            {"user_id": "admin@example.com"}
-        )
+        decision = await enforcement_service.evaluate({"user_id": "admin@example.com"})
 
         assert decision.allowed is True
         assert decision.decision_source == "allowlist"
@@ -111,9 +103,7 @@ class TestEnforcementService:
             action=TimeRuleAction.BLOCK,
         )
 
-        decision = await enforcement_service.evaluate(
-            {"device_ip": "192.168.1.50"}
-        )
+        decision = await enforcement_service.evaluate({"device_ip": "192.168.1.50"})
 
         assert decision.allowed is False
         assert decision.decision_source == "time_rule"
@@ -134,9 +124,7 @@ class TestEnforcementService:
             action=TimeRuleAction.ALERT,
         )
 
-        decision = await enforcement_service.evaluate(
-            {"device_ip": "192.168.1.50"}
-        )
+        decision = await enforcement_service.evaluate({"device_ip": "192.168.1.50"})
 
         # Alert action should allow but not mark as time_rule source
         assert decision.allowed is True
@@ -160,9 +148,7 @@ class TestEnforcementService:
         # Activate emergency
         await emergency_service.activate(duration_minutes=60, reason="test")
 
-        decision = await enforcement_service.evaluate(
-            {"device_ip": "192.168.1.50"}
-        )
+        decision = await enforcement_service.evaluate({"device_ip": "192.168.1.50"})
 
         # Emergency should take priority
         assert decision.allowed is True
@@ -187,9 +173,7 @@ class TestEnforcementService:
         # Add to allowlist
         await allowlist_service.add_device("192.168.1.50", name="admin-device")
 
-        decision = await enforcement_service.evaluate(
-            {"device_ip": "192.168.1.50"}
-        )
+        decision = await enforcement_service.evaluate({"device_ip": "192.168.1.50"})
 
         # Allowlist should take priority
         assert decision.allowed is True

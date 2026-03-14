@@ -101,9 +101,7 @@ class TestTokenTrackerService:
         mock_db.add.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_record_batch(
-        self, tracker: TokenTrackerService, mock_db: MagicMock
-    ) -> None:
+    async def test_record_batch(self, tracker: TokenTrackerService, mock_db: MagicMock) -> None:
         """Test batch recording."""
         usages = [
             TokenUsage(
@@ -180,9 +178,7 @@ class TestTokenTrackerService:
         assert result["date"] == "2025-01-15"
 
     @pytest.mark.asyncio
-    async def test_get_device_stats(
-        self, tracker: TokenTrackerService, mock_db: MagicMock
-    ) -> None:
+    async def test_get_device_stats(self, tracker: TokenTrackerService, mock_db: MagicMock) -> None:
         """Test get_device_stats returns period stats."""
         mock_row = MagicMock()
         mock_row.request_count = 100
@@ -208,9 +204,7 @@ class TestTokenTrackerService:
         assert len(result["daily"]) == 2
 
     @pytest.mark.asyncio
-    async def test_get_top_devices(
-        self, tracker: TokenTrackerService, mock_db: MagicMock
-    ) -> None:
+    async def test_get_top_devices(self, tracker: TokenTrackerService, mock_db: MagicMock) -> None:
         """Test get_top_devices returns ranked devices."""
         mock_result = MagicMock()
         mock_result.fetchall.return_value = [

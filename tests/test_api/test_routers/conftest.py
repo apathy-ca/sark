@@ -16,32 +16,37 @@ from sark.services.auth import get_current_user as get_current_user_auth
 # Mock user contexts for testing - API dependencies version
 def override_get_current_user_admin_api():
     """Override get_current_user (API) to return admin user."""
-    return UserContextAPI({
-        "user_id": "test-admin-123",
-        "email": "admin@example.com",
-        "name": "Test Admin",
-        "roles": ["admin"],
-        "teams": ["admin-team"],
-        "permissions": ["*"],
-    })
+    return UserContextAPI(
+        {
+            "user_id": "test-admin-123",
+            "email": "admin@example.com",
+            "name": "Test Admin",
+            "roles": ["admin"],
+            "teams": ["admin-team"],
+            "permissions": ["*"],
+        }
+    )
 
 
 def override_get_current_user_api_regular():
     """Override get_current_user (API) to return regular user."""
-    return UserContextAPI({
-        "user_id": "test-user-123",
-        "email": "user@example.com",
-        "name": "Test User",
-        "roles": ["user"],
-        "teams": ["user-team"],
-        "permissions": [],
-    })
+    return UserContextAPI(
+        {
+            "user_id": "test-user-123",
+            "email": "user@example.com",
+            "name": "Test User",
+            "roles": ["user"],
+            "teams": ["user-team"],
+            "permissions": [],
+        }
+    )
 
 
 # Mock user contexts - services/auth version
 async def override_get_current_user_admin_auth():
     """Override get_current_user (auth) to return admin user."""
     from uuid import uuid4
+
     return UserContextAuth(
         user_id=uuid4(),
         email="admin@example.com",
@@ -55,6 +60,7 @@ async def override_get_current_user_admin_auth():
 async def override_get_current_user_auth_regular():
     """Override get_current_user (auth) to return regular user."""
     from uuid import uuid4
+
     return UserContextAuth(
         user_id=uuid4(),
         email="user@example.com",
@@ -98,8 +104,11 @@ def client():
     # Remove AuthMiddleware and CSRFProtectionMiddleware from the stack
     # CSRF requires SessionMiddleware which we don't configure in tests
     app.user_middleware = [
-        m for m in app.user_middleware
-        if not (hasattr(m, 'cls') and m.cls.__name__ in ('AuthMiddleware', 'CSRFProtectionMiddleware'))
+        m
+        for m in app.user_middleware
+        if not (
+            hasattr(m, "cls") and m.cls.__name__ in ("AuthMiddleware", "CSRFProtectionMiddleware")
+        )
     ]
 
     # Rebuild middleware stack
@@ -126,8 +135,11 @@ def client_user():
     # Remove auth and CSRF middleware for testing
     original_middleware = app.user_middleware.copy()
     app.user_middleware = [
-        m for m in app.user_middleware
-        if not (hasattr(m, 'cls') and m.cls.__name__ in ('AuthMiddleware', 'CSRFProtectionMiddleware'))
+        m
+        for m in app.user_middleware
+        if not (
+            hasattr(m, "cls") and m.cls.__name__ in ("AuthMiddleware", "CSRFProtectionMiddleware")
+        )
     ]
 
     app.middleware_stack = app.build_middleware_stack()

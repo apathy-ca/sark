@@ -61,6 +61,7 @@ def create_mock_db_for_tool(tool, method="get"):
         tool: The MCPTool object to return
         method: Query method - "get" for db.get(), "execute" for db.execute()
     """
+
     async def mock_db_generator():
         mock_session = AsyncMock(spec=AsyncSession)
 
@@ -78,11 +79,13 @@ def create_mock_db_for_tool(tool, method="get"):
         mock_session.flush = AsyncMock()
         mock_session.refresh = AsyncMock()
         yield mock_session
+
     return mock_db_generator
 
 
 def create_mock_db_empty():
     """Create a mock database dependency that returns no results."""
+
     async def mock_db_generator():
         mock_session = AsyncMock(spec=AsyncSession)
 
@@ -96,23 +99,25 @@ def create_mock_db_empty():
         mock_session.execute = AsyncMock(return_value=mock_result)
 
         yield mock_session
+
     return mock_db_generator
 
 
 def create_mock_timescale_db():
     """Create a mock timescale database dependency for audit logs."""
+
     async def mock_db_generator():
         mock_session = AsyncMock(spec=AsyncSession)
         mock_session.execute = AsyncMock()
         mock_session.commit = AsyncMock()
         yield mock_session
+
     return mock_db_generator
 
 
 # ============================================================================
 # GET TOOL SENSITIVITY TESTS
 # ============================================================================
-
 
 
 def test_get_tool_sensitivity_success(client, mock_tool):
@@ -136,7 +141,6 @@ def test_get_tool_sensitivity_success(client, mock_tool):
             del app.dependency_overrides[get_db]
 
 
-
 def test_get_tool_sensitivity_not_found(client):
     """Test getting sensitivity for non-existent tool."""
     from sark.api.main import app
@@ -152,7 +156,6 @@ def test_get_tool_sensitivity_not_found(client):
     finally:
         if get_db in app.dependency_overrides:
             del app.dependency_overrides[get_db]
-
 
 
 def test_get_tool_sensitivity_with_override(client, mock_tool):
@@ -189,7 +192,6 @@ def test_get_tool_sensitivity_with_override(client, mock_tool):
 # ============================================================================
 
 
-
 def test_update_tool_sensitivity_success(client, mock_tool):
     """Test manually updating tool sensitivity level."""
     from sark.api.main import app
@@ -200,7 +202,11 @@ def test_update_tool_sensitivity_success(client, mock_tool):
     app.dependency_overrides[get_timescale_db] = create_mock_timescale_db()
 
     try:
-        with patch("sark.services.policy.opa_client.OPAClient.authorize", new_callable=AsyncMock, return_value=True):
+        with patch(
+            "sark.services.policy.opa_client.OPAClient.authorize",
+            new_callable=AsyncMock,
+            return_value=True,
+        ):
             response = client.post(
                 f"/api/v1/tools/{mock_tool.id}/sensitivity",
                 json={
@@ -220,11 +226,8 @@ def test_update_tool_sensitivity_success(client, mock_tool):
             del app.dependency_overrides[get_timescale_db]
 
 
-
 @patch("sark.services.policy.OPAClient.authorize", return_value=False)
-def test_update_tool_sensitivity_forbidden(
-    mock_authorize, client, mock_tool, mock_user
-):
+def test_update_tool_sensitivity_forbidden(mock_authorize, client, mock_tool, mock_user):
     """Test updating tool sensitivity without authorization."""
     with patch("sark.services.auth.get_current_user", return_value=mock_user):
         response = client.post(
@@ -238,11 +241,8 @@ def test_update_tool_sensitivity_forbidden(
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
-
 @patch("sark.services.policy.OPAClient.authorize", return_value=True)
-def test_update_tool_sensitivity_invalid_level(
-    mock_authorize, client, mock_tool, mock_user
-):
+def test_update_tool_sensitivity_invalid_level(mock_authorize, client, mock_tool, mock_user):
     """Test updating tool with invalid sensitivity level."""
     with patch("sark.services.auth.get_current_user", return_value=mock_user):
         response = client.post(
@@ -257,7 +257,6 @@ def test_update_tool_sensitivity_invalid_level(
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-
 def test_update_tool_sensitivity_not_found(client):
     """Test updating sensitivity for non-existent tool."""
     from sark.api.main import app
@@ -268,7 +267,11 @@ def test_update_tool_sensitivity_not_found(client):
 
     try:
         fake_id = uuid4()
-        with patch("sark.services.policy.opa_client.OPAClient.authorize", new_callable=AsyncMock, return_value=True):
+        with patch(
+            "sark.services.policy.opa_client.OPAClient.authorize",
+            new_callable=AsyncMock,
+            return_value=True,
+        ):
             response = client.post(
                 f"/api/v1/tools/{fake_id}/sensitivity",
                 json={
@@ -290,7 +293,6 @@ def test_update_tool_sensitivity_not_found(client):
 # ============================================================================
 
 
-
 def test_detect_sensitivity_low(client):
     """Test detecting LOW sensitivity."""
     response = client.post(
@@ -308,7 +310,6 @@ def test_detect_sensitivity_low(client):
     assert "read" in data.get("keywords_matched", [])
 
 
-
 def test_detect_sensitivity_medium(client):
     """Test detecting MEDIUM sensitivity."""
     response = client.post(
@@ -323,7 +324,6 @@ def test_detect_sensitivity_medium(client):
     data = response.json()
     assert data["detected_level"] == "medium"
     assert data["detection_method"] == "medium_keywords"
-
 
 
 def test_detect_sensitivity_high(client):
@@ -343,7 +343,6 @@ def test_detect_sensitivity_high(client):
     assert "delete" in data.get("keywords_matched", [])
 
 
-
 def test_detect_sensitivity_critical(client):
     """Test detecting CRITICAL sensitivity."""
     response = client.post(
@@ -360,7 +359,6 @@ def test_detect_sensitivity_critical(client):
     assert data["detection_method"] == "critical_keywords"
 
 
-
 def test_detect_sensitivity_default(client):
     """Test default sensitivity detection."""
     response = client.post(
@@ -375,7 +373,6 @@ def test_detect_sensitivity_default(client):
     data = response.json()
     assert data["detected_level"] == "medium"
     assert data["detection_method"] == "default"
-
 
 
 def test_detect_sensitivity_with_parameters(client):
@@ -403,7 +400,6 @@ def test_detect_sensitivity_with_parameters(client):
 # ============================================================================
 
 
-
 def test_get_sensitivity_history(client, mock_tool):
     """Test getting sensitivity change history."""
     from sark.api.main import app
@@ -422,7 +418,6 @@ def test_get_sensitivity_history(client, mock_tool):
     finally:
         if get_db in app.dependency_overrides:
             del app.dependency_overrides[get_db]
-
 
 
 def test_get_sensitivity_history_not_found(client):
@@ -445,7 +440,6 @@ def test_get_sensitivity_history_not_found(client):
 # ============================================================================
 # STATISTICS TESTS
 # ============================================================================
-
 
 
 def test_get_sensitivity_statistics(client, mock_tool):
@@ -483,7 +477,6 @@ def test_get_sensitivity_statistics(client, mock_tool):
 # ============================================================================
 
 
-
 def test_list_tools_by_sensitivity_high(client, mock_tool):
     """Test listing tools by sensitivity level."""
     from sark.api.main import app
@@ -505,7 +498,6 @@ def test_list_tools_by_sensitivity_high(client, mock_tool):
             del app.dependency_overrides[get_db]
 
 
-
 def test_list_tools_by_sensitivity_invalid_level(client):
     """Test listing tools with invalid sensitivity level."""
     response = client.get("/api/v1/tools/sensitivity/invalid")
@@ -516,7 +508,6 @@ def test_list_tools_by_sensitivity_invalid_level(client):
 # ============================================================================
 # BULK DETECTION TESTS
 # ============================================================================
-
 
 
 def test_bulk_detect_sensitivity(client, mock_server, mock_user):
@@ -537,7 +528,6 @@ def test_bulk_detect_sensitivity(client, mock_server, mock_user):
 # ============================================================================
 
 
-
 def test_update_sensitivity_missing_level(client, mock_tool, mock_user):
     """Test update with missing sensitivity level."""
     with patch("sark.services.auth.get_current_user", return_value=mock_user):
@@ -550,7 +540,6 @@ def test_update_sensitivity_missing_level(client, mock_tool, mock_user):
         )
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-
 
 
 def test_detect_sensitivity_missing_name(client):
@@ -566,7 +555,6 @@ def test_detect_sensitivity_missing_name(client):
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-
 def test_update_sensitivity_with_optional_reason(client, mock_tool, mock_user):
     """Test update with optional reason field."""
     from sark.api.main import app
@@ -577,7 +565,11 @@ def test_update_sensitivity_with_optional_reason(client, mock_tool, mock_user):
     app.dependency_overrides[get_timescale_db] = create_mock_timescale_db()
 
     try:
-        with patch("sark.services.policy.opa_client.OPAClient.authorize", new_callable=AsyncMock, return_value=True):
+        with patch(
+            "sark.services.policy.opa_client.OPAClient.authorize",
+            new_callable=AsyncMock,
+            return_value=True,
+        ):
             response = client.post(
                 f"/api/v1/tools/{mock_tool.id}/sensitivity",
                 json={

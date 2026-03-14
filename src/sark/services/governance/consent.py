@@ -346,9 +346,7 @@ class ConsentService:
         stats = {}
         for status in ConsentStatus:
             result = await self.db.execute(
-                select(func.count(ConsentRequest.id)).where(
-                    ConsentRequest.status == status.value
-                )
+                select(func.count(ConsentRequest.id)).where(ConsentRequest.status == status.value)
             )
             stats[f"total_{status.value}"] = result.scalar() or 0
 
