@@ -1,6 +1,5 @@
 """Security tests for CSRF token validation middleware."""
 
-import secrets
 from unittest.mock import MagicMock
 
 import pytest

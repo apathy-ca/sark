@@ -6,11 +6,10 @@ Supports daily, weekly, and monthly reports in JSON and CSV formats.
 """
 
 import csv
+from datetime import UTC, date, datetime, timedelta
+from enum import Enum
 import io
 import json
-from datetime import UTC, date, datetime, timedelta
-from decimal import Decimal
-from enum import Enum
 from typing import Any
 from uuid import uuid4
 
@@ -18,7 +17,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 import structlog
 
-from sark.models.analytics import DailyAggregate, UsageEvent
+from sark.models.analytics import UsageEvent
 from sark.services.analytics.cost_calculator import CostCalculatorService
 
 logger = structlog.get_logger(__name__)

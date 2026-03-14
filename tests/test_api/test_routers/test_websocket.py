@@ -4,13 +4,11 @@ import asyncio
 from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
-import pytest
-from fastapi import status
 from fastapi.testclient import TestClient
 from fastapi.websockets import WebSocket
+import pytest
 
 from sark.main import app
-
 
 # Create a test client
 client = TestClient(app)

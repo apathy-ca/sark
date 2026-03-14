@@ -7,11 +7,12 @@ import logging
 from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 
+from sark.api.routers import admin, export, websocket
+from sark.api.routers import health as health_v2
 from sark.config import get_settings
 from sark.health import router as health_router
 from sark.logging_config import setup_logging
 from sark.metrics import PrometheusMiddleware, get_metrics, initialize_metrics
-from sark.api.routers import admin, export, health as health_v2, websocket
 
 settings = get_settings()
 

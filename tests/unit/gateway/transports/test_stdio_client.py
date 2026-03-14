@@ -11,8 +11,8 @@ Tests cover:
 """
 
 import asyncio
-import json
 from datetime import UTC, datetime, timedelta
+import json
 from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
 import pytest
@@ -581,7 +581,7 @@ class TestStdioTransportErrorHandling:
         with (
             patch("asyncio.create_subprocess_exec", return_value=mock_process),
             patch("psutil.Process", return_value=mock_psutil_process),
-            patch("asyncio.create_task") as mock_create_task,
+            patch("asyncio.create_task"),
         ):
             await transport.start()
 
@@ -617,7 +617,7 @@ class TestStdioTransportErrorHandling:
         with (
             patch("asyncio.create_subprocess_exec", return_value=mock_process),
             patch("psutil.Process", return_value=mock_psutil_process),
-            patch("asyncio.create_task") as mock_create_task,
+            patch("asyncio.create_task"),
         ):
             await transport.start()
 

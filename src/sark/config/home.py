@@ -11,14 +11,13 @@ Key differences from enterprise deployment:
 - Local audit logging instead of SIEM integration
 """
 
-import logging
-import os
 from dataclasses import dataclass, field
 from functools import lru_cache
+import logging
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import Field, field_validator
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 logger = logging.getLogger(__name__)

@@ -7,24 +7,22 @@ Provides fixtures for integration testing of home deployment profile including:
 - Sample data fixtures
 """
 
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from decimal import Decimal
-from typing import Any, AsyncGenerator
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
 import pytest
 
 from sark.models.gateway import (
-    AgentContext,
-    AgentType,
     GatewayAuthorizationRequest,
     GatewayAuthorizationResponse,
     GatewayServerInfo,
     GatewayToolInfo,
     SensitivityLevel,
-    TrustLevel,
 )
 from sark.services.auth.user_context import UserContext
 
@@ -425,11 +423,11 @@ HOME_SAMPLE_ENDPOINTS = [
 
 
 __all__ = [
+    "HOME_SAMPLE_ENDPOINTS",
+    "HOME_SAMPLE_PROMPTS",
     "HomeDeploymentConfig",
     "HomeDeploymentContext",
-    "home_deployment_context",
     "HomeDevice",
     "TimeRule",
-    "HOME_SAMPLE_PROMPTS",
-    "HOME_SAMPLE_ENDPOINTS",
+    "home_deployment_context",
 ]

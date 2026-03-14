@@ -7,16 +7,13 @@ Supports IP addresses, MAC addresses, and user IDs.
 
 from datetime import UTC, datetime
 from ipaddress import ip_address
-from typing import Any
 
-import structlog
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+import structlog
 
 from sark.models.governance import (
     AllowlistEntry,
-    AllowlistEntryCreate,
-    AllowlistEntryResponse,
     AllowlistEntryType,
 )
 from sark.services.governance.exceptions import AllowlistError

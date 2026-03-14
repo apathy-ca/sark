@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
-      contents: read
+      contents: write  # Required to publish to gh-pages
       pull-requests: write  # Required to comment on PRs
       issues: write  # Required to create comments
 

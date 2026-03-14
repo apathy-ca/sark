@@ -1,13 +1,16 @@
 """Pytest configuration for router tests."""
 
-import pytest
-from fastapi.testclient import TestClient
 from unittest.mock import AsyncMock, MagicMock
 
-from sark.api.dependencies import UserContext as UserContextAPI, get_current_user as get_current_user_api
-from sark.services.auth import UserContext as UserContextAuth, get_current_user as get_current_user_auth
-from sark.db import get_db
+from fastapi.testclient import TestClient
+import pytest
+
+from sark.api.dependencies import UserContext as UserContextAPI
+from sark.api.dependencies import get_current_user as get_current_user_api
 from sark.api.main import app
+from sark.db import get_db
+from sark.services.auth import UserContext as UserContextAuth
+from sark.services.auth import get_current_user as get_current_user_auth
 
 
 # Mock user contexts for testing - API dependencies version

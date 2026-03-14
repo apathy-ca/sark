@@ -1,6 +1,6 @@
 """Unit tests for UsageReporterService."""
 
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, date, datetime
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest

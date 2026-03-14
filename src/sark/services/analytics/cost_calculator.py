@@ -287,7 +287,7 @@ class CostCalculatorService:
         await self._load_db_rates()
 
         rates = []
-        for key, rate in self._rates.items():
+        for _key, rate in self._rates.items():
             if provider and rate.provider.lower() != provider.lower():
                 continue
             rates.append(
@@ -438,4 +438,4 @@ class CostCalculatorService:
         }
 
 
-__all__ = ["CostCalculatorService", "ProviderRate", "DEFAULT_RATES"]
+__all__ = ["DEFAULT_RATES", "CostCalculatorService", "ProviderRate"]

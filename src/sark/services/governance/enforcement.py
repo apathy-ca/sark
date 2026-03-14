@@ -5,18 +5,17 @@ Coordinates all governance services to make authorization decisions,
 following the evaluation order: emergency -> allowlist -> override -> time_rules -> OPA.
 """
 
-import time
 from datetime import UTC, datetime
+import time
 from typing import Any
 from uuid import uuid4
 
-import structlog
 from sqlalchemy.ext.asyncio import AsyncSession
+import structlog
 
 from sark.models.governance import EnforcementDecision, EnforcementDecisionLog
 from sark.services.governance.allowlist import AllowlistService
 from sark.services.governance.emergency import EmergencyService
-from sark.services.governance.exceptions import EnforcementError
 from sark.services.governance.override import OverrideService
 from sark.services.governance.time_rules import TimeRulesService
 

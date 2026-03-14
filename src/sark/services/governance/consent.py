@@ -7,9 +7,9 @@ supporting multi-approver consent (e.g., two-parent consent).
 
 from datetime import UTC, datetime, timedelta
 
-import structlog
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+import structlog
 
 from sark.models.governance import ConsentRequest, ConsentStatus
 from sark.services.governance.exceptions import ConsentError

@@ -389,30 +389,30 @@ class EnforcementDecision(PydanticBaseModel):
 # =============================================================================
 
 __all__ = [
-    # Enums
-    "AllowlistEntryType",
-    "ConsentStatus",
-    "OverrideStatus",
-    "TimeRuleAction",
     # SQLAlchemy models
     "AllowlistEntry",
-    "ConsentRequest",
-    "EmergencyOverride",
-    "EnforcementDecisionLog",
-    "GovernanceBase",
-    "OverrideRequest",
-    "TimeRule",
     # Pydantic schemas
     "AllowlistEntryCreate",
     "AllowlistEntryResponse",
+    # Enums
+    "AllowlistEntryType",
+    "ConsentRequest",
     "ConsentRequestCreate",
     "ConsentRequestResponse",
+    "ConsentStatus",
+    "EmergencyOverride",
     "EmergencyOverrideCreate",
     "EmergencyOverrideResponse",
     "EnforcementDecision",
+    "EnforcementDecisionLog",
+    "GovernanceBase",
+    "OverrideRequest",
     "OverrideRequestCreate",
     "OverrideRequestResponse",
+    "OverrideStatus",
     "TimeCheckResult",
+    "TimeRule",
+    "TimeRuleAction",
     "TimeRuleCreate",
     "TimeRuleResponse",
 ]

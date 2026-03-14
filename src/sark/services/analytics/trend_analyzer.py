@@ -5,7 +5,7 @@ Analyzes usage patterns and trends over time to identify
 peak hours, growth rates, and anomalies.
 """
 
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from enum import Enum
 from statistics import mean, stdev
 from typing import Any
@@ -14,7 +14,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 import structlog
 
-from sark.models.analytics import DailyAggregate, UsageEvent
+from sark.models.analytics import UsageEvent
 
 logger = structlog.get_logger(__name__)
 

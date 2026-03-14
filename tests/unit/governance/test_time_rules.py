@@ -2,7 +2,7 @@
 Unit tests for TimeRulesService.
 """
 
-from datetime import UTC, datetime, time, timedelta
+from datetime import UTC, datetime, timedelta
 
 import pytest
 

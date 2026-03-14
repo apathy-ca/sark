@@ -7,9 +7,9 @@ temporarily. Useful for urgent situations like homework deadlines.
 
 from datetime import UTC, datetime, timedelta
 
-import structlog
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+import structlog
 
 from sark.models.governance import EmergencyOverride
 from sark.services.governance.exceptions import EmergencyOverrideError

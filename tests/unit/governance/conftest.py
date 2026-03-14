@@ -3,11 +3,8 @@ Pytest fixtures for governance unit tests.
 """
 
 from collections.abc import AsyncGenerator
-from datetime import UTC, datetime
 
-import pytest
 import pytest_asyncio
-from sqlalchemy import event
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 

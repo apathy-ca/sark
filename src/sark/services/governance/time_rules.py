@@ -5,19 +5,17 @@ Manages time-based rules that control when LLM access is allowed,
 such as bedtime restrictions, school hours, etc.
 """
 
-from datetime import UTC, datetime, time, timedelta
-from typing import Any
+from datetime import UTC, datetime, time
 from zoneinfo import ZoneInfo
 
-import structlog
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+import structlog
 
 from sark.models.governance import (
     TimeCheckResult,
     TimeRule,
     TimeRuleAction,
-    TimeRuleCreate,
 )
 from sark.services.governance.exceptions import TimeRuleError
 
@@ -86,8 +84,8 @@ class TimeRulesService:
             TimeRuleError: If validation fails or rule already exists
         """
         # Validate times
-        start_time = self._parse_time(start)
-        end_time = self._parse_time(end)
+        self._parse_time(start)
+        self._parse_time(end)
 
         # Validate timezone
         try:

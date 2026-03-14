@@ -14,7 +14,6 @@ from pydantic import Field
 from sqlalchemy import (
     Column,
     DateTime,
-    Float,
     Index,
     Integer,
     Numeric,
@@ -260,13 +259,13 @@ class UsageReportSchema(PydanticBaseModel):
 __all__ = [
     # SQLAlchemy models
     "DailyAggregate",
-    "ProviderPricing",
-    "UsageEvent",
     # Pydantic schemas
     "DailyUsageSchema",
     "DashboardStatsSchema",
     "PeriodStatsSchema",
+    "ProviderPricing",
     "TrendDataSchema",
+    "UsageEvent",
     "UsageEventSchema",
     "UsageReportSchema",
 ]

@@ -1,8 +1,6 @@
 """Security tests for settings configuration - default credentials validation."""
 
 import logging
-import os
-from unittest.mock import patch
 
 import pytest
 
@@ -146,7 +144,7 @@ class TestDefaultCredentialsValidation:
         monkeypatch.delenv("REDIS_PASSWORD", raising=False)
 
         with caplog.at_level(logging.WARNING):
-            settings = Settings()
+            Settings()
 
         # All three warnings should appear
         assert caplog.text.count("DO NOT USE IN PRODUCTION") >= 3

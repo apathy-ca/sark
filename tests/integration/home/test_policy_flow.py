@@ -9,10 +9,9 @@ Tests the complete policy evaluation pipeline including:
 Following AAA pattern: Arrange, Act, Assert
 """
 
-import sys
-from datetime import UTC, datetime
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
+import sys
+from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
 import pytest
@@ -21,13 +20,11 @@ import pytest
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "fixtures" / "home"))
 
 from home_fixtures import (
-    HomeDeploymentConfig,
     home_deployment_context,
 )
 
 from sark.models.gateway import (
     GatewayAuthorizationRequest,
-    GatewayAuthorizationResponse,
     SensitivityLevel,
 )
 from sark.services.auth.user_context import UserContext

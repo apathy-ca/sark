@@ -18,6 +18,11 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Rust toolchain (required for maturin to build sark-rust extension)
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | \
+    sh -s -- -y --default-toolchain 1.92 --profile minimal
+ENV PATH="/root/.cargo/bin:${PATH}"
+
 # Development stage
 FROM base as development
 
@@ -49,6 +54,9 @@ COPY --chown=appuser:appuser pyproject.toml Cargo.toml README.md ./
 
 # Copy Rust source code
 COPY --chown=appuser:appuser rust ./rust
+
+# Copy grid-core submodule (required by maturin/cargo to build sark-rust)
+COPY --chown=appuser:appuser grid-core ./grid-core
 
 # Copy application code
 COPY --chown=appuser:appuser src ./src

@@ -27,19 +27,19 @@ from sark.services.governance.override import OverrideService
 from sark.services.governance.time_rules import TimeRulesService
 
 __all__ = [
-    # Services
-    "AllowlistService",
-    "ConsentService",
-    "EmergencyService",
-    "EnforcementService",
-    "OverrideService",
-    "TimeRulesService",
     # Exceptions
     "AllowlistError",
+    # Services
+    "AllowlistService",
     "ConsentError",
+    "ConsentService",
     "EmergencyOverrideError",
+    "EmergencyService",
     "EnforcementError",
+    "EnforcementService",
     "GovernanceError",
     "OverrideError",
+    "OverrideService",
     "TimeRuleError",
+    "TimeRulesService",
 ]

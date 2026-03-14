@@ -272,7 +272,6 @@ class TestAdminAuthorizationRequirements:
         """Test that admin endpoints require authentication."""
         # This test would require setting up proper authentication
         # For now, we verify the dependency is declared
-        from sark.api.routers.admin import router
 
         # Check that endpoints use require_role dependency
         for route in router.routes:

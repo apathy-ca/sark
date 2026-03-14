@@ -385,7 +385,7 @@ class TestGatewayClientParameters:
             mock_transport = AsyncMock()
             MockTransport.return_value = mock_transport
 
-            client = GatewayClient(base_url="http://gateway:8080")
+            GatewayClient(base_url="http://gateway:8080")
 
             # Verify defaults
             call_kwargs = MockTransport.call_args.kwargs

@@ -5,13 +5,13 @@ Provides PIN-based override functionality for bypassing policy
 on a specific request, with proper authentication and audit trail.
 """
 
+from datetime import UTC, datetime, timedelta
 import hashlib
 import secrets
-from datetime import UTC, datetime, timedelta
 
-import structlog
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+import structlog
 
 from sark.models.governance import OverrideRequest, OverrideStatus
 from sark.services.governance.exceptions import OverrideError
