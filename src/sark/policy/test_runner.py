@@ -310,11 +310,12 @@ class PolicyTestRunner:
                 input_path = Path(input_file.name)
 
             try:
-                # Run OPA eval
+                # Run OPA eval (v1-compatible for Rego v1 syntax)
                 result = subprocess.run(
                     [
                         self.opa_path,
                         "eval",
+                        "--v1-compatible",
                         "--data",
                         str(policy_path),
                         "--input",
