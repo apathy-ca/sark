@@ -8,7 +8,7 @@
 
 ## Overview
 
-> **Migration Note (v1.6.0):** The Rust components have been migrated to **[GRID Core](https://github.com/apathy-ca/grid-core)**, a shared library used by both SARK and [YORI](https://github.com/apathy-ca/yori). The crates are now named `grid-opa` and `grid-cache` instead of `grid-opa` and `grid-cache`.
+> **Migration Note (v1.6.0):** The Rust components have been migrated to **[GRID Core](https://github.com/apathy-ca/grid-core)**, a shared library used by both SARK and [YORI](https://github.com/apathy-ca/yori). The crates are now named `grid-opa` and `grid-cache` instead of `sark-opa` and `sark-cache`.
 
 SARK's performance-critical components are available as standalone Rust crates from GRID Core:
 
