@@ -4,6 +4,9 @@ members = [
     ".",
     "rust/sark-gateway",
 ]
+exclude = [
+    "grid-core",
+]
 
 [workspace.package]
 version = "1.6.0"
@@ -14,12 +17,19 @@ authors = ["James Henry"]
 
 [workspace.dependencies]
 # GRID Core components
-grid-opa = { path = "../grid-core/crates/grid-opa" }
-grid-cache = { path = "../grid-core/crates/grid-cache" }
+grid-opa = { path = "grid-core/crates/grid-opa" }
+grid-cache = { path = "grid-core/crates/grid-cache" }
 
 # Python bindings
 # Note: pyo3 pinned to 0.22 for grid-core compatibility (LOW severity CVE deferred)
-pyo3 = { version = "0.22", features = ["extension-module"] }
+pyo3 = { version = "0.22", features = ["extension-module", "abi3-py39"] }
+pythonize = "0.22"
+
+# OPA engine (required by grid-opa)
+regorus = "0.2"
+
+# Cache (required by grid-cache)
+dashmap = "6.1"
 
 # HTTP server
 axum = { version = "0.7", features = ["macros"] }
@@ -71,4 +81,4 @@ grid-cache = { workspace = true, features = ["python"] }
 
 # Note: Internal rust/sark-opa and rust/sark-cache are deprecated.
 # They remain for reference but grid-core is now the source of truth.
-# See ../grid-core/README.md for details.
+# See grid-core/README.md for details.

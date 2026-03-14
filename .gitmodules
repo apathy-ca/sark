@@ -1,0 +1,3 @@
+[submodule "grid-core"]
+	path = grid-core
+	url = git@github.com:apathy-ca/grid-core.git
