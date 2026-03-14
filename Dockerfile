@@ -21,10 +21,11 @@ RUN apt-get update && apt-get install -y \
 # Install Rust toolchain (required for maturin to build sark-rust extension)
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | \
     sh -s -- -y --default-toolchain 1.92 --profile minimal && \
-    /root/.cargo/bin/rustup default 1.92
+    ln -s /root/.cargo/bin/cargo /usr/local/bin/cargo && \
+    ln -s /root/.cargo/bin/rustc /usr/local/bin/rustc && \
+    ln -s /root/.cargo/bin/rustup /usr/local/bin/rustup && \
+    cargo --version
 ENV PATH="/root/.cargo/bin:${PATH}"
-# Verify cargo is available at build time
-RUN cargo --version
 
 # Development stage
 FROM base as development

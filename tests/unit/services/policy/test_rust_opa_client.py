@@ -43,15 +43,13 @@ def rust_client(mock_cache, tmp_path):
 
     # Create a simple test policy
     policy_file = policy_dir / "test_policy.rego"
-    policy_file.write_text(
-        """
+    policy_file.write_text("""
         package test
         default allow = false
         allow {
             input.user.role == "admin"
         }
-    """
-    )
+    """)
 
     client = RustOPAClient(policy_dir=policy_dir, cache=mock_cache, cache_enabled=True)
 

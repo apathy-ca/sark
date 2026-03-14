@@ -268,15 +268,11 @@ class TestMigration007Federation:
 
     def test_materialized_view_exists(self, session):
         """Test that materialized view for cost analysis is created."""
-        result = session.execute(
-            text(
-                """
+        result = session.execute(text("""
                 SELECT EXISTS (
                     SELECT 1 FROM pg_matviews WHERE matviewname = 'mv_daily_cost_summary'
                 )
-            """
-            )
-        )
+            """))
         assert result.scalar() is True
 
 
@@ -300,8 +296,7 @@ class TestDataMigration:
 
         # Run migration (simulated - in practice would be via alembic or script)
         session.execute(
-            text(
-                """
+            text("""
                 INSERT INTO resources (id, name, protocol, endpoint, sensitivity_level, metadata, created_at, updated_at)
                 SELECT
                     id::text,
@@ -319,8 +314,7 @@ class TestDataMigration:
                 FROM mcp_servers
                 WHERE id = :server_id
                 ON CONFLICT (id) DO NOTHING
-            """
-            ),
+            """),
             {"server_id": server_id},
         )
         session.commit()
@@ -362,23 +356,20 @@ class TestDataMigration:
 
         # Migrate server first
         session.execute(
-            text(
-                """
+            text("""
                 INSERT INTO resources (id, name, protocol, endpoint, sensitivity_level, metadata, created_at, updated_at)
                 SELECT
                     id::text, name, 'mcp', command, sensitivity_level::text,
                     '{}'::jsonb, created_at, updated_at
                 FROM mcp_servers WHERE id = :server_id
                 ON CONFLICT (id) DO NOTHING
-            """
-            ),
+            """),
             {"server_id": server_id},
         )
 
         # Migrate tool
         session.execute(
-            text(
-                """
+            text("""
                 INSERT INTO capabilities (id, resource_id, name, description, input_schema, output_schema, sensitivity_level, metadata)
                 SELECT
                     id::text,
@@ -392,8 +383,7 @@ class TestDataMigration:
                 FROM mcp_tools
                 WHERE id = :tool_id
                 ON CONFLICT (id) DO NOTHING
-            """
-            ),
+            """),
             {"tool_id": tool_id},
         )
         session.commit()
@@ -437,22 +427,16 @@ class TestDataMigration:
         v1_tool_count = session.query(MCPTool).count()
 
         # Run full migration
-        session.execute(
-            text(
-                """
+        session.execute(text("""
                 INSERT INTO resources (id, name, protocol, endpoint, sensitivity_level, metadata, created_at, updated_at)
                 SELECT
                     id::text, name, 'mcp', command, sensitivity_level::text,
                     '{}'::jsonb, created_at, updated_at
                 FROM mcp_servers
                 ON CONFLICT (id) DO NOTHING
-            """
-            )
-        )
+            """))
 
-        session.execute(
-            text(
-                """
+        session.execute(text("""
                 INSERT INTO capabilities (id, resource_id, name, description, input_schema, output_schema, sensitivity_level, metadata)
                 SELECT
                     id::text, server_id::text, name, description,
@@ -460,9 +444,7 @@ class TestDataMigration:
                     sensitivity_level::text, '{}'::jsonb
                 FROM mcp_tools
                 ON CONFLICT (id) DO NOTHING
-            """
-            )
-        )
+            """))
         session.commit()
 
         # Count v2.0 data
@@ -494,40 +476,28 @@ class TestDataMigration:
         session.commit()
 
         # Migrate
-        session.execute(
-            text(
-                """
+        session.execute(text("""
                 INSERT INTO resources (id, name, protocol, endpoint, sensitivity_level, metadata, created_at, updated_at)
                 SELECT id::text, name, 'mcp', command, sensitivity_level::text, '{}'::jsonb, created_at, updated_at
                 FROM mcp_servers
                 ON CONFLICT (id) DO NOTHING
-            """
-            )
-        )
+            """))
 
-        session.execute(
-            text(
-                """
+        session.execute(text("""
                 INSERT INTO capabilities (id, resource_id, name, description, input_schema, output_schema, sensitivity_level, metadata)
                 SELECT id::text, server_id::text, name, description, COALESCE(parameters, '{}'::jsonb),
                        '{}'::jsonb, sensitivity_level::text, '{}'::jsonb
                 FROM mcp_tools
                 ON CONFLICT (id) DO NOTHING
-            """
-            )
-        )
+            """))
         session.commit()
 
         # Verify FK integrity - should be no orphaned capabilities
-        orphaned = session.execute(
-            text(
-                """
+        orphaned = session.execute(text("""
                 SELECT COUNT(*)
                 FROM capabilities c
                 WHERE NOT EXISTS (SELECT 1 FROM resources r WHERE r.id = c.resource_id)
-            """
-            )
-        ).scalar()
+            """)).scalar()
 
         assert orphaned == 0
 

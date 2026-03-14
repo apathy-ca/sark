@@ -369,8 +369,7 @@ async def initialized_db(postgres_connection):
     """
     async with postgres_connection.acquire() as conn:
         # Create tables (simplified - in real implementation use Alembic)
-        await conn.execute(
-            """
+        await conn.execute("""
             CREATE TABLE IF NOT EXISTS mcp_servers (
                 id UUID PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
@@ -382,11 +381,9 @@ async def initialized_db(postgres_connection):
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
                 updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
             );
-        """
-        )
+        """)
 
-        await conn.execute(
-            """
+        await conn.execute("""
             CREATE TABLE IF NOT EXISTS policies (
                 id UUID PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
@@ -396,11 +393,9 @@ async def initialized_db(postgres_connection):
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
                 updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
             );
-        """
-        )
+        """)
 
-        await conn.execute(
-            """
+        await conn.execute("""
             CREATE TABLE IF NOT EXISTS users (
                 id UUID PRIMARY KEY,
                 email VARCHAR(255) UNIQUE NOT NULL,
@@ -412,8 +407,7 @@ async def initialized_db(postgres_connection):
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
                 updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
             );
-        """
-        )
+        """)
 
     yield postgres_connection
 

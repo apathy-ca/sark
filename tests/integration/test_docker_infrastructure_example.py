@@ -40,15 +40,13 @@ class TestPostgreSQLIntegration:
         """Test table creation and basic operations."""
         async with postgres_connection.acquire() as conn:
             # Create table
-            await conn.execute(
-                """
+            await conn.execute("""
                 CREATE TEMPORARY TABLE test_servers (
                     id UUID PRIMARY KEY,
                     name VARCHAR(255) NOT NULL,
                     endpoint VARCHAR(500)
                 )
-            """
-            )
+            """)
 
             # Insert data
             test_id = uuid4()
@@ -73,14 +71,12 @@ class TestPostgreSQLIntegration:
         """Test transaction rollback behavior."""
         async with postgres_connection.acquire() as conn:
             # Create temp table
-            await conn.execute(
-                """
+            await conn.execute("""
                 CREATE TEMPORARY TABLE test_rollback (
                     id SERIAL PRIMARY KEY,
                     value TEXT
                 )
-            """
-            )
+            """)
 
             # Test rollback
             async with conn.transaction():
@@ -188,37 +184,31 @@ class TestTimescaleDBIntegration:
         """Test creating and using a hypertable."""
         async with timescaledb_connection.acquire() as conn:
             # Create regular table
-            await conn.execute(
-                """
+            await conn.execute("""
                 CREATE TEMPORARY TABLE test_metrics (
                     time TIMESTAMPTZ NOT NULL,
                     device_id INTEGER,
                     temperature DOUBLE PRECISION
                 )
-            """
-            )
+            """)
 
             # Convert to hypertable
-            await conn.execute(
-                """
+            await conn.execute("""
                 SELECT create_hypertable(
                     'test_metrics',
                     'time',
                     if_not_exists => TRUE
                 )
-            """
-            )
+            """)
 
             # Insert time-series data
-            await conn.execute(
-                """
+            await conn.execute("""
                 INSERT INTO test_metrics (time, device_id, temperature)
                 VALUES
                     (NOW(), 1, 20.5),
                     (NOW() - INTERVAL '1 hour', 1, 21.0),
                     (NOW() - INTERVAL '2 hours', 1, 19.5)
-            """
-            )
+            """)
 
             # Query data
             count = await conn.fetchval("SELECT COUNT(*) FROM test_metrics")
@@ -289,15 +279,13 @@ class TestMultiServiceIntegration:
         """Test caching layer with database operations."""
         # Create temp table
         async with postgres_connection.acquire() as conn:
-            await conn.execute(
-                """
+            await conn.execute("""
                 CREATE TEMPORARY TABLE test_cache_db (
                     id UUID PRIMARY KEY,
                     name VARCHAR(255),
                     value TEXT
                 )
-            """
-            )
+            """)
 
             # Insert data
             test_id = uuid4()
@@ -340,12 +328,10 @@ class TestDatabaseInitialization:
         """Test that initialized_db fixture creates tables."""
         async with initialized_db.acquire() as conn:
             # Check that tables exist
-            tables = await conn.fetch(
-                """
+            tables = await conn.fetch("""
                 SELECT tablename FROM pg_tables
                 WHERE schemaname = 'public'
-            """
-            )
+            """)
 
             table_names = [t["tablename"] for t in tables]
 
@@ -398,14 +384,12 @@ class TestPerformance:
         import time
 
         async with postgres_connection.acquire() as conn:
-            await conn.execute(
-                """
+            await conn.execute("""
                 CREATE TEMPORARY TABLE test_bulk (
                     id SERIAL PRIMARY KEY,
                     value TEXT
                 )
-            """
-            )
+            """)
 
             # Bulk insert
             start = time.time()
