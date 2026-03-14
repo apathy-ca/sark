@@ -36,8 +36,10 @@ SARK provides zero-trust governance for AI deployments at scale. Built for Model
 
 ```bash
 # 1. Clone and setup
-git clone <repository-url>
+git clone --recurse-submodules <repository-url>
 cd sark
+# If you already cloned without --recurse-submodules:
+# git submodule update --init
 python3.11 -m venv venv && source venv/bin/activate
 pip install -e ".[dev]"
 
@@ -290,7 +292,7 @@ SARK is the **reference implementation of GRID Protocol Specification v0.1**.
 - **Governance:** Allowlist, time-based rules, emergency override, consent tracking
 - **Analytics:** Token tracking, cost estimation, usage reports
 
-YORI reuses SARK's battle-tested Rust core (`sark-opa`, `sark-cache`) via PyO3 bindings, bringing enterprise-grade policy evaluation to resource-constrained home routers.
+YORI reuses SARK's battle-tested Rust core (`grid-opa`, `grid-cache`) via PyO3 bindings, bringing enterprise-grade policy evaluation to resource-constrained home routers.
 
 📖 **[YORI Repository](https://github.com/apathy-ca/yori)** | **[Project Plan](docs/v2.0/YORI_PROJECT_PLAN.md)**
 

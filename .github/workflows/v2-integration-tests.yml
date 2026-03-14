@@ -47,6 +47,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          submodules: true
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -102,6 +104,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          submodules: true
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -119,14 +123,14 @@ jobs:
 
       - name: Start mock services
         run: |
-          docker-compose -f docker-compose.v2-testing.yml up -d \
+          docker compose -f docker-compose.v2-testing.yml up -d \
             mock-mcp-server \
             mock-http-api \
             mock-grpc-service
 
       - name: Wait for services
         run: |
-          timeout 30 sh -c 'until docker-compose -f docker-compose.v2-testing.yml ps | grep -q "Up"; do sleep 1; done'
+          timeout 30 sh -c 'until docker compose -f docker-compose.v2-testing.yml ps | grep -q "Up"; do sleep 1; done'
 
       - name: Run multi-protocol tests
         run: |
@@ -142,7 +146,7 @@ jobs:
       - name: Cleanup services
         if: always()
         run: |
-          docker-compose -f docker-compose.v2-testing.yml down -v
+          docker compose -f docker-compose.v2-testing.yml down -v
 
       - name: Upload test results
         if: always()
@@ -173,6 +177,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          submodules: true
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -190,7 +196,7 @@ jobs:
 
       - name: Start federation test environment
         run: |
-          docker-compose -f docker-compose.v2-testing.yml up -d \
+          docker compose -f docker-compose.v2-testing.yml up -d \
             sark-node-a \
             sark-node-b \
             sark-node-c
@@ -215,9 +221,9 @@ jobs:
       - name: Collect federation logs
         if: failure()
         run: |
-          docker-compose -f docker-compose.v2-testing.yml logs sark-node-a > logs-node-a.txt
-          docker-compose -f docker-compose.v2-testing.yml logs sark-node-b > logs-node-b.txt
-          docker-compose -f docker-compose.v2-testing.yml logs sark-node-c > logs-node-c.txt
+          docker compose -f docker-compose.v2-testing.yml logs sark-node-a > logs-node-a.txt
+          docker compose -f docker-compose.v2-testing.yml logs sark-node-b > logs-node-b.txt
+          docker compose -f docker-compose.v2-testing.yml logs sark-node-c > logs-node-c.txt
 
       - name: Upload logs
         if: failure()
@@ -229,7 +235,7 @@ jobs:
       - name: Cleanup
         if: always()
         run: |
-          docker-compose -f docker-compose.v2-testing.yml down -v
+          docker compose -f docker-compose.v2-testing.yml down -v
 
       - name: Upload test results
         if: always()
@@ -260,6 +266,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          submodules: true
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -277,7 +285,7 @@ jobs:
 
       - name: Start full test environment
         run: |
-          docker-compose -f docker-compose.v2-testing.yml up -d
+          docker compose -f docker-compose.v2-testing.yml up -d
 
       - name: Wait for all services
         run: |
@@ -295,7 +303,7 @@ jobs:
       - name: Cleanup
         if: always()
         run: |
-          docker-compose -f docker-compose.v2-testing.yml down -v
+          docker compose -f docker-compose.v2-testing.yml down -v
 
       - name: Upload test results
         if: always()
@@ -317,6 +325,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          submodules: true
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -334,7 +344,7 @@ jobs:
 
       - name: Start complete test environment
         run: |
-          docker-compose -f docker-compose.v2-testing.yml up -d
+          docker compose -f docker-compose.v2-testing.yml up -d
 
       - name: Wait for all services
         run: |
@@ -386,7 +396,7 @@ jobs:
       - name: Cleanup
         if: always()
         run: |
-          docker-compose -f docker-compose.v2-testing.yml down -v
+          docker compose -f docker-compose.v2-testing.yml down -v
 
   # ============================================================================
   # Test Summary and Reporting

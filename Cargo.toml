@@ -9,7 +9,7 @@ exclude = [
 ]
 
 [workspace.package]
-version = "1.6.0"
+version = "1.7.0"
 edition = "2021"
 rust-version = "1.75"
 license = "MIT"
@@ -21,7 +21,7 @@ grid-opa = { path = "grid-core/crates/grid-opa" }
 grid-cache = { path = "grid-core/crates/grid-cache" }
 
 # Python bindings
-# pyo3 0.24.1+ fixes buffer overflow CVE (GHSA-...)
+# pyo3 0.24.1+ fixes CVE GHSA-f267-3vm8-fhw9 (buffer overflow in PyString::from_object)
 pyo3 = { version = "0.24", features = ["extension-module", "abi3-py39"] }
 pythonize = "0.24"
 
@@ -79,6 +79,3 @@ pyo3.workspace = true
 grid-opa = { workspace = true, features = ["python"] }
 grid-cache = { workspace = true, features = ["python"] }
 
-# Note: Internal rust/sark-opa and rust/sark-cache are deprecated.
-# They remain for reference but grid-core is now the source of truth.
-# See grid-core/README.md for details.
