@@ -186,10 +186,14 @@ class CSRFProtectionMiddleware(BaseHTTPMiddleware):
         token_from_header = request.headers.get(self.csrf_header_name)
 
         # First try session-based validation (preferred)
-        if hasattr(request, "session"):
-            token_from_session = request.session.get("csrf_token")
-            if token_from_header and token_from_session:
-                return secrets.compare_digest(token_from_header, token_from_session)
+        try:
+            if hasattr(request, "session"):
+                token_from_session = request.session.get("csrf_token")
+                if token_from_header and token_from_session:
+                    return secrets.compare_digest(token_from_header, token_from_session)
+        except (AssertionError, RuntimeError):
+            # SessionMiddleware not installed - fall back to cookie pattern
+            pass
 
         # Fall back to double-submit cookie pattern
         # Get token from cookie
