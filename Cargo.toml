@@ -18,6 +18,7 @@ grid-opa = { path = "../grid-core/crates/grid-opa" }
 grid-cache = { path = "../grid-core/crates/grid-cache" }
 
 # Python bindings
+# Note: pyo3 pinned to 0.22 for grid-core compatibility (LOW severity CVE deferred)
 pyo3 = { version = "0.22", features = ["extension-module"] }
 
 # HTTP server
@@ -39,7 +40,7 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 # Auth
-jsonwebtoken = "9.2"
+jsonwebtoken = "10.3"  # CVE: Type confusion auth bypass fix
 
 # Time
 chrono = { version = "0.4", features = ["serde"] }
