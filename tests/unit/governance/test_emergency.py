@@ -25,7 +25,12 @@ class TestEmergencyService:
         assert override.active is True
         assert override.reason == "Homework deadline"
         assert override.activated_by == "parent"
-        assert override.expires_at > datetime.now(UTC)
+        # Handle both naive and aware datetimes
+        now = datetime.now(UTC)
+        expires = override.expires_at
+        if expires.tzinfo is None:
+            expires = expires.replace(tzinfo=UTC)
+        assert expires > now
 
     @pytest.mark.asyncio
     async def test_activate_invalid_duration(self, emergency_service: EmergencyService):
@@ -101,9 +106,14 @@ class TestEmergencyService:
         """Test extending emergency override."""
         override = await emergency_service.activate(duration_minutes=60, reason="test")
         original_expires = override.expires_at
+        if original_expires.tzinfo is None:
+            original_expires = original_expires.replace(tzinfo=UTC)
 
         extended = await emergency_service.extend(30, extended_by="admin")
-        assert extended.expires_at > original_expires
+        extended_expires = extended.expires_at
+        if extended_expires.tzinfo is None:
+            extended_expires = extended_expires.replace(tzinfo=UTC)
+        assert extended_expires > original_expires
 
     @pytest.mark.asyncio
     async def test_extend_exceeds_max(self, emergency_service: EmergencyService):
@@ -148,8 +158,9 @@ class TestEmergencyService:
         # Create an override that will expire immediately
         override = await emergency_service.activate(duration_minutes=1, reason="test")
 
-        # Manually expire it by setting expires_at to past
-        override.expires_at = datetime.now(UTC) - timedelta(minutes=1)
+        # Manually expire it by setting expires_at to past (use naive for SQLite)
+        past = datetime.now(UTC) - timedelta(minutes=1)
+        override.expires_at = past.replace(tzinfo=None)
         await emergency_service.db.commit()
 
         count = await emergency_service.cleanup_expired()

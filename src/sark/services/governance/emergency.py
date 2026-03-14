@@ -148,9 +148,13 @@ class EmergencyService:
         Returns:
             True if emergency override is active, False otherwise
         """
-        # Check cache first
+        # Check cache first (handle both naive and aware datetimes)
+        now = datetime.now(UTC)
         if self._is_cache_valid() and self._cached_override is not None:
-            if self._cached_override.expires_at > datetime.now(UTC):
+            expires = self._cached_override.expires_at
+            if expires.tzinfo is None:
+                expires = expires.replace(tzinfo=UTC)
+            if expires > now:
                 return True
             # Cached override has expired, invalidate
             self._invalidate_cache()
@@ -292,14 +296,16 @@ class EmergencyService:
         """
         from sqlalchemy import update
 
-        now = datetime.now(UTC)
+        # Use naive UTC datetime for SQLite compatibility
+        now_aware = datetime.now(UTC)
+        now_naive = now_aware.replace(tzinfo=None)
         result = await self.db.execute(
             update(EmergencyOverride)
             .where(
                 EmergencyOverride.active == True,  # noqa: E712
-                EmergencyOverride.expires_at < now,
+                EmergencyOverride.expires_at < now_naive,
             )
-            .values(active=False, deactivated_at=now)
+            .values(active=False, deactivated_at=now_aware)
         )
         await self.db.commit()
 
@@ -315,7 +321,9 @@ class EmergencyService:
 
     async def _get_current_override(self) -> EmergencyOverride | None:
         """Get current active emergency override."""
-        now = datetime.now(UTC)
+        # Use naive UTC datetime for SQLite compatibility
+        now_aware = datetime.now(UTC)
+        now_naive = now_aware.replace(tzinfo=None)
 
         # First, clean up any expired overrides
         from sqlalchemy import update
@@ -324,16 +332,16 @@ class EmergencyService:
             update(EmergencyOverride)
             .where(
                 EmergencyOverride.active == True,  # noqa: E712
-                EmergencyOverride.expires_at < now,
+                EmergencyOverride.expires_at < now_naive,
             )
-            .values(active=False, deactivated_at=now)
+            .values(active=False, deactivated_at=now_aware)
         )
 
         # Get active override
         result = await self.db.execute(
             select(EmergencyOverride).where(
                 EmergencyOverride.active == True,  # noqa: E712
-                EmergencyOverride.expires_at > now,
+                EmergencyOverride.expires_at > now_naive,
             )
         )
         return result.scalar_one_or_none()

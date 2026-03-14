@@ -450,7 +450,7 @@ class EnforcementService:
             rule_name=decision.rule,
             policy_name=decision.policy,
             duration_ms=duration_ms,
-            metadata=json.dumps({}),
+            decision_metadata=json.dumps({}),
         )
         self.db.add(log_entry)
         await self.db.commit()

@@ -150,8 +150,12 @@ class OverrideService:
         if not override:
             return False
 
-        # Check expiration
-        if override.expires_at < datetime.now(UTC):
+        # Check expiration (handle both naive and aware datetimes)
+        now = datetime.now(UTC)
+        expires = override.expires_at
+        if expires.tzinfo is None:
+            expires = expires.replace(tzinfo=UTC)
+        if expires < now:
             override.status = OverrideStatus.EXPIRED.value
             await self.db.commit()
             return False
@@ -191,8 +195,12 @@ class OverrideService:
         if not override:
             return False
 
-        # Check expiration
-        if override.expires_at < datetime.now(UTC):
+        # Check expiration (handle both naive and aware datetimes)
+        now = datetime.now(UTC)
+        expires = override.expires_at
+        if expires.tzinfo is None:
+            expires = expires.replace(tzinfo=UTC)
+        if expires < now:
             override.status = OverrideStatus.EXPIRED.value
             await self.db.commit()
             return False

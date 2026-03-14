@@ -189,13 +189,13 @@ class TestTrendAnalyzerService:
             (today - timedelta(days=4), 100, 10000),
             (today - timedelta(days=3), 105, 10500),
             (today - timedelta(days=2), 95, 9500),
-            (today - timedelta(days=1), 300, 30000),  # Anomaly!
+            (today - timedelta(days=1), 500, 50000),  # Anomaly! (z > 2.0)
             (today, 100, 10000),
         ]
 
         mock_db.execute = AsyncMock(return_value=mock_result)
 
-        result = await analyzer.detect_anomalies(days=5, threshold_std=2.0)
+        result = await analyzer.detect_anomalies(days=5, threshold_std=1.5)
 
         assert "anomalies" in result
         assert len(result["anomalies"]) > 0

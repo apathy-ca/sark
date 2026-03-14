@@ -214,7 +214,7 @@ class EnforcementDecisionLog(GovernanceBase):
     rule_name = Column(String(100), nullable=True)  # Rule that triggered decision
     policy_name = Column(String(100), nullable=True)  # OPA policy name
     duration_ms = Column(Integer, nullable=True)  # Decision latency
-    metadata = Column(Text, nullable=True)  # JSON metadata
+    decision_metadata = Column(Text, nullable=True)  # JSON metadata
     created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC), index=True)
 
     def __repr__(self) -> str:

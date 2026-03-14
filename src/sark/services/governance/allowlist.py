@@ -193,13 +193,18 @@ class AllowlistService:
         )
         entry = result.scalar_one_or_none()
 
-        # Check expiration
-        if entry and entry.expires_at and entry.expires_at < datetime.now(UTC):
-            # Entry expired, deactivate it
-            entry.active = False
-            await self.db.commit()
-            self._invalidate_cache()
-            return False
+        # Check expiration (handle both naive and aware datetimes)
+        now = datetime.now(UTC)
+        if entry and entry.expires_at:
+            expires = entry.expires_at
+            if expires.tzinfo is None:
+                expires = expires.replace(tzinfo=UTC)
+            if expires < now:
+                # Entry expired, deactivate it
+                entry.active = False
+                await self.db.commit()
+                self._invalidate_cache()
+                return False
 
         is_allowed = entry is not None
         self._cache[cache_key] = is_allowed
