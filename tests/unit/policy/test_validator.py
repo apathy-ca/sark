@@ -12,6 +12,11 @@ from sark.policy.validator import (
     ValidationResult,
 )
 
+from .conftest import requires_opa
+
+# Skip all tests in this module if OPA is not available
+pytestmark = requires_opa
+
 
 class TestPolicyValidator:
     """Test PolicyValidator class."""
