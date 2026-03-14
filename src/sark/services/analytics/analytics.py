@@ -5,7 +5,7 @@ Aggregates data from token tracker, cost calculator, and trend analyzer
 to provide comprehensive dashboard statistics.
 """
 
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from sqlalchemy import delete, func, select
@@ -105,16 +105,16 @@ class AnalyticsService:
         now = datetime.now(UTC)
 
         if period == "today":
-            start = datetime.combine(date.today(), datetime.min.time(), tzinfo=UTC)
+            start = datetime.combine(now.date(), datetime.min.time(), tzinfo=UTC)
             end = now
         elif period == "week":
             # Start of week (Monday)
             days_since_monday = now.weekday()
-            week_start = date.today() - timedelta(days=days_since_monday)
+            week_start = now.date() - timedelta(days=days_since_monday)
             start = datetime.combine(week_start, datetime.min.time(), tzinfo=UTC)
             end = now
         else:  # month
-            month_start = date.today().replace(day=1)
+            month_start = now.date().replace(day=1)
             start = datetime.combine(month_start, datetime.min.time(), tzinfo=UTC)
             end = now
 
@@ -174,9 +174,7 @@ class AnalyticsService:
         query = select(
             UsageEvent.endpoint,
             func.count(UsageEvent.id).label("request_count"),
-            func.sum(
-                UsageEvent.tokens_prompt + UsageEvent.tokens_response
-            ).label("total_tokens"),
+            func.sum(UsageEvent.tokens_prompt + UsageEvent.tokens_response).label("total_tokens"),
             func.sum(UsageEvent.cost_estimate).label("cost_total"),
         ).where(
             UsageEvent.timestamp >= start,
@@ -186,9 +184,11 @@ class AnalyticsService:
         if device_ip:
             query = query.where(UsageEvent.device_ip == device_ip)
 
-        query = query.group_by(UsageEvent.endpoint).order_by(
-            func.count(UsageEvent.id).desc()
-        ).limit(limit)
+        query = (
+            query.group_by(UsageEvent.endpoint)
+            .order_by(func.count(UsageEvent.id).desc())
+            .limit(limit)
+        )
 
         result = await self.db.execute(query)
 
@@ -402,7 +402,7 @@ class AnalyticsService:
         events_deleted = events_result.rowcount
 
         # Delete old daily aggregates
-        cutoff_date = (date.today() - timedelta(days=retention_days)).isoformat()
+        cutoff_date = (datetime.now(UTC).date() - timedelta(days=retention_days)).isoformat()
         aggregates_result = await self.db.execute(
             delete(DailyAggregate).where(DailyAggregate.date < cutoff_date)
         )

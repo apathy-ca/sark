@@ -165,7 +165,7 @@ class TokenTrackerService:
         Returns:
             Dictionary with daily usage statistics
         """
-        day = day or date.today()
+        day = day or datetime.now(UTC).date()
         start = datetime.combine(day, datetime.min.time(), tzinfo=UTC)
         end = datetime.combine(day, datetime.max.time(), tzinfo=UTC)
 
@@ -188,9 +188,7 @@ class TokenTrackerService:
             select(
                 UsageEvent.endpoint,
                 func.count(UsageEvent.id).label("count"),
-                func.sum(UsageEvent.tokens_prompt + UsageEvent.tokens_response).label(
-                    "tokens"
-                ),
+                func.sum(UsageEvent.tokens_prompt + UsageEvent.tokens_response).label("tokens"),
             )
             .where(
                 UsageEvent.device_ip == device_ip,
@@ -200,8 +198,7 @@ class TokenTrackerService:
             .group_by(UsageEvent.endpoint)
         )
         by_endpoint = {
-            ep: {"count": cnt, "tokens": tok}
-            for ep, cnt, tok in endpoint_result.fetchall()
+            ep: {"count": cnt, "tokens": tok} for ep, cnt, tok in endpoint_result.fetchall()
         }
 
         tokens_prompt = row.tokens_prompt or 0
@@ -255,9 +252,7 @@ class TokenTrackerService:
             select(
                 func.date(UsageEvent.timestamp).label("day"),
                 func.count(UsageEvent.id).label("count"),
-                func.sum(UsageEvent.tokens_prompt + UsageEvent.tokens_response).label(
-                    "tokens"
-                ),
+                func.sum(UsageEvent.tokens_prompt + UsageEvent.tokens_response).label("tokens"),
             )
             .where(
                 UsageEvent.device_ip == device_ip,
@@ -321,9 +316,7 @@ class TokenTrackerService:
                 UsageEvent.timestamp <= end,
             )
             .group_by(UsageEvent.device_ip, UsageEvent.device_name)
-            .order_by(
-                func.sum(UsageEvent.tokens_prompt + UsageEvent.tokens_response).desc()
-            )
+            .order_by(func.sum(UsageEvent.tokens_prompt + UsageEvent.tokens_response).desc())
             .limit(limit)
         )
 
@@ -359,9 +352,7 @@ class TokenTrackerService:
         query = select(
             func.strftime("%H", UsageEvent.timestamp).label("hour"),
             func.count(UsageEvent.id).label("request_count"),
-            func.sum(UsageEvent.tokens_prompt + UsageEvent.tokens_response).label(
-                "total_tokens"
-            ),
+            func.sum(UsageEvent.tokens_prompt + UsageEvent.tokens_response).label("total_tokens"),
         ).where(
             UsageEvent.timestamp >= start,
             UsageEvent.timestamp <= end,
@@ -397,7 +388,7 @@ class TokenTrackerService:
         Returns:
             Number of aggregates created/updated
         """
-        day = day or (date.today() - timedelta(days=1))
+        day = day or (datetime.now(UTC).date() - timedelta(days=1))
         start = datetime.combine(day, datetime.min.time(), tzinfo=UTC)
         end = datetime.combine(day, datetime.max.time(), tzinfo=UTC)
 
@@ -424,9 +415,15 @@ class TokenTrackerService:
         )
 
         count = 0
-        for device_ip, endpoint, provider, req_cnt, tok_prompt, tok_response, cost in (
-            result.fetchall()
-        ):
+        for (
+            device_ip,
+            endpoint,
+            provider,
+            req_cnt,
+            tok_prompt,
+            tok_response,
+            cost,
+        ) in result.fetchall():
             # Check if aggregate exists
             existing = await self.db.execute(
                 select(DailyAggregate).where(
