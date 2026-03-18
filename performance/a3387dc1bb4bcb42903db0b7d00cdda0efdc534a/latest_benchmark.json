@@ -1,0 +1,77 @@
+{
+  "suite_name": "SARK v1.3.0 Security Features",
+  "timestamp": "2026-03-18T13:10:49.549879",
+  "git_commit": "a3387dc",
+  "results": [
+    {
+      "name": "Injection Detection - Simple",
+      "iterations": 1000,
+      "min_ms": 0.09986699996034076,
+      "max_ms": 0.15734300001213342,
+      "mean_ms": 0.10370400900063714,
+      "median_ms": 0.1016344999982266,
+      "p95_ms": 0.11282999997774823,
+      "p99_ms": 0.1212259999761045,
+      "std_dev_ms": 0.005168529867979573,
+      "timestamp": "2026-03-18T13:10:47.460239",
+      "passed": true,
+      "target_ms": 2.0
+    },
+    {
+      "name": "Injection Detection - Complex",
+      "iterations": 500,
+      "min_ms": 3.145641000003252,
+      "max_ms": 4.476083999975344,
+      "mean_ms": 3.2186957340011304,
+      "median_ms": 3.2146400000101494,
+      "p95_ms": 3.276986000003035,
+      "p99_ms": 3.3441310000057456,
+      "std_dev_ms": 0.07824012358604723,
+      "timestamp": "2026-03-18T13:10:49.233998",
+      "passed": true,
+      "target_ms": 5.0
+    },
+    {
+      "name": "Secret Scan - Small",
+      "iterations": 1000,
+      "min_ms": 0.0042679999978645355,
+      "max_ms": 0.013755999987097312,
+      "mean_ms": 0.004419379001262769,
+      "median_ms": 0.004369000009774027,
+      "p95_ms": 0.0044679999859909,
+      "p99_ms": 0.004879000016444479,
+      "std_dev_ms": 0.0005630124374941463,
+      "timestamp": "2026-03-18T13:10:49.241389",
+      "passed": true,
+      "target_ms": 0.5
+    },
+    {
+      "name": "Secret Scan - Large",
+      "iterations": 500,
+      "min_ms": 0.3303369999798633,
+      "max_ms": 0.40258100000301056,
+      "mean_ms": 0.336148688000776,
+      "median_ms": 0.3328159999966829,
+      "p95_ms": 0.34423199997490883,
+      "p99_ms": 0.37510999999312844,
+      "std_dev_ms": 0.007197922802628159,
+      "timestamp": "2026-03-18T13:10:49.428420",
+      "passed": true,
+      "target_ms": 5.0
+    },
+    {
+      "name": "Combined - Injection + Secrets",
+      "iterations": 1000,
+      "min_ms": 0.10448400001905611,
+      "max_ms": 0.1795250000213855,
+      "mean_ms": 0.1077956469995911,
+      "median_ms": 0.10589750002054643,
+      "p95_ms": 0.11766000000079657,
+      "p99_ms": 0.1265960000296218,
+      "std_dev_ms": 0.005690500651121821,
+      "timestamp": "2026-03-18T13:10:49.549867",
+      "passed": true,
+      "target_ms": 3.0
+    }
+  ]
+}
