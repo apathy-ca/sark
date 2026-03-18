@@ -84,7 +84,7 @@ jobs:
 
       - name: Upload coverage
         if: always()
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           files: ./coverage-adapter-${{ matrix.adapter }}.xml
           flags: adapter-${{ matrix.adapter }}
@@ -157,7 +157,7 @@ jobs:
 
       - name: Upload coverage
         if: always()
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           files: ./coverage-multi-protocol.xml
           flags: multi-protocol
@@ -246,7 +246,7 @@ jobs:
 
       - name: Upload coverage
         if: always()
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           files: ./coverage-federation.xml
           flags: federation
@@ -388,7 +388,7 @@ jobs:
 
       - name: Upload full coverage
         if: always()
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           files: ./coverage-full.xml
           flags: v2-full-suite
