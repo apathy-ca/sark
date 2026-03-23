@@ -18,11 +18,15 @@ from sark.services.policy.opa_client import (
     OPAClient,
 )
 
+# Import Rust implementations
+from sark.services.policy.rust_cache import RustPolicyCache, is_rust_cache_available
+from sark.services.policy.rust_opa_client import RustOPAClient, RUST_AVAILABLE as OPA_RUST_AVAILABLE
+
 logger = structlog.get_logger()
 
 
-# Check if Rust libraries are available
-RUST_AVAILABLE = os.getenv("RUST_ENABLED", "false").lower() == "true"
+# Check if Rust libraries are available (from environment variable for feature flag control)
+RUST_ENABLED = os.getenv("RUST_ENABLED", "false").lower() == "true"
 
 
 # Protocol definitions for type checking
@@ -70,124 +74,8 @@ class PolicyCacheProtocol(Protocol):
         ...
 
 
-# Rust implementation stubs (actual implementations from opa-engine/cache-engine workers)
-class RustOPAClient:
-    """
-    Rust-based OPA client using native Rego engine.
-
-    This is a stub that will be replaced by the actual implementation
-    from the opa-engine worker. The real implementation will use PyO3
-    bindings to call Rust code.
-    """
-
-    def __init__(self, opa_url: str | None = None):
-        """
-        Initialize Rust OPA client.
-
-        Args:
-            opa_url: OPA server URL (may not be needed for native engine)
-        """
-        if not RUST_AVAILABLE:
-            raise RuntimeError(
-                "Rust OPA client not available. Set RUST_ENABLED=true "
-                "and ensure rust_opa module is installed."
-            )
-
-        # In real implementation, this would initialize the Rust engine
-        logger.info("Initializing Rust OPA client (stub)")
-        self._initialized = True
-
-    async def evaluate_policy(
-        self, auth_input: AuthorizationInput, use_cache: bool = True
-    ) -> AuthorizationDecision:
-        """
-        Evaluate policy using native Rust Rego engine.
-
-        In the actual implementation, this would call into Rust via PyO3.
-        """
-        # Stub: would call rust_opa.evaluate() here
-        raise NotImplementedError(
-            "Rust OPA client stub - waiting for opa-engine worker implementation"
-        )
-
-    async def close(self) -> None:
-        """Close Rust client resources."""
-        logger.info("Closing Rust OPA client")
-
-
-class RustPolicyCache:
-    """
-    Rust-based policy cache using high-performance concurrent data structures.
-
-    This is a stub that will be replaced by the actual implementation
-    from the cache-engine worker. The real implementation will use
-    Rust-based concurrent cache with TTL support.
-    """
-
-    def __init__(self, max_size: int = 10000):
-        """
-        Initialize Rust policy cache.
-
-        Args:
-            max_size: Maximum cache size
-        """
-        if not RUST_AVAILABLE:
-            raise RuntimeError(
-                "Rust policy cache not available. Set RUST_ENABLED=true "
-                "and ensure rust_cache module is installed."
-            )
-
-        # In real implementation, this would initialize the Rust cache
-        logger.info(f"Initializing Rust policy cache (stub) with max_size={max_size}")
-        self._max_size = max_size
-        self._initialized = True
-
-    async def get(
-        self,
-        user_id: str,
-        action: str,
-        resource: str,
-        context: dict[str, Any] | None = None,
-    ) -> dict[str, Any] | None:
-        """
-        Get cached decision using Rust cache.
-
-        In the actual implementation, this would call into Rust via PyO3.
-        """
-        # Stub: would call rust_cache.get() here
-        raise NotImplementedError(
-            "Rust cache stub - waiting for cache-engine worker implementation"
-        )
-
-    async def set(
-        self,
-        user_id: str,
-        action: str,
-        resource: str,
-        decision: dict[str, Any],
-        context: dict[str, Any] | None = None,
-        ttl: int | None = None,
-    ) -> None:
-        """
-        Set cached decision using Rust cache.
-
-        In the actual implementation, this would call into Rust via PyO3.
-        """
-        # Stub: would call rust_cache.set() here
-        raise NotImplementedError(
-            "Rust cache stub - waiting for cache-engine worker implementation"
-        )
-
-    async def delete(self, user_id: str, action: str, resource: str) -> None:
-        """
-        Delete cached decision using Rust cache.
-
-        In the actual implementation, this would call into Rust via PyO3.
-        """
-        # Stub: would call rust_cache.delete() here
-        raise NotImplementedError(
-            "Rust cache stub - waiting for cache-engine worker implementation"
-        )
+# Rust implementations are now imported from rust_opa_client.py and rust_cache.py
+# These provide full PyO3 bindings to the grid-core Rust libraries
 
 
 # Factory functions
@@ -213,14 +101,14 @@ def create_opa_client(
     should_use_rust = feature_flags.should_use_rust("rust_opa", user_id)
 
     # Check if user should get Rust implementation
-    if RUST_AVAILABLE and should_use_rust:
+    if RUST_ENABLED and OPA_RUST_AVAILABLE and should_use_rust:
         try:
             logger.info(
                 "Creating Rust OPA client",
                 user_id=user_id,
                 feature="rust_opa",
             )
-            return RustOPAClient(opa_url)
+            return RustOPAClient()
         except Exception as e:
             if fallback_on_error:
                 logger.warning(
@@ -237,7 +125,8 @@ def create_opa_client(
         "Creating Python OPA client",
         user_id=user_id,
         feature="rust_opa",
-        rust_available=RUST_AVAILABLE,
+        rust_enabled=RUST_ENABLED,
+        rust_available=OPA_RUST_AVAILABLE,
         should_use_rust=should_use_rust,
     )
     return OPAClient(opa_url=opa_url)
@@ -263,7 +152,7 @@ def create_policy_cache(
     should_use_rust = feature_flags.should_use_rust("rust_cache", user_id)
 
     # Check if user should get Rust implementation
-    if RUST_AVAILABLE and should_use_rust:
+    if RUST_ENABLED and is_rust_cache_available() and should_use_rust:
         try:
             logger.info(
                 "Creating Rust policy cache",
@@ -287,7 +176,8 @@ def create_policy_cache(
         "Creating Redis policy cache",
         user_id=user_id,
         feature="rust_cache",
-        rust_available=RUST_AVAILABLE,
+        rust_enabled=RUST_ENABLED,
+        rust_available=is_rust_cache_available(),
         should_use_rust=should_use_rust,
     )
     return PolicyCache()
