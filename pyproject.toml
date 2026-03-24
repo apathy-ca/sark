@@ -21,10 +21,10 @@ dependencies = [
     "httpx>=0.25.0",
     "python-consul>=1.1.0",
     "python-multipart>=0.0.6",
-    "pyjwt[crypto]>=2.10.0",  # Replaced python-jose to eliminate ecdsa dependency
-    "cryptography>=44.0.0",  # Required for PyJWT RSA/ECDSA support
+    "pyjwt[crypto]>=2.12.0",  # CVE-2026-32597: algorithm confusion attack fix
+    "cryptography>=46.0.5",  # CVE-2026-26007: memory corruption fix
     "passlib[bcrypt]>=1.7.4",
-    "authlib>=1.6.6",  # CVE-2025-68158: CSRF account takeover fix
+    "authlib>=1.6.9",  # CVE-2026-28802/27962/28490: CSRF/PKCE/token fixes
     "ldap3>=2.9.1",
     "python3-saml>=1.15.0",
     "structlog>=23.1.0",
@@ -39,12 +39,12 @@ dependencies = [
     "grpcio>=1.60.0",
     "grpcio-reflection>=1.60.0",
     "grpcio-tools>=1.60.0",
-    "protobuf>=4.25.0",
+    "protobuf>=6.33.5",  # CVE-2026-0994: protobuf memory safety fix
     "psutil>=5.9.0",
     # Security fixes (v1.6.0)
     "aiohttp>=3.13.3",  # CVE-2025-69223-69230: DoS, request smuggling, memory exhaustion
     "urllib3>=2.6.3",  # CVE-2025-50181, CVE-2025-66418, CVE-2025-66471, CVE-2026-21441
-    "werkzeug>=3.1.5",  # CVE-2026-21860: Windows path traversal fix
+    "werkzeug>=3.1.6",  # CVE-2026-21860/27199: path traversal fixes
     "pyasn1>=0.6.3",  # CVE-2026-23490, CVE-2026-XXXXX: DoS fixes
     "pynacl>=1.6.2",  # CVE-2025-69277: Elliptic curve validation
     "azure-core>=1.38.0",  # CVE-2026-21226: Deserialization vulnerability
@@ -81,7 +81,7 @@ dev = [
     "bokeh>=3.8.2",  # CVE-2026-21883: CSWSH fix
     "fonttools>=4.60.2",  # CVE-2025-66034: Arbitrary file write RCE
     "fastapi-sso>=0.19.0",  # CVE-2025-14546: CSRF OAuth callback fix
-    "nbconvert>=7.16.6",  # CVE-2025-53000: Windows inkscape.bat RCE (awaiting fix, Linux unaffected)
+    "nbconvert>=7.17.0",  # CVE-2025-53000: inkscape.bat RCE fix
 ]
 
 [build-system]
