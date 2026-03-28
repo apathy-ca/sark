@@ -40,7 +40,7 @@ class TestRolloutStatusEndpoint:
     @patch("sark.api.routers.admin.get_feature_flag_manager")
     def test_get_rollout_status_default_values(self, mock_feature_flags, client):
         """Test rollout status returns 0 for missing features."""
-# Mock feature flag manager returning empty dict
+        # Mock feature flag manager returning empty dict
         mock_manager = MagicMock()
         mock_manager.get_all_rollouts.return_value = {}
         mock_feature_flags.return_value = mock_manager
@@ -55,7 +55,7 @@ class TestRolloutStatusEndpoint:
     @patch("sark.api.routers.admin.get_feature_flag_manager")
     def test_get_rollout_status_error_handling(self, mock_feature_flags, client):
         """Test error handling when feature flag manager fails."""
-# Mock feature flag manager to raise exception
+        # Mock feature flag manager to raise exception
         mock_feature_flags.side_effect = Exception("Database connection failed")
 
         response = client.get("/admin/rollout/status")
@@ -223,9 +223,7 @@ class TestRollbackAllFeaturesEndpoint:
 
     @patch("sark.api.routers.admin.get_feature_flag_manager")
     @patch("sark.api.routers.admin.record_rollout_percentage")
-    def test_rollback_all_features_success(
-        self, mock_record, mock_feature_flags, client
-    ):
+    def test_rollback_all_features_success(self, mock_record, mock_feature_flags, client):
         """Test successfully rolling back all features."""
         mock_manager = MagicMock()
         mock_manager.get_all_rollouts.return_value = {
@@ -272,7 +270,6 @@ class TestAdminAuthorizationRequirements:
         """Test that admin endpoints require authentication."""
         # This test would require setting up proper authentication
         # For now, we verify the dependency is declared
-        from sark.api.routers.admin import router
 
         # Check that endpoints use require_role dependency
         for route in router.routes:

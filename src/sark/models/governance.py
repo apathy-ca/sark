@@ -89,7 +89,9 @@ class AllowlistEntry(GovernanceBase):
     )
 
     def __repr__(self) -> str:
-        return f"<AllowlistEntry(id={self.id}, type={self.entry_type}, identifier={self.identifier})>"
+        return (
+            f"<AllowlistEntry(id={self.id}, type={self.entry_type}, identifier={self.identifier})>"
+        )
 
 
 class TimeRule(GovernanceBase):
@@ -137,13 +139,17 @@ class EmergencyOverride(GovernanceBase):
     active = Column(Boolean, default=True, nullable=False, index=True)
     reason = Column(String(500), nullable=False)
     activated_by = Column(String(100), nullable=True)
-    activated_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC))
+    activated_at = Column(
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC)
+    )
     expires_at = Column(DateTime(timezone=True), nullable=False, index=True)
     deactivated_at = Column(DateTime(timezone=True), nullable=True)
     deactivated_by = Column(String(100), nullable=True)
 
     def __repr__(self) -> str:
-        return f"<EmergencyOverride(id={self.id}, active={self.active}, expires_at={self.expires_at})>"
+        return (
+            f"<EmergencyOverride(id={self.id}, active={self.active}, expires_at={self.expires_at})>"
+        )
 
 
 class ConsentRequest(GovernanceBase):
@@ -193,7 +199,9 @@ class OverrideRequest(GovernanceBase):
     created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC))
 
     def __repr__(self) -> str:
-        return f"<OverrideRequest(id={self.id}, request_id={self.request_id}, status={self.status})>"
+        return (
+            f"<OverrideRequest(id={self.id}, request_id={self.request_id}, status={self.status})>"
+        )
 
 
 class EnforcementDecisionLog(GovernanceBase):
@@ -210,12 +218,16 @@ class EnforcementDecisionLog(GovernanceBase):
     client_ip = Column(String(45), nullable=True, index=True)  # IPv4/IPv6
     allowed = Column(Boolean, nullable=False, index=True)
     reason = Column(String(500), nullable=False)
-    decision_source = Column(String(50), nullable=False)  # e.g., "emergency", "allowlist", "time_rule", "opa"
+    decision_source = Column(
+        String(50), nullable=False
+    )  # e.g., "emergency", "allowlist", "time_rule", "opa"
     rule_name = Column(String(100), nullable=True)  # Rule that triggered decision
     policy_name = Column(String(100), nullable=True)  # OPA policy name
     duration_ms = Column(Integer, nullable=True)  # Decision latency
-    metadata = Column(Text, nullable=True)  # JSON metadata
-    created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC), index=True)
+    decision_metadata = Column(Text, nullable=True)  # JSON metadata
+    created_at = Column(
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(UTC), index=True
+    )
 
     def __repr__(self) -> str:
         return f"<EnforcementDecisionLog(id={self.id}, allowed={self.allowed}, source={self.decision_source})>"
@@ -230,7 +242,9 @@ class AllowlistEntryCreate(PydanticBaseModel):
     """Request to add entry to allowlist."""
 
     entry_type: AllowlistEntryType = Field(default=AllowlistEntryType.DEVICE)
-    identifier: str = Field(..., min_length=1, max_length=100, description="IP address, MAC, or user ID")
+    identifier: str = Field(
+        ..., min_length=1, max_length=100, description="IP address, MAC, or user ID"
+    )
     name: str | None = Field(None, max_length=100, description="Human-readable name")
     reason: str | None = Field(None, max_length=500, description="Reason for allowlisting")
     expires_at: datetime | None = Field(None, description="Optional expiration time")
@@ -270,7 +284,9 @@ class TimeRuleCreate(PydanticBaseModel):
     start_time: str = Field(..., pattern=r"^\d{2}:\d{2}$", description="Start time in HH:MM format")
     end_time: str = Field(..., pattern=r"^\d{2}:\d{2}$", description="End time in HH:MM format")
     action: TimeRuleAction = Field(default=TimeRuleAction.BLOCK)
-    days: list[str] | None = Field(None, description="Days of week (mon,tue,wed,etc.) or null for all")
+    days: list[str] | None = Field(
+        None, description="Days of week (mon,tue,wed,etc.) or null for all"
+    )
     timezone: str = Field(default="UTC")
     priority: int = Field(default=100, ge=0, le=1000)
 
@@ -306,7 +322,9 @@ class TimeCheckResult(PydanticBaseModel):
 class EmergencyOverrideCreate(PydanticBaseModel):
     """Request to activate emergency override."""
 
-    duration_minutes: int = Field(..., ge=1, le=1440, description="Duration in minutes (max 24 hours)")
+    duration_minutes: int = Field(
+        ..., ge=1, le=1440, description="Duration in minutes (max 24 hours)"
+    )
     reason: str = Field(..., min_length=1, max_length=500)
 
 
@@ -379,7 +397,9 @@ class EnforcementDecision(PydanticBaseModel):
 
     allowed: bool = Field(description="Whether the request is allowed")
     reason: str = Field(description="Reason for decision")
-    decision_source: str = Field(description="Source of decision (emergency, allowlist, time_rule, opa)")
+    decision_source: str = Field(
+        description="Source of decision (emergency, allowlist, time_rule, opa)"
+    )
     rule: str | None = Field(None, description="Rule name if applicable")
     policy: str | None = Field(None, description="Policy name if applicable")
 
@@ -389,30 +409,30 @@ class EnforcementDecision(PydanticBaseModel):
 # =============================================================================
 
 __all__ = [
-    # Enums
-    "AllowlistEntryType",
-    "ConsentStatus",
-    "OverrideStatus",
-    "TimeRuleAction",
     # SQLAlchemy models
     "AllowlistEntry",
-    "ConsentRequest",
-    "EmergencyOverride",
-    "EnforcementDecisionLog",
-    "GovernanceBase",
-    "OverrideRequest",
-    "TimeRule",
     # Pydantic schemas
     "AllowlistEntryCreate",
     "AllowlistEntryResponse",
+    # Enums
+    "AllowlistEntryType",
+    "ConsentRequest",
     "ConsentRequestCreate",
     "ConsentRequestResponse",
+    "ConsentStatus",
+    "EmergencyOverride",
     "EmergencyOverrideCreate",
     "EmergencyOverrideResponse",
     "EnforcementDecision",
+    "EnforcementDecisionLog",
+    "GovernanceBase",
+    "OverrideRequest",
     "OverrideRequestCreate",
     "OverrideRequestResponse",
+    "OverrideStatus",
     "TimeCheckResult",
+    "TimeRule",
+    "TimeRuleAction",
     "TimeRuleCreate",
     "TimeRuleResponse",
 ]

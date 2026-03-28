@@ -7,24 +7,22 @@ Provides fixtures for integration testing of home deployment profile including:
 - Sample data fixtures
 """
 
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from decimal import Decimal
-from typing import Any, AsyncGenerator
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
 import pytest
 
 from sark.models.gateway import (
-    AgentContext,
-    AgentType,
     GatewayAuthorizationRequest,
     GatewayAuthorizationResponse,
     GatewayServerInfo,
     GatewayToolInfo,
     SensitivityLevel,
-    TrustLevel,
 )
 from sark.services.auth.user_context import UserContext
 
@@ -50,11 +48,13 @@ class HomeDeploymentConfig:
     enable_rate_limiting: bool = True
     daily_budget_usd: Decimal = Decimal("10.00")
     monthly_budget_usd: Decimal = Decimal("100.00")
-    allowed_endpoints: list[str] = field(default_factory=lambda: [
-        "api.openai.com",
-        "api.anthropic.com",
-        "generativelanguage.googleapis.com",
-    ])
+    allowed_endpoints: list[str] = field(
+        default_factory=lambda: [
+            "api.openai.com",
+            "api.anthropic.com",
+            "generativelanguage.googleapis.com",
+        ]
+    )
 
 
 @dataclass
@@ -110,9 +110,7 @@ async def home_deployment_context(
     )
 
     mock_cost_tracker = MagicMock()
-    mock_cost_tracker.check_budget_before_invocation = AsyncMock(
-        return_value=(True, None)
-    )
+    mock_cost_tracker.check_budget_before_invocation = AsyncMock(return_value=(True, None))
     mock_cost_tracker.record_invocation_cost = AsyncMock()
 
     mock_rate_limiter = MagicMock()
@@ -396,9 +394,7 @@ def home_chat_request() -> GatewayAuthorizationRequest:
         server_name="openai-proxy",
         tool_name="chat_completion",
         parameters={
-            "messages": [
-                {"role": "user", "content": "Help me with my homework"}
-            ],
+            "messages": [{"role": "user", "content": "Help me with my homework"}],
             "model": "gpt-3.5-turbo",
         },
     )
@@ -425,11 +421,11 @@ HOME_SAMPLE_ENDPOINTS = [
 
 
 __all__ = [
+    "HOME_SAMPLE_ENDPOINTS",
+    "HOME_SAMPLE_PROMPTS",
     "HomeDeploymentConfig",
     "HomeDeploymentContext",
-    "home_deployment_context",
     "HomeDevice",
     "TimeRule",
-    "HOME_SAMPLE_PROMPTS",
-    "HOME_SAMPLE_ENDPOINTS",
+    "home_deployment_context",
 ]

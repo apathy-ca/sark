@@ -32,4 +32,4 @@ except ImportError as e:
         stacklevel=2,
     )
 
-__all__ = ["RUST_AVAILABLE", "RustOPAEngine", "RustCache"]
+__all__ = ["RUST_AVAILABLE", "RustCache", "RustOPAEngine"]

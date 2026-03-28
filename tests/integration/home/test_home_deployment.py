@@ -9,10 +9,10 @@ Tests the complete home deployment scenario including:
 Following AAA pattern: Arrange, Act, Assert
 """
 
-import sys
 from decimal import Decimal
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
+import sys
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
@@ -21,7 +21,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent / "fixtures" / "home"
 
 from home_fixtures import (
     HomeDeploymentConfig,
-    HomeDeploymentContext,
     HomeDevice,
     TimeRule,
     home_deployment_context,
@@ -204,9 +203,7 @@ class TestHomeDeploymentCostTracking:
             metadata = {"provider": "openai"}
 
             # Act
-            await ctx.cost_tracker.record_invocation_cost(
-                request, result, resource_id, metadata
-            )
+            await ctx.cost_tracker.record_invocation_cost(request, result, resource_id, metadata)
 
             # Assert
             ctx.cost_tracker.record_invocation_cost.assert_called_once()

@@ -2,8 +2,8 @@
 
 from unittest.mock import patch
 
-import pytest
 from ldap3.utils.conv import escape_filter_chars
+import pytest
 
 from sark.services.auth.providers.ldap import LDAPProvider, LDAPProviderConfig
 
@@ -33,7 +33,7 @@ class TestLDAPInjectionPrevention:
         malicious_input = "admin)(uid=*"
 
         # Mock the search to verify the filter is escaped
-        with patch.object(provider, "_search_user", return_value=(None, {})) as mock_search:
+        with patch.object(provider, "_search_user", return_value=(None, {})):
             result = await provider.authenticate(malicious_input, "password")
 
             # Verify authentication failed (user not found)
@@ -86,10 +86,9 @@ class TestLDAPInjectionPrevention:
 
         # Manually verify the escaping happens
         safe_username = escape_filter_chars(malicious_username)
-        expected_filter = f"(uid={safe_username})"
 
         # The escaped version should not contain unescaped special characters
-        assert "admin\\29\\28uid=\\2a" in safe_username or "admin)(uid=*" != safe_username
+        assert "admin\\29\\28uid=\\2a" in safe_username or safe_username != "admin)(uid=*"
 
     @pytest.mark.asyncio
     async def test_user_dn_escaping_in_get_groups(self, provider):

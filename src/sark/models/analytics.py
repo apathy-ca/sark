@@ -14,7 +14,6 @@ from pydantic import Field
 from sqlalchemy import (
     Column,
     DateTime,
-    Float,
     Index,
     Integer,
     Numeric,
@@ -139,9 +138,7 @@ class ProviderPricing(Base):
     provider = Column(String(50), nullable=False, index=True)
     model = Column(String(100), nullable=False, index=True)
     prompt_per_1m = Column(Numeric(10, 4), nullable=False)  # Cost per 1M prompt tokens
-    response_per_1m = Column(
-        Numeric(10, 4), nullable=False
-    )  # Cost per 1M response tokens
+    response_per_1m = Column(Numeric(10, 4), nullable=False)  # Cost per 1M response tokens
     currency = Column(String(3), nullable=False, default="USD")
     effective_date = Column(
         DateTime(timezone=True),
@@ -150,9 +147,7 @@ class ProviderPricing(Base):
     )
     notes = Column(Text, nullable=True)
 
-    __table_args__ = (
-        Index("idx_pricing_provider_model", "provider", "model", unique=True),
-    )
+    __table_args__ = (Index("idx_pricing_provider_model", "provider", "model", unique=True),)
 
     def __repr__(self) -> str:
         return f"<ProviderPricing(provider={self.provider}, model={self.model})>"
@@ -260,13 +255,13 @@ class UsageReportSchema(PydanticBaseModel):
 __all__ = [
     # SQLAlchemy models
     "DailyAggregate",
-    "ProviderPricing",
-    "UsageEvent",
     # Pydantic schemas
     "DailyUsageSchema",
     "DashboardStatsSchema",
     "PeriodStatsSchema",
+    "ProviderPricing",
     "TrendDataSchema",
+    "UsageEvent",
     "UsageEventSchema",
     "UsageReportSchema",
 ]

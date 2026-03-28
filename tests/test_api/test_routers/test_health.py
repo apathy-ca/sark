@@ -2,11 +2,9 @@
 
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import pytest
 from fastapi.testclient import TestClient
 
 from sark.main import app
-
 
 # Create a test client
 client = TestClient(app)
@@ -192,7 +190,7 @@ class TestDetailedHealthCheck:
         assert "opa" in data["dependencies"]
 
         # Verify each dependency has correct structure
-        for dep_name, dep_status in data["dependencies"].items():
+        for _dep_name, dep_status in data["dependencies"].items():
             assert "healthy" in dep_status
             assert "latency_ms" in dep_status
             assert dep_status["healthy"] is True
@@ -252,7 +250,6 @@ class TestCheckDatabaseHealth:
     async def test_check_database_health_success(self, mock_create_engine):
         """Test database health check succeeds when connection is healthy."""
         from sark.api.routers.health import check_database_health
-        from unittest.mock import MagicMock
 
         # Mock engine and connection
         mock_engine = AsyncMock()
@@ -421,7 +418,7 @@ class TestHealthResponseModels:
 
     def test_detailed_health_response_model(self):
         """Test DetailedHealthResponse model."""
-        from sark.api.routers.health import DetailedHealthResponse, DependencyStatus
+        from sark.api.routers.health import DependencyStatus, DetailedHealthResponse
 
         response = DetailedHealthResponse(
             status="healthy",

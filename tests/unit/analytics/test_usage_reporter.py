@@ -1,6 +1,6 @@
 """Unit tests for UsageReporterService."""
 
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, date, datetime
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -208,18 +208,14 @@ class TestUsageReporterService:
 
         mock_db.execute = AsyncMock(return_value=mock_result)
 
-        csv_content = await reporter.export_csv(
-            period=ReportPeriod.DAY, include_details=True
-        )
+        csv_content = await reporter.export_csv(period=ReportPeriod.DAY, include_details=True)
 
         assert "timestamp" in csv_content
         assert "192.168.1.100" in csv_content
         assert "gpt-4" in csv_content
 
     @pytest.mark.asyncio
-    async def test_export_json(
-        self, reporter: UsageReporterService, mock_db: MagicMock
-    ) -> None:
+    async def test_export_json(self, reporter: UsageReporterService, mock_db: MagicMock) -> None:
         """Test export_json returns JSON string."""
         # Setup mocks for generate
         mock_summary = MagicMock()
@@ -253,9 +249,7 @@ class TestUsageReporterService:
     ) -> None:
         """Test get_quick_summary returns period summaries."""
         mock_result = MagicMock()
-        mock_result.one.return_value = MagicMock(
-            requests=50, tokens=5000, cost=0.50
-        )
+        mock_result.one.return_value = MagicMock(requests=50, tokens=5000, cost=0.50)
 
         mock_db.execute = AsyncMock(return_value=mock_result)
 

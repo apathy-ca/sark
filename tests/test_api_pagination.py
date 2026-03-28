@@ -13,21 +13,24 @@ from sark.models.mcp_server import MCPServer, SensitivityLevel, ServerStatus, Tr
 def _get_mock_user():
     """Create a mock user context for tests."""
     from sark.api.dependencies import UserContext
-    return UserContext({
-        "user_id": str(uuid4()),
-        "email": "test@example.com",
-        "name": "Test User",
-        "roles": ["admin"],
-        "teams": [],
-        "permissions": ["servers:read", "servers:write"],
-    })
+
+    return UserContext(
+        {
+            "user_id": str(uuid4()),
+            "email": "test@example.com",
+            "name": "Test User",
+            "roles": ["admin"],
+            "teams": [],
+            "permissions": ["servers:read", "servers:write"],
+        }
+    )
 
 
 @pytest.fixture
 def client() -> TestClient:
     """Create test client with mocked authentication."""
-    from sark.api.main import app
     from sark.api.dependencies import get_current_user
+    from sark.api.main import app
 
     # Override auth dependency to return mock user
     app.dependency_overrides[get_current_user] = _get_mock_user

@@ -9,10 +9,10 @@ Tests the API layer for governance functionality including:
 Following AAA pattern: Arrange, Act, Assert
 """
 
-import sys
 from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
+import sys
 from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
@@ -21,7 +21,7 @@ import pytest
 # Add fixtures to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "fixtures" / "home"))
 
-from home_fixtures import HomeDeploymentConfig, home_deployment_context
+from home_fixtures import home_deployment_context
 
 from sark.models.gateway import (
     GatewayAuthorizationRequest,
@@ -177,6 +177,7 @@ class TestServerListAPI:
         ]
 
         with patch("sark.services.gateway.authorization.evaluate_policy") as mock_opa:
+
             async def mock_evaluate(policy_path, input_data):
                 server = input_data["resource"]["server"]
                 if server == "openai-proxy":
@@ -222,6 +223,7 @@ class TestToolListAPI:
         ]
 
         with patch("sark.services.gateway.authorization.evaluate_policy") as mock_opa:
+
             async def mock_evaluate(policy_path, input_data):
                 sensitivity = input_data["resource"]["sensitivity"]
                 if sensitivity != "critical":

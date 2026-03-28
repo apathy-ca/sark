@@ -7,16 +7,13 @@ Supports IP addresses, MAC addresses, and user IDs.
 
 from datetime import UTC, datetime
 from ipaddress import ip_address
-from typing import Any
 
-import structlog
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+import structlog
 
 from sark.models.governance import (
     AllowlistEntry,
-    AllowlistEntryCreate,
-    AllowlistEntryResponse,
     AllowlistEntryType,
 )
 from sark.services.governance.exceptions import AllowlistError
@@ -193,13 +190,18 @@ class AllowlistService:
         )
         entry = result.scalar_one_or_none()
 
-        # Check expiration
-        if entry and entry.expires_at and entry.expires_at < datetime.now(UTC):
-            # Entry expired, deactivate it
-            entry.active = False
-            await self.db.commit()
-            self._invalidate_cache()
-            return False
+        # Check expiration (handle both naive and aware datetimes)
+        now = datetime.now(UTC)
+        if entry and entry.expires_at:
+            expires = entry.expires_at
+            if expires.tzinfo is None:
+                expires = expires.replace(tzinfo=UTC)
+            if expires < now:
+                # Entry expired, deactivate it
+                entry.active = False
+                await self.db.commit()
+                self._invalidate_cache()
+                return False
 
         is_allowed = entry is not None
         self._cache[cache_key] = is_allowed
@@ -239,9 +241,7 @@ class AllowlistService:
 
     async def get_entry(self, entry_id: int) -> AllowlistEntry | None:
         """Get allowlist entry by ID."""
-        result = await self.db.execute(
-            select(AllowlistEntry).where(AllowlistEntry.id == entry_id)
-        )
+        result = await self.db.execute(select(AllowlistEntry).where(AllowlistEntry.id == entry_id))
         return result.scalar_one_or_none()
 
     async def update_entry(

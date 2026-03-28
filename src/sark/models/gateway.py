@@ -111,6 +111,10 @@ class GatewayAuthorizationRequest(BaseModel):
     tool_name: str | None = Field(None, description="Tool to invoke")
     parameters: dict[str, Any] = Field(default_factory=dict, description="Request parameters")
     gateway_metadata: dict[str, Any] = Field(default_factory=dict, description="Gateway context")
+    sensitivity_level: SensitivityLevel | None = Field(
+        None, description="Resource sensitivity level"
+    )
+    context: dict[str, Any] = Field(default_factory=dict, description="Additional context")
 
     @field_validator("action")
     @classmethod
@@ -144,6 +148,9 @@ class A2AAuthorizationRequest(BaseModel):
     capability: str = Field(..., description="Requested capability (execute/query/delegate)")
     message_type: str = Field(..., description="Message type (request/response/notification)")
     payload_metadata: dict[str, Any] = Field(default_factory=dict)
+    target_environment: str = Field(default="", description="Target agent environment")
+    parameters: dict[str, Any] = Field(default_factory=dict, description="Request parameters")
+    context: dict[str, Any] = Field(default_factory=dict, description="Additional context")
 
     @field_validator("capability")
     @classmethod

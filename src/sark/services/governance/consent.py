@@ -7,9 +7,9 @@ supporting multi-approver consent (e.g., two-parent consent).
 
 from datetime import UTC, datetime, timedelta
 
-import structlog
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+import structlog
 
 from sark.models.governance import ConsentRequest, ConsentStatus
 from sark.services.governance.exceptions import ConsentError
@@ -133,11 +133,16 @@ class ConsentService:
                 details={"request_id": request_id, "status": consent.status},
             )
 
-        # Check expiration
-        if consent.expires_at and consent.expires_at < datetime.now(UTC):
-            consent.status = ConsentStatus.EXPIRED.value
-            await self.db.commit()
-            raise ConsentError("Consent request has expired")
+        # Check expiration (handle both naive and aware datetimes)
+        now = datetime.now(UTC)
+        if consent.expires_at:
+            expires = consent.expires_at
+            if expires.tzinfo is None:
+                expires = expires.replace(tzinfo=UTC)
+            if expires < now:
+                consent.status = ConsentStatus.EXPIRED.value
+                await self.db.commit()
+                raise ConsentError("Consent request has expired")
 
         # Requester cannot approve their own request
         if consent.requester == approver:
@@ -341,9 +346,7 @@ class ConsentService:
         stats = {}
         for status in ConsentStatus:
             result = await self.db.execute(
-                select(func.count(ConsentRequest.id)).where(
-                    ConsentRequest.status == status.value
-                )
+                select(func.count(ConsentRequest.id)).where(ConsentRequest.status == status.value)
             )
             stats[f"total_{status.value}"] = result.scalar() or 0
 

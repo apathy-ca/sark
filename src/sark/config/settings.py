@@ -1,9 +1,9 @@
 """SARK configuration settings."""
 
+from functools import lru_cache
 import logging
 import os
 import sys
-from functools import lru_cache
 from typing import Any
 
 from pydantic import Field, field_validator

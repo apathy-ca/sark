@@ -34,27 +34,15 @@ class ProviderRate:
 # Format: "provider:model" -> ProviderRate
 DEFAULT_RATES: dict[str, ProviderRate] = {
     # OpenAI
-    "openai:gpt-4-turbo": ProviderRate(
-        "openai", "gpt-4-turbo", Decimal("10.00"), Decimal("30.00")
-    ),
-    "openai:gpt-4": ProviderRate(
-        "openai", "gpt-4", Decimal("30.00"), Decimal("60.00")
-    ),
-    "openai:gpt-4o": ProviderRate(
-        "openai", "gpt-4o", Decimal("2.50"), Decimal("10.00")
-    ),
-    "openai:gpt-4o-mini": ProviderRate(
-        "openai", "gpt-4o-mini", Decimal("0.15"), Decimal("0.60")
-    ),
+    "openai:gpt-4-turbo": ProviderRate("openai", "gpt-4-turbo", Decimal("10.00"), Decimal("30.00")),
+    "openai:gpt-4": ProviderRate("openai", "gpt-4", Decimal("30.00"), Decimal("60.00")),
+    "openai:gpt-4o": ProviderRate("openai", "gpt-4o", Decimal("2.50"), Decimal("10.00")),
+    "openai:gpt-4o-mini": ProviderRate("openai", "gpt-4o-mini", Decimal("0.15"), Decimal("0.60")),
     "openai:gpt-3.5-turbo": ProviderRate(
         "openai", "gpt-3.5-turbo", Decimal("0.50"), Decimal("1.50")
     ),
-    "openai:o1-preview": ProviderRate(
-        "openai", "o1-preview", Decimal("15.00"), Decimal("60.00")
-    ),
-    "openai:o1-mini": ProviderRate(
-        "openai", "o1-mini", Decimal("3.00"), Decimal("12.00")
-    ),
+    "openai:o1-preview": ProviderRate("openai", "o1-preview", Decimal("15.00"), Decimal("60.00")),
+    "openai:o1-mini": ProviderRate("openai", "o1-mini", Decimal("3.00"), Decimal("12.00")),
     # Anthropic
     "anthropic:claude-3-opus": ProviderRate(
         "anthropic", "claude-3-opus", Decimal("15.00"), Decimal("75.00")
@@ -88,16 +76,12 @@ DEFAULT_RATES: dict[str, ProviderRate] = {
     "mistral:mistral-small": ProviderRate(
         "mistral", "mistral-small", Decimal("0.20"), Decimal("0.60")
     ),
-    "mistral:codestral": ProviderRate(
-        "mistral", "codestral", Decimal("0.20"), Decimal("0.60")
-    ),
+    "mistral:codestral": ProviderRate("mistral", "codestral", Decimal("0.20"), Decimal("0.60")),
     "mistral:mixtral-8x7b": ProviderRate(
         "mistral", "mixtral-8x7b", Decimal("0.45"), Decimal("0.70")
     ),
     # Default fallback
-    "default:default": ProviderRate(
-        "default", "default", Decimal("5.00"), Decimal("15.00")
-    ),
+    "default:default": ProviderRate("default", "default", Decimal("5.00"), Decimal("15.00")),
 }
 
 
@@ -218,9 +202,7 @@ class CostCalculatorService:
         rate = self._get_rate(provider, model)
 
         prompt_cost = (Decimal(tokens_prompt) / Decimal(1_000_000)) * rate.prompt_per_1m
-        response_cost = (
-            Decimal(tokens_response) / Decimal(1_000_000)
-        ) * rate.response_per_1m
+        response_cost = (Decimal(tokens_response) / Decimal(1_000_000)) * rate.response_per_1m
         total_cost = prompt_cost + response_cost
 
         return {
@@ -287,7 +269,7 @@ class CostCalculatorService:
         await self._load_db_rates()
 
         rates = []
-        for key, rate in self._rates.items():
+        for _key, rate in self._rates.items():
             if provider and rate.provider.lower() != provider.lower():
                 continue
             rates.append(
@@ -438,4 +420,4 @@ class CostCalculatorService:
         }
 
 
-__all__ = ["CostCalculatorService", "ProviderRate", "DEFAULT_RATES"]
+__all__ = ["DEFAULT_RATES", "CostCalculatorService", "ProviderRate"]

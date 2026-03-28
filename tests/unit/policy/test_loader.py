@@ -12,6 +12,11 @@ from sark.policy.loader import (
 )
 from sark.policy.validator import PolicyValidator
 
+from .conftest import requires_opa
+
+# Skip all tests in this module if OPA is not available
+pytestmark = requires_opa
+
 
 class TestPolicyLoader:
     """Test PolicyLoader class."""

@@ -53,11 +53,11 @@ Cold path (admin, UI) stays in Python/FastAPI
 
 ### Prerequisites
 - Rust 1.75+
-- Access to `../../../grid-core` repository
+- Access to `grid-core/` repository
 
 ### Build
 ```bash
-cd /home/jhenry/Source/sark
+cd <repo-root>
 cargo build --release -p sark-gateway
 ```
 
@@ -87,7 +87,7 @@ The guide contains:
 
 - **[Implementation Guide](../../docs/RUST_GATEWAY_IMPLEMENTATION.md)** - Detailed development guide
 - **[Architecture Plan](../../docs/RUST_GATEWAY_PLAN.md)** - High-level overview and benefits
-- **[Grid Core API](../../../grid-core/README.md)** - OPA and Cache API reference
+- **[Grid Core API](grid-core/README.md)** - OPA and Cache API reference
 
 ## Dependencies
 

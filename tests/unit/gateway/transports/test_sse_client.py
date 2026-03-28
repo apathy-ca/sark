@@ -414,7 +414,9 @@ class TestGatewaySSEClient:
         assert call_count >= 2  # Should have reconnected
         await client.close()
 
-    @pytest.mark.skip(reason="Needs further investigation - timeout issue with exception handling in async generator")
+    @pytest.mark.skip(
+        reason="Needs further investigation - timeout issue with exception handling in async generator"
+    )
     async def test_no_reconnection_when_disabled(self, client_no_reconnect):
         """Test that reconnection doesn't happen when disabled."""
 
@@ -449,7 +451,9 @@ class TestGatewaySSEClient:
         assert call_count == 1  # Should not retry
         await client_no_reconnect.close()
 
-    @pytest.mark.skip(reason="Needs further investigation - timeout issue with exception handling in async generator")
+    @pytest.mark.skip(
+        reason="Needs further investigation - timeout issue with exception handling in async generator"
+    )
     async def test_max_retries_exceeded(self, client):
         """Test max retries exceeded."""
 

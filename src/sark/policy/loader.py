@@ -233,9 +233,9 @@ class PolicyLoader:
                     tmp_path = Path(tmp_file.name)
 
                 try:
-                    # Verify with OPA
+                    # Verify with OPA (v1-compatible for Rego v1 syntax)
                     result = subprocess.run(
-                        [self.opa_path, "check", str(tmp_path)],
+                        [self.opa_path, "check", "--v1-compatible", str(tmp_path)],
                         capture_output=True,
                         text=True,
                         timeout=10,

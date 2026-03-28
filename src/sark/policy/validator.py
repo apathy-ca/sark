@@ -300,9 +300,9 @@ class PolicyValidator:
                 tmp_path = Path(tmp_file.name)
 
             try:
-                # Run opa check
+                # Run opa check with v1-compatible flag for Rego v1 syntax
                 result = subprocess.run(
-                    [self.opa_path, "check", str(tmp_path)],
+                    [self.opa_path, "check", "--v1-compatible", str(tmp_path)],
                     capture_output=True,
                     text=True,
                     timeout=10,
@@ -514,11 +514,12 @@ class PolicyValidator:
                         input_path = Path(input_file.name)
 
                     try:
-                        # Evaluate policy with sample input
+                        # Evaluate policy with sample input (v1-compatible for Rego v1 syntax)
                         result = subprocess.run(
                             [
                                 self.opa_path,
                                 "eval",
+                                "--v1-compatible",
                                 "--data",
                                 str(policy_path),
                                 "--input",

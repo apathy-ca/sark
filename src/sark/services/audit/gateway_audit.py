@@ -31,8 +31,7 @@ async def log_gateway_event(event: GatewayAuditEvent) -> str:
     try:
         async for session in get_db():
             await session.execute(
-                text(
-                    """
+                text("""
                     INSERT INTO gateway_audit_events (
                         id, event_type, user_id, agent_id, server_name, tool_name,
                         decision, reason, timestamp, gateway_request_id, metadata
@@ -40,8 +39,7 @@ async def log_gateway_event(event: GatewayAuditEvent) -> str:
                         :id, :event_type, :user_id, :agent_id, :server_name, :tool_name,
                         :decision, :reason, :timestamp, :gateway_request_id, :metadata
                     )
-                """
-                ),
+                """),
                 {
                     "id": audit_id,
                     "event_type": event.event_type,

@@ -11,6 +11,11 @@ from sark.policy.test_runner import (
     TestStatus,
 )
 
+from .conftest import requires_opa
+
+# Skip all tests in this module if OPA is not available
+pytestmark = requires_opa
+
 
 class TestPolicyTestRunner:
     """Test PolicyTestRunner class."""

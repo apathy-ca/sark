@@ -69,18 +69,14 @@ class TestBasicRollback:
         original_server_count = session.query(MCPServer).count()
 
         # Migrate to v2.0
-        session.execute(
-            text(
-                """
+        session.execute(text("""
                 INSERT INTO resources (id, name, protocol, endpoint, sensitivity_level, metadata, created_at, updated_at)
                 SELECT
                     id::text, name, 'mcp', command, sensitivity_level::text,
                     '{}'::jsonb, created_at, updated_at
                 FROM mcp_servers
                 ON CONFLICT (id) DO NOTHING
-            """
-            )
-        )
+            """))
         session.commit()
 
         # Verify migration
@@ -193,18 +189,14 @@ class TestPartialRollback:
         session.commit()
 
         # Migrate all to v2.0
-        session.execute(
-            text(
-                """
+        session.execute(text("""
                 INSERT INTO resources (id, name, protocol, endpoint, sensitivity_level, metadata, created_at, updated_at)
                 SELECT
                     id::text, name, 'mcp', command, sensitivity_level::text,
                     '{}'::jsonb, created_at, updated_at
                 FROM mcp_servers
                 ON CONFLICT (id) DO NOTHING
-            """
-            )
-        )
+            """))
         session.commit()
 
         # Rollback only first 5 resources
@@ -268,18 +260,14 @@ class TestDataIntegrityDuringRollback:
         session.commit()
 
         # Migrate
-        session.execute(
-            text(
-                """
+        session.execute(text("""
                 INSERT INTO resources (id, name, protocol, endpoint, sensitivity_level, metadata, created_at, updated_at)
                 SELECT
                     id::text, name, 'mcp', command, sensitivity_level::text,
                     '{}'::jsonb, created_at, updated_at
                 FROM mcp_servers
                 ON CONFLICT (id) DO NOTHING
-            """
-            )
-        )
+            """))
         session.commit()
 
         # Simulate failed rollback (transaction rollback)
@@ -306,18 +294,14 @@ class TestDataIntegrityDuringRollback:
         session.add(server)
         session.commit()
 
-        session.execute(
-            text(
-                """
+        session.execute(text("""
                 INSERT INTO resources (id, name, protocol, endpoint, sensitivity_level, metadata, created_at, updated_at)
                 SELECT
                     id::text, name, 'mcp', command, sensitivity_level::text,
                     '{}'::jsonb, created_at, updated_at
                 FROM mcp_servers
                 ON CONFLICT (id) DO NOTHING
-            """
-            )
-        )
+            """))
         session.commit()
 
         # First rollback
@@ -403,8 +387,7 @@ class TestComplexRollbackScenarios:
         # Partially migrate (only first 5)
         first_five_ids = [s.id for s in servers[:5]]
         session.execute(
-            text(
-                """
+            text("""
                 INSERT INTO resources (id, name, protocol, endpoint, sensitivity_level, metadata, created_at, updated_at)
                 SELECT
                     id::text, name, 'mcp', command, sensitivity_level::text,
@@ -412,8 +395,7 @@ class TestComplexRollbackScenarios:
                 FROM mcp_servers
                 WHERE id = ANY(:ids)
                 ON CONFLICT (id) DO NOTHING
-            """
-            ),
+            """),
             {"ids": first_five_ids},
         )
         session.commit()
@@ -460,26 +442,18 @@ class TestEmergencyRecovery:
         session.commit()
 
         # Verify orphaned capability
-        orphaned = session.execute(
-            text(
-                """
+        orphaned = session.execute(text("""
                 SELECT COUNT(*)
                 FROM capabilities c
                 WHERE NOT EXISTS (SELECT 1 FROM resources r WHERE r.id = c.resource_id)
-            """
-            )
-        ).scalar()
+            """)).scalar()
         assert orphaned == 1
 
         # Recovery: Clean up orphaned capabilities
-        session.execute(
-            text(
-                """
+        session.execute(text("""
                 DELETE FROM capabilities
                 WHERE NOT EXISTS (SELECT 1 FROM resources r WHERE r.id = resource_id)
-            """
-            )
-        )
+            """))
         session.commit()
 
         # Verify cleanup
@@ -498,9 +472,7 @@ class TestEmergencyRecovery:
         session.commit()
 
         # First migration
-        session.execute(
-            text(
-                """
+        session.execute(text("""
                 INSERT INTO resources (id, name, protocol, endpoint, sensitivity_level, metadata, created_at, updated_at)
                 SELECT
                     id::text, name, 'mcp', command, sensitivity_level::text,
@@ -509,15 +481,11 @@ class TestEmergencyRecovery:
                 ON CONFLICT (id) DO UPDATE SET
                     name = EXCLUDED.name,
                     updated_at = EXCLUDED.updated_at
-            """
-            )
-        )
+            """))
         session.commit()
 
         # Second migration (should be idempotent)
-        session.execute(
-            text(
-                """
+        session.execute(text("""
                 INSERT INTO resources (id, name, protocol, endpoint, sensitivity_level, metadata, created_at, updated_at)
                 SELECT
                     id::text, name, 'mcp', command, sensitivity_level::text,
@@ -526,9 +494,7 @@ class TestEmergencyRecovery:
                 ON CONFLICT (id) DO UPDATE SET
                     name = EXCLUDED.name,
                     updated_at = EXCLUDED.updated_at
-            """
-            )
-        )
+            """))
         session.commit()
 
         # Verify no duplicates

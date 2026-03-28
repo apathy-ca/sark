@@ -5,13 +5,13 @@ Provides PIN-based override functionality for bypassing policy
 on a specific request, with proper authentication and audit trail.
 """
 
+from datetime import UTC, datetime, timedelta
 import hashlib
 import secrets
-from datetime import UTC, datetime, timedelta
 
-import structlog
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+import structlog
 
 from sark.models.governance import OverrideRequest, OverrideStatus
 from sark.services.governance.exceptions import OverrideError
@@ -150,8 +150,12 @@ class OverrideService:
         if not override:
             return False
 
-        # Check expiration
-        if override.expires_at < datetime.now(UTC):
+        # Check expiration (handle both naive and aware datetimes)
+        now = datetime.now(UTC)
+        expires = override.expires_at
+        if expires.tzinfo is None:
+            expires = expires.replace(tzinfo=UTC)
+        if expires < now:
             override.status = OverrideStatus.EXPIRED.value
             await self.db.commit()
             return False
@@ -191,8 +195,12 @@ class OverrideService:
         if not override:
             return False
 
-        # Check expiration
-        if override.expires_at < datetime.now(UTC):
+        # Check expiration (handle both naive and aware datetimes)
+        now = datetime.now(UTC)
+        expires = override.expires_at
+        if expires.tzinfo is None:
+            expires = expires.replace(tzinfo=UTC)
+        if expires < now:
             override.status = OverrideStatus.EXPIRED.value
             await self.db.commit()
             return False
@@ -279,9 +287,7 @@ class OverrideService:
         # Total by status
         for status in OverrideStatus:
             result = await self.db.execute(
-                select(func.count(OverrideRequest.id)).where(
-                    OverrideRequest.status == status.value
-                )
+                select(func.count(OverrideRequest.id)).where(OverrideRequest.status == status.value)
             )
             stats[f"total_{status.value}"] = result.scalar() or 0
 

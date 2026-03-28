@@ -1,6 +1,5 @@
 """Security tests for CSRF token validation middleware."""
 
-import secrets
 from unittest.mock import MagicMock
 
 import pytest
@@ -115,13 +114,15 @@ class TestCSRFValidation:
         assert "secrets.compare_digest" in source
 
     def test_csrf_no_session_fallback(self, middleware):
-        """Test CSRF validation when session is not available."""
-        # Mock request without session attribute
+        """Test CSRF validation when session is not available uses cookie pattern."""
+        # Mock request without session attribute but with matching header + cookie
         request = MagicMock(spec=Request)
-        request.headers.get.return_value = "some-token"
+        token = middleware.generate_csrf_token()
+        request.headers.get.return_value = token
+        request.cookies.get.return_value = token
         delattr(request, "session")  # Remove session attribute
 
-        # Should fall back to checking header presence only
+        # Should fall back to double-submit cookie pattern
         result = middleware._validate_csrf_token(request)
         assert result is True
 
@@ -203,9 +204,7 @@ class TestCSRFValidation:
     def test_csrf_header_name_customizable(self):
         """Test that CSRF header name can be customized."""
         app = Starlette()
-        custom_middleware = CSRFProtectionMiddleware(
-            app, csrf_header_name="X-Custom-CSRF-Token"
-        )
+        custom_middleware = CSRFProtectionMiddleware(app, csrf_header_name="X-Custom-CSRF-Token")
 
         assert custom_middleware.csrf_header_name == "X-Custom-CSRF-Token"
 

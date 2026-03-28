@@ -22,13 +22,14 @@ use axum::{
     Json, Router,
 };
 use clap::Parser;
-use grid_cache::Cache;
-use grid_opa::PolicyEngine;
+use grid_cache::LRUTTLCache;
+use grid_opa::OPAEngine;
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
 use std::path::PathBuf;
 use std::sync::Arc;
-use tracing::{info, warn, error};
+use tokio::sync::Mutex;
+use tracing::{error, info};
 use tracing_subscriber;
 
 #[derive(Parser, Debug)]
@@ -50,8 +51,8 @@ struct Args {
 /// Shared application state
 #[derive(Clone)]
 struct AppState {
-    opa_engine: Arc<PolicyEngine>,
-    cache: Arc<Cache>,
+    opa_engine: Arc<Mutex<OPAEngine>>,
+    cache: Arc<LRUTTLCache>,
 }
 
 /// Gateway authorization request
@@ -66,7 +67,7 @@ struct GatewayAuthRequest {
 }
 
 /// Gateway authorization response
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct GatewayAuthResponse {
     allow: bool,
     reason: String,
@@ -123,14 +124,13 @@ async fn authorize(
     // Try cache first
     if let Some(cached) = state.cache.get(&cache_key) {
         info!(cache_key = %cache_key, "Cache hit");
-        // Parse cached decision
         if let Ok(response) = serde_json::from_str::<GatewayAuthResponse>(&cached) {
             return Ok(Json(response));
         }
     }
 
-    // Build OPA input
-    let opa_input = serde_json::json!({
+    // Build OPA input as regorus Value via JSON round-trip
+    let opa_input_json = serde_json::json!({
         "user": {
             "id": user.user_id,
             "email": user.email,
@@ -141,40 +141,54 @@ async fn authorize(
         "resource": {
             "server": request.server_name,
             "tool": request.tool_name,
-            "sensitivity": request.sensitivity_level.unwrap_or("medium".to_string()),
+            "sensitivity": request.sensitivity_level.unwrap_or_else(|| "medium".to_string()),
         },
         "parameters": request.parameters,
         "context": request.context,
     });
 
+    let opa_input = match grid_opa::Value::from_json_str(&opa_input_json.to_string()) {
+        Ok(v) => v,
+        Err(e) => {
+            error!(error = %e, "Failed to build OPA input");
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("Failed to build OPA input: {}", e),
+            ));
+        }
+    };
+
     // Evaluate policy with Rust OPA engine
-    match state.opa_engine.evaluate("data.mcp.gateway.allow", &opa_input) {
-        Ok(result) => {
-            let allow = result.get("allow").and_then(|v| v.as_bool()).unwrap_or(false);
-            let reason = result
-                .get("reason")
-                .and_then(|v| v.as_str())
-                .unwrap_or("Policy evaluated")
-                .to_string();
+    let result = {
+        let mut engine = state.opa_engine.lock().await;
+        engine.evaluate("data.mcp.gateway.allow", opa_input)
+    };
+
+    match result {
+        Ok(value) => {
+            // Extract allow bool from regorus Value — stub: treat Bool(true) as allow
+            let allow = matches!(value, grid_opa::Value::Bool(true));
+            let reason = if allow {
+                "Policy evaluated: allowed".to_string()
+            } else {
+                "Policy evaluated: denied".to_string()
+            };
 
             let response = GatewayAuthResponse {
                 allow,
                 reason: reason.clone(),
-                filtered_parameters: result.get("filtered_parameters").cloned(),
-                cache_ttl: 300, // 5 minutes
+                filtered_parameters: None,
+                cache_ttl: 300,
             };
 
             // Cache the decision
             if let Ok(cached_value) = serde_json::to_string(&response) {
-                state.cache.set(&cache_key, &cached_value, Some(300));
+                if let Err(e) = state.cache.set(cache_key.clone(), cached_value, Some(300)) {
+                    error!(error = %e, "Failed to cache authorization decision");
+                }
             }
 
-            info!(
-                allow = allow,
-                reason = %reason,
-                "Authorization decision"
-            );
-
+            info!(allow = allow, reason = %reason, "Authorization decision");
             Ok(Json(response))
         }
         Err(e) => {
@@ -204,18 +218,14 @@ async fn main() -> Result<()> {
 
     // Initialize OPA engine
     // TODO: Load policies from config
-    let opa_engine = Arc::new(
-        PolicyEngine::new()
-            .context("Failed to initialize OPA engine")?,
-    );
+    let opa_engine = Arc::new(Mutex::new(
+        OPAEngine::new().context("Failed to initialize OPA engine")?,
+    ));
 
-    // Initialize cache
-    let cache = Arc::new(Cache::new(10000)); // 10K entries max
+    // Initialize cache: 10K entries, 5-minute default TTL
+    let cache = Arc::new(LRUTTLCache::new(10_000, 300));
 
-    let state = AppState {
-        opa_engine,
-        cache,
-    };
+    let state = AppState { opa_engine, cache };
 
     // Build router
     let app = Router::new()

@@ -5,18 +5,17 @@ Coordinates all governance services to make authorization decisions,
 following the evaluation order: emergency -> allowlist -> override -> time_rules -> OPA.
 """
 
-import time
 from datetime import UTC, datetime
+import time
 from typing import Any
 from uuid import uuid4
 
-import structlog
 from sqlalchemy.ext.asyncio import AsyncSession
+import structlog
 
 from sark.models.governance import EnforcementDecision, EnforcementDecisionLog
 from sark.services.governance.allowlist import AllowlistService
 from sark.services.governance.emergency import EmergencyService
-from sark.services.governance.exceptions import EnforcementError
 from sark.services.governance.override import OverrideService
 from sark.services.governance.time_rules import TimeRulesService
 
@@ -321,9 +320,7 @@ class EnforcementService:
             )
         return None
 
-    async def _check_override(
-        self, request_id: str, pin: str
-    ) -> EnforcementDecision | None:
+    async def _check_override(self, request_id: str, pin: str) -> EnforcementDecision | None:
         """Check if valid override exists."""
         if await self.override.validate_override(request_id, pin):
             return EnforcementDecision(
@@ -333,9 +330,7 @@ class EnforcementService:
             )
         return None
 
-    async def _check_time_rules(
-        self, device_ip: str | None
-    ) -> EnforcementDecision | None:
+    async def _check_time_rules(self, device_ip: str | None) -> EnforcementDecision | None:
         """Check time rules."""
         result = await self.time_rules.check_rules(device_ip=device_ip)
 
@@ -356,9 +351,7 @@ class EnforcementService:
 
         return None
 
-    async def _check_opa_policies(
-        self, request: dict[str, Any]
-    ) -> EnforcementDecision:
+    async def _check_opa_policies(self, request: dict[str, Any]) -> EnforcementDecision:
         """Evaluate OPA policies."""
         if self.opa_client is None:
             # No OPA client - default allow
@@ -450,7 +443,7 @@ class EnforcementService:
             rule_name=decision.rule,
             policy_name=decision.policy,
             duration_ms=duration_ms,
-            metadata=json.dumps({}),
+            decision_metadata=json.dumps({}),
         )
         self.db.add(log_entry)
         await self.db.commit()

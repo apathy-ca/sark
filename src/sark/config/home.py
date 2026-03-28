@@ -11,14 +11,13 @@ Key differences from enterprise deployment:
 - Local audit logging instead of SIEM integration
 """
 
-import logging
-import os
 from dataclasses import dataclass, field
 from functools import lru_cache
+import logging
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import Field, field_validator
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 logger = logging.getLogger(__name__)
@@ -344,7 +343,9 @@ class HomeDeploymentConfig:
     cache: HomeCacheConfig = field(default_factory=HomeCacheConfig)
 
     # LLM endpoints to intercept
-    endpoints: list[HomeEndpointConfig] = field(default_factory=lambda: DEFAULT_HOME_ENDPOINTS.copy())
+    endpoints: list[HomeEndpointConfig] = field(
+        default_factory=lambda: DEFAULT_HOME_ENDPOINTS.copy()
+    )
 
     def __post_init__(self) -> None:
         """Initialize configuration from settings."""
@@ -372,7 +373,9 @@ class HomeDeploymentConfig:
         # Audit
         self.audit.enabled = s.audit_enabled
         self.audit.retention_days = s.audit_retention_days
-        self.audit.prompt_preview_length = s.audit_prompt_preview_length if s.audit_prompt_preview else 0
+        self.audit.prompt_preview_length = (
+            s.audit_prompt_preview_length if s.audit_prompt_preview else 0
+        )
 
         # Proxy
         self.proxy.listen_host = s.host
@@ -391,9 +394,7 @@ class HomeDeploymentConfig:
         # Validate SQLite database paths
         for db_path in [self.database.main_database, self.database.audit_database]:
             if "postgresql" in db_path.lower() or "postgres" in db_path.lower():
-                raise ValueError(
-                    f"Home deployment requires SQLite, got PostgreSQL path: {db_path}"
-                )
+                raise ValueError(f"Home deployment requires SQLite, got PostgreSQL path: {db_path}")
 
         # Validate resource limits for home deployment
         if self.resources.max_memory_mb > 512:
@@ -512,8 +513,7 @@ class HomeDeploymentConfig:
                 "max_size_mb": self.cache.max_size_mb,
             },
             "endpoints": [
-                {"domain": e.domain, "name": e.name, "enabled": e.enabled}
-                for e in self.endpoints
+                {"domain": e.domain, "name": e.name, "enabled": e.enabled} for e in self.endpoints
             ],
         }
 

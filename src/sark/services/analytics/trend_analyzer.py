@@ -5,7 +5,7 @@ Analyzes usage patterns and trends over time to identify
 peak hours, growth rates, and anomalies.
 """
 
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from enum import Enum
 from statistics import mean, stdev
 from typing import Any
@@ -14,7 +14,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 import structlog
 
-from sark.models.analytics import DailyAggregate, UsageEvent
+from sark.models.analytics import UsageEvent
 
 logger = structlog.get_logger(__name__)
 
@@ -76,9 +76,7 @@ class TrendAnalyzerService:
         if metric == TrendMetric.REQUESTS:
             metric_col = func.count(UsageEvent.id)
         elif metric == TrendMetric.TOKENS:
-            metric_col = func.sum(
-                UsageEvent.tokens_prompt + UsageEvent.tokens_response
-            )
+            metric_col = func.sum(UsageEvent.tokens_prompt + UsageEvent.tokens_response)
         elif metric == TrendMetric.COST:
             metric_col = func.sum(UsageEvent.cost_estimate)
         else:  # DEVICES
@@ -102,8 +100,7 @@ class TrendAnalyzerService:
 
         result = await self.db.execute(query)
         data_points = [
-            {"date": str(day), "value": float(val) if val else 0}
-            for day, val in result.fetchall()
+            {"date": str(day), "value": float(val) if val else 0} for day, val in result.fetchall()
         ]
 
         if not data_points:
@@ -143,9 +140,7 @@ class TrendAnalyzerService:
             second_half_avg = mean(values[mid:])
 
             if first_half_avg > 0:
-                change_percent = (
-                    (second_half_avg - first_half_avg) / first_half_avg
-                ) * 100
+                change_percent = ((second_half_avg - first_half_avg) / first_half_avg) * 100
             else:
                 change_percent = 100.0 if second_half_avg > 0 else 0.0
 
@@ -198,12 +193,8 @@ class TrendAnalyzerService:
         query = select(
             func.strftime("%H", UsageEvent.timestamp).label("hour"),
             func.count(UsageEvent.id).label("request_count"),
-            func.sum(
-                UsageEvent.tokens_prompt + UsageEvent.tokens_response
-            ).label("total_tokens"),
-            func.avg(
-                UsageEvent.tokens_prompt + UsageEvent.tokens_response
-            ).label("avg_tokens"),
+            func.sum(UsageEvent.tokens_prompt + UsageEvent.tokens_response).label("total_tokens"),
+            func.avg(UsageEvent.tokens_prompt + UsageEvent.tokens_response).label("avg_tokens"),
         ).where(
             UsageEvent.timestamp >= start,
             UsageEvent.timestamp <= end,
@@ -212,9 +203,7 @@ class TrendAnalyzerService:
         if device_ip:
             query = query.where(UsageEvent.device_ip == device_ip)
 
-        query = query.group_by(
-            func.strftime("%H", UsageEvent.timestamp)
-        ).order_by(
+        query = query.group_by(func.strftime("%H", UsageEvent.timestamp)).order_by(
             func.strftime("%H", UsageEvent.timestamp)
         )
 
@@ -252,9 +241,7 @@ class TrendAnalyzerService:
             "peak_hours_by_requests": peak_hours_by_requests,
             "peak_hours_by_tokens": peak_hours_by_tokens,
             "summary": {
-                "most_active_hour": (
-                    peak_hours_by_requests[0] if peak_hours_by_requests else None
-                ),
+                "most_active_hour": (peak_hours_by_requests[0] if peak_hours_by_requests else None),
                 "least_active_hour": (
                     min(hourly_data, key=lambda h: h["request_count"])["hour"]
                     if hourly_data
@@ -284,9 +271,7 @@ class TrendAnalyzerService:
         query = select(
             func.strftime("%w", UsageEvent.timestamp).label("weekday"),
             func.count(UsageEvent.id).label("request_count"),
-            func.sum(
-                UsageEvent.tokens_prompt + UsageEvent.tokens_response
-            ).label("total_tokens"),
+            func.sum(UsageEvent.tokens_prompt + UsageEvent.tokens_response).label("total_tokens"),
         ).where(
             UsageEvent.timestamp >= start,
             UsageEvent.timestamp <= end,
@@ -295,9 +280,7 @@ class TrendAnalyzerService:
         if device_ip:
             query = query.where(UsageEvent.device_ip == device_ip)
 
-        query = query.group_by(
-            func.strftime("%w", UsageEvent.timestamp)
-        ).order_by(
+        query = query.group_by(func.strftime("%w", UsageEvent.timestamp)).order_by(
             func.strftime("%w", UsageEvent.timestamp)
         )
 
@@ -327,15 +310,9 @@ class TrendAnalyzerService:
 
         # Calculate weekday vs weekend comparison
         weekday_requests = sum(
-            d["request_count"]
-            for d in weekday_data
-            if d["weekday"] in [1, 2, 3, 4, 5]
+            d["request_count"] for d in weekday_data if d["weekday"] in [1, 2, 3, 4, 5]
         )
-        weekend_requests = sum(
-            d["request_count"]
-            for d in weekday_data
-            if d["weekday"] in [0, 6]
-        )
+        weekend_requests = sum(d["request_count"] for d in weekday_data if d["weekday"] in [0, 6])
 
         return {
             "period_days": days,
@@ -355,9 +332,7 @@ class TrendAnalyzerService:
                 "weekday_total_requests": weekday_requests,
                 "weekend_total_requests": weekend_requests,
                 "weekday_vs_weekend_ratio": (
-                    round(weekday_requests / weekend_requests, 2)
-                    if weekend_requests > 0
-                    else 0
+                    round(weekday_requests / weekend_requests, 2) if weekend_requests > 0 else 0
                 ),
             },
         }
@@ -387,9 +362,7 @@ class TrendAnalyzerService:
         query = select(
             func.date(UsageEvent.timestamp).label("day"),
             func.count(UsageEvent.id).label("request_count"),
-            func.sum(
-                UsageEvent.tokens_prompt + UsageEvent.tokens_response
-            ).label("total_tokens"),
+            func.sum(UsageEvent.tokens_prompt + UsageEvent.tokens_response).label("total_tokens"),
         ).where(
             UsageEvent.timestamp >= start,
             UsageEvent.timestamp <= end,
@@ -440,9 +413,7 @@ class TrendAnalyzerService:
 
             # Check request anomaly
             if request_std > 0:
-                request_z = (
-                    day_data["request_count"] - request_mean
-                ) / request_std
+                request_z = (day_data["request_count"] - request_mean) / request_std
                 if abs(request_z) > threshold_std:
                     anomaly_types.append(
                         {
@@ -510,14 +481,10 @@ class TrendAnalyzerService:
         current_start = now - timedelta(days=current_days)
         previous_start = current_start - timedelta(days=current_days)
 
-        async def get_period_stats(
-            start: datetime, end: datetime
-        ) -> dict[str, Any]:
+        async def get_period_stats(start: datetime, end: datetime) -> dict[str, Any]:
             query = select(
                 func.count(UsageEvent.id).label("requests"),
-                func.sum(
-                    UsageEvent.tokens_prompt + UsageEvent.tokens_response
-                ).label("tokens"),
+                func.sum(UsageEvent.tokens_prompt + UsageEvent.tokens_response).label("tokens"),
                 func.sum(UsageEvent.cost_estimate).label("cost"),
                 func.count(func.distinct(UsageEvent.device_ip)).label("devices"),
             ).where(
@@ -566,18 +533,10 @@ class TrendAnalyzerService:
                 "end": current_start.isoformat(),
             },
             "comparison": {
-                "requests": calc_change(
-                    current_stats["requests"], previous_stats["requests"]
-                ),
-                "tokens": calc_change(
-                    current_stats["tokens"], previous_stats["tokens"]
-                ),
-                "cost": calc_change(
-                    current_stats["cost"], previous_stats["cost"]
-                ),
-                "devices": calc_change(
-                    current_stats["devices"], previous_stats["devices"]
-                ),
+                "requests": calc_change(current_stats["requests"], previous_stats["requests"]),
+                "tokens": calc_change(current_stats["tokens"], previous_stats["tokens"]),
+                "cost": calc_change(current_stats["cost"], previous_stats["cost"]),
+                "devices": calc_change(current_stats["devices"], previous_stats["devices"]),
             },
         }
 

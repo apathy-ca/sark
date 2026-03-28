@@ -6,11 +6,10 @@ Supports daily, weekly, and monthly reports in JSON and CSV formats.
 """
 
 import csv
+from datetime import UTC, date, datetime, timedelta
+from enum import Enum
 import io
 import json
-from datetime import UTC, date, datetime, timedelta
-from decimal import Decimal
-from enum import Enum
 from typing import Any
 from uuid import uuid4
 
@@ -18,7 +17,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 import structlog
 
-from sark.models.analytics import DailyAggregate, UsageEvent
+from sark.models.analytics import UsageEvent
 from sark.services.analytics.cost_calculator import CostCalculatorService
 
 logger = structlog.get_logger(__name__)
@@ -80,7 +79,7 @@ class UsageReporterService:
         Returns:
             Tuple of (start_datetime, end_datetime)
         """
-        reference = reference_date or date.today()
+        reference = reference_date or datetime.now(UTC).date()
 
         if period == ReportPeriod.DAY:
             start = datetime.combine(reference, datetime.min.time(), tzinfo=UTC)
@@ -90,9 +89,7 @@ class UsageReporterService:
             days_since_monday = reference.weekday()
             week_start = reference - timedelta(days=days_since_monday)
             start = datetime.combine(week_start, datetime.min.time(), tzinfo=UTC)
-            end = datetime.combine(
-                week_start + timedelta(days=6), datetime.max.time(), tzinfo=UTC
-            )
+            end = datetime.combine(week_start + timedelta(days=6), datetime.max.time(), tzinfo=UTC)
         elif period == ReportPeriod.MONTH:
             # Start of month
             month_start = reference.replace(day=1)
@@ -114,7 +111,7 @@ class UsageReporterService:
     async def generate(
         self,
         period: ReportPeriod = ReportPeriod.WEEK,
-        format: ReportFormat = ReportFormat.SUMMARY,
+        report_format: ReportFormat = ReportFormat.SUMMARY,
         device_ip: str | None = None,
         start_date: datetime | None = None,
         end_date: datetime | None = None,
@@ -124,7 +121,7 @@ class UsageReporterService:
 
         Args:
             period: Report period (day, week, month)
-            format: Report format (summary, detailed)
+            report_format: Report format (summary, detailed)
             device_ip: Optional device IP to filter by
             start_date: Custom start date (for CUSTOM period)
             end_date: Custom end date (for CUSTOM period)
@@ -304,9 +301,7 @@ class UsageReporterService:
             "cost_summary": {
                 "total_cost_usd": cost_total,
                 "currency": "USD",
-                "by_provider": {
-                    item["provider"]: item["cost_estimate"] for item in by_provider
-                },
+                "by_provider": {item["provider"]: item["cost_estimate"] for item in by_provider},
             },
         }
 
@@ -367,9 +362,7 @@ class UsageReporterService:
                 base_filter.append(UsageEvent.device_ip == device_ip)
 
             result = await self.db.execute(
-                select(UsageEvent)
-                .where(*base_filter)
-                .order_by(UsageEvent.timestamp)
+                select(UsageEvent).where(*base_filter).order_by(UsageEvent.timestamp)
             )
 
             for event in result.scalars():
@@ -496,9 +489,7 @@ class UsageReporterService:
             result = await self.db.execute(
                 select(
                     func.count(UsageEvent.id).label("requests"),
-                    func.sum(UsageEvent.tokens_prompt + UsageEvent.tokens_response).label(
-                        "tokens"
-                    ),
+                    func.sum(UsageEvent.tokens_prompt + UsageEvent.tokens_response).label("tokens"),
                     func.sum(UsageEvent.cost_estimate).label("cost"),
                 ).where(*base_filter)
             )
