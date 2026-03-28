@@ -152,7 +152,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Download current results
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: performance-benchmarks-${{ github.sha }}
           path: ./current
