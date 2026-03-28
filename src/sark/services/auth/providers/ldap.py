@@ -1,12 +1,9 @@
 """LDAP authentication provider."""
 
-import asyncio
 from typing import Any
 from uuid import UUID, uuid5
 
-from ldap3 import ALL, SIMPLE, Connection, Server
-from ldap3.core.exceptions import LDAPBindError, LDAPException
-from ldap3.utils.conv import escape_filter_chars
+import bonsai
 from pydantic import Field
 
 from sark.services.auth.providers.base import (
@@ -14,6 +11,16 @@ from sark.services.auth.providers.base import (
     AuthProviderConfig,
     AuthResult,
 )
+
+
+def _escape_filter_chars(value: str) -> str:
+    """Escape special characters in an LDAP filter value per RFC 4515."""
+    value = value.replace("\\", "\\5c")
+    value = value.replace("*", "\\2a")
+    value = value.replace("(", "\\28")
+    value = value.replace(")", "\\29")
+    value = value.replace("\x00", "\\00")
+    return value
 
 
 class LDAPProviderConfig(AuthProviderConfig):
@@ -43,8 +50,6 @@ class LDAPProvider(AuthProvider):
         """
         super().__init__(config)
         self.config: LDAPProviderConfig = config
-        # In production, initialize LDAP connection here
-        # For mock implementation, we'll simulate connections
 
     async def authenticate(
         self,
@@ -156,7 +161,7 @@ class LDAPProvider(AuthProvider):
             Tuple of (user_dn, user_attributes)
         """
         # Escape username to prevent LDAP injection
-        safe_username = escape_filter_chars(username)
+        safe_username = _escape_filter_chars(username)
         search_filter = self.config.user_search_filter.format(username=safe_username)
 
         self.logger.debug(
@@ -165,59 +170,40 @@ class LDAPProvider(AuthProvider):
             filter=search_filter,
         )
 
-        def _sync_search():
-            """Synchronous LDAP search operation."""
-            try:
-                # Create server object
-                server = Server(
-                    self.config.server_url,
-                    get_info=ALL,
-                    use_ssl=self.config.use_ssl,
+        try:
+            client = bonsai.LDAPClient(self.config.server_url)
+            if self.config.bind_dn and self.config.bind_password:
+                client.set_credentials(
+                    "SIMPLE", self.config.bind_dn, self.config.bind_password
                 )
 
-                # Create connection for service account
-                conn = Connection(
-                    server,
-                    user=self.config.bind_dn,
-                    password=self.config.bind_password,
-                    authentication=SIMPLE,
-                    auto_bind=True,
+            async with await client.connect(is_async=True) as conn:
+                results = await conn.search(
+                    self.config.base_dn,
+                    bonsai.LDAPSearchScope.SUB,
+                    search_filter,
+                    attrlist=self.config.attributes,
                 )
 
-                # Search for user
-                conn.search(
-                    search_base=self.config.base_dn,
-                    search_filter=search_filter,
-                    attributes=self.config.attributes,
-                )
-
-                if not conn.entries:
-                    conn.unbind()
+                if not results:
                     return None, {}
 
-                # Get first entry
-                entry = conn.entries[0]
-                user_dn = entry.entry_dn
+                entry = results[0]
+                user_dn = str(entry.dn)
 
                 # Extract attributes
                 user_attrs = {}
                 for attr in self.config.attributes:
-                    if hasattr(entry, attr):
-                        attr_value = getattr(entry, attr)
-                        if hasattr(attr_value, "value"):
-                            user_attrs[attr] = attr_value.value
-                        else:
-                            user_attrs[attr] = str(attr_value)
+                    try:
+                        user_attrs[attr] = entry[attr][0]
+                    except (KeyError, IndexError):
+                        pass
 
-                conn.unbind()
                 return user_dn, user_attrs
 
-            except LDAPException as e:
-                self.logger.error("ldap_search_failed", error=str(e))
-                return None, {}
-
-        # Run synchronous LDAP operation in thread pool
-        return await asyncio.get_event_loop().run_in_executor(None, _sync_search)
+        except bonsai.LDAPError as e:
+            self.logger.error("ldap_search_failed", error=str(e))
+            return None, {}
 
     async def _bind_user(self, user_dn: str, password: str) -> bool:
         """
@@ -232,36 +218,19 @@ class LDAPProvider(AuthProvider):
         """
         self.logger.debug("ldap_bind_attempt", user_dn=user_dn)
 
-        def _sync_bind():
-            """Synchronous LDAP bind operation."""
-            try:
-                server = Server(
-                    self.config.server_url,
-                    get_info=ALL,
-                    use_ssl=self.config.use_ssl,
-                )
+        try:
+            client = bonsai.LDAPClient(self.config.server_url)
+            client.set_credentials("SIMPLE", user_dn, password)
 
-                # Attempt to bind as the user
-                conn = Connection(
-                    server,
-                    user=user_dn,
-                    password=password,
-                    authentication=SIMPLE,
-                    auto_bind=True,
-                )
-
-                # If we get here, bind succeeded
-                conn.unbind()
+            async with await client.connect(is_async=True):
                 return True
 
-            except LDAPBindError:
-                self.logger.debug("ldap_bind_failed", user_dn=user_dn)
-                return False
-            except LDAPException as e:
-                self.logger.error("ldap_bind_error", user_dn=user_dn, error=str(e))
-                return False
-
-        return await asyncio.get_event_loop().run_in_executor(None, _sync_bind)
+        except bonsai.AuthenticationError:
+            self.logger.debug("ldap_bind_failed", user_dn=user_dn)
+            return False
+        except bonsai.LDAPError as e:
+            self.logger.error("ldap_bind_error", user_dn=user_dn, error=str(e))
+            return False
 
     async def _get_user_groups(self, user_dn: str) -> list[str]:
         """
@@ -277,7 +246,7 @@ class LDAPProvider(AuthProvider):
             return []
 
         # Escape user_dn to prevent LDAP injection
-        safe_user_dn = escape_filter_chars(user_dn)
+        safe_user_dn = _escape_filter_chars(user_dn)
         search_filter = self.config.group_search_filter.format(user_dn=safe_user_dn)
 
         self.logger.debug(
@@ -286,47 +255,33 @@ class LDAPProvider(AuthProvider):
             filter=search_filter,
         )
 
-        def _sync_group_search():
-            """Synchronous LDAP group search."""
-            try:
-                server = Server(
-                    self.config.server_url,
-                    get_info=ALL,
-                    use_ssl=self.config.use_ssl,
+        try:
+            client = bonsai.LDAPClient(self.config.server_url)
+            if self.config.bind_dn and self.config.bind_password:
+                client.set_credentials(
+                    "SIMPLE", self.config.bind_dn, self.config.bind_password
                 )
 
-                conn = Connection(
-                    server,
-                    user=self.config.bind_dn,
-                    password=self.config.bind_password,
-                    authentication=SIMPLE,
-                    auto_bind=True,
-                )
-
-                # Search for groups
-                conn.search(
-                    search_base=self.config.group_search_base,
-                    search_filter=search_filter,
-                    attributes=["cn"],
+            async with await client.connect(is_async=True) as conn:
+                results = await conn.search(
+                    self.config.group_search_base,
+                    bonsai.LDAPSearchScope.SUB,
+                    search_filter,
+                    attrlist=["cn"],
                 )
 
                 groups = []
-                for entry in conn.entries:
-                    if hasattr(entry, "cn"):
-                        cn_value = entry.cn
-                        if hasattr(cn_value, "value"):
-                            groups.append(cn_value.value)
-                        else:
-                            groups.append(str(cn_value))
+                for entry in results:
+                    try:
+                        groups.append(entry["cn"][0])
+                    except (KeyError, IndexError):
+                        pass
 
-                conn.unbind()
                 return groups
 
-            except LDAPException as e:
-                self.logger.error("ldap_group_search_failed", error=str(e))
-                return []
-
-        return await asyncio.get_event_loop().run_in_executor(None, _sync_group_search)
+        except bonsai.LDAPError as e:
+            self.logger.error("ldap_group_search_failed", error=str(e))
+            return []
 
     async def health_check(self) -> bool:
         """
@@ -338,41 +293,23 @@ class LDAPProvider(AuthProvider):
         if not self.config.enabled or not self.config.server_url:
             return False
 
-        def _sync_health_check():
-            """Synchronous LDAP health check."""
-            try:
-                server = Server(
-                    self.config.server_url,
-                    get_info=ALL,
-                    use_ssl=self.config.use_ssl,
-                    connect_timeout=5,
+        try:
+            client = bonsai.LDAPClient(self.config.server_url)
+            if self.config.bind_dn and self.config.bind_password:
+                client.set_credentials(
+                    "SIMPLE", self.config.bind_dn, self.config.bind_password
                 )
+            client.set_connect_timeout(5)
 
-                conn = Connection(
-                    server,
-                    user=self.config.bind_dn,
-                    password=self.config.bind_password,
-                    authentication=SIMPLE,
-                    auto_bind=True,
+            async with await client.connect(is_async=True) as conn:
+                await conn.search(
+                    self.config.base_dn,
+                    bonsai.LDAPSearchScope.BASE,
+                    "(objectClass=*)",
+                    attrlist=["objectClass"],
                 )
-
-                # Perform a simple search to verify connectivity
-                conn.search(
-                    search_base=self.config.base_dn,
-                    search_filter="(objectClass=*)",
-                    search_scope="BASE",
-                    attributes=["objectClass"],
-                )
-
-                conn.unbind()
                 return True
 
-            except Exception as e:
-                self.logger.error("ldap_health_check_failed", error=str(e))
-                return False
-
-        try:
-            return await asyncio.get_event_loop().run_in_executor(None, _sync_health_check)
         except Exception as e:
             self.logger.error("ldap_health_check_failed", error=str(e))
             return False

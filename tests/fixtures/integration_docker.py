@@ -2,8 +2,9 @@
 
 from collections.abc import Generator
 
+import socket
+
 import httpx
-import psycopg2
 import pytest
 import valkey
 
@@ -67,16 +68,11 @@ def postgres_service(docker_services: Services) -> Generator[dict, None, None]:
 def is_postgres_responsive(host: str, port: int) -> bool:
     """Check if PostgreSQL is responsive."""
     try:
-        conn = psycopg2.connect(
-            host=host,
-            port=port,
-            user="sark_test",
-            password="sark_test",
-            database="sark_test",
-            connect_timeout=2,
-        )
-        conn.close()
-        return True
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(2)
+        result = sock.connect_ex((host, port))
+        sock.close()
+        return result == 0
     except Exception:
         return False
 

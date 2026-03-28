@@ -2,10 +2,16 @@
 
 from unittest.mock import patch
 
-from ldap3.utils.conv import escape_filter_chars
 import pytest
 
-from sark.services.auth.providers.ldap import LDAPProvider, LDAPProviderConfig
+from sark.services.auth.providers.ldap import (
+    LDAPProvider,
+    LDAPProviderConfig,
+    _escape_filter_chars,
+)
+
+# Alias for use in tests
+escape_filter_chars = _escape_filter_chars
 
 
 class TestLDAPInjectionPrevention:

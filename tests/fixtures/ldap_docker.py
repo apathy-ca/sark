@@ -1,8 +1,9 @@
 """Docker-based LDAP fixtures for integration testing."""
 
+import asyncio
 from collections.abc import Generator
 
-from ldap3 import ALL, Connection, Server
+import bonsai
 import pytest
 
 # Check if pytest-docker is available
@@ -47,7 +48,7 @@ def ldap_service(docker_services: Services) -> Generator[dict, None, None]:
     }
 
     # Populate LDAP with test data
-    populate_ldap_test_data(ldap_config)
+    asyncio.run(populate_ldap_test_data(ldap_config))
 
     yield ldap_config
 
@@ -63,132 +64,143 @@ def is_ldap_responsive(host: str, port: int) -> bool:
     Returns:
         True if LDAP server is ready
     """
-    try:
-        server = Server(f"ldap://{host}:{port}", get_info=ALL)
-        conn = Connection(
-            server,
-            user="cn=admin,dc=example,dc=com",
-            password="admin",
-            auto_bind=True,
-        )
-        conn.unbind()
-        return True
-    except Exception:
-        return False
+
+    async def _check():
+        try:
+            client = bonsai.LDAPClient(f"ldap://{host}:{port}")
+            client.set_credentials("SIMPLE", "cn=admin,dc=example,dc=com", "admin")
+            client.set_connect_timeout(2)
+            conn = await client.connect(is_async=True)
+            await conn.close()
+            return True
+        except Exception:
+            return False
+
+    return asyncio.run(_check())
 
 
-def populate_ldap_test_data(ldap_config: dict) -> None:
+async def populate_ldap_test_data(ldap_config: dict) -> None:
     """
     Populate LDAP server with test data.
 
     Args:
         ldap_config: LDAP connection configuration
     """
-    server = Server(ldap_config["server_url"], get_info=ALL)
-    conn = Connection(
-        server,
-        user=ldap_config["bind_dn"],
-        password=ldap_config["bind_password"],
-        auto_bind=True,
+    client = bonsai.LDAPClient(ldap_config["server_url"])
+    client.set_credentials(
+        "SIMPLE", ldap_config["bind_dn"], ldap_config["bind_password"]
     )
 
-    base_dn = ldap_config["base_dn"]
+    async with await client.connect(is_async=True) as conn:
+        base_dn = ldap_config["base_dn"]
 
-    try:
-        # Create organizational units
-        conn.add(f"ou=users,{base_dn}", ["organizationalUnit"], {"ou": "users"})
-        conn.add(f"ou=groups,{base_dn}", ["organizationalUnit"], {"ou": "groups"})
+        try:
+            # Create organizational units
+            for ou_name in ("users", "groups"):
+                entry = bonsai.LDAPEntry(f"ou={ou_name},{base_dn}")
+                entry["objectClass"] = ["organizationalUnit"]
+                entry["ou"] = [ou_name]
+                try:
+                    await conn.add(entry)
+                except Exception:
+                    pass
 
-        # Add test users
-        test_users = [
-            {
-                "dn": f"uid=testuser,ou=users,{base_dn}",
-                "objectClass": ["inetOrgPerson", "posixAccount", "shadowAccount"],
-                "attributes": {
-                    "uid": "testuser",
-                    "cn": "Test User",
-                    "sn": "User",
-                    "givenName": "Test",
-                    "mail": "testuser@example.com",
-                    "userPassword": "testpass",
-                    "uidNumber": "10001",
-                    "gidNumber": "10001",
-                    "homeDirectory": "/home/testuser",
+            # Add test users
+            test_users = [
+                {
+                    "dn": f"uid=testuser,ou=users,{base_dn}",
+                    "objectClass": ["inetOrgPerson", "posixAccount", "shadowAccount"],
+                    "attributes": {
+                        "uid": "testuser",
+                        "cn": "Test User",
+                        "sn": "User",
+                        "givenName": "Test",
+                        "mail": "testuser@example.com",
+                        "userPassword": "testpass",
+                        "uidNumber": "10001",
+                        "gidNumber": "10001",
+                        "homeDirectory": "/home/testuser",
+                    },
                 },
-            },
-            {
-                "dn": f"uid=admin,ou=users,{base_dn}",
-                "objectClass": ["inetOrgPerson", "posixAccount", "shadowAccount"],
-                "attributes": {
-                    "uid": "admin",
-                    "cn": "Admin User",
-                    "sn": "User",
-                    "givenName": "Admin",
-                    "mail": "admin@example.com",
-                    "userPassword": "adminpass",
-                    "uidNumber": "10002",
-                    "gidNumber": "10002",
-                    "homeDirectory": "/home/admin",
+                {
+                    "dn": f"uid=admin,ou=users,{base_dn}",
+                    "objectClass": ["inetOrgPerson", "posixAccount", "shadowAccount"],
+                    "attributes": {
+                        "uid": "admin",
+                        "cn": "Admin User",
+                        "sn": "User",
+                        "givenName": "Admin",
+                        "mail": "admin@example.com",
+                        "userPassword": "adminpass",
+                        "uidNumber": "10002",
+                        "gidNumber": "10002",
+                        "homeDirectory": "/home/admin",
+                    },
                 },
-            },
-            {
-                "dn": f"uid=jdoe,ou=users,{base_dn}",
-                "objectClass": ["inetOrgPerson", "posixAccount", "shadowAccount"],
-                "attributes": {
-                    "uid": "jdoe",
-                    "cn": "John Doe",
-                    "sn": "Doe",
-                    "givenName": "John",
-                    "mail": "jdoe@example.com",
-                    "userPassword": "password123",
-                    "uidNumber": "10003",
-                    "gidNumber": "10003",
-                    "homeDirectory": "/home/jdoe",
+                {
+                    "dn": f"uid=jdoe,ou=users,{base_dn}",
+                    "objectClass": ["inetOrgPerson", "posixAccount", "shadowAccount"],
+                    "attributes": {
+                        "uid": "jdoe",
+                        "cn": "John Doe",
+                        "sn": "Doe",
+                        "givenName": "John",
+                        "mail": "jdoe@example.com",
+                        "userPassword": "password123",
+                        "uidNumber": "10003",
+                        "gidNumber": "10003",
+                        "homeDirectory": "/home/jdoe",
+                    },
                 },
-            },
-        ]
+            ]
 
-        for user in test_users:
-            try:
-                conn.add(user["dn"], user["objectClass"], user["attributes"])
-            except Exception:
-                # User might already exist
-                pass
+            for user in test_users:
+                try:
+                    entry = bonsai.LDAPEntry(user["dn"])
+                    entry["objectClass"] = user["objectClass"]
+                    for attr, val in user["attributes"].items():
+                        entry[attr] = [val] if isinstance(val, str) else val
+                    await conn.add(entry)
+                except Exception:
+                    # User might already exist
+                    pass
 
-        # Add test groups
-        test_groups = [
-            {
-                "dn": f"cn=developers,ou=groups,{base_dn}",
-                "objectClass": ["groupOfNames"],
-                "attributes": {
-                    "cn": "developers",
-                    "member": [
-                        f"uid=testuser,ou=users,{base_dn}",
-                        f"uid=jdoe,ou=users,{base_dn}",
-                    ],
+            # Add test groups
+            test_groups = [
+                {
+                    "dn": f"cn=developers,ou=groups,{base_dn}",
+                    "objectClass": ["groupOfNames"],
+                    "attributes": {
+                        "cn": "developers",
+                        "member": [
+                            f"uid=testuser,ou=users,{base_dn}",
+                            f"uid=jdoe,ou=users,{base_dn}",
+                        ],
+                    },
                 },
-            },
-            {
-                "dn": f"cn=admins,ou=groups,{base_dn}",
-                "objectClass": ["groupOfNames"],
-                "attributes": {
-                    "cn": "admins",
-                    "member": [f"uid=admin,ou=users,{base_dn}"],
+                {
+                    "dn": f"cn=admins,ou=groups,{base_dn}",
+                    "objectClass": ["groupOfNames"],
+                    "attributes": {
+                        "cn": "admins",
+                        "member": [f"uid=admin,ou=users,{base_dn}"],
+                    },
                 },
-            },
-        ]
+            ]
 
-        for group in test_groups:
-            try:
-                conn.add(group["dn"], group["objectClass"], group["attributes"])
-            except Exception:
-                # Group might already exist
-                pass
+            for group in test_groups:
+                try:
+                    entry = bonsai.LDAPEntry(group["dn"])
+                    entry["objectClass"] = group["objectClass"]
+                    for attr, val in group["attributes"].items():
+                        entry[attr] = val if isinstance(val, list) else [val]
+                    await conn.add(entry)
+                except Exception:
+                    # Group might already exist
+                    pass
 
-    except Exception as e:
-        print(f"Error populating LDAP: {e}")
-    finally:
-        conn.unbind()
+        except Exception as e:
+            print(f"Error populating LDAP: {e}")
 
 
 @pytest.fixture
