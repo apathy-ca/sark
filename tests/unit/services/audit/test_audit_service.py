@@ -538,6 +538,7 @@ class TestGRIDSpecCompliance:
         assert added_event.retention_until is not None
         # Retention should be approximately 30 days from now
         from datetime import timedelta
+
         expected = datetime.now(UTC) + timedelta(days=30)
         actual = added_event.retention_until
         # Allow 1 second tolerance
@@ -554,6 +555,7 @@ class TestGRIDSpecCompliance:
         added_event = mock_db_session.add.call_args[0][0]
         assert added_event.retention_until is not None
         from datetime import timedelta
+
         expected = datetime.now(UTC) + timedelta(days=90)
         actual = added_event.retention_until
         # Allow 1 second tolerance

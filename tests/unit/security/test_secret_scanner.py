@@ -76,11 +76,9 @@ class TestSecretScanner:
     # Test private key detection
     def test_rsa_private_key_detected(self, scanner):
         """Test detection of RSA private key"""
-        data = {
-            "key": """-----BEGIN RSA PRIVATE KEY-----
+        data = {"key": """-----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEA0Z3VS5JJcds3xfn/ygWyF06bpk5u6rVl
------END RSA PRIVATE KEY-----"""
-        }
+-----END RSA PRIVATE KEY-----"""}
 
         findings = scanner.scan(data)
 
