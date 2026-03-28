@@ -20,7 +20,8 @@ from sark.services.policy.opa_client import (
 
 # Import Rust implementations
 from sark.services.policy.rust_cache import RustPolicyCache, is_rust_cache_available
-from sark.services.policy.rust_opa_client import RustOPAClient, RUST_AVAILABLE as OPA_RUST_AVAILABLE
+from sark.services.policy.rust_opa_client import RUST_AVAILABLE as OPA_RUST_AVAILABLE
+from sark.services.policy.rust_opa_client import RustOPAClient
 
 logger = structlog.get_logger()
 

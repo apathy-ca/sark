@@ -9,9 +9,9 @@ from datetime import UTC, datetime
 from enum import Enum
 from uuid import uuid4
 
-from pydantic import BaseModel as PydanticBaseModel, ConfigDict, Field
-from sqlalchemy import JSON, Column, DateTime, Float, String
-from sqlalchemy import Enum as SAEnum
+from pydantic import BaseModel as PydanticBaseModel
+from pydantic import ConfigDict, Field
+from sqlalchemy import Column, DateTime, String
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 
