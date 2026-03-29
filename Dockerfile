@@ -16,6 +16,8 @@ RUN apt-get update && apt-get install -y \
     g++ \
     git \
     curl \
+    libldap2-dev \
+    libsasl2-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Rust toolchain (required for maturin to build sark-rust extension)
