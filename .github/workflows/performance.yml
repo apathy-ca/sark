@@ -67,7 +67,7 @@ jobs:
             --threshold 0.10
 
       - name: Upload benchmark results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: quick-benchmark-results
@@ -119,7 +119,7 @@ jobs:
             > benchmark-report.txt 2>&1 || true
 
       - name: Upload results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: benchmark-results
@@ -197,7 +197,7 @@ jobs:
             --max-p95-latency 100
 
       - name: Upload load test results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: load-test-results
@@ -232,7 +232,7 @@ jobs:
           ./profile_memory.sh short
 
       - name: Upload memory test results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: memory-test-results
@@ -266,7 +266,7 @@ jobs:
             --output performance-report-${{ github.run_number }}.md
 
       - name: Upload report
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: performance-report
           path: performance-report-*.md
@@ -315,7 +315,7 @@ jobs:
           pytest tests/performance/stress/ -v -m stress
 
       - name: Upload stress test results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: stress-test-results
