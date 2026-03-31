@@ -114,7 +114,7 @@ class GatewayAuthorizationRequest(BaseModel):
     sensitivity_level: SensitivityLevel | None = Field(
         None, description="Resource sensitivity level"
     )
-    context: dict[str, Any] = Field(default_factory=dict, description="Additional context")
+    context: dict[str, Any] | None = Field(None, description="Additional context")
 
     @field_validator("action")
     @classmethod

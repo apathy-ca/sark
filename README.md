@@ -73,6 +73,7 @@ docker compose --profile full up -d
 ### Enterprise Security (v1.3.0 Enhanced)
 - **Authentication** - OIDC, LDAP, SAML, API Keys
 - **Authorization** - OPA policy engine, ReBAC+ABAC
+- **Prompt Injection Detection** - 24+ attack patterns, entropy analysis, risk-based blocking (v1.3.0)
 - **Audit** - Immutable logs, SIEM integration (Splunk, Datadog)
 - **Federation** - Cross-organization governance with mTLS
 - **🆕 Prompt Injection Detection** - 20+ patterns, entropy analysis, 30x faster
@@ -243,6 +244,11 @@ helm install sark ./helm/sark -n production --create-namespace
 - **v1.8.0** - OPNsense plugin submission to official repository
 - **v1.9.0** - Local LLM support (Ollama integration)
 - **v2.0.0** - GRID Reference Implementation (protocol abstraction, federation, cost attribution)
+
+**v1.3.0 Security Features (In Development):**
+- ✅ Prompt injection detection (24+ patterns, entropy analysis, <10ms latency)
+- ⏳ Advanced rate limiting (token bucket, sliding window)
+- ⏳ Anomaly detection (behavioral analysis, ML-based)
 
 📖 **[Roadmap](docs/ROADMAP.md)** | **[Changelog](CHANGELOG.md)**
 
