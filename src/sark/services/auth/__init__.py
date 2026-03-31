@@ -1,6 +1,6 @@
 """Authentication services."""
 
-from sark.services.auth.api_key import APIKey, APIKeyService, get_api_key, require_scope
+from sark.services.auth.api_keys import APIKey, APIKeyService
 from sark.services.auth.jwt import JWTHandler, get_current_user
 from sark.services.auth.providers import (
     AuthProvider,
@@ -34,8 +34,6 @@ __all__ = [
     # User Context
     "UserContext",
     "extract_user_context",
-    "get_api_key",
     "get_current_user",
     "get_session_store",
-    "require_scope",
 ]
