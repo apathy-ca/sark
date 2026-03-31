@@ -1,104 +1,210 @@
 """
-Secret Scanner
+Secret Scanner — detects and redacts exposed secrets.
 
-Detects accidentally exposed secrets in tool responses:
-- API keys (OpenAI, GitHub, AWS, etc.)
-- Private keys
-- Passwords
-- Tokens
-- Base64-encoded secrets
+Combines high-performance dict scanning (chunked, pre-filtered) with
+context-aware text scanning (entropy detection, code block skipping,
+suppression annotations).
+
+Supports API keys, tokens, credentials, private keys, database URLs,
+and high-entropy strings across 30+ providers.
 """
 
 import copy
-from dataclasses import dataclass
 import logging
+import math
 import re
+from dataclasses import dataclass
+from enum import Enum
 from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
+class SecretType(str, Enum):
+    """Types of secrets that can be detected."""
+
+    # AI/ML Services
+    OPENAI_API_KEY = "openai_api_key"
+    OPENAI_PROJECT_KEY = "openai_project_key"
+    ANTHROPIC_API_KEY = "anthropic_api_key"
+
+    # Version Control
+    GITHUB_PAT = "github_pat"
+    GITHUB_OAUTH = "github_oauth"
+    GITHUB_FINE_GRAINED_PAT = "github_fine_grained_pat"
+    GITHUB_APP_TOKEN = "github_app_token"
+    GITLAB_PAT = "gitlab_pat"
+
+    # Cloud — AWS
+    AWS_ACCESS_KEY = "aws_access_key"
+    AWS_SECRET_KEY = "aws_secret_key"
+
+    # Cloud — Google
+    GOOGLE_API_KEY = "google_api_key"
+    GOOGLE_OAUTH = "google_oauth"
+
+    # Cloud — Azure
+    AZURE_STORAGE_KEY = "azure_storage_key"
+    AZURE_CONNECTION_STRING = "azure_connection_string"
+
+    # Cloud — Other
+    HEROKU_API_KEY = "heroku_api_key"
+    DIGITALOCEAN_TOKEN = "digitalocean_token"
+
+    # Communication
+    SLACK_TOKEN = "slack_token"
+    SLACK_WEBHOOK = "slack_webhook"
+    TWILIO_API_KEY = "twilio_api_key"
+    SENDGRID_API_KEY = "sendgrid_api_key"
+    MAILGUN_API_KEY = "mailgun_api_key"
+
+    # Payment
+    STRIPE_KEY = "stripe_key"
+
+    # Cryptographic
+    PRIVATE_KEY = "private_key"
+    JWT_TOKEN = "jwt_token"
+
+    # Database
+    DATABASE_URL = "database_url"
+
+    # Package Managers
+    NPM_TOKEN = "npm_token"
+    PYPI_TOKEN = "pypi_token"
+
+    # Generic
+    GENERIC_PASSWORD = "generic_password"
+    GENERIC_API_KEY = "generic_api_key"
+    GENERIC_SECRET = "generic_secret"
+    HIGH_ENTROPY_SECRET = "high_entropy_secret"
+    BASE64_SECRET = "base64_secret"
+
+
 @dataclass
 class SecretFinding:
-    """Represents a detected secret"""
+    """Represents a detected secret."""
 
-    secret_type: str
-    location: str
-    matched_value: str  # Truncated for security
+    secret_type: SecretType
+    location: str  # Dotted path for dict scanning, empty for text
+    matched_value: str  # Truncated for display/logging
     confidence: float  # 0.0 to 1.0
     should_redact: bool = True
-    _full_match: str = ""  # Full secret for redaction (internal use)
+    full_match: str = ""  # Full matched text (for redaction)
+    start_pos: int | None = None  # Character offset in scanned string
+    end_pos: int | None = None
+    line_number: int | None = None
 
 
 class SecretScanner:
-    """Scan tool responses for accidentally exposed secrets"""
+    """Scan data for accidentally exposed secrets.
+
+    Provides two scanning modes:
+    - Dict scanning: ``scan(dict)`` / ``redact_secrets(dict)`` — optimised for
+      structured tool responses with pre-filtering and chunked processing.
+    - Text scanning: ``scan_text(str)`` / ``redact(Any)`` — context-aware
+      scanning with entropy detection, code-block skipping, and suppression
+      annotations.  ``redact`` also handles dicts, lists, and tuples
+      recursively.
+    """
 
     # Performance tuning
-    CHUNK_SIZE = 10000  # Process strings in 10KB chunks to prevent backtracking
-    CHUNK_OVERLAP = 200  # Overlap to catch secrets at chunk boundaries
-    MAX_STRING_LENGTH = 1_000_000  # 1MB max to prevent catastrophic backtracking
+    CHUNK_SIZE = 10_000
+    CHUNK_OVERLAP = 200
+    MAX_STRING_LENGTH = 1_000_000
 
-    # Secret detection patterns (pattern, name, confidence)
-    SECRET_PATTERNS: list[tuple[str, str, float]] = [
-        # API Keys
-        (r"sk-[a-zA-Z0-9]{20,}", "OpenAI API Key", 1.0),
-        (r"sk-proj-[a-zA-Z0-9\-_]{20,}", "OpenAI Project API Key", 1.0),
-        (r"ghp_[a-zA-Z0-9]{20,}", "GitHub Personal Access Token", 1.0),
-        (r"gho_[a-zA-Z0-9]{20,}", "GitHub OAuth Token", 1.0),
-        (r"github_pat_[a-zA-Z0-9_]{82}", "GitHub Fine-Grained PAT", 1.0),
-        (r"ghs_[a-zA-Z0-9]{36}", "GitHub App Token", 1.0),
-        (r"glpat-[a-zA-Z0-9\-_]{20,}", "GitLab Personal Access Token", 1.0),
-        (r"AKIA[0-9A-Z]{16}", "AWS Access Key ID", 1.0),
-        (r"AIza[0-9A-Za-z\-_]{35}", "Google API Key", 0.95),
-        (r"ya29\.[0-9A-Za-z\-_]+", "Google OAuth Token", 0.95),
-        (r"xox[baprs]-[0-9a-zA-Z]{10,48}", "Slack Token", 1.0),
-        # Private Keys
-        (r"-----BEGIN[ A-Z]*PRIVATE KEY-----", "Private Key (PEM)", 1.0),
-        (r"-----BEGIN RSA PRIVATE KEY-----", "RSA Private Key", 1.0),
-        (r"-----BEGIN EC PRIVATE KEY-----", "EC Private Key", 1.0),
-        (r"-----BEGIN OPENSSH PRIVATE KEY-----", "OpenSSH Private Key", 1.0),
-        # JWT Tokens
-        (r"eyJ[a-zA-Z0-9_\-]+\.eyJ[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-]+", "JWT Token", 0.9),
-        # Generic secrets
+    # (SecretType, regex_string, confidence)
+    _PATTERN_DEFS: list[tuple[SecretType, str, float]] = [
+        # AI/ML ----------------------------------------------------------------
+        (SecretType.OPENAI_PROJECT_KEY, r"sk-proj-[a-zA-Z0-9\-_]{20,}", 1.0),
+        (SecretType.OPENAI_API_KEY, r"sk-[a-zA-Z0-9]{20,}", 1.0),
+        (SecretType.ANTHROPIC_API_KEY, r"sk-ant-[a-zA-Z0-9\-_]{70,}", 1.0),
+        # Version Control ------------------------------------------------------
+        (SecretType.GITHUB_FINE_GRAINED_PAT, r"github_pat_[a-zA-Z0-9_]{82}", 1.0),
+        (SecretType.GITHUB_PAT, r"ghp_[a-zA-Z0-9]{20,}", 1.0),
+        (SecretType.GITHUB_OAUTH, r"gho_[a-zA-Z0-9]{20,}", 1.0),
+        (SecretType.GITHUB_APP_TOKEN, r"ghs_[a-zA-Z0-9]{36}", 1.0),
+        (SecretType.GITLAB_PAT, r"glpat-[a-zA-Z0-9\-_]{20,}", 1.0),
+        # Cloud — AWS ----------------------------------------------------------
+        (SecretType.AWS_ACCESS_KEY, r"AKIA[0-9A-Z]{16}", 1.0),
         (
-            r"(?i)(password|passwd|pwd)\s*[:=]\s*['\"]?[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};:,.<>?]{8,}['\"]?",
-            "Password",
+            SecretType.AWS_SECRET_KEY,
+            r"(?i)aws.{0,20}secret.{0,20}['\"][a-zA-Z0-9/+=]{40}['\"]",
+            0.9,
+        ),
+        # Cloud — Google -------------------------------------------------------
+        (SecretType.GOOGLE_API_KEY, r"AIza[0-9A-Za-z\-_]{35}", 0.95),
+        (SecretType.GOOGLE_OAUTH, r"ya29\.[0-9A-Za-z\-_]+", 0.95),
+        # Cloud — Azure --------------------------------------------------------
+        (SecretType.AZURE_STORAGE_KEY, r"AccountKey=[A-Za-z0-9+/]{86,90}={0,2}", 0.95),
+        (
+            SecretType.AZURE_CONNECTION_STRING,
+            r"(?i)(?:DefaultEndpointsProtocol|BlobEndpoint|QueueEndpoint|TableEndpoint|FileEndpoint)=[^;\s]+(?:;|$)",
+            0.9,
+        ),
+        # Cloud — Other --------------------------------------------------------
+        (
+            SecretType.HEROKU_API_KEY,
+            r"(?i)heroku[_\-\s]*(?:api[_\-\s]*)?(?:key|token)[_\-\s]*[:=\s]+[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}",
+            0.90,
+        ),
+        (SecretType.DIGITALOCEAN_TOKEN, r"dop_v1_[a-f0-9]{64}", 1.0),
+        # Communication --------------------------------------------------------
+        (SecretType.SLACK_TOKEN, r"xox[baprs]-[0-9a-zA-Z\-]{10,48}", 1.0),
+        (
+            SecretType.SLACK_WEBHOOK,
+            r"https://hooks\.slack\.com/services/T[a-zA-Z0-9_]{8,}/B[a-zA-Z0-9_]{8,}/[a-zA-Z0-9_]{24,}",
+            1.0,
+        ),
+        (SecretType.TWILIO_API_KEY, r"SK[0-9a-fA-F]{32}", 0.85),
+        (SecretType.SENDGRID_API_KEY, r"SG\.[a-zA-Z0-9_-]{20,}\.[a-zA-Z0-9_-]{40,}", 1.0),
+        (SecretType.MAILGUN_API_KEY, r"key-[0-9a-zA-Z]{32}", 0.95),
+        # Payment --------------------------------------------------------------
+        (SecretType.STRIPE_KEY, r"(?:sk|pk|rk)_(?:live|test)_[0-9a-zA-Z]{24,}", 1.0),
+        # Cryptographic --------------------------------------------------------
+        (
+            SecretType.PRIVATE_KEY,
+            r"-----BEGIN (?:RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----"
+            r"(?:[\s\S]*?-----END (?:RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----)?",
+            1.0,
+        ),
+        (
+            SecretType.JWT_TOKEN,
+            r"eyJ[a-zA-Z0-9_\-]+\.eyJ[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-]+",
+            0.9,
+        ),
+        # Database -------------------------------------------------------------
+        (
+            SecretType.DATABASE_URL,
+            r"(?i)(?:postgres|mysql|mongodb|redis|mariadb|mssql)://[^\s@:]+:[^\s@]+@[^\s]+",
+            0.95,
+        ),
+        # Package Managers -----------------------------------------------------
+        (SecretType.NPM_TOKEN, r"npm_[a-zA-Z0-9]{32,}", 1.0),
+        (SecretType.PYPI_TOKEN, r"pypi-AgEIcHlwaS5vcmc[a-zA-Z0-9_-]{70,}", 1.0),
+        # Generic --------------------------------------------------------------
+        (
+            SecretType.GENERIC_PASSWORD,
+            r"(?i)(?:password|passwd|pwd)\s*[:=]\s*['\"]?[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};:,.<>?]{8,}['\"]?",
             0.7,
         ),
         (
-            r"(?i)(api[_\-]?key|apikey)\s*[:=]\s*['\"]?[a-zA-Z0-9]{16,}['\"]?",
-            "Generic API Key",
+            SecretType.GENERIC_API_KEY,
+            r"(?i)(?:api[_\-]?key|apikey)\s*[:=]\s*['\"]?[a-zA-Z0-9]{16,}['\"]?",
             0.8,
         ),
-        (r"(?i)(secret|token)\s*[:=]\s*['\"]?[a-zA-Z0-9]{16,}['\"]?", "Generic Secret/Token", 0.7),
-        # Database connection strings
-        (r"(?i)(postgres|mysql|mongodb)://[^:]+:[^@]+@[^/]+", "Database Connection String", 0.95),
-        # Stripe
-        (r"sk_live_[0-9a-zA-Z]{24,}", "Stripe Secret Key", 1.0),
-        (r"rk_live_[0-9a-zA-Z]{24,}", "Stripe Restricted Key", 1.0),
-        # Twilio
-        (r"SK[0-9a-fA-F]{32}", "Twilio API Key", 0.85),
-        # Anthropic
-        (r"sk-ant-[a-zA-Z0-9\-_]{70,}", "Anthropic API Key", 1.0),
-        # Azure Storage
-        (r"AccountKey=[A-Za-z0-9+/]{86,90}={0,2}", "Azure Storage Account Key", 0.95),
-        # Heroku — require heroku naming context to avoid matching every UUID
         (
-            r"(?i)heroku[_\-\s]*(?:api[_\-\s]*)?(?:key|token)[_\-\s]*[:=\s]+[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}",
-            "Heroku API Key",
-            0.90,
+            SecretType.GENERIC_SECRET,
+            r"(?i)(?:secret|token)\s*[:=]\s*['\"]?[a-zA-Z0-9]{16,}['\"]?",
+            0.7,
         ),
-        # Mailgun
-        (r"key-[0-9a-zA-Z]{32}", "Mailgun API Key", 0.95),
-        # Potential base64 encoded secrets (long base64 strings - minimum 64 chars)
+        # Base64 (low confidence — informational only) -------------------------
         (
+            SecretType.BASE64_SECRET,
             r"(?:[A-Za-z0-9+/]{4}){16,}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?",
-            "Potential Base64 Secret",
             0.5,
         ),
     ]
 
-    # Patterns that should never be redacted (false positive reduction)
     FALSE_POSITIVE_PATTERNS = [
         r"127\.0\.0\.1",
         r"0\.0\.0\.0",
@@ -108,383 +214,454 @@ class SecretScanner:
         r"(?i)placeholder",
     ]
 
-    def __init__(self, config: dict[str, Any] | None = None):
-        """
-        Initialize secret scanner
-
-        Args:
-            config: Optional configuration (custom patterns, thresholds, etc.)
-        """
+    def __init__(
+        self,
+        config: dict[str, Any] | None = None,
+        redaction_placeholder: str = "[REDACTED]",
+        skip_code_blocks: bool = True,
+        skip_test_fixtures: bool = True,
+        enable_suppressions: bool = True,
+    ):
         self.config = config or {}
+        self.redaction_placeholder = redaction_placeholder
+        self.skip_code_blocks = skip_code_blocks
+        self.skip_test_fixtures = skip_test_fixtures
+        self.enable_suppressions = enable_suppressions
         self._compile_patterns()
 
-    def _compile_patterns(self):
-        """Compile regex patterns for performance"""
-        self.compiled_secret_patterns = [
-            (re.compile(pattern), name, confidence)
-            for pattern, name, confidence in self.SECRET_PATTERNS
+    def _compile_patterns(self) -> None:
+        self._compiled_patterns: list[tuple[SecretType, re.Pattern, float]] = [
+            (secret_type, re.compile(pattern), confidence)
+            for secret_type, pattern, confidence in self._PATTERN_DEFS
         ]
+        self._compiled_fp_patterns = [
+            re.compile(p) for p in self.FALSE_POSITIVE_PATTERNS
+        ]
+        self._high_entropy_pattern = re.compile(r"[A-Za-z0-9+/]{60,}={0,2}")
 
-        self.compiled_fp_patterns = [
-            re.compile(pattern) for pattern in self.FALSE_POSITIVE_PATTERNS
-        ]
+    # ------------------------------------------------------------------
+    # Dict API
+    # ------------------------------------------------------------------
 
     def scan(self, data: dict[str, Any]) -> list[SecretFinding]:
+        """Scan a dictionary for exposed secrets.
+
+        Optimised for structured tool responses: flattens the dict, pre-filters
+        short / unlikely strings, then pattern-matches candidates.
         """
-        Scan data for exposed secrets
-
-        Args:
-            data: Dictionary to scan (typically tool response)
-
-        Returns:
-            List of secret findings
-        """
-        findings = []
-
-        # Batch candidate strings to reduce iteration overhead
-        # Use min_str_len=16 as a balance between performance and detection
-        # (Most API keys are 20+ chars, but some tokens can be 16+)
+        findings: list[SecretFinding] = []
         candidates = [
             (loc, val)
             for loc, val in self._flatten_dict_generator(data, min_str_len=16)
             if self._could_contain_secret(val)
         ]
-
-        # Scan all candidates
         for location, value in candidates:
             findings.extend(self._scan_value(value, location))
-
         return findings
 
     def redact_secrets(
-        self, data: dict[str, Any], findings: list[SecretFinding] | None = None
+        self,
+        data: dict[str, Any],
+        findings: list[SecretFinding] | None = None,
     ) -> dict[str, Any]:
-        """
-        Redact secrets from data
-
-        Args:
-            data: Data to redact
-            findings: Optional pre-computed findings (scans if not provided)
-
-        Returns:
-            Redacted copy of data
-        """
+        """Return a deep copy of *data* with high-confidence secrets replaced."""
         if findings is None:
             findings = self.scan(data)
-
         if not findings:
             return data
-
-        # Deep copy to avoid modifying original
         redacted = copy.deepcopy(data)
-
-        # Redact each finding
         for finding in findings:
             if finding.should_redact:
-                redacted = self._redact_location(redacted, finding.location, finding._full_match)
-
+                redacted = self._redact_location(
+                    redacted, finding.location, finding.full_match
+                )
         return redacted
 
-    def _scan_value(self, value: str, location: str) -> list[SecretFinding]:
-        """Scan a single string value for secrets"""
-        # Truncate extremely long strings to prevent catastrophic backtracking
-        if len(value) > self.MAX_STRING_LENGTH:
-            logger.warning(
-                f"String at {location} exceeds max length ({len(value)} > {self.MAX_STRING_LENGTH}), truncating"
-            )
-            value = value[: self.MAX_STRING_LENGTH]
+    # ------------------------------------------------------------------
+    # Text / polymorphic API
+    # ------------------------------------------------------------------
 
-        # Use chunked processing for large strings to prevent backtracking
-        if len(value) > self.CHUNK_SIZE:
-            return self._scan_value_chunked(value, location)
-        else:
-            return self._scan_value_direct(value, location)
+    def scan_text(
+        self, text: str, file_path: str | None = None
+    ) -> list[SecretFinding]:
+        """Scan raw text for secrets with context awareness.
 
-    def _scan_value_direct(self, value: str, location: str) -> list[SecretFinding]:
-        """Scan a string directly (for small strings)"""
-        findings = []
+        Supports code-block skipping, suppression annotations, and Shannon
+        entropy detection for high-entropy strings.
+        """
+        if self.skip_test_fixtures and file_path and self._is_test_fixture(file_path):
+            return []
 
-        for pattern, secret_type, confidence in self.compiled_secret_patterns:
-            matches = pattern.finditer(value)
+        excluded_ranges = self._get_excluded_ranges(text)
+        findings: list[SecretFinding] = []
 
-            for match in matches:
+        for secret_type, pattern, confidence in self._compiled_patterns:
+            for match in pattern.finditer(text):
                 matched_text = match.group(0)
+                start_pos = match.start()
+                end_pos = match.end()
 
-                # Check for false positives
+                if self._is_in_excluded_range(start_pos, end_pos, excluded_ranges):
+                    continue
                 if self._is_false_positive(matched_text):
                     continue
 
+                line_number = text[:start_pos].count("\n") + 1
+                findings.append(
+                    SecretFinding(
+                        secret_type=secret_type,
+                        location="",
+                        matched_value=self._truncate_secret(matched_text),
+                        confidence=confidence,
+                        should_redact=confidence >= 0.7,
+                        full_match=matched_text,
+                        start_pos=start_pos,
+                        end_pos=end_pos,
+                        line_number=line_number,
+                    )
+                )
+
+        findings.extend(self._scan_high_entropy(text, excluded_ranges))
+        return sorted(findings, key=lambda f: f.start_pos or 0)
+
+    def redact(
+        self, data: Any, file_path: str | None = None
+    ) -> tuple[Any, list[SecretFinding]]:
+        """Recursively redact secrets from any data structure.
+
+        Returns ``(redacted_data, findings)``.  Handles str, dict, list, and
+        tuple; other types pass through unchanged.
+        """
+        all_findings: list[SecretFinding] = []
+
+        def _recursive(obj: Any) -> Any:
+            if isinstance(obj, str):
+                findings = self.scan_text(obj, file_path=file_path)
+                all_findings.extend(findings)
+                if not findings:
+                    return obj
+                result = obj
+                for finding in reversed(findings):
+                    result = (
+                        result[: finding.start_pos]
+                        + self.redaction_placeholder
+                        + result[finding.end_pos :]
+                    )
+                return result
+            if isinstance(obj, dict):
+                return {k: _recursive(v) for k, v in obj.items()}
+            if isinstance(obj, list):
+                return [_recursive(item) for item in obj]
+            if isinstance(obj, tuple):
+                return tuple(_recursive(item) for item in obj)
+            return obj
+
+        redacted = _recursive(data)
+        return redacted, all_findings
+
+    # ------------------------------------------------------------------
+    # Core pattern matching
+    # ------------------------------------------------------------------
+
+    def _scan_value(self, value: str, location: str) -> list[SecretFinding]:
+        if len(value) > self.MAX_STRING_LENGTH:
+            logger.warning(
+                "String at %s exceeds max length (%d > %d), truncating",
+                location,
+                len(value),
+                self.MAX_STRING_LENGTH,
+            )
+            value = value[: self.MAX_STRING_LENGTH]
+        if len(value) > self.CHUNK_SIZE:
+            return self._scan_value_chunked(value, location)
+        return self._scan_value_direct(value, location)
+
+    def _scan_value_direct(self, value: str, location: str) -> list[SecretFinding]:
+        findings: list[SecretFinding] = []
+        for secret_type, pattern, confidence in self._compiled_patterns:
+            for match in pattern.finditer(value):
+                matched_text = match.group(0)
+                if self._is_false_positive(matched_text):
+                    continue
                 findings.append(
                     SecretFinding(
                         secret_type=secret_type,
                         location=location,
-                        matched_value=self._truncate_secret(matched_text),  # Truncated for display
+                        matched_value=self._truncate_secret(matched_text),
                         confidence=confidence,
-                        should_redact=confidence >= 0.7,  # Only redact high-confidence findings
-                        _full_match=matched_text,  # Full value for redaction
+                        should_redact=confidence >= 0.7,
+                        full_match=matched_text,
+                        start_pos=match.start(),
+                        end_pos=match.end(),
                     )
                 )
-
         return findings
 
     def _scan_value_chunked(self, value: str, location: str) -> list[SecretFinding]:
-        """Scan a large string in chunks to prevent backtracking"""
-        findings = []
-        seen_secrets = set()  # Deduplicate findings from overlapping chunks
-
-        # Process in overlapping chunks
+        findings: list[SecretFinding] = []
+        seen: set[str] = set()
         for i in range(0, len(value), self.CHUNK_SIZE):
-            # Include overlap to catch secrets at boundaries
             chunk_start = max(0, i - self.CHUNK_OVERLAP)
             chunk_end = min(len(value), i + self.CHUNK_SIZE + self.CHUNK_OVERLAP)
-            chunk = value[chunk_start:chunk_end]
-
-            # Scan this chunk
-            chunk_findings = self._scan_value_direct(chunk, location)
-
-            # Deduplicate
-            for finding in chunk_findings:
-                # Use full match as dedup key
-                if finding._full_match not in seen_secrets:
-                    seen_secrets.add(finding._full_match)
+            for finding in self._scan_value_direct(value[chunk_start:chunk_end], location):
+                if finding.full_match not in seen:
+                    seen.add(finding.full_match)
                     findings.append(finding)
-
         return findings
 
-    # Pre-compiled set of secret prefixes for faster lookup
-    _SECRET_PREFIXES = frozenset(
-        [
-            "sk-",
-            "ghp_",
-            "gho_",
-            "ghs_",
-            "glpat-",
-            "AKIA",
-            "AIza",
-            "ya29",
-            "xox",
-            "sk_",
-            "rk_",
-            "pk_",
-            "-----BEGIN",
-            "postgres://",
-            "mysql://",
-            "mongodb://",
-            "AccountKey=",
-            "key-",
-        ]
-    )
+    # ------------------------------------------------------------------
+    # Pre-filtering (dict mode performance)
+    # ------------------------------------------------------------------
 
     def _could_contain_secret(self, value: str) -> bool:
-        """
-        Ultra-fast pre-filter to skip strings unlikely to contain secrets.
-        Optimized for minimal CPU usage per call.
+        """Ultra-fast pre-filter to skip strings unlikely to contain secrets."""
+        if len(value) < 3:
+            return False
 
-        Returns:
-            True if string might contain a secret, False if definitely not
-        """
-        # Check for common secret prefixes (very fast string search)
-        # Use membership test on first few chars for common patterns
-        if len(value) >= 3:
-            prefix_3 = value[:3]
-            if prefix_3 in ("sk-", "ghp", "gho", "ghs", "glp", "xox", "sk_", "rk_", "pk_", "key"):
-                return True
-
-            # Check for longer prefixes
-            if (
-                value[:4] == "AKIA"
-                or value[:4] == "AIza"
-                or value[:4] == "ya29"
-                or value[:4] == "key-"
-            ):
-                return True
-
-            if (
-                value.startswith("-----BEGIN")
-                or value.startswith("postgres://")
-                or value.startswith("mysql://")
-                or value.startswith("mongodb://")
-            ):
-                return True
-
-        # Check for secret keywords (case-insensitive for these specific ones)
-        if (
-            "password" in value
-            or "secret" in value
-            or "token" in value
-            or "api_key" in value
-            or "AccountKey=" in value
-            or "heroku" in value.lower()
+        p3 = value[:3]
+        if p3 in (
+            "sk-", "ghp", "gho", "ghs", "glp", "xox", "sk_", "rk_", "pk_", "key",
+            "npm", "SG.", "dop",
         ):
             return True
 
-        # For longer strings (40+), check if they look like base64/random tokens
-        # Most real secrets are 32-100 chars and mostly alphanumeric
+        p4 = value[:4]
+        if p4 in ("AKIA", "AIza", "ya29", "key-", "pypi", "eyJ"):
+            return True
+
+        if value.startswith((
+            "-----BEGIN",
+            "postgres://", "mysql://", "mongodb://", "redis://",
+            "mariadb://", "mssql://",
+            "https://hooks.slack.com",
+            "github_pat_",
+        )):
+            return True
+
+        lower = value.lower()
+        if any(
+            kw in lower
+            for kw in ("password", "secret", "token", "api_key", "accountkey=", "heroku")
+        ):
+            return True
+
         if len(value) >= 40:
-            # Count alnum chars - if >80% and long enough, likely a token
-            # Use a faster approximation: check first 40 chars only
-            sample = value[:40]
-            alnum = sum(c.isalnum() for c in sample)
-            if alnum > 32:  # >80% of 40
+            alnum = sum(c.isalnum() for c in value[:40])
+            if alnum > 32:
                 return True
 
         return False
 
     def _is_false_positive(self, value: str) -> bool:
-        """Check if value matches false positive patterns"""
-        return any(pattern.search(value) for pattern in self.compiled_fp_patterns)
+        return any(p.search(value) for p in self._compiled_fp_patterns)
 
-    def _truncate_secret(self, secret: str, show_chars: int = 10) -> str:
-        """Truncate secret for logging (show first N chars only)"""
+    @staticmethod
+    def _truncate_secret(secret: str, show_chars: int = 10) -> str:
         if len(secret) <= show_chars:
             return secret[:3] + "..."
-
         return secret[:show_chars] + "..."
 
+    # ------------------------------------------------------------------
+    # Entropy detection (text mode)
+    # ------------------------------------------------------------------
+
+    def _scan_high_entropy(
+        self,
+        text: str,
+        excluded_ranges: list[tuple[int, int]],
+    ) -> list[SecretFinding]:
+        findings: list[SecretFinding] = []
+        context_keywords = (
+            "secret", "password", "passwd", "pwd", "key", "token",
+            "credential", "auth", "api", "private", "bearer",
+        )
+
+        for match in self._high_entropy_pattern.finditer(text):
+            value = match.group(0)
+            start_pos, end_pos = match.start(), match.end()
+
+            if self._is_in_excluded_range(start_pos, end_pos, excluded_ranges):
+                continue
+            if len(value) < 60 or self._is_likely_non_secret(value):
+                continue
+            if self._calculate_entropy(value) <= 4.8:
+                continue
+
+            ctx_start = max(0, start_pos - 50)
+            ctx_end = min(len(text), end_pos + 50)
+            context = text[ctx_start:ctx_end].lower()
+
+            if not any(kw in context for kw in context_keywords):
+                continue
+
+            findings.append(
+                SecretFinding(
+                    secret_type=SecretType.HIGH_ENTROPY_SECRET,
+                    location="",
+                    matched_value=self._truncate_secret(value),
+                    confidence=0.8,
+                    should_redact=True,
+                    full_match=value,
+                    start_pos=start_pos,
+                    end_pos=end_pos,
+                    line_number=text[:start_pos].count("\n") + 1,
+                )
+            )
+        return findings
+
+    @staticmethod
+    def _calculate_entropy(data: str) -> float:
+        if not data:
+            return 0.0
+        freq: dict[str, int] = {}
+        for ch in data:
+            freq[ch] = freq.get(ch, 0) + 1
+        length = len(data)
+        return -sum(
+            (c / length) * math.log2(c / length) for c in freq.values() if c > 0
+        )
+
+    @staticmethod
+    def _is_likely_non_secret(value: str) -> bool:
+        """Return True if *value* looks like a hash, UUID, or repeated pattern."""
+        if re.match(
+            r"^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12}$",
+            value,
+        ):
+            return True
+        if re.match(r"^[0-9a-fA-F]{32}$", value):
+            return True
+        if re.match(r"^[0-9a-fA-F]{40}$", value):
+            return True
+        if re.match(r"^[0-9a-fA-F]{64}$", value):
+            return True
+        if len(set(value)) < len(value) * 0.3:
+            return True
+        return False
+
+    # ------------------------------------------------------------------
+    # Context awareness (text mode)
+    # ------------------------------------------------------------------
+
+    def _get_excluded_ranges(self, text: str) -> list[tuple[int, int]]:
+        ranges: list[tuple[int, int]] = []
+        if self.skip_code_blocks:
+            ranges.extend(self._find_code_blocks(text))
+        if self.enable_suppressions:
+            ranges.extend(self._find_suppressed_regions(text))
+        return ranges
+
+    @staticmethod
+    def _find_code_blocks(text: str) -> list[tuple[int, int]]:
+        return [
+            (m.start(), m.end())
+            for m in re.finditer(r"```[a-zA-Z]*\n.*?\n```", text, re.DOTALL)
+        ]
+
+    @staticmethod
+    def _find_suppressed_regions(text: str) -> list[tuple[int, int]]:
+        ranges: list[tuple[int, int]] = []
+        block_start: int | None = None
+        pos = 0
+        for line in text.split("\n"):
+            line_start, line_end = pos, pos + len(line)
+            if "sark-secret-scanner: ignore-start" in line:
+                block_start = line_start
+            elif "sark-secret-scanner: ignore-end" in line and block_start is not None:
+                ranges.append((block_start, line_end))
+                block_start = None
+            elif block_start is None and (
+                "sark-secret-scanner: ignore" in line or "nosecret" in line
+            ):
+                ranges.append((line_start, line_end))
+            pos = line_end + 1
+        return ranges
+
+    @staticmethod
+    def _is_in_excluded_range(
+        start: int, end: int, excluded: list[tuple[int, int]]
+    ) -> bool:
+        return any(not (end <= es or start >= ee) for es, ee in excluded)
+
+    @staticmethod
+    def _is_test_fixture(file_path: str) -> bool:
+        normalized = file_path.lower().replace("\\", "/")
+        indicators = (
+            "/test/", "/tests/", "/fixtures/", "/mocks/", "/stubs/",
+            "test_", "_test.", "fixture", "mock_", ".fixture.",
+            "conftest.py", "/examples/", "/samples/",
+        )
+        return any(ind in normalized for ind in indicators)
+
+    # ------------------------------------------------------------------
+    # Dict helpers
+    # ------------------------------------------------------------------
+
     def _flatten_dict_generator(
-        self, data: Any, prefix: str = "", depth: int = 0, min_str_len: int = 20
+        self,
+        data: Any,
+        prefix: str = "",
+        depth: int = 0,
+        min_str_len: int = 20,
     ):
-        """
-        Generator that yields (location, value) pairs from nested data structures.
-        Only yields string values >= min_str_len for efficiency.
-        Optimized to avoid string operations for filtered values.
-
-        Args:
-            data: Data to flatten (dict, list, or scalar)
-            prefix: Current key prefix
-            depth: Current recursion depth (prevents stack overflow)
-            min_str_len: Minimum string length to yield (default 20)
-
-        Yields:
-            Tuples of (location, string_value) where len(string_value) >= min_str_len
-        """
-        # Prevent infinite recursion
         MAX_DEPTH = 50
         if depth > MAX_DEPTH:
             return
 
         if isinstance(data, dict):
-            # Check if prefix needs to be computed (only if we might yield)
-            if prefix:
-                for key, value in data.items():
-                    # Quick check: if value is a short string, skip entirely (no string ops)
-                    if isinstance(value, str):
-                        if len(value) >= min_str_len:
-                            yield (f"{prefix}.{key}", value)
-                    elif isinstance(value, (dict, list)):
-                        yield from self._flatten_dict_generator(
-                            value, f"{prefix}.{key}", depth + 1, min_str_len
-                        )
-            else:
-                for key, value in data.items():
-                    if isinstance(value, str):
-                        if len(value) >= min_str_len:
-                            yield (key, value)
-                    elif isinstance(value, (dict, list)):
-                        yield from self._flatten_dict_generator(value, key, depth + 1, min_str_len)
-
+            for key, value in data.items():
+                full_key = f"{prefix}.{key}" if prefix else key
+                if isinstance(value, str):
+                    if len(value) >= min_str_len:
+                        yield (full_key, value)
+                elif isinstance(value, (dict, list)):
+                    yield from self._flatten_dict_generator(
+                        value, full_key, depth + 1, min_str_len
+                    )
         elif isinstance(data, list):
             for i, item in enumerate(data):
+                idx_key = f"{prefix}[{i}]"
                 if isinstance(item, str):
                     if len(item) >= min_str_len:
-                        yield (f"{prefix}[{i}]", item)
+                        yield (idx_key, item)
                 elif isinstance(item, (dict, list)):
                     yield from self._flatten_dict_generator(
-                        item, f"{prefix}[{i}]", depth + 1, min_str_len
+                        item, idx_key, depth + 1, min_str_len
                     )
-
         elif isinstance(data, str) and len(data) >= min_str_len:
             yield (prefix, data)
 
-    def _flatten_dict(self, data: dict[str, Any], prefix: str = "") -> dict[str, Any]:
-        """
-        Flatten nested dictionary
-
-        Args:
-            data: Dictionary to flatten
-            prefix: Current key prefix
-
-        Returns:
-            Flattened dictionary with dotted keys
-        """
-        flat = {}
-
-        for key, value in data.items():
-            full_key = f"{prefix}.{key}" if prefix else key
-
-            if isinstance(value, dict):
-                flat.update(self._flatten_dict(value, full_key))
-            elif isinstance(value, list):
-                for i, item in enumerate(value):
-                    if isinstance(item, dict):
-                        flat.update(self._flatten_dict(item, f"{full_key}[{i}]"))
-                    else:
-                        flat[f"{full_key}[{i}]"] = item
-            else:
-                flat[full_key] = value
-
-        return flat
-
-    def _redact_location(self, data: dict[str, Any], location: str, secret: str) -> dict[str, Any]:
-        """
-        Redact a secret at a specific location
-
-        Args:
-            data: Data dictionary
-            location: Dotted path to secret (e.g., "response.data.api_key")
-            secret: Secret value to redact
-
-        Returns:
-            Data with secret redacted
-        """
-        # Parse location path
+    def _redact_location(
+        self, data: dict[str, Any], location: str, secret: str
+    ) -> dict[str, Any]:
         keys = self._parse_location(location)
-
-        # Navigate to parent
-        current = data
+        current: Any = data
         for key in keys[:-1]:
             if isinstance(current, dict):
                 current = current.get(key, {})
             elif isinstance(current, list) and isinstance(key, int):
                 current = current[key] if key < len(current) else {}
-
-        # Redact final value
         final_key = keys[-1]
         if isinstance(current, dict) and final_key in current:
             if isinstance(current[final_key], str):
-                # Replace secret with redaction marker
-                current[final_key] = current[final_key].replace(secret, "[REDACTED]")
-
+                current[final_key] = current[final_key].replace(
+                    secret, self.redaction_placeholder
+                )
         return data
 
-    def _parse_location(self, location: str) -> list[Any]:
-        """
-        Parse location string into keys
-
-        Args:
-            location: Dotted path like "response.data[0].key"
-
-        Returns:
-            List of keys (strings and ints for array indices)
-        """
-        keys = []
-        parts = location.split(".")
-
-        for part in parts:
-            # Check for array index
+    @staticmethod
+    def _parse_location(location: str) -> list[Any]:
+        keys: list[Any] = []
+        for part in location.split("."):
             if "[" in part:
-                # Split on '[' to get key and index
                 key, rest = part.split("[", 1)
                 if key:
                     keys.append(key)
-
-                # Extract index
-                index_str = rest.rstrip("]")
+                idx_str = rest.rstrip("]")
                 try:
-                    keys.append(int(index_str))
+                    keys.append(int(idx_str))
                 except ValueError:
-                    keys.append(index_str)
+                    keys.append(idx_str)
             else:
                 keys.append(part)
-
         return keys

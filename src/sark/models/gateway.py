@@ -174,3 +174,47 @@ class GatewayAuditEvent(BaseModel):
     timestamp: int = Field(..., description="Unix timestamp")
     gateway_request_id: str = Field(..., description="Gateway request ID")
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class SecretScanRequest(BaseModel):
+    """Request to scan tool response for secrets."""
+
+    response_data: Any = Field(..., description="Tool response data to scan")
+    server_name: str = Field(..., description="Server that generated the response")
+    tool_name: str = Field(..., description="Tool that was invoked")
+    user_id: str | None = Field(None, description="User ID (if user request)")
+    gateway_request_id: str = Field(..., description="Gateway request ID for tracing")
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "response_data": {"result": "Database connection: postgres://user:pass@localhost/db"},
+                "server_name": "postgres-mcp",
+                "tool_name": "get_connection_info",
+                "user_id": "user_123",
+                "gateway_request_id": "req_abc456",
+            }
+        }
+    )
+
+
+class SecretScanResponse(BaseModel):
+    """Response from secret scanning."""
+
+    redacted_data: Any = Field(..., description="Response data with secrets redacted")
+    secrets_found: int = Field(ge=0, description="Number of secrets detected")
+    secret_types: list[str] = Field(default_factory=list, description="Types of secrets found")
+    alert_sent: bool = Field(..., description="Whether security alert was triggered")
+    scan_duration_ms: float = Field(ge=0, description="Time taken to scan (milliseconds)")
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "redacted_data": {"result": "Database connection: [REDACTED]"},
+                "secrets_found": 1,
+                "secret_types": ["database_url"],
+                "alert_sent": True,
+                "scan_duration_ms": 0.42,
+            }
+        }
+    )
