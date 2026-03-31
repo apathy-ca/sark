@@ -68,7 +68,7 @@ jobs:
         continue-on-error: false
 
       - name: Upload benchmark results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: performance-benchmarks-${{ github.sha }}
