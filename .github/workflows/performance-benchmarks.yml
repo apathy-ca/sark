@@ -158,7 +158,7 @@ jobs:
           path: ./current
 
       - name: Download baseline
-        uses: dawidd6/action-download-artifact@v19
+        uses: dawidd6/action-download-artifact@v20
         with:
           workflow: performance-benchmarks.yml
           branch: main
