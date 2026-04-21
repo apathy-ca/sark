@@ -81,7 +81,7 @@ dev = [
     "bokeh>=3.8.2",  # CVE-2026-21883: CSWSH fix
     "fonttools>=4.60.2",  # CVE-2025-66034: Arbitrary file write RCE
     "fastapi-sso>=0.19.0",  # CVE-2025-14546: CSRF OAuth callback fix
-    "nbconvert>=7.17.0",  # CVE-2025-53000: inkscape.bat RCE fix
+    "nbconvert>=7.17.1",  # CVE-2025-53000: inkscape.bat RCE fix
 ]
 
 [build-system]
