@@ -31,7 +31,7 @@ python-multipart>=0.0.6
 
 # Authentication
 pyjwt[crypto]>=2.12.0
-authlib>=1.6.9
+authlib>=1.6.12
 passlib[bcrypt]>=1.7.4
 
 # Logging and observability
