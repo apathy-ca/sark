@@ -27,7 +27,7 @@ pyyaml>=6.0.0
 python-consul>=1.1.0
 
 # File upload support
-python-multipart>=0.0.6
+python-multipart>=0.0.27
 
 # Authentication
 pyjwt[crypto]>=2.12.0
