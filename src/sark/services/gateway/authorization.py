@@ -29,13 +29,14 @@ async def authorize_gateway_request(
     request: GatewayAuthorizationRequest,
 ) -> GatewayAuthorizationResponse:
     """
-    Authorize Gateway request via OPA policy evaluation.
+    Authorize Gateway request via OPA policy evaluation and injection detection.
 
     Flow:
     1. Build OPA policy input from user context and request
     2. Query OPA for authorization decision
-    3. Calculate cache TTL based on sensitivity
-    4. Return decision with filtered parameters
+    3. Run prompt injection detection (if enabled and OPA allowed)
+    4. Calculate cache TTL based on sensitivity
+    5. Return decision with filtered parameters
 
     Args:
         user: User context from JWT
@@ -77,6 +78,27 @@ async def authorize_gateway_request(
         allow = opa_result.get("result", {}).get("allow", False)
         reason = opa_result.get("result", {}).get("reason", "Policy evaluation completed")
         filtered_params = opa_result.get("result", {}).get("filtered_parameters")
+
+        # Run injection detection AFTER OPA but BEFORE tool execution (if enabled and allowed)
+        from sark.security.injection_response import is_injection_detection_enabled
+
+        if allow and is_injection_detection_enabled():
+            injection_response = await _check_injection(
+                request=request,
+                user_id=user.user_id,
+                user_email=user.email,
+            )
+
+            # If injection detected and action is BLOCK, override allow decision
+            if injection_response and not injection_response.allow:
+                allow = False
+                reason = injection_response.reason
+                logger.warning(
+                    "gateway_request_blocked_by_injection_detection",
+                    user_id=str(user.user_id),
+                    risk_score=injection_response.risk_score,
+                    findings_count=len(injection_response.detection_result.findings),
+                )
 
         # Calculate cache TTL based on sensitivity
         cache_ttl = _get_cache_ttl(request.sensitivity_level)
@@ -407,3 +429,58 @@ async def _enforce_a2a_restrictions(
         "allow": True,
         "reason": "A2A restrictions passed",
     }
+
+
+async def _check_injection(
+    request: GatewayAuthorizationRequest,
+    user_id: Any,
+    user_email: str | None,
+) -> Any:
+    """
+    Check request for prompt injection attempts.
+
+    Args:
+        request: Gateway authorization request
+        user_id: User ID
+        user_email: User email
+
+    Returns:
+        InjectionResponse if detection ran, None if skipped
+    """
+    try:
+        from sark.security.injection_detector import PromptInjectionDetector
+        from sark.security.injection_response import InjectionResponseHandler
+
+        # Initialize detector and handler
+        detector = PromptInjectionDetector()
+        handler = InjectionResponseHandler()
+
+        # Run detection on parameters and context
+        detection_result = detector.detect(
+            parameters=request.parameters or {},
+            context=request.gateway_metadata or {},
+        )
+
+        # Handle detection result
+        if detection_result.detected:
+            injection_response = await handler.handle_detection(
+                detection_result=detection_result,
+                user_id=user_id,
+                user_email=user_email,
+                tool_name=request.tool_name,
+                server_name=request.server_name,
+                request_id=request.gateway_metadata.get("request_id") if request.gateway_metadata else None,
+                parameters=request.parameters,
+            )
+            return injection_response
+
+        return None
+
+    except Exception as e:
+        logger.error(
+            "injection_detection_error",
+            error=str(e),
+            user_id=str(user_id),
+        )
+        # Don't block on detection errors - fail open for availability
+        return None
