@@ -112,30 +112,28 @@ class OAuthCallbackResponse(BaseModel):
 # Dependencies
 
 
-async def get_settings() -> Settings:
-    """Get application settings.
+async def get_settings(request: Request) -> Settings:
+    """Get application settings from app state.
 
-    This is a placeholder for dependency injection.
-    In production, retrieve from app state.
+    Args:
+        request: FastAPI request
+
+    Returns:
+        Settings instance from app state
     """
-    # TODO: Get from app state
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Settings dependency not configured",
-    )
+    return request.app.state.settings
 
 
-async def get_session_service() -> SessionService:
-    """Get session service instance.
+async def get_session_service(request: Request) -> SessionService:
+    """Get session service instance from app state.
 
-    This is a placeholder for dependency injection.
-    In production, retrieve from app state.
+    Args:
+        request: FastAPI request
+
+    Returns:
+        SessionService instance from app state
     """
-    # TODO: Get from app state
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Session service dependency not configured",
-    )
+    return request.app.state.session_service
 
 
 async def get_current_session(

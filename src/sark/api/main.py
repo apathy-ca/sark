@@ -21,6 +21,8 @@ from sark.api.routers import (
 )
 from sark.config import get_settings
 from sark.db import init_db
+from sark.db.pools import get_redis_client
+from sark.services.auth.sessions import SessionService
 
 logger = structlog.get_logger()
 settings = get_settings()
@@ -173,6 +175,22 @@ See the documentation for complete details.
             version=settings.app_version,
             environment=settings.environment,
         )
+
+        # Store settings in app.state for dependency injection
+        app.state.settings = settings
+
+        # Initialize Redis client
+        redis_client = await get_redis_client()
+
+        # Initialize SessionService with Redis client
+        session_service = SessionService(
+            redis_client=redis_client,
+            default_timeout_seconds=settings.session_timeout_seconds,
+            max_concurrent_sessions=settings.session_max_concurrent,
+        )
+
+        # Store session service in app.state for dependency injection
+        app.state.session_service = session_service
 
         # Initialize database
         await init_db()
