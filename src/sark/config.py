@@ -170,6 +170,7 @@ class FeatureFlags:
     enable_federation: bool
     enable_cost_attribution: bool
     enable_programmatic_policies: bool
+    enable_secret_scanning: bool
 
     @classmethod
     def from_env(cls) -> "FeatureFlags":
@@ -181,6 +182,8 @@ class FeatureFlags:
             enable_cost_attribution=os.getenv("FEATURE_COST_ATTRIBUTION", "false").lower()
             == "true",
             enable_programmatic_policies=os.getenv("FEATURE_PROGRAMMATIC_POLICIES", "false").lower()
+            == "true",
+            enable_secret_scanning=os.getenv("FEATURE_SECRET_SCANNING", "true").lower()
             == "true",
         )
 

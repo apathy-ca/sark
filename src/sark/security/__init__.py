@@ -13,7 +13,7 @@ from .behavioral_analyzer import Anomaly, BehavioralAnalyzer
 from .injection_detector import InjectionDetectionResult, InjectionFinding, PromptInjectionDetector
 from .injection_response import InjectionResponse, InjectionResponseHandler
 from .mfa import MFAChallenge, MFAChallengeSystem, MFAMethod
-from .secret_scanner import SecretFinding, SecretScanner
+from .secret_scanner import SecretFinding, SecretScanner, SecretType
 
 __all__ = [
     "Anomaly",
@@ -29,4 +29,5 @@ __all__ = [
     "PromptInjectionDetector",
     "SecretFinding",
     "SecretScanner",
+    "SecretType",
 ]

@@ -12,6 +12,8 @@ from sark.models.gateway import (
     GatewayAuthorizationResponse,
     GatewayServerInfo,
     GatewayToolInfo,
+    SecretScanRequest,
+    SecretScanResponse,
 )
 from sark.services.auth import UserContext, get_current_user
 
@@ -287,3 +289,160 @@ async def log_gateway_audit_event(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to log audit event: {e!s}",
         )
+
+
+@router.post("/scan-response", response_model=SecretScanResponse)
+async def scan_tool_response(
+    request: SecretScanRequest,
+    x_gateway_api_key: Annotated[str, Header(description="Gateway API key")],
+) -> SecretScanResponse:
+    """Scan tool response for secrets and redact if found.
+
+    Called by the Gateway after receiving a tool response from an MCP server
+    and before returning it to the client.
+
+    **Authentication:** Gateway API key required (in ``X-Gateway-Api-Key`` header)
+    """
+    import time
+
+    from sark.config import get_settings
+    from sark.security import SecretScanner
+
+    start_time = time.perf_counter()
+
+    try:
+        settings = get_settings()
+
+        # Validate Gateway API key
+        expected_key = settings.gateway_api_key
+        if not expected_key:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Gateway API key not configured",
+            )
+        if x_gateway_api_key != expected_key:
+            logger.warning("gateway_scan_invalid_api_key")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid Gateway API key",
+            )
+
+        # Feature flag check
+        if not settings.feature_flags.enable_secret_scanning:
+            scan_duration = (time.perf_counter() - start_time) * 1000
+            return SecretScanResponse(
+                redacted_data=request.response_data,
+                secrets_found=0,
+                secret_types=[],
+                alert_sent=False,
+                scan_duration_ms=scan_duration,
+            )
+
+        scanner = SecretScanner()
+        redacted_data, findings = scanner.redact(request.response_data)
+        scan_duration = (time.perf_counter() - start_time) * 1000
+
+        if findings:
+            secret_types = list({f.secret_type.value for f in findings})
+
+            logger.warning(
+                "secrets_detected_in_tool_response",
+                server_name=request.server_name,
+                tool_name=request.tool_name,
+                user_id=request.user_id,
+                gateway_request_id=request.gateway_request_id,
+                secret_count=len(findings),
+                secret_types=secret_types,
+                scan_duration_ms=scan_duration,
+            )
+
+            alert_sent = await _send_secret_alert(
+                findings=findings,
+                server_name=request.server_name,
+                tool_name=request.tool_name,
+                user_id=request.user_id,
+                gateway_request_id=request.gateway_request_id,
+            )
+
+            return SecretScanResponse(
+                redacted_data=redacted_data,
+                secrets_found=len(findings),
+                secret_types=secret_types,
+                alert_sent=alert_sent,
+                scan_duration_ms=scan_duration,
+            )
+
+        logger.debug(
+            "secret_scan_clean",
+            server_name=request.server_name,
+            tool_name=request.tool_name,
+            gateway_request_id=request.gateway_request_id,
+            scan_duration_ms=scan_duration,
+        )
+        return SecretScanResponse(
+            redacted_data=redacted_data,
+            secrets_found=0,
+            secret_types=[],
+            alert_sent=False,
+            scan_duration_ms=scan_duration,
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(
+            "gateway_scan_failed",
+            error=str(e),
+            gateway_request_id=request.gateway_request_id,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to scan response: {e!s}",
+        )
+
+
+async def _send_secret_alert(
+    findings: list,
+    server_name: str,
+    tool_name: str,
+    user_id: str | None,
+    gateway_request_id: str,
+) -> bool:
+    """Send a CRITICAL audit event when secrets are detected (best-effort)."""
+    try:
+        from sark.models.audit import AuditEventType, SeverityLevel
+        from sark.services.audit.audit_service import AuditService
+
+        audit_service = AuditService()
+        secret_details = [
+            {
+                "type": f.secret_type.value,
+                "line_number": f.line_number,
+                "length": len(f.full_match),
+            }
+            for f in findings
+        ]
+
+        await audit_service.log_event(
+            event_type=AuditEventType.SECURITY_VIOLATION,
+            severity=SeverityLevel.CRITICAL,
+            user_id=user_id,
+            server_name=server_name,
+            tool_name=tool_name,
+            decision="redacted",
+            details={
+                "violation_type": "secret_detected",
+                "secret_count": len(findings),
+                "secrets": secret_details,
+                "gateway_request_id": gateway_request_id,
+            },
+        )
+        return True
+
+    except Exception as e:
+        logger.error(
+            "failed_to_send_secret_alert",
+            error=str(e),
+            gateway_request_id=gateway_request_id,
+        )
+        return False
