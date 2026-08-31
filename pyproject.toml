@@ -290,6 +290,18 @@ markers = [
     "v2: marks tests for future SARK v2.0 features (not yet released)",
     "federation: marks tests for federation features",
     "chaos: marks tests for chaos engineering",
+    "adapter: marks tests for protocol adapters",
+    "auth: marks tests for authentication",
+    "memory: marks tests for memory usage/leak checks",
+    "multi_protocol: marks tests exercising multiple protocols",
+    "policy: marks tests for policy evaluation",
+    "requires_adapters: marks tests requiring adapter services",
+    "requires_db: marks tests requiring a database",
+    "requires_opa: marks tests requiring an OPA instance",
+    "requires_services: marks tests requiring external services",
+    "siem: marks tests for SIEM integration",
+    "stress: marks tests as stress tests",
+    "timeout: marks tests with a custom timeout",
 ]
 
 [tool.coverage.run]

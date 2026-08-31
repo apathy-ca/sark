@@ -21,9 +21,9 @@ grid-opa = { path = "grid-core/crates/grid-opa" }
 grid-cache = { path = "grid-core/crates/grid-cache" }
 
 # Python bindings
-# pyo3 0.24.1+ fixes CVE GHSA-f267-3vm8-fhw9 (buffer overflow in PyString::from_object)
-pyo3 = { version = "0.24", features = ["extension-module", "abi3-py39"] }
-pythonize = "0.24"
+# pyo3 0.29.0+ fixes GHSA-36hh-v3qg-5jq4 (OOB read in PyList/PyTuple iterator nth/nth_back)
+pyo3 = { version = "0.29", features = ["extension-module", "abi3-py39"] }
+pythonize = "0.29"
 
 # OPA engine (required by grid-opa)
 regorus = "0.2"
